@@ -7,6 +7,7 @@ import { useTheme } from "next-themes"
 import { motion, AnimatePresence } from "motion/react"
 import { SunIcon, MoonIcon, ListBulletsIcon, XIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
+import { PianoButton, PianoModal } from "@/components/ui/piano-modal"
 
 const navLinks = [
   { href: "/about", label: "About" },
@@ -73,6 +74,7 @@ function NavLink({ href, label }: { href: string; label: string }) {
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [pianoOpen, setPianoOpen] = useState(false)
   const pathname = usePathname()
 
   useEffect(() => {
@@ -107,6 +109,7 @@ export function Navbar() {
           </ul>
 
           <div className="hidden items-center gap-1 md:flex">
+            <PianoButton onClick={() => setPianoOpen((v) => !v)} active={pianoOpen} />
             <ThemeToggle />
           </div>
 
@@ -163,6 +166,8 @@ export function Navbar() {
           </>
         )}
       </AnimatePresence>
+
+      <PianoModal open={pianoOpen} onClose={() => setPianoOpen(false)} />
     </>
   )
 }
