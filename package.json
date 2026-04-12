@@ -27,7 +27,10 @@
     ]
   },
   "dependencies": {
+    "@fontsource/space-mono": "^5.2.9",
+    "@phosphor-icons/react": "^2.1.10",
     "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.0.6",
     "@vercel/og": "^0.11.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -38,8 +41,10 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-email": "^5.2.10",
+    "rehype-pretty-code": "^0.14.3",
     "resend": "^6.10.0",
     "shiki": "^4.0.2",
+    "simple-icons": "^16.16.0",
     "tailwind-merge": "^3.5.0",
     "velite": "^0.3.1"
   },

@@ -1,14 +1,12 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* ─── Fontes ─────────────────────────────────────────────── */
 @theme inline {
   --font-display: var(--font-poppins);
   --font-sans: var(--font-space-grotesk);
   --font-mono: var(--font-space-mono);
 }
 
-/* ─── Tokens de cor — dark mode (padrão) ─────────────────── */
 :root {
   --bg-base: #0a0a0f;
   --bg-surface: #111118;
@@ -29,7 +27,6 @@
   --indigo-950: #0f0c29;
 }
 
-/* ─── Light mode ─────────────────────────────────────────── */
 .light {
   --bg-base: #fafafa;
   --bg-surface: #ffffff;
@@ -45,7 +42,6 @@
   --indigo-500: #4f46e5;
 }
 
-/* ─── Base ───────────────────────────────────────────────── */
 html {
   color-scheme: dark;
 }
@@ -64,7 +60,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Tailwind custom theme tokens ──────────────────────── */
 @theme inline {
   --color-bg-base: var(--bg-base);
   --color-bg-surface: var(--bg-surface);
@@ -82,14 +77,45 @@ body {
   --color-indigo-950: var(--indigo-950);
 }
 
-/* ─── Focus visible global ──────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--indigo-500);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* ─── Reduced motion ─────────────────────────────────────── */
+[data-rehype-pretty-code-figure] pre {
+  background-color: #0d0d14 !important;
+  color: #e2e8f0 !important;
+}
+
+[data-rehype-pretty-code-figure] pre code {
+  background-color: transparent !important;
+}
+
+[data-line] {
+  padding: 0 1rem;
+}
+
+[data-highlighted-line] {
+  background-color: rgba(99, 102, 241, 0.08);
+}
+
+[data-rehype-pretty-code-title] {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+[data-rehype-pretty-code-title] + pre {
+  border-radius: 0 0 8px 8px;
+  margin-top: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

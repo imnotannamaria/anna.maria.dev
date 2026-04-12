@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { Poppins, Space_Grotesk, Space_Mono } from "next/font/google"
 import { ThemeProvider } from "next-themes"
+import { Navbar } from "@/components/layout/navbar"
+import { Footer } from "@/components/layout/footer"
 import "./globals.css"
 
 const poppins = Poppins({
@@ -39,13 +41,15 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="pt-BR"
+      lang="en"
       suppressHydrationWarning
       className={`${poppins.variable} ${spaceGrotesk.variable} ${spaceMono.variable}`}
     >
       <body className="flex min-h-screen flex-col antialiased">
         <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
-          {children}
+          <Navbar />
+          <main className="flex flex-1 flex-col pt-14">{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

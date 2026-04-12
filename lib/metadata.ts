@@ -20,7 +20,7 @@ export function createMetadata({
       url: `${baseUrl}${path}`,
       images: [`${baseUrl}/api/og?title=${encodeURIComponent(title)}`],
       siteName: "Anna Maria",
-      locale: "pt_BR",
+      locale: "en_US",
       type: "website",
     },
     twitter: {

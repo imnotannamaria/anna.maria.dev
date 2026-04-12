@@ -1,29 +1,31 @@
 ---
-title: "Por que eu uso TypeScript strict em todo projeto"
-description: "Como o modo strict do TypeScript me salvou de bugs silenciosos e mudou a forma como eu escrevo código."
+title: "Why I use TypeScript strict mode on every project"
+description: "How strict mode saved me from silent bugs and changed the way I write code."
 date: "2026-04-12"
-tags: ["typescript", "developer-experience"]
+tags: ["typescript"]
 published: true
 ---
 
-TypeScript sem `strict: true` é como usar cinto de segurança sem apertar a fivela.
+TypeScript without `strict: true` is like wearing a seatbelt without buckling it.
 
-## O que o strict mode ativa
+## What strict mode enables
 
-Quando você habilita `strict` no `tsconfig.json`, você está ativando um conjunto de checagens que o TypeScript não faz por padrão...
+When you enable `strict` in `tsconfig.json`, you activate a set of checks TypeScript skips by default:
 
 ```typescript
-// Sem strict: isso passa
+// Without strict: this compiles fine
 function greet(name: string | null) {
-  return name.toUpperCase() // 💥 runtime error potencial
+  return name.toUpperCase() // 💥 potential runtime error
 }
 
-// Com strict: o compilador te para
+// With strict: the compiler stops you
 function greet(name: string | null) {
-  return name?.toUpperCase() ?? "Olá!"
+  return name?.toUpperCase() ?? "Hello!"
 }
 ```
 
-## Por que vale o atrito inicial
+## Why the initial friction is worth it
 
-A curva de aprendizado existe, mas o ROI é alto...
+The learning curve exists, but the ROI is high. Strict mode catches entire categories of bugs at compile time — null dereferences, implicit any, missing return types — that would otherwise surface in production.
+
+Once you internalize the patterns, writing strict TypeScript is faster than debugging runtime errors.
