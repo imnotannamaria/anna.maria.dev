@@ -6,6 +6,7 @@ import { getPublishedProjects, getProjectBySlug } from "@/lib/velite"
 import { formatDate } from "@/lib/utils"
 import { MDXContent } from "@/components/blog/mdx-content"
 import { Badge } from "@/components/ui/badge"
+import { InlineArrow } from "@/components/ui/inline-arrow"
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -50,9 +51,10 @@ export default async function ProjectPage({ params }: Props) {
     <div className="mx-auto w-full max-w-275 px-5 py-16">
       <Link
         href="/projects"
-        className="text-text-muted hover:text-text-primary mb-10 inline-flex items-center gap-1.5 text-sm transition-colors"
+        className="group text-text-muted hover:text-text-primary mb-10 inline-flex items-center gap-1.5 text-sm transition-colors"
       >
-        ← All projects
+        <InlineArrow direction="left" />
+        All projects
       </Link>
 
       <div className="mt-6 flex flex-col gap-10 lg:flex-row lg:gap-16">

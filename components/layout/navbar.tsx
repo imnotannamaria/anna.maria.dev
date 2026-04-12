@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useSyncExternalStore } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { motion, AnimatePresence } from "motion/react"
+import { motion, AnimatePresence, useReducedMotion } from "motion/react"
 import { SunIcon, MoonIcon, ListBulletsIcon, XIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { PianoButton, PianoModal } from "@/components/ui/piano-modal"
@@ -17,8 +17,17 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ]
 
+function useHydrated() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  )
+}
+
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
+  const mounted = useHydrated()
   const isDark = resolvedTheme === "dark"
 
   return (
@@ -29,14 +38,20 @@ function ThemeToggle() {
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
-          key={resolvedTheme}
+          key={mounted ? resolvedTheme : "theme-placeholder"}
           initial={{ rotate: -45, opacity: 0, scale: 0.7 }}
           animate={{ rotate: 0, opacity: 1, scale: 1 }}
           exit={{ rotate: 45, opacity: 0, scale: 0.7 }}
           transition={{ duration: 0.18, ease: "easeInOut" }}
           className="flex items-center justify-center"
         >
-          {isDark ? <SunIcon size={16} /> : <MoonIcon size={16} />}
+          {!mounted ? (
+            <span aria-hidden="true" className="bg-text-secondary/30 block size-4 rounded-full" />
+          ) : isDark ? (
+            <SunIcon size={16} />
+          ) : (
+            <MoonIcon size={16} />
+          )}
         </motion.span>
       </AnimatePresence>
     </button>
@@ -46,27 +61,64 @@ function ThemeToggle() {
 function NavLink({ href, label }: { href: string; label: string }) {
   const pathname = usePathname()
   const isActive = pathname === href || pathname.startsWith(href + "/")
+  const shouldReduceMotion = useReducedMotion()
+  const [isHovered, setIsHovered] = useState(false)
+  const showIndicator = isActive || isHovered
+  const barHeights = [
+    [0.45, 0.95, 0.55, 0.8, 0.45],
+    [0.75, 0.4, 1, 0.5, 0.75],
+    [0.35, 0.7, 0.45, 0.9, 0.35],
+  ]
 
   return (
     <Link
       href={href}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={cn(
-        "group relative text-sm font-medium transition-colors duration-150",
+        "group relative inline-flex pb-4 text-sm font-medium transition-colors duration-150",
         isActive ? "text-indigo-400" : "text-text-secondary hover:text-text-primary",
       )}
     >
+      {label}
+
       <span
         className={cn(
-          "pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 text-xs text-indigo-400 select-none",
-          "opacity-0 transition-all duration-200",
-          "group-hover:-translate-y-0.5 group-hover:opacity-100",
-          isActive && "opacity-100",
+          "pointer-events-none absolute inset-x-0 -bottom-0.5 flex justify-center transition-opacity duration-200",
+          showIndicator ? "opacity-100" : "opacity-0",
         )}
         aria-hidden="true"
       >
-        ♩
+        <span className="border-border/60 bg-bg-surface/80 flex h-4 items-end gap-1 rounded-full border px-2 py-1 backdrop-blur-sm">
+          {barHeights.map((heights, index) => (
+            <motion.span
+              key={index}
+              className={cn(
+                "w-[3px] rounded-full bg-indigo-400",
+                isActive ? "shadow-[0_0_10px_rgba(129,140,248,0.35)]" : "",
+              )}
+              initial={false}
+              animate={
+                shouldReduceMotion
+                  ? { height: `${Math.round(heights[0] * 8)}px`, opacity: showIndicator ? 1 : 0.65 }
+                  : showIndicator
+                    ? { height: heights.map((value) => `${Math.round(value * 8)}px`), opacity: 1 }
+                    : { height: "3px", opacity: 0.65 }
+              }
+              transition={
+                shouldReduceMotion
+                  ? { duration: 0.15 }
+                  : {
+                      duration: 1.15,
+                      repeat: showIndicator ? Number.POSITIVE_INFINITY : 0,
+                      ease: "easeInOut",
+                      delay: index * 0.08,
+                    }
+              }
+            />
+          ))}
+        </span>
       </span>
-      {label}
     </Link>
   )
 }
@@ -82,6 +134,21 @@ export function Navbar() {
     handler()
     window.addEventListener("scroll", handler, { passive: true })
     return () => window.removeEventListener("scroll", handler)
+  }, [])
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "p") return
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+        return
+      }
+
+      event.preventDefault()
+      setPianoOpen((value) => !value)
+    }
+
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
   }, [])
 
   return (

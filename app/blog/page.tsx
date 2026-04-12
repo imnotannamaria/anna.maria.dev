@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 import Link from "next/link"
 import { createMetadata } from "@/lib/metadata"
+import { InlineArrow } from "@/components/ui/inline-arrow"
 import { getPublishedPosts } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/utils"
 import { TagFilter } from "./tag-filter"
@@ -78,7 +79,7 @@ async function PostList({
             </div>
 
             <span className="text-text-muted shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
-              →
+              <InlineArrow />
             </span>
           </Link>
         </li>

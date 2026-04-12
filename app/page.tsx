@@ -3,6 +3,7 @@ import Image from "next/image"
 import { siReact, siNextdotjs, siTypescript, siPython } from "simple-icons"
 import { BlurFade } from "@/components/ui/blur-fade"
 import { LinkButton } from "@/components/ui/button"
+import { InlineArrow } from "@/components/ui/inline-arrow"
 import { ProjectCard } from "@/components/projects/project-card"
 import { getFeaturedProjects, getPublishedPosts } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/utils"
@@ -85,6 +86,18 @@ export default function Home() {
                 </LinkButton>
               </div>
             </BlurFade>
+
+            <BlurFade delay={0.5}>
+              <div className="text-text-muted mt-5 flex flex-wrap items-center gap-2 text-xs">
+                <span>Press</span>
+                <span className="border-border bg-bg-surface text-text-secondary inline-flex items-center gap-1 rounded-md border px-2 py-1 font-mono shadow-sm">
+                  <kbd className="leading-none">Command</kbd>
+                  <span className="text-text-muted">+</span>
+                  <kbd className="leading-none">P</kbd>
+                </span>
+                <span>to play piano</span>
+              </div>
+            </BlurFade>
           </div>
 
           <BlurFade delay={0.2} className="flex justify-center lg:justify-end">
@@ -158,9 +171,9 @@ export default function Home() {
 
               <Link
                 href="/about"
-                className="mt-6 inline-flex items-center gap-1.5 text-sm text-indigo-400 transition-colors hover:text-indigo-300"
+                className="group mt-6 inline-flex items-center gap-1.5 text-sm text-indigo-400 transition-colors hover:text-indigo-300"
               >
-                More about me →
+                More about me <InlineArrow />
               </Link>
             </div>
 
@@ -243,7 +256,7 @@ export default function Home() {
                       {estimateReadingTime(post.body)} min
                     </span>
                     <span className="text-text-muted shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
-                      →
+                      <InlineArrow />
                     </span>
                   </Link>
                 </li>
@@ -268,8 +281,11 @@ function SectionHeader({
   return (
     <div className="flex items-baseline justify-between">
       <h2 className="font-display text-text-primary text-xl font-semibold">{title}</h2>
-      <Link href={href} className="text-text-muted text-sm transition-colors hover:text-indigo-400">
-        {linkLabel} →
+      <Link
+        href={href}
+        className="group text-text-muted inline-flex items-center gap-1.5 text-sm transition-colors hover:text-indigo-400"
+      >
+        {linkLabel} <InlineArrow />
       </Link>
     </div>
   )
