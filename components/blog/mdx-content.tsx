@@ -96,7 +96,7 @@ const defaultComponents = {
   },
 }
 
-type MDXComponents = Record<string, React.ComponentType<React.HTMLAttributes<HTMLElement>>>
+type MDXComponents = Record<string, React.ComponentType<Record<string, unknown>>>
 
 function getMDXComponent(
   code: string,
@@ -106,6 +106,6 @@ function getMDXComponent(
 }
 
 export function MDXContent({ code, components }: { code: string; components?: MDXComponents }) {
-  const merged = { ...defaultComponents, ...components }
+  const merged = { ...defaultComponents, ...components } as unknown as MDXComponents
   return getMDXComponent(code)({ components: merged })
 }
