@@ -1,0 +1,29 @@
+---
+title: "Por que eu uso TypeScript strict em todo projeto"
+description: "Como o modo strict do TypeScript me salvou de bugs silenciosos e mudou a forma como eu escrevo código."
+date: "2026-04-12"
+tags: ["typescript", "developer-experience"]
+published: true
+---
+
+TypeScript sem `strict: true` é como usar cinto de segurança sem apertar a fivela.
+
+## O que o strict mode ativa
+
+Quando você habilita `strict` no `tsconfig.json`, você está ativando um conjunto de checagens que o TypeScript não faz por padrão...
+
+```typescript
+// Sem strict: isso passa
+function greet(name: string | null) {
+  return name.toUpperCase() // 💥 runtime error potencial
+}
+
+// Com strict: o compilador te para
+function greet(name: string | null) {
+  return name?.toUpperCase() ?? "Olá!"
+}
+```
+
+## Por que vale o atrito inicial
+
+A curva de aprendizado existe, mas o ROI é alto...
