@@ -5,7 +5,7 @@ import { BlurFade } from "@/components/ui/blur-fade"
 import { LinkButton } from "@/components/ui/button"
 import { InlineArrow } from "@/components/ui/inline-arrow"
 import { ProjectCard } from "@/components/projects/project-card"
-import { getFeaturedProjects, getPublishedPosts } from "@/lib/velite"
+import { getFeaturedProjects, getPublishedPosts, getPublishedContributions } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/utils"
 
 const stats = [
@@ -37,6 +37,7 @@ const career = [
 export default function Home() {
   const featuredProjects = getFeaturedProjects()
   const recentPosts = getPublishedPosts().slice(0, 3)
+  const recentContributions = getPublishedContributions().slice(0, 3)
 
   return (
     <div className="mx-auto w-full max-w-275 px-5">
@@ -254,6 +255,44 @@ export default function Home() {
                     </span>
                     <span className="text-text-muted hidden shrink-0 text-xs sm:block">
                       {estimateReadingTime(post.body)} min
+                    </span>
+                    <span className="text-text-muted shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
+                      <InlineArrow />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </BlurFade>
+        </section>
+      )}
+
+      {recentContributions.length > 0 && (
+        <section className="py-16">
+          <BlurFade delay={0.85}>
+            <SectionHeader
+              title="Recent Contributions"
+              href="/contributions"
+              linkLabel="All contributions"
+            />
+          </BlurFade>
+
+          <BlurFade delay={0.9}>
+            <ul className="divide-border mt-6 divide-y">
+              {recentContributions.map((contribution) => (
+                <li key={contribution.slug}>
+                  <Link
+                    href={`/contributions/${contribution.slug}`}
+                    className="group flex items-center gap-6 py-5 transition-colors"
+                  >
+                    <time
+                      dateTime={contribution.date}
+                      className="text-text-muted hidden w-28 shrink-0 font-mono text-xs sm:block"
+                    >
+                      {formatDate(contribution.date)}
+                    </time>
+                    <span className="text-text-primary flex-1 text-sm font-medium transition-colors group-hover:text-indigo-400">
+                      {contribution.title}
                     </span>
                     <span className="text-text-muted shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
                       <InlineArrow />

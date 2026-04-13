@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/about", label: "About" },
   { href: "/blog", label: "Blog" },
   { href: "/projects", label: "Projects" },
+  { href: "/contributions", label: "Contributions" },
   { href: "/uses", label: "Uses" },
   { href: "/contact", label: "Contact" },
 ]
@@ -94,7 +95,7 @@ function NavLink({ href, label }: { href: string; label: string }) {
             <motion.span
               key={index}
               className={cn(
-                "w-[3px] rounded-full bg-indigo-400",
+                "w-0.75 rounded-full bg-indigo-400",
                 isActive ? "shadow-[0_0_10px_rgba(129,140,248,0.35)]" : "",
               )}
               initial={false}

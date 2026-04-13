@@ -32,6 +32,22 @@ const projects = defineCollection({
   }),
 })
 
+const contributions = defineCollection({
+  name: "Contribution",
+  pattern: "contributions/**/*.mdx",
+  schema: s.object({
+    title: s.string(),
+    description: s.string(),
+    date: s.isodate(),
+    tags: s.array(s.string()),
+    repo: s.string().url().optional(),
+    pr: s.string().url().optional(),
+    published: s.boolean().default(true),
+    slug: s.path(),
+    body: s.mdx(),
+  }),
+})
+
 export default defineConfig({
   root: "content",
   output: {
@@ -41,7 +57,7 @@ export default defineConfig({
     name: "[name]-[hash:8].[ext]",
     clean: true,
   },
-  collections: { blog, projects },
+  collections: { blog, projects, contributions },
   mdx: {
     outputFormat: "function-body",
     rehypePlugins: [

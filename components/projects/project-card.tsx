@@ -9,6 +9,7 @@ interface ProjectCardProps {
   tags: string[]
   github?: string
   live?: string
+  basePath?: string
 }
 
 function ProjectThumbnail({ title }: { title: string }) {
@@ -25,13 +26,21 @@ function ProjectThumbnail({ title }: { title: string }) {
   )
 }
 
-export function ProjectCard({ slug, title, description, tags, github, live }: ProjectCardProps) {
+export function ProjectCard({
+  slug,
+  title,
+  description,
+  tags,
+  github,
+  live,
+  basePath = "/projects",
+}: ProjectCardProps) {
   const visibleTags = tags.slice(0, 3)
   const remaining = tags.length - visibleTags.length
 
   return (
     <article className="group border-border bg-bg-surface hover:border-border-hover flex flex-col overflow-hidden rounded-xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
-      <Link href={`/projects/${slug}`} tabIndex={-1} aria-hidden="true">
+      <Link href={`${basePath}/${slug}`} tabIndex={-1} aria-hidden="true">
         <ProjectThumbnail title={title} />
       </Link>
 
@@ -53,7 +62,7 @@ export function ProjectCard({ slug, title, description, tags, github, live }: Pr
         </div>
 
         <div className="flex-1">
-          <Link href={`/projects/${slug}`}>
+          <Link href={`${basePath}/${slug}`}>
             <h2 className="text-text-primary text-base font-semibold transition-colors group-hover:text-indigo-400">
               {title}
             </h2>

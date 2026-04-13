@@ -1,4 +1,4 @@
-import { blog, projects } from "@/.velite"
+import { blog, projects, contributions } from "@/.velite"
 
 function stripPrefix(slug: string) {
   return slug.split("/").slice(1).join("/")
@@ -37,4 +37,18 @@ export function getProjectBySlug(slug: string) {
     .filter((project) => project.published)
     .map((project) => ({ ...project, slug: stripPrefix(project.slug) }))
     .find((project) => project.slug === slug)
+}
+
+export function getPublishedContributions() {
+  return contributions
+    .filter((c) => c.published)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .map((c) => ({ ...c, slug: stripPrefix(c.slug) }))
+}
+
+export function getContributionBySlug(slug: string) {
+  return contributions
+    .filter((c) => c.published)
+    .map((c) => ({ ...c, slug: stripPrefix(c.slug) }))
+    .find((c) => c.slug === slug)
 }
