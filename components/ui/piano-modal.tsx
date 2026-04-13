@@ -103,7 +103,7 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set())
   const [noteDisplay, setNoteDisplay] = useState<{ note: string; id: number } | null>(null)
 
-  function getAudioCtx(): AudioContext {
+  async function getAudioCtx(): Promise<AudioContext> {
     if (!audioCtxRef.current) {
       const AudioContextCtor = window.AudioContext || (window as WebkitWindow).webkitAudioContext
 
@@ -114,13 +114,13 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
       audioCtxRef.current = new AudioContextCtor()
     }
     if (audioCtxRef.current.state === "suspended") {
-      void audioCtxRef.current.resume()
+      await audioCtxRef.current.resume()
     }
     return audioCtxRef.current
   }
 
-  const triggerKey = useCallback((key: PianoKey) => {
-    const ctx = getAudioCtx()
+  const triggerKey = useCallback(async (key: PianoKey) => {
+    const ctx = await getAudioCtx()
     playPianoNote(ctx, key.freq)
     setNoteDisplay({ note: key.note, id: Date.now() })
     setActiveKeys((prev) => new Set([...prev, key.note]))
@@ -142,7 +142,7 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
         return
       }
       const key = KBD_MAP[e.key.toLowerCase()]
-      if (key) triggerKey(key)
+      if (key) void triggerKey(key)
     }
     window.addEventListener("keydown", onKeyDown)
     return () => window.removeEventListener("keydown", onKeyDown)
@@ -188,7 +188,7 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
               aria-label={`${key.note} (${key.kbd.toUpperCase()})`}
               onPointerDown={(e) => {
                 if (e.pointerType === "mouse" && e.button !== 0) return
-                triggerKey(key)
+                void triggerKey(key)
               }}
               className={cn(
                 "relative flex-1 cursor-pointer touch-none transition-colors duration-75 outline-none select-none focus:outline-none focus-visible:outline-none",
@@ -220,7 +220,7 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
               onPointerDown={(e) => {
                 if (e.pointerType === "mouse" && e.button !== 0) return
                 e.stopPropagation()
-                triggerKey(key)
+                void triggerKey(key)
               }}
               style={{
                 position: "absolute",

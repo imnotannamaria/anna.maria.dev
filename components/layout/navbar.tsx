@@ -232,7 +232,13 @@ export function Navbar() {
               ))}
 
               <div className="border-border mt-auto flex items-center gap-2 border-t pt-6">
-                <PianoButton onClick={() => router.push("/piano")} active={pathname === "/piano"} />
+                <PianoButton
+                  onClick={() => {
+                    setMobileOpen(false)
+                    router.push("/piano")
+                  }}
+                  active={pathname === "/piano"}
+                />
                 <ThemeToggle />
               </div>
             </motion.div>
