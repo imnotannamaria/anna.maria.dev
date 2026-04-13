@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr"
 import { createMetadata } from "@/lib/metadata"
 import { getPublishedProjects } from "@/lib/velite"
 import { ProjectCard } from "@/components/projects/project-card"
@@ -26,7 +27,25 @@ export default function ProjectsPage({
         </h1>
         <p className="text-text-secondary mt-2">
           Open-source tools, libraries, and side projects. This list features my latest work from{" "}
-          <strong>2026</strong> onwards, check my GitHub for the full archive.
+          <strong>2026</strong> onwards. For the full archive, check my{" "}
+          <a
+            href="https://github.com/imnotannamaria"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-0.5 text-indigo-400 transition-colors hover:text-indigo-300"
+          >
+            GitHub <ArrowSquareOutIcon size={13} />
+          </a>{" "}
+          or my{" "}
+          <a
+            href="https://anna-maria-portfolio.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-0.5 text-indigo-400 transition-colors hover:text-indigo-300"
+          >
+            old portfolio <ArrowSquareOutIcon size={13} />
+          </a>
+          .
         </p>
       </div>
 
