@@ -191,7 +191,7 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
                 triggerKey(key)
               }}
               className={cn(
-                "relative flex-1 cursor-pointer touch-none transition-colors duration-75 select-none focus:outline-none focus-visible:outline-none",
+                "relative flex-1 cursor-pointer touch-none transition-colors duration-75 outline-none select-none focus:outline-none focus-visible:outline-none",
                 "border-r border-[#aaa] last:border-r-0",
                 activeKeys.has(key.note) ? "bg-indigo-200" : "bg-[#f5f5f2] hover:bg-[#eaeaf0]",
               )}
@@ -230,7 +230,7 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
                 height: "62%",
               }}
               className={cn(
-                "z-10 cursor-pointer touch-none rounded-b-md border border-[#333] transition-colors duration-75 select-none focus:outline-none focus-visible:outline-none",
+                "z-10 cursor-pointer touch-none rounded-b-md border border-[#333] transition-colors duration-75 outline-none select-none focus:outline-none focus-visible:outline-none",
                 activeKeys.has(key.note) ? "bg-indigo-600" : "bg-[#1a1a20] hover:bg-[#2d2d3a]",
               )}
             >
