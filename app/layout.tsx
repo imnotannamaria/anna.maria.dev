@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { Poppins, Space_Grotesk, Space_Mono } from "next/font/google"
 import { ThemeProvider } from "next-themes"
-import Script from "next/script"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
 import "./globals.css"
@@ -52,13 +51,6 @@ export default function RootLayout({
           <main className="flex flex-1 flex-col pt-14">{children}</main>
           <Footer />
         </ThemeProvider>
-        {process.env.NEXT_PUBLIC_UMAMI_ID && process.env.NEXT_PUBLIC_UMAMI_URL && (
-          <Script
-            defer
-            src={`${process.env.NEXT_PUBLIC_UMAMI_URL}/script.js`}
-            data-website-id={process.env.NEXT_PUBLIC_UMAMI_ID}
-          />
-        )}
       </body>
     </html>
   )

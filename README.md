@@ -16,7 +16,6 @@ Personal portfolio and open-source template for full-stack engineers. Built with
 - **Dark mode** — Default dark, toggle to light, no flash
 - **Animations** — BlurFade entrance animations via Motion
 - **SEO** — Dynamic OG images, sitemap, robots.txt, canonical URLs
-- **Analytics** — Umami (self-hosted, privacy-first)
 
 ## Stack
 
@@ -31,7 +30,6 @@ Personal portfolio and open-source template for full-stack engineers. Built with
 | Syntax highlight | Shiki                   |
 | Themes           | next-themes             |
 | OG images        | @vercel/og              |
-| Analytics        | Umami                   |
 | SEO              | next-sitemap            |
 | Icons            | Phosphor Icons          |
 | Deploy           | Vercel                  |
@@ -63,9 +61,6 @@ RESEND_API_KEY=re_xxxxxxxxxxxx
 # Your public URL (used for sitemap and OG images)
 NEXT_PUBLIC_BASE_URL=https://yourdomain.com
 
-# Optional — Umami analytics (self-hosted)
-NEXT_PUBLIC_UMAMI_URL=https://umami.yourdomain.com
-NEXT_PUBLIC_UMAMI_ID=your-website-id
 ```
 
 ### 3. Update your personal info
