@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Poppins, Space_Grotesk, Space_Mono } from "next/font/google"
 import { ThemeProvider } from "next-themes"
+import { Analytics } from "@vercel/analytics/next"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
 import "./globals.css"
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
     default: "Anna Maria",
     template: "%s · Anna Maria",
   },
-  description: "Full-stack engineer building tools for developers.",
+  description: "Full-stack Software Engineer with 5 years shipping web products.",
 }
 
 export default function RootLayout({
@@ -51,6 +52,7 @@ export default function RootLayout({
           <main className="flex flex-1 flex-col pt-14">{children}</main>
           <Footer />
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )

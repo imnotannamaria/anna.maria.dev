@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
             letterSpacing: "0.05em",
           }}
         >
-          anna.maria.dev
+          anna-maria-dev.vercel.app
         </span>
       </div>
 

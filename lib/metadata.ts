@@ -9,7 +9,7 @@ export function createMetadata({
   description: string
   path?: string
 }): Metadata {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://anna.maria.dev"
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://anna-maria-dev.vercel.app"
 
   return {
     title,

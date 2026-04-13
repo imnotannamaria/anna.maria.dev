@@ -225,7 +225,8 @@ export function Navbar() {
                 </Link>
               ))}
 
-              <div className="border-border mt-auto border-t pt-6">
+              <div className="border-border mt-auto flex items-center gap-2 border-t pt-6">
+                <PianoButton onClick={() => setPianoOpen((v) => !v)} active={pianoOpen} />
                 <ThemeToggle />
               </div>
             </motion.div>

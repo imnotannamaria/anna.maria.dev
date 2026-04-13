@@ -2,7 +2,7 @@
 
 Personal portfolio and open-source template for full-stack engineers. Built with Next.js 16, MDX, Resend, dark mode by default, and smooth animations.
 
-**Live:** [anna.maria.dev](https://anna.maria.dev)
+**Live:** [anna-maria-dev.vercel.app](https://anna-maria-dev.vercel.app)
 
 ---
 

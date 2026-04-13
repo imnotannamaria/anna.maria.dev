@@ -46,7 +46,9 @@ export function ContactEmail({ name, email, message }: ContactEmailProps) {
 
           {/* Footer */}
           <Section style={footer}>
-            <Text style={footerText}>anna.maria.dev · Reply directly to this email to respond</Text>
+            <Text style={footerText}>
+              anna-maria-dev.vercel.app · Reply directly to this email to respond
+            </Text>
           </Section>
         </Container>
       </Body>
