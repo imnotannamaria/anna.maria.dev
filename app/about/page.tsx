@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { createMetadata } from "@/lib/metadata"
+import { GithubCalendar } from "@/components/about/github-calendar"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
 import {
   BarbellIcon,
@@ -66,14 +67,14 @@ const education = [
     degree: "Postgraduate Certificate in AI Engineering",
     period: "2026 — 2027",
     description:
-      "I'm currently completing a Postgraduate Certificate in AI Engineering at FIAP, with coursework spanning the full modern AI stack, from Machine Learning fundamentals and Computer Vision to LLMs, Generative AI, Prompt Engineering, Fine-tuning, RAG, and LangChain. Expected completion: March 2027.",
+      "I'm currently doing a Postgraduate Certificate in AI Engineering at FIAP, with coursework spanning the full modern AI stack, from Machine Learning fundamentals and Computer Vision to LLMs, Generative AI, Prompt Engineering, Fine-tuning, RAG, and LangChain. Expected completion: March 2027.",
   },
   {
     institution: "Descomplica",
     degree: "Bachelor's Degree in Information Systems",
     period: "2021 — 2025",
     description:
-      "I hold a Bachelor's Degree in Information Systems from Descomplica Faculdade Digital, completed in December 2025. The program covered the full software engineering stack, from Data Structures, Databases, and Cloud Computing to Software Design, AI Algorithms, and Data Science, giving me the foundation to work across the entire product lifecycle.",
+      "I hold a Bachelor's Degree in Information Systems from Descomplica, completed in December 2025. The program covered the full software engineering stack, from Data Structures, Databases, and Cloud Computing to Software Design, AI Algorithms, and Data Science, giving me the foundation to work across the entire product lifecycle.",
   },
 ]
 
@@ -179,7 +180,7 @@ const interests = [
   {
     emoji: <FilmSlateIcon size={32} />,
     label: "Films and Tv Shows",
-    description: "Big fan of Mike Flanagan and horror films.",
+    description: "Big fan of Mike Flanagan and Game of Thrones; my comfort show is Modern Family.",
   },
 ]
 
@@ -202,7 +203,7 @@ export default function AboutPage() {
             <span className="border-border bg-bg-surface text-text-secondary inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs">
               <MapPinSimpleIcon /> Pernambuco, BR
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/40 bg-indigo-950/60 px-3 py-1 text-xs text-indigo-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-indigo-400/50 bg-indigo-100 px-3 py-1 text-xs text-indigo-700 dark:border-indigo-500/40 dark:bg-indigo-950/60 dark:text-indigo-300">
               ✦ Building in public
             </span>
           </div>
@@ -250,9 +251,9 @@ export default function AboutPage() {
           </p>
           <p>
             On the academic side, I hold a Bachelor&apos;s Degree in Information Systems from
-            Descomplica Faculdade Digital and I&apos;m currently completing a Postgraduate
-            Certificate in AI Engineering at FIAP, with coursework covering LLMs, Generative AI,
-            RAG, LangChain, and the full modern AI stack.
+            Descomplica and I&apos;m currently doing a Postgraduate Certificate in AI Engineering at
+            FIAP, with coursework covering LLMs, Generative AI, RAG, LangChain, and the full modern
+            AI stack.
           </p>
           <p>
             Outside of work, I contribute to open source, play guitar, ukulele and piano at a
@@ -347,6 +348,18 @@ export default function AboutPage() {
               <p className="text-text-secondary mt-1 text-sm">{item.description}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <Divider />
+
+      <section>
+        <SectionHeading>Contributions</SectionHeading>
+        <p className="text-text-secondary mt-2 mb-6 text-sm">
+          My open-source activity on GitHub over the past year.
+        </p>
+        <div className="overflow-x-auto">
+          <GithubCalendar username="imnotannamaria" />
         </div>
       </section>
     </div>

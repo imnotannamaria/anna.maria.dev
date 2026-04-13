@@ -24,7 +24,10 @@ export default function ProjectsPage({
         <h1 className="font-display text-text-primary text-4xl font-bold">
           Projects <span className="text-2xl font-normal text-indigo-500">({projects.length})</span>
         </h1>
-        <p className="text-text-secondary mt-2">Open-source tools, libraries, and side projects.</p>
+        <p className="text-text-secondary mt-2">
+          Open-source tools, libraries, and side projects. This list features my latest work from{" "}
+          <strong>2026</strong> onwards, check my GitHub for the full archive.
+        </p>
       </div>
 
       <Suspense>

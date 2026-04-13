@@ -106,18 +106,18 @@ export default function Home() {
                 aria-hidden="true"
                 className="absolute inset-0 rounded-2xl bg-indigo-500/10 blur-2xl"
               />
-              <div className="relative overflow-hidden rounded-2xl">
+              <div className="group relative overflow-hidden rounded-2xl">
                 <Image
                   src="https://github.com/imnotannamaria.png"
                   alt="Anna Maria"
                   width={288}
                   height={288}
-                  className="h-full w-full object-cover grayscale"
+                  className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0"
                   priority
                 />
                 <div
                   aria-hidden="true"
-                  className="absolute inset-0 bg-indigo-950/10 mix-blend-color"
+                  className="absolute inset-0 bg-indigo-950/10 mix-blend-color transition-opacity duration-500 group-hover:opacity-0"
                 />
               </div>
             </div>

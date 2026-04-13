@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://anna.maria.dev
+
+# Sitemaps
+Sitemap: https://anna.maria.dev/sitemap.xml

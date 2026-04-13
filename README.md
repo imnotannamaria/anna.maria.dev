@@ -1,36 +1,202 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# anna.maria.dev
 
-## Getting Started
+Personal portfolio and open-source template for full-stack engineers. Built with Next.js 16, MDX, Resend, dark mode by default, and smooth animations.
 
-First, run the development server:
+**Live:** [anna.maria.dev](https://anna.maria.dev)
+
+---
+
+## What's inside
+
+- **Blog** — MDX posts with syntax highlighting (Shiki), reading progress bar, tag filtering, and dynamic OG images
+- **Projects** — Case studies with sidebar metadata, tag filtering, and rich MDX content
+- **About** — Career timeline, education, full stack grid, GitHub contributions calendar
+- **Uses** — Hardware, tools, and daily apps
+- **Contact** — Email form powered by Resend + React Email
+- **Dark mode** — Default dark, toggle to light, no flash
+- **Animations** — BlurFade entrance animations via Motion
+- **SEO** — Dynamic OG images, sitemap, robots.txt, canonical URLs
+- **Analytics** — Umami (self-hosted, privacy-first)
+
+## Stack
+
+| Layer            | Tech                    |
+| ---------------- | ----------------------- |
+| Framework        | Next.js 16 (App Router) |
+| Language         | TypeScript (strict)     |
+| Styling          | Tailwind CSS v4         |
+| Content          | MDX via Velite          |
+| Animations       | Motion v12              |
+| Email            | Resend + React Email    |
+| Syntax highlight | Shiki                   |
+| Themes           | next-themes             |
+| OG images        | @vercel/og              |
+| Analytics        | Umami                   |
+| SEO              | next-sitemap            |
+| Icons            | Phosphor Icons          |
+| Deploy           | Vercel                  |
+
+---
+
+## Fork and customize in 5 minutes
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/imnotannamaria/anna.maria.dev.git my-portfolio
+cd my-portfolio
+npm install
+```
+
+### 2. Set up environment variables
+
+Copy the example and fill in your values:
+
+```bash
+cp .env.example .env.local
+```
+
+```bash
+# Required — get yours at resend.com
+RESEND_API_KEY=re_xxxxxxxxxxxx
+
+# Your public URL (used for sitemap and OG images)
+NEXT_PUBLIC_BASE_URL=https://yourdomain.com
+
+# Optional — Umami analytics (self-hosted)
+NEXT_PUBLIC_UMAMI_URL=https://umami.yourdomain.com
+NEXT_PUBLIC_UMAMI_ID=your-website-id
+```
+
+### 3. Update your personal info
+
+Edit the following files with your own data:
+
+| File                                   | What to change                       |
+| -------------------------------------- | ------------------------------------ |
+| `app/page.tsx`                         | Name, bio, stats, career entries     |
+| `app/about/page.tsx`                   | Full bio, timeline, stack, interests |
+| `app/uses/page.tsx`                    | Hardware, tools, apps                |
+| `app/layout.tsx`                       | Site title and description           |
+| `app/api/contact/route.ts`             | Email `from` and `to` addresses      |
+| `components/about/github-calendar.tsx` | Your GitHub username                 |
+| `lib/metadata.ts`                      | `baseUrl` fallback                   |
+
+### 4. Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Adding content
 
-## Learn More
+### Blog post
 
-To learn more about Next.js, take a look at the following resources:
+Create `content/blog/your-post-slug.mdx`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```mdx
+---
+title: "Your post title"
+description: "A short description for SEO and cards."
+date: "2026-01-01"
+tags: ["next.js", "typescript"]
+published: true
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Your content here.
+```
 
-## Deploy on Vercel
+### Project
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Create `content/projects/your-project-slug.mdx`:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```mdx
+---
+title: "Project Name"
+description: "What it does in one sentence."
+date: "2026-01-01"
+tags: ["react", "typescript"]
+github: "https://github.com/you/project"
+live: "https://project.vercel.app"
+featured: true
+published: true
+---
+
+## Overview
+
+...
+```
+
+Set `featured: true` to show on the home page (max 2 shown).
+
+---
+
+## Configuring email (Resend)
+
+1. Create an account at [resend.com](https://resend.com)
+2. Add and verify your domain
+3. Create an API key and add it to `.env.local`
+4. Update `from` and `to` in `app/api/contact/route.ts`:
+
+```ts
+from: "Portfolio <hello@yourdomain.com>",
+to: ["you@yourdomain.com"],
+```
+
+---
+
+## Deploy to Vercel
+
+1. Push to GitHub
+2. Import the repo at [vercel.com/new](https://vercel.com/new)
+3. Add the environment variables from `.env.local` in the Vercel dashboard
+4. Deploy — sitemap and robots.txt are generated automatically at build time
+
+---
+
+## Project structure
+
+```
+app/
+  page.tsx              # Home
+  about/page.tsx        # About
+  blog/                 # Blog list + [slug]
+  projects/             # Projects list + [slug]
+  uses/page.tsx         # Uses
+  contact/page.tsx      # Contact form
+  api/
+    contact/route.ts    # Email via Resend
+    og/route.tsx        # Dynamic OG images
+  icon.tsx              # Favicon
+  layout.tsx            # Root layout
+
+content/
+  blog/*.mdx            # Blog posts
+  projects/*.mdx        # Project case studies
+
+components/
+  layout/               # Navbar, Footer
+  ui/                   # Button, Badge, BlurFade, etc.
+  blog/                 # MDX renderer, reading progress
+  projects/             # Project card
+  about/                # GitHub calendar
+  contact/              # Contact form
+
+emails/
+  contact-email.tsx     # React Email template
+
+lib/
+  velite.ts             # Content query helpers
+  utils.ts              # cn(), formatDate(), estimateReadingTime()
+  metadata.ts           # createMetadata() helper
+```
+
+---
+
+## License
+
+MIT — fork freely, customize, make it yours.

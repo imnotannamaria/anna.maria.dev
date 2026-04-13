@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import { motion, AnimatePresence, useReducedMotion } from "motion/react"
-import { SunIcon, MoonIcon, ListBulletsIcon, XIcon } from "@phosphor-icons/react"
+import { SunIcon, MoonIcon, ListBulletsIcon, XIcon, WaveSineIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { PianoButton, PianoModal } from "@/components/ui/piano-modal"
 
@@ -160,11 +160,10 @@ export function Navbar() {
         )}
       >
         <nav className="mx-auto flex h-14 max-w-275 items-center justify-between px-5">
-          <Link
-            href="/"
-            className="font-mono text-sm font-bold text-indigo-500 transition-opacity hover:opacity-80"
-          >
-            am
+          <Link href="/" aria-label="Home" className="transition-opacity hover:opacity-80">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-white">
+              <WaveSineIcon size={18} className="text-indigo-600" aria-hidden="true" />
+            </span>
           </Link>
 
           <ul className="hidden items-center gap-6 md:flex">
