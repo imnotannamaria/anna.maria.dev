@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { XIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import { PianoKeysIcon } from "@phosphor-icons/react/dist/ssr"
+import { PianoKeysIcon, MusicNoteIcon, MusicNoteSimpleIcon } from "@phosphor-icons/react/dist/ssr"
 
 function playPianoNote(audioCtx: AudioContext, frequency: number) {
   const now = audioCtx.currentTime
@@ -297,9 +297,29 @@ export function PianoModal({ open, onClose }: PianoModalProps) {
 interface PianoButtonProps {
   onClick: () => void
   active?: boolean
+  pulse?: boolean
 }
 
-export function PianoButton({ onClick, active }: PianoButtonProps) {
+const NOTE_VARIANTS = [
+  { Icon: MusicNoteIcon, x: -10, delay: 0 },
+  { Icon: MusicNoteSimpleIcon, x: 0, delay: 0.35 },
+  { Icon: MusicNoteIcon, x: -5, delay: 0.65 },
+]
+
+export function PianoButton({ onClick, active, pulse }: PianoButtonProps) {
+  const [pinging, setPinging] = useState(false)
+
+  useEffect(() => {
+    if (!pulse || active) return
+    const trigger = () => {
+      setPinging(true)
+      setTimeout(() => setPinging(false), 1600)
+    }
+    trigger()
+    const id = setInterval(trigger, 3000)
+    return () => clearInterval(id)
+  }, [pulse, active])
+
   return (
     <button
       onClick={onClick}
@@ -311,6 +331,23 @@ export function PianoButton({ onClick, active }: PianoButtonProps) {
           : "text-text-secondary hover:bg-bg-elevated hover:text-text-primary",
       )}
     >
+      <AnimatePresence>
+        {pulse &&
+          pinging &&
+          !active &&
+          NOTE_VARIANTS.map(({ Icon, x, delay }, i) => (
+            <motion.span
+              key={i}
+              className="pointer-events-none absolute -top-1 left-1/2 text-indigo-400"
+              style={{ x }}
+              initial={{ opacity: 0, y: 0, scale: 0.7 }}
+              animate={{ opacity: [0, 1, 0], y: 0, scale: [0.7, 1, 0.85] }}
+              transition={{ duration: 1.1, delay, ease: "easeOut" }}
+            >
+              <Icon size={10} weight="fill" />
+            </motion.span>
+          ))}
+      </AnimatePresence>
       <PianoKeysIcon size={16} />
     </button>
   )

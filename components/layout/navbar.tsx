@@ -176,7 +176,7 @@ export function Navbar() {
           </ul>
 
           <div className="hidden items-center gap-1 md:flex">
-            <PianoButton onClick={() => setPianoOpen((v) => !v)} active={pianoOpen} />
+            <PianoButton onClick={() => setPianoOpen((v) => !v)} active={pianoOpen} pulse />
             <ThemeToggle />
           </div>
 
