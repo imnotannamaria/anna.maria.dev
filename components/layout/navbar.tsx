@@ -4,10 +4,11 @@ import { useEffect, useState, useSyncExternalStore } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
+import { useRouter } from "next/navigation"
 import { motion, AnimatePresence, useReducedMotion } from "motion/react"
 import { SunIcon, MoonIcon, ListBulletsIcon, XIcon, WaveSineIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import { PianoButton, PianoModal } from "@/components/ui/piano-modal"
+import { PianoButton } from "@/components/ui/piano-modal"
 
 const navLinks = [
   { href: "/about", label: "About" },
@@ -127,8 +128,8 @@ function NavLink({ href, label }: { href: string; label: string }) {
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [pianoOpen, setPianoOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 16)
@@ -145,12 +146,12 @@ export function Navbar() {
       }
 
       event.preventDefault()
-      setPianoOpen((value) => !value)
+      router.push("/piano")
     }
 
     window.addEventListener("keydown", onKeyDown)
     return () => window.removeEventListener("keydown", onKeyDown)
-  }, [])
+  }, [router])
 
   return (
     <>
@@ -176,7 +177,11 @@ export function Navbar() {
           </ul>
 
           <div className="hidden items-center gap-1 md:flex">
-            <PianoButton onClick={() => setPianoOpen((v) => !v)} active={pianoOpen} pulse />
+            <PianoButton
+              onClick={() => router.push("/piano")}
+              active={pathname === "/piano"}
+              pulse
+            />
             <ThemeToggle />
           </div>
 
@@ -227,15 +232,13 @@ export function Navbar() {
               ))}
 
               <div className="border-border mt-auto flex items-center gap-2 border-t pt-6">
-                <PianoButton onClick={() => setPianoOpen((v) => !v)} active={pianoOpen} />
+                <PianoButton onClick={() => router.push("/piano")} active={pathname === "/piano"} />
                 <ThemeToggle />
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
-
-      <PianoModal open={pianoOpen} onClose={() => setPianoOpen(false)} />
     </>
   )
 }

@@ -2,11 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
-import { XIcon } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { PianoKeysIcon, MusicNoteIcon, MusicNoteSimpleIcon } from "@phosphor-icons/react/dist/ssr"
 
-function playPianoNote(audioCtx: AudioContext, frequency: number) {
+export function playPianoNote(audioCtx: AudioContext, frequency: number) {
   const now = audioCtx.currentTime
 
   const osc1 = audioCtx.createOscillator()
@@ -86,6 +85,10 @@ const KEYS: PianoKey[] = [
 
 const KBD_MAP: Record<string, PianoKey> = Object.fromEntries(KEYS.map((k) => [k.kbd, k]))
 
+export const NOTE_FREQ_MAP: Record<string, number> = Object.fromEntries(
+  KEYS.map((k) => [k.note, k.freq]),
+)
+
 interface PianoKeyboardProps {
   onClose: () => void
 }
@@ -95,7 +98,7 @@ type WebkitWindow = Window &
     webkitAudioContext?: typeof AudioContext
   }
 
-function PianoKeyboard({ onClose }: PianoKeyboardProps) {
+export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
   const audioCtxRef = useRef<AudioContext | null>(null)
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set())
   const [noteDisplay, setNoteDisplay] = useState<{ note: string; id: number } | null>(null)
@@ -172,14 +175,6 @@ function PianoKeyboard({ onClose }: PianoKeyboardProps) {
             )}
           </AnimatePresence>
         </div>
-
-        <button
-          onClick={onClose}
-          aria-label="Close piano"
-          className="text-text-secondary hover:bg-bg-elevated hover:text-text-primary flex size-7 cursor-pointer items-center justify-center rounded-lg transition-colors"
-        >
-          <XIcon size={14} />
-        </button>
       </div>
 
       <div className="border-border bg-bg-elevated mx-auto w-full max-w-2xl rounded-xl border p-3 shadow-inner">
@@ -252,9 +247,7 @@ function PianoKeyboard({ onClose }: PianoKeyboardProps) {
         </div>
       </div>
 
-      <p className="text-text-muted text-center font-mono text-xs">
-        click keys or use keyboard · esc to close
-      </p>
+      <p className="text-text-muted text-center font-mono text-xs">click keys or use keyboard</p>
     </div>
   )
 }
