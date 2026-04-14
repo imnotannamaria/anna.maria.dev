@@ -1,11 +1,13 @@
 import {
   Body,
+  Column,
   Container,
   Head,
   Heading,
   Hr,
   Html,
   Preview,
+  Row,
   Section,
   Text,
 } from "@react-email/components"
@@ -32,11 +34,16 @@ export function ContactEmail({ name, email, message }: ContactEmailProps) {
           <Section style={content}>
             <Heading style={heading}>New message via portfolio</Heading>
 
-            <Text style={label}>From</Text>
-            <Text style={value}>{name}</Text>
-
-            <Text style={label}>Email</Text>
-            <Text style={value}>{email}</Text>
+            <Row>
+              <Column style={fieldCol}>
+                <Text style={label}>From</Text>
+                <Text style={value}>{name}</Text>
+              </Column>
+              <Column style={fieldCol}>
+                <Text style={label}>Email</Text>
+                <Text style={value}>{email}</Text>
+              </Column>
+            </Row>
 
             <Hr style={divider} />
 
@@ -46,9 +53,7 @@ export function ContactEmail({ name, email, message }: ContactEmailProps) {
 
           {/* Footer */}
           <Section style={footer}>
-            <Text style={footerText}>
-              anna-maria-dev.vercel.app · Reply directly to this email to respond
-            </Text>
+            <Text style={footerText}>anna-maria-dev.vercel.app</Text>
           </Section>
         </Container>
       </Body>
@@ -57,7 +62,7 @@ export function ContactEmail({ name, email, message }: ContactEmailProps) {
 }
 
 const body: React.CSSProperties = {
-  backgroundColor: "#f4f4f8",
+  backgroundColor: "#f0f0f5",
   fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
   margin: 0,
   padding: "40px 0",
@@ -69,20 +74,22 @@ const container: React.CSSProperties = {
   maxWidth: "560px",
   margin: "0 auto",
   overflow: "hidden",
+  border: "1px solid #e4e4f0",
 }
 
 const header: React.CSSProperties = {
   backgroundColor: "#0a0a0f",
-  padding: "24px 32px",
+  padding: "20px 32px",
 }
 
 const logo: React.CSSProperties = {
-  color: "#6366f1",
-  fontFamily: "monospace",
-  fontSize: "18px",
+  color: "#818cf8",
+  fontFamily: "'Courier New', Courier, monospace",
+  fontSize: "22px",
   fontWeight: 700,
   margin: 0,
-  letterSpacing: "-0.5px",
+  letterSpacing: "-1px",
+  lineHeight: 1,
 }
 
 const content: React.CSSProperties = {
@@ -93,8 +100,14 @@ const heading: React.CSSProperties = {
   color: "#0a0a0f",
   fontSize: "20px",
   fontWeight: 600,
-  margin: "0 0 24px",
+  margin: "0 0 28px",
   lineHeight: 1.3,
+}
+
+const fieldCol: React.CSSProperties = {
+  paddingRight: "24px",
+  verticalAlign: "top",
+  width: "50%",
 }
 
 const label: React.CSSProperties = {
@@ -109,7 +122,7 @@ const label: React.CSSProperties = {
 const value: React.CSSProperties = {
   color: "#0a0a0f",
   fontSize: "15px",
-  margin: "0 0 20px",
+  margin: "0 0 4px",
 }
 
 const divider: React.CSSProperties = {

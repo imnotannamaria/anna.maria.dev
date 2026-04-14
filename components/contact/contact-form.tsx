@@ -144,6 +144,6 @@ const inputClass = cn(
   "w-full rounded-lg border border-border bg-bg-surface px-4 py-3 text-sm text-text-primary",
   "placeholder:text-text-muted",
   "transition-colors",
-  "focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20",
+  "outline-none focus:border-indigo-500 focus:shadow-[0_0_0_4px_rgba(99,102,241,0.15)]",
   "disabled:cursor-not-allowed disabled:opacity-60",
 )
