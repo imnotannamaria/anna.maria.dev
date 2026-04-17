@@ -34,6 +34,20 @@ This project is a starter kit of e-commerce transactional email templates built 
 
 The idea came from a simple observation: every purchase triggers a predictable sequence of emails (order created, payment confirmed, shipped, delivered). I looked for a ready-made template for this flow and couldn’t find one, so I built it.
 
+## Updates
+
+**April 2026 — Migrated to React Email 6**
+
+React Email 6 was released with a unified package structure. All components previously imported from `@react-email/components` are now available directly from `react-email`. This project has been updated to reflect that change.
+
+```bash
+# before
+import { Button, Html, Head, render } from "@react-email/components"
+
+# after
+import { Button, Html, Head, render } from "react-email"
+```
+
 ## What’s included
 
 - 4 transactional templates (core purchase flow)
