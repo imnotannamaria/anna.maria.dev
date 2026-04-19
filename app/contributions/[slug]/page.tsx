@@ -114,7 +114,7 @@ export default async function ContributionPage({ params }: Props) {
           </div>
         </aside>
 
-        <article className="min-w-0 flex-1">
+        <article className="min-w-0 flex-1 [&>*:first-child]:mt-0">
           <MDXContent code={contribution.body} />
         </article>
       </div>

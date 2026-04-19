@@ -112,7 +112,7 @@ export default async function ProjectPage({ params }: Props) {
           </div>
         </aside>
 
-        <article className="min-w-0 flex-1">
+        <article className="min-w-0 flex-1 [&>*:first-child]:mt-0">
           <MDXContent code={project.body} />
         </article>
       </div>
