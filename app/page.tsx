@@ -11,7 +11,7 @@ import { formatDate, estimateReadingTime } from "@/lib/utils"
 const stats = [
   { value: "5", label: "years of experience" },
   { value: "1/12", label: "open source projects this year" },
-  { value: "0/12", label: "open source contributions this year" },
+  { value: "1/12", label: "open source contributions this year" },
 ]
 
 const mainStack = [

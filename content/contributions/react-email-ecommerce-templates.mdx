@@ -1,0 +1,24 @@
+---
+title: "react-email: ecommerce templates"
+description: "Added 4 transactional email templates to the Community section: Order Created, Order Confirmed, Order Shipped, and Order Delivered."
+date: "2026-04-19"
+tags: ["react-email", "resend", "typescript", "react"]
+repo: "https://github.com/resend/react-email"
+pr: "https://github.com/resend/react-email/pull/3402"
+published: true
+---
+
+## Overview
+
+Added a set of 4 ecommerce transactional email templates to the Community section of react-email.
+
+## Templates
+
+- **Order Created** — confirms the order was received with expected delivery date and order summary
+- **Order Confirmed** — confirms payment with payment method details and order summary
+- **Order Shipped** — notifies shipment with tracking number, carrier, estimated delivery, and a track button
+- **Order Delivered** — confirms delivery with delivery date, review CTA, and order summary
+
+## Tests
+
+Updated `get-emails-directory-metadata.spec.ts` in both `packages/react-email` and `packages/ui` to include the new ecommerce directory and its 4 templates in the expected directory metadata output.
