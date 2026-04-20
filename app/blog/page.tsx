@@ -45,7 +45,13 @@ async function PostList({
   const filtered = tag ? posts.filter((p) => p.tags.includes(tag)) : posts
 
   if (filtered.length === 0) {
-    return <p className="text-text-muted mt-12 text-center">No posts found for this tag.</p>
+    return (
+      <p className="text-text-muted mt-12 text-center">
+        {posts.length === 0
+          ? "No posts yet. When I publish something, it will show up here first."
+          : "No posts found for this tag."}
+      </p>
+    )
   }
 
   return (

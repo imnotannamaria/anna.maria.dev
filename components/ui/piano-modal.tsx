@@ -103,7 +103,12 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
   const [activeKeys, setActiveKeys] = useState<Set<string>>(new Set())
   const [noteDisplay, setNoteDisplay] = useState<{ note: string; id: number } | null>(null)
 
-  async function getAudioCtx(): Promise<AudioContext> {
+  /**
+   * iOS Safari only unlocks audio from a *synchronous* user gesture. Any `await`
+   * before `resume()` breaks that chain and notes pile up until the context
+   * eventually runs — so keep this path strictly synchronous on pointer/keys.
+   */
+  function getAudioCtx(): AudioContext {
     if (!audioCtxRef.current) {
       const AudioContextCtor = window.AudioContext || (window as WebkitWindow).webkitAudioContext
 
@@ -113,14 +118,15 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
 
       audioCtxRef.current = new AudioContextCtor()
     }
-    if (audioCtxRef.current.state === "suspended") {
-      await audioCtxRef.current.resume()
+    const ctx = audioCtxRef.current
+    if (ctx.state === "suspended") {
+      void ctx.resume()
     }
-    return audioCtxRef.current
+    return ctx
   }
 
-  const triggerKey = useCallback(async (key: PianoKey) => {
-    const ctx = await getAudioCtx()
+  const triggerKey = useCallback((key: PianoKey) => {
+    const ctx = getAudioCtx()
     playPianoNote(ctx, key.freq)
     setNoteDisplay({ note: key.note, id: Date.now() })
     setActiveKeys((prev) => new Set([...prev, key.note]))
@@ -142,7 +148,7 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
         return
       }
       const key = KBD_MAP[e.key.toLowerCase()]
-      if (key) void triggerKey(key)
+      if (key) triggerKey(key)
     }
     window.addEventListener("keydown", onKeyDown)
     return () => window.removeEventListener("keydown", onKeyDown)
@@ -188,7 +194,7 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
               aria-label={`${key.note} (${key.kbd.toUpperCase()})`}
               onPointerDown={(e) => {
                 if (e.pointerType === "mouse" && e.button !== 0) return
-                void triggerKey(key)
+                triggerKey(key)
               }}
               className={cn(
                 "relative flex-1 cursor-pointer touch-none transition-colors duration-75 outline-none select-none focus:outline-none focus-visible:outline-none",
@@ -220,7 +226,7 @@ export function PianoKeyboard({ onClose }: PianoKeyboardProps) {
               onPointerDown={(e) => {
                 if (e.pointerType === "mouse" && e.button !== 0) return
                 e.stopPropagation()
-                void triggerKey(key)
+                triggerKey(key)
               }}
               style={{
                 position: "absolute",

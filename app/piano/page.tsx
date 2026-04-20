@@ -6,6 +6,11 @@ import { PlayIcon, StopIcon } from "@phosphor-icons/react"
 import { PianoKeyboard, playPianoNote, NOTE_FREQ_MAP } from "@/components/ui/piano-modal"
 import { cn } from "@/lib/utils"
 
+type WebkitWindow = Window &
+  typeof globalThis & {
+    webkitAudioContext?: typeof AudioContext
+  }
+
 const KEYBOARD_MAP: Record<string, string> = {
   C4: "Z",
   D4: "X",
@@ -313,12 +318,17 @@ export default function PianoPage() {
 
   function getAudioCtx() {
     if (!audioCtxRef.current) {
-      audioCtxRef.current = new AudioContext()
+      const AudioContextCtor = window.AudioContext || (window as WebkitWindow).webkitAudioContext
+      if (!AudioContextCtor) {
+        throw new Error("AudioContext is not supported in this browser")
+      }
+      audioCtxRef.current = new AudioContextCtor()
     }
-    if (audioCtxRef.current.state === "suspended") {
-      void audioCtxRef.current.resume()
+    const ctx = audioCtxRef.current
+    if (ctx.state === "suspended") {
+      void ctx.resume()
     }
-    return audioCtxRef.current
+    return ctx
   }
 
   function stopPlayback() {
