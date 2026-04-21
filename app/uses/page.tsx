@@ -43,7 +43,7 @@ const sections = [
       {
         name: "Warp",
         description: "Modern terminal with AI built in. Fast and well designed.",
-        href: "https://www.warp.dev/",
+        href: "https://app.warp.dev/referral/KRP3VJ",
       },
       {
         name: "Fish Shell",
