@@ -5,13 +5,13 @@ import { BlurFade } from "@/components/ui/blur-fade"
 import { LinkButton } from "@/components/ui/button"
 import { InlineArrow } from "@/components/ui/inline-arrow"
 import { ProjectCard } from "@/components/projects/project-card"
-import { getFeaturedProjects, getPublishedPosts, getPublishedContributions } from "@/lib/velite"
+import {
+  getFeaturedProjects,
+  getPublishedPosts,
+  getPublishedContributions,
+  getPublishedProjects,
+} from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/utils"
-
-const stats = [
-  { value: "5", label: "years of experience" },
-  { value: "2/12", label: "open source contributions & projects this year" },
-]
 
 const mainStack = [
   { name: "React", path: siReact.path },
@@ -37,6 +37,22 @@ export default function Home() {
   const featuredProjects = getFeaturedProjects()
   const recentPosts = getPublishedPosts().slice(0, 3)
   const recentContributions = getPublishedContributions().slice(0, 3)
+  const currentYear = new Date().getFullYear()
+  const thisYearContributions = getPublishedContributions().filter(
+    (c) => new Date(c.date).getFullYear() === currentYear,
+  )
+  const thisYearProjects = getPublishedProjects().filter(
+    (p) => new Date(p.date).getFullYear() === currentYear,
+  )
+  const openSourceGoal = 12
+  const openSourceProgress = thisYearContributions.length + thisYearProjects.length
+  const stats = [
+    { value: "5", label: "years of experience" },
+    {
+      value: `${openSourceProgress}/${openSourceGoal}`,
+      label: "open source contributions & projects this year",
+    },
+  ]
 
   return (
     <div className="mx-auto w-full max-w-275 px-5">
