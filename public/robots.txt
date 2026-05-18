@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://anna.maria.dev
+Host: https://annamaria.app
 
 # Sitemaps
-Sitemap: https://anna.maria.dev/sitemap.xml
+Sitemap: https://annamaria.app/sitemap.xml

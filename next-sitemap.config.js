@@ -1,5 +1,5 @@
 /** @type {import('next-sitemap').IConfig} */
-const PRODUCTION_SITE = "https://anna.maria.dev"
+const PRODUCTION_SITE = "https://annamaria.app"
 
 function resolveSiteUrl() {
   const base = process.env.NEXT_PUBLIC_BASE_URL || ""
