@@ -1,0 +1,93 @@
+---
+title: "entrepta"
+description: "A dark-first design system for sites that look like they were built by an engineer."
+date: "2026-05-18"
+tags:
+  ["nextjs", "react", "typescript", "tailwindcss", "design-system", "components", "cli", "radix-ui"]
+github: "https://github.com/imnotannamaria/entrepta"
+live: "https://entrepta.vercel.app"
+featured: true
+published: true
+---
+
+## Overview
+
+entrepta is a dark-first design system. You copy the components into your project and own the code. No SDK, no black box.
+
+```bash
+npx @entrepta/cli@latest init
+```
+
+## What you get
+
+14 components across 4 categories, written in React 19 and styled with Tailwind v4 + CSS variables.
+
+- **Primitives**: Button, Badge, Input, Card, Dialog, Dropdown, Tooltip, Tabs
+- **Layout**: StatusBar, TopNav
+- **Feedback**: Toast, Skeleton, CommandPalette
+- **Content**: CodeBlock
+
+Plus 6 theme presets you can switch with one flag: `entrepta`, `blossom`, `marmalade`, `julia`, `ivy`, `bosco`.
+
+## Two ways to install
+
+### With the CLI
+
+```bash
+npx @entrepta/cli@latest init --theme=ivy
+npx @entrepta/cli@latest add button card command-palette
+```
+
+The CLI writes your `globals.css`, sets up `lib/utils.ts`, installs peer deps, and copies the components into your project.
+
+### By hand
+
+If you want to skip the CLI:
+
+1. Install peer deps: `pnpm add clsx tailwind-merge class-variance-authority`
+2. Copy `packages/registry/styles/globals.css` into your project, then append one theme file from `packages/registry/styles/themes/`
+3. Copy `lib/utils.ts` with the `cn` helper
+4. Copy any component file from `packages/registry/` into `components/entrepta/`
+
+Each component page in the docs has a **Manual** tab with its own dependency list and source code ready to paste.
+
+## Quick usage
+
+```tsx
+import { Button } from "@/components/entrepta/button"
+import { CodeBlock } from "@/components/entrepta/code-block"
+
+export function Hero() {
+  return (
+    <>
+      <Button variant="primary">Ship</Button>
+      <CodeBlock
+        code="npx @entrepta/cli@latest init --theme=ivy"
+        variant="terminal"
+        filename="terminal · zsh"
+        language="bash"
+      />
+    </>
+  )
+}
+```
+
+## Stack
+
+- React 19 + Next.js 15 (App Router) as the reference setup
+- Tailwind v4 for utility classes
+- Radix UI primitives for behavior and a11y
+- CSS variables for all design tokens
+- TypeScript strict
+- class-variance-authority for variants
+- lucide-react icons (1.5px stroke)
+
+## License
+
+MIT.
+
+## Links
+
+https://entrepta.vercel.app
+
+https://github.com/imnotannamaria/entrepta
