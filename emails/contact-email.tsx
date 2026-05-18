@@ -53,7 +53,7 @@ export function ContactEmail({ name, email, message }: ContactEmailProps) {
 
           {/* Footer */}
           <Section style={footer}>
-            <Text style={footerText}>anna-maria-dev.vercel.app</Text>
+            <Text style={footerText}>annamaria.app</Text>
           </Section>
         </Container>
       </Body>

@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!contribution) return {}
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://anna-maria-dev.vercel.app"
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://annamaria.app"
 
   return {
     title: contribution.title,
