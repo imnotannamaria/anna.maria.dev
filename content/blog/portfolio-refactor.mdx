@@ -1,0 +1,87 @@
+---
+title: "Building a portfolio that doesn't look like it was made with AI in 30 minutes"
+description: "My process for refactoring my portfolio so it actually feels like me. A design system, a wrist kit, and a new UI."
+date: "2026-06-09"
+tags: ["portfolio", "design-system", "ui", "process"]
+published: true
+---
+
+## How I got here
+
+I finished my portfolio. When I looked at it, I noticed something. It felt generic. The kind of site that looks like it was "made with AI in 30 minutes."
+
+It had fun features, like the piano, but the UI was not me. I wanted something more unique. Something that actually came from me.
+
+So I started refactoring it. I am splitting the work into 3 parts (or I have already finished them, depending on when you are reading this).
+
+## 1. A design system
+
+The first part is something that had been in my head for a long time: **entrepta**.
+
+entrepta is a dark-first design system. You copy the components into your project and own the code. No SDK, no black box. It ships with 14 components, 6 theme presets, and a CLI to set the whole thing up in one command.
+
+If you want to look at it: https://entrepta.vercel.app
+
+## 2. Wrist kit
+
+While looking for inspiration for my new portfolio, I came across a personal site that made me stop and think "wow." That is the reaction I want people to have when they land on mine.
+
+Two things in particular caught my attention.
+
+1. **The bento grid.** I had not seen this layout before. It is a grid of cards in different sizes that fit together like little boxes. I plan to use something similar.
+2. **The Apple Fitness ring.** That little ring on the Apple Watch with your activity data.
+
+I searched for a ready-made solution that gives you that Apple ring filled with your Apple Watch data, and I could not find one. So I built it myself. That is how the **wrist kit** was born.
+
+The idea is simple. I use Apple Shortcuts to send my data to an endpoint. Every day the endpoint updates a ring component that lives on my site.
+
+At the time I am writing this, the design system is already live. I am still working on the wrist kit.
+
+## 3. Prototyping and UI
+
+For this part I am using Claude Design to turn my ideas into something visual. I do not know yet how the final UI will look, but it will be close to what I describe below.
+
+### Home
+
+A lot of bento grid here. I want to show:
+
+- The wrist kit
+- A favorite project
+- My GitHub contributions
+- A Spotify card. Maybe a playlist where the song on display keeps shuffling on its own.
+
+### About
+
+A bit about me. A short summary, my professional and academic background, and my tech stack.
+
+### Projects
+
+Personal projects and some public projects I worked on at CESAR.
+
+### Posts
+
+The blog list and the post page (yes, the one you are reading right now), with the new UI applied. Same content, new skin.
+
+### Contact
+
+A nice form and badges with my socials.
+
+### Piano
+
+The piano stays. Same piano, just with the refactored UI.
+
+### Log
+
+I am thinking of something like Letterboxd, but for everything. Movies, series, albums, places I went to.
+
+## Spoiler alert
+
+A small preview of where I am at. These are still drafts, so things will probably change before launch.
+
+![New contact page preview](/blog/new-ui-contact.png)
+
+![New piano page preview](/blog/new-ui-piano.png)
+
+## What is next
+
+When I finish the whole process, I will come back to this post and add the before and after, so you can see how far it went.
