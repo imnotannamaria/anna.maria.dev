@@ -3,6 +3,7 @@ import { getFeaturedProjects, getPublishedPosts, getPublishedProjects } from "@/
 import { formatDate, estimateReadingTime } from "@/lib/utils"
 import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
+import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -132,7 +133,8 @@ function ProgressBar({ filled, total }: { filled: number; total: number }) {
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
-export default function Home() {
+export default async function Home() {
+  const activityState = await loadTodayActivity({ tz: "America/Sao_Paulo" })
   const featuredProject = getFeaturedProjects()[0]
   const latestPost = getPublishedPosts()[0]
   const currentYear = new Date().getFullYear()
@@ -572,70 +574,7 @@ export default function Home() {
             <CardFoot comment="guitar · keys · uke · bass" />
           </div>
 
-          {/* Gym ring — Wrist Kit placeholder */}
-          <div className="bento-card">
-            <CardHead label="gym / week" meta="wk 27" />
-            <div className="flex flex-1 flex-col items-center justify-center gap-2">
-              <div style={{ position: "relative", width: 96, height: 96 }}>
-                <svg
-                  width="96"
-                  height="96"
-                  viewBox="0 0 96 96"
-                  style={{ transform: "rotate(-90deg)" }}
-                >
-                  <circle
-                    cx="48"
-                    cy="48"
-                    r="38"
-                    stroke="var(--border-subtle)"
-                    strokeWidth="8"
-                    fill="none"
-                  />
-                  <circle
-                    cx="48"
-                    cy="48"
-                    r="38"
-                    stroke="var(--fg-brand)"
-                    strokeWidth="8"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeDasharray="239"
-                    strokeDashoffset="68"
-                  />
-                </svg>
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    display: "grid",
-                    placeItems: "center",
-                    fontFamily: "var(--font-serif)",
-                    fontSize: 32,
-                    color: "var(--fg-primary)",
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  <span>
-                    <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>5</em>
-                    <sub
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: 11,
-                        color: "var(--fg-brand)",
-                        verticalAlign: "super",
-                        marginLeft: 1,
-                      }}
-                    >
-                      / 7
-                    </sub>
-                  </span>
-                </div>
-              </div>
-              <span className="font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
-                {"// "}trained this week
-              </span>
-            </div>
-          </div>
+          <TodayActivityCard state={activityState} />
         </div>
       </section>
 
