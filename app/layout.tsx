@@ -1,31 +1,20 @@
 import type { Metadata } from "next"
-import { Poppins, Space_Grotesk, Space_Mono } from "next/font/google"
-import { ThemeProvider } from "next-themes"
 import { Analytics } from "@vercel/analytics/next"
-import { Navbar } from "@/components/layout/navbar"
-import { Footer } from "@/components/layout/footer"
+import { Titlebar } from "@/components/chrome/titlebar"
+import { Sidebar } from "@/components/chrome/sidebar"
+import { StatusBar, StatusBarItem, StatusBarSeparator } from "@/app/components/entrepta/status-bar"
+import { ThemeScript } from "@/app/components/entrepta/theme-switcher"
+import { ThemeSwitcher } from "@/app/components/entrepta/theme-switcher"
 import "./globals.css"
 
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  display: "swap",
-})
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "swap",
-})
-
-const spaceMono = Space_Mono({
-  variable: "--font-space-mono",
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
-})
+const THEMES = [
+  { id: "entrepta", label: "entrepta", color: "#7c6bff", lightColor: "#6b5bff" },
+  { id: "blossom", label: "blossom", color: "#cc2e36", lightColor: "#b02028" },
+  { id: "marmalade", label: "marmalade", color: "#ff8213", lightColor: "#e06800" },
+  { id: "julia", label: "julia", color: "#e85a8a", lightColor: "#cc3a6a" },
+  { id: "ivy", label: "ivy", color: "#35a365", lightColor: "#258a50" },
+  { id: "bosco", label: "bosco", color: "#2563eb", lightColor: "#1d4ed8" },
+] as const
 
 export const metadata: Metadata = {
   title: {
@@ -41,17 +30,60 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${poppins.variable} ${spaceGrotesk.variable} ${spaceMono.variable}`}
-    >
-      <body className="flex min-h-screen flex-col antialiased">
-        <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
-          <Navbar />
-          <main className="flex flex-1 flex-col pt-14">{children}</main>
-          <Footer />
-        </ThemeProvider>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
+      <body>
+        {/* Editor chrome — fixed full-viewport grid */}
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            display: "grid",
+            gridTemplateRows: "40px 1fr 28px",
+          }}
+        >
+          <Titlebar />
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "56px 1fr",
+              overflow: "hidden",
+            }}
+          >
+            <Sidebar />
+            <main style={{ overflowY: "auto" }}>{children}</main>
+          </div>
+
+          <StatusBar
+            style={{
+              position: "relative",
+              bottom: "auto",
+              left: "auto",
+              right: "auto",
+              zIndex: "auto",
+            }}
+            left={
+              <>
+                <StatusBarItem>◆ entrepta</StatusBarItem>
+                <StatusBarSeparator />
+                <StatusBarItem>main ✓</StatusBarItem>
+              </>
+            }
+            right={
+              <>
+                <StatusBarItem>UTF-8</StatusBarItem>
+                <StatusBarSeparator />
+                <StatusBarItem>TypeScript</StatusBarItem>
+              </>
+            }
+          />
+        </div>
+
+        <ThemeSwitcher themes={THEMES} defaultTheme="entrepta" position="bottom-right" />
+
         <Analytics />
       </body>
     </html>
