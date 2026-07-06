@@ -471,6 +471,28 @@ button:focus-visible,
   }
 }
 
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+@keyframes dot-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--fg-brand-pulse, rgba(124, 107, 255, 0.5));
+  }
+  50% {
+    box-shadow: 0 0 0 5px var(--fg-brand-pulse, rgba(124, 107, 255, 0));
+  }
+}
+
 /* ============================================================
    REHYPE-PRETTY-CODE — code block overrides
    ============================================================ */

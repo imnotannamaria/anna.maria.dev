@@ -4,6 +4,7 @@ import { formatDate, estimateReadingTime } from "@/lib/utils"
 import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
 import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
+import { LinkButton } from "@/components/ui/button"
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -131,6 +132,37 @@ function ProgressBar({ filled, total }: { filled: number; total: number }) {
   )
 }
 
+// ─── Experience timeline constants ─────────────────────────────────────────────
+
+// Professional start: March 15, 2021
+const CAREER_START_DATE = new Date(2021, 2, 15) // month is 0-indexed
+const CAREER_START = CAREER_START_DATE.getFullYear()
+const TIMELINE_WINDOW = 5 // intervals shown (= points - 1)
+
+const YEAR_WORDS: Record<number, string> = {
+  1: "One",
+  2: "Two",
+  3: "Three",
+  4: "Four",
+  5: "Five",
+  6: "Six",
+  7: "Seven",
+  8: "Eight",
+  9: "Nine",
+  10: "Ten",
+}
+
+function calcYearsOfExp(): number {
+  const now = new Date()
+  let years = now.getFullYear() - CAREER_START_DATE.getFullYear()
+  const hasPassedAnniversary =
+    now.getMonth() > CAREER_START_DATE.getMonth() ||
+    (now.getMonth() === CAREER_START_DATE.getMonth() &&
+      now.getDate() >= CAREER_START_DATE.getDate())
+  if (!hasPassedAnniversary) years--
+  return Math.max(0, years)
+}
+
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Home() {
@@ -143,6 +175,15 @@ export default async function Home() {
   ).length
   const ossGoal = 12
   const yrShort = currentYear.toString().slice(2)
+
+  // Experience timeline — counts from exact date (March 15 2021), not just year
+  const yearsOfExp = calcYearsOfExp()
+  const windowStart = Math.max(CAREER_START, currentYear - TIMELINE_WINDOW)
+  const showBeforeHint = windowStart > CAREER_START
+  const timelineYears = Array.from(
+    { length: currentYear - windowStart + 1 },
+    (_, i) => windowStart + i,
+  )
 
   return (
     <div className="mx-auto flex flex-col gap-20 px-12 py-8" style={{ maxWidth: 1280 }}>
@@ -181,7 +222,7 @@ export default async function Home() {
               >
                 v1.0
               </span>
-              <span>· recife, brazil</span>
+              <span>· Pernambuco, Brasil</span>
             </p>
 
             <h1
@@ -215,10 +256,7 @@ export default async function Home() {
               className="relative z-10 mb-8 max-w-[52ch] text-base leading-relaxed"
               style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
             >
-              <strong style={{ color: "var(--fg-primary)", fontWeight: 500 }}>
-                Full-stack engineer.
-              </strong>{" "}
-              Six years shipping web products — currently at{" "}
+              Full-stack Software Engineer with 5 years shipping web products. Currently at{" "}
               <Link
                 href="https://cesar.org.br"
                 target="_blank"
@@ -229,65 +267,150 @@ export default async function Home() {
                   borderBottom: "1px solid var(--border-strong)",
                 }}
               >
-                cesar
-              </Link>
-              , building open source on the side.
+                CESAR
+              </Link>{" "}
+              and always working on something open source on the side.
             </p>
 
             <div className="relative z-10 flex flex-wrap gap-3">
-              <Link
-                href="/projects"
-                className="inline-flex h-11 items-center gap-2 rounded-[var(--radius-md)] px-6 font-mono text-sm font-medium transition-all hover:-translate-y-px hover:[background:var(--fg-brand-hover)]"
-                style={{ background: "var(--fg-brand)", color: "var(--bg-canvas)" }}
-              >
+              <LinkButton href="/projects" variant="primary">
                 browse projects →
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex h-11 items-center gap-2 rounded-[var(--radius-md)] px-6 font-mono text-sm transition-all hover:[border-color:var(--border-strong)] hover:[background:var(--bg-surface-elevated)]"
-                style={{
-                  background: "var(--bg-surface)",
-                  color: "var(--fg-primary)",
-                  border: "1px solid var(--border-subtle)",
-                }}
-              >
+              </LinkButton>
+              <LinkButton href="/contact" variant="ghost">
                 <span style={{ color: "var(--fg-brand)" }}>$</span> cat contact.txt
-              </Link>
+              </LinkButton>
             </div>
           </div>
 
           {/* Hero side */}
           <div className="flex flex-col gap-3">
             <div className="bento-card">
-              <CardHead label="experience" meta="since 2020" />
-              <div
-                style={{
-                  fontFamily: "var(--font-serif)",
-                  fontSize: 72,
-                  lineHeight: 0.95,
-                  color: "var(--fg-primary)",
-                  letterSpacing: "-0.02em",
-                  fontWeight: 400,
-                }}
-              >
-                <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>Six</em>
-                <sub
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <CardHead label="experience" />
+                <span
+                  className="font-mono text-[11px] tracking-[0.04em]"
+                  style={{ color: "var(--fg-brand)" }}
+                >
+                  {CAREER_START} → NOW
+                </span>
+              </div>
+
+              {/* Display number */}
+              <div className="mt-3 flex items-baseline gap-3">
+                <em
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 12,
-                    color: "var(--fg-muted)",
+                    fontFamily: "var(--font-serif)",
+                    fontSize: 72,
+                    fontStyle: "italic",
                     fontWeight: 400,
-                    marginLeft: 6,
-                    letterSpacing: 0,
-                    verticalAlign: "baseline",
+                    lineHeight: 0.9,
+                    color: "var(--fg-brand)",
+                    letterSpacing: "-0.02em",
                   }}
                 >
-                  years
-                </sub>
+                  {YEAR_WORDS[yearsOfExp] ?? String(yearsOfExp)}
+                </em>
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <em
+                    style={{
+                      fontFamily: "var(--font-serif)",
+                      fontSize: 24,
+                      fontStyle: "italic",
+                      fontWeight: 400,
+                      color: "var(--fg-secondary)",
+                      lineHeight: 1,
+                    }}
+                  >
+                    years
+                  </em>
+                  <span
+                    className="font-mono tracking-[0.12em] uppercase"
+                    style={{ fontSize: 11, color: "var(--fg-secondary)" }}
+                  >
+                    shipping
+                  </span>
+                </div>
               </div>
-              <CardFoot comment="shipping web products">
-                <span>↗</span>
-              </CardFoot>
+
+              {/* Timeline */}
+              <div className="relative mt-auto flex justify-between" style={{ paddingTop: 28 }}>
+                {/* Line */}
+                <div
+                  className="absolute right-0 left-0"
+                  style={{ height: 1, background: "var(--fg-brand)", top: 33 }}
+                />
+                {timelineYears.map((year, i) => {
+                  const isCurrent = year === currentYear
+                  const isFirst = i === 0
+                  const label =
+                    isFirst && showBeforeHint
+                      ? `-'${year.toString().slice(2)}`
+                      : `'${year.toString().slice(2)}`
+                  return (
+                    <div
+                      key={year}
+                      className="group/dot flex flex-col items-center gap-2"
+                      style={{ cursor: "default", position: "relative", zIndex: 1 }}
+                    >
+                      <div
+                        style={{
+                          width: isCurrent ? 12 : 10,
+                          height: isCurrent ? 12 : 10,
+                          borderRadius: "50%",
+                          background: isCurrent ? "var(--fg-brand)" : "var(--fg-primary)",
+                          border: `2px solid ${isCurrent ? "var(--fg-brand)" : "var(--fg-secondary)"}`,
+                          transition: "transform 200ms ease, border-color 200ms ease",
+                          animation: isCurrent ? "dot-glow 2s ease-in-out infinite" : undefined,
+                        }}
+                        className={
+                          isCurrent
+                            ? ""
+                            : "group-hover/dot:scale-125 group-hover/dot:[border-color:var(--fg-brand)]"
+                        }
+                      />
+                      <span
+                        className="font-mono transition-colors duration-200 group-hover/dot:[color:var(--fg-brand)]"
+                        style={{
+                          fontSize: 10,
+                          color: isCurrent ? "var(--fg-brand)" : "var(--fg-muted)",
+                          fontWeight: isCurrent ? 600 : 400,
+                        }}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Footer */}
+              <div
+                className="mt-4 flex items-center justify-between font-mono text-[11px]"
+                style={{
+                  color: "var(--fg-muted)",
+                  borderTop: "1px dashed var(--border-subtle)",
+                  paddingTop: 12,
+                }}
+              >
+                <span>
+                  <span style={{ opacity: 0.6 }}>{"// "}</span>
+                  full-stack · web products
+                </span>
+                <span
+                  className="inline-flex items-center gap-1.5"
+                  style={{ color: "var(--fg-brand)" }}
+                >
+                  <span
+                    className="inline-block h-1.5 w-1.5 rounded-full"
+                    style={{
+                      background: "var(--fg-brand)",
+                      animation: "live-pulse 2s ease-in-out infinite",
+                    }}
+                  />
+                  live
+                </span>
+              </div>
             </div>
 
             <div className="bento-card">
