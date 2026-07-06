@@ -60,17 +60,19 @@ function CoverFallback() {
 function LoadingSkeleton() {
   return (
     <div
-      className="flex items-center gap-4 rounded-2xl border p-5"
+      className="flex flex-col justify-center rounded-2xl border p-5"
       style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
     >
-      <Skeleton className="h-[72px] w-[72px] shrink-0 rounded-lg" />
-      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-        <Skeleton variant="line" className="h-3.5 w-[78%]" />
-        <Skeleton variant="line" className="h-2.5 w-[52%]" />
-        <div
-          className="mt-1.5 h-px rounded-full"
-          style={{ background: "var(--bg-surface-elevated)" }}
-        />
+      <div className="flex items-center gap-4">
+        <Skeleton className="h-[72px] w-[72px] shrink-0 rounded-lg" />
+        <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+          <Skeleton variant="line" className="h-3.5 w-[78%]" />
+          <Skeleton variant="line" className="h-2.5 w-[52%]" />
+          <div
+            className="mt-1.5 h-px rounded-full"
+            style={{ background: "var(--bg-surface-elevated)" }}
+          />
+        </div>
       </div>
     </div>
   )
@@ -163,7 +165,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "group/card relative overflow-hidden rounded-2xl border p-5",
+        "group/card relative flex flex-col justify-center overflow-hidden rounded-2xl border p-5",
         "transition-all duration-200",
         "hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]",
         className,
