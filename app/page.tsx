@@ -676,43 +676,9 @@ export default async function Home() {
 
       {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
       <section>
-        <SectHead cmd="cat ./off-the-clock" meta="music · plays · gym" />
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr_1fr]">
+        <SectHead cmd="cat ./off-the-clock" meta="music · gym" />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <NowPlayingWidget />
-
-          {/* Plays */}
-          <div className="bento-card">
-            <CardHead label="plays" meta="four · weekly" />
-            <div
-              style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8, flex: 1 }}
-            >
-              {[
-                { id: "guit", opacity: 1 },
-                { id: "keys", opacity: 0.7 },
-                { id: "uke", opacity: 0.4 },
-                { id: "elec", opacity: 0.18 },
-              ].map(({ id, opacity }) => (
-                <div key={id} className="group/play flex flex-col items-center gap-2">
-                  <div
-                    className="w-full transition-transform duration-200 group-hover/play:-translate-y-0.5"
-                    style={{
-                      aspectRatio: "1",
-                      borderRadius: "var(--radius-sm)",
-                      background: `rgba(124,107,255,${opacity})`,
-                    }}
-                  />
-                  <span
-                    className="font-mono text-[10px] tracking-[0.04em]"
-                    style={{ color: "var(--fg-muted)" }}
-                  >
-                    {id}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <CardFoot comment="guitar · keys · uke · bass" />
-          </div>
-
           <TodayActivityCard state={activityState} />
         </div>
       </section>
