@@ -5,6 +5,7 @@ import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
 import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
 import { LinkButton } from "@/components/ui/button"
+import { StackCard } from "@/components/home/stack-card"
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -190,7 +191,8 @@ export default async function Home() {
       {/* ═══════════════ WHOAMI ═══════════════ */}
       <section>
         <SectHead cmd="whoami" meta="uptime · six years" />
-        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
+        {/* Row 1: hero + experience */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr]">
           {/* Hero card */}
           <div
             className="bento-card bento-card-xl relative overflow-hidden"
@@ -282,158 +284,172 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* Hero side */}
-          <div className="flex flex-col gap-3">
-            <div className="bento-card">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <CardHead label="experience" />
-                <span
-                  className="font-mono text-[11px] tracking-[0.04em]"
-                  style={{ color: "var(--fg-brand)" }}
-                >
-                  {CAREER_START} → NOW
-                </span>
-              </div>
+          {/* Experience card — directly in grid, stretches to hero height */}
+          <div className="bento-card relative flex flex-col overflow-hidden">
+            {/* Dot pattern decoration */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "28%",
+                width: "80%",
+                aspectRatio: "1",
+                opacity: 0.18,
+                pointerEvents: "none",
+                backgroundImage: "radial-gradient(var(--fg-brand) 1px, transparent 1.4px)",
+                backgroundSize: "18px 18px",
+                maskImage: "radial-gradient(circle, #000 0%, transparent 65%)",
+                WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 65%)",
+              }}
+            />
+            {/* Radial glow */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: "30%",
+                top: "10%",
+                width: 260,
+                height: 260,
+                borderRadius: "50%",
+                background: "radial-gradient(circle, var(--bg-surface-brand), transparent 70%)",
+                pointerEvents: "none",
+                opacity: 0.7,
+              }}
+            />
+            {/* Header */}
+            <div className="relative flex items-center justify-between">
+              <CardHead label="experience" />
+              <span
+                className="font-mono text-[11px] tracking-[0.04em]"
+                style={{ color: "var(--fg-brand)" }}
+              >
+                {CAREER_START} → NOW
+              </span>
+            </div>
 
-              {/* Display number */}
-              <div className="mt-3 flex items-baseline gap-3">
+            {/* Display number */}
+            <div className="relative mt-3 flex items-baseline gap-3">
+              <em
+                style={{
+                  fontFamily: "var(--font-serif)",
+                  fontSize: 72,
+                  fontStyle: "italic",
+                  fontWeight: 400,
+                  lineHeight: 0.9,
+                  color: "var(--fg-brand)",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                {YEAR_WORDS[yearsOfExp] ?? String(yearsOfExp)}
+              </em>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <em
                   style={{
                     fontFamily: "var(--font-serif)",
-                    fontSize: 72,
+                    fontSize: 24,
                     fontStyle: "italic",
                     fontWeight: 400,
-                    lineHeight: 0.9,
-                    color: "var(--fg-brand)",
-                    letterSpacing: "-0.02em",
+                    color: "var(--fg-secondary)",
+                    lineHeight: 1,
                   }}
                 >
-                  {YEAR_WORDS[yearsOfExp] ?? String(yearsOfExp)}
+                  years
                 </em>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <em
-                    style={{
-                      fontFamily: "var(--font-serif)",
-                      fontSize: 24,
-                      fontStyle: "italic",
-                      fontWeight: 400,
-                      color: "var(--fg-secondary)",
-                      lineHeight: 1,
-                    }}
-                  >
-                    years
-                  </em>
-                  <span
-                    className="font-mono tracking-[0.12em] uppercase"
-                    style={{ fontSize: 11, color: "var(--fg-secondary)" }}
-                  >
-                    shipping
-                  </span>
-                </div>
-              </div>
-
-              {/* Timeline */}
-              <div className="relative mt-auto flex justify-between" style={{ paddingTop: 28 }}>
-                {/* Line */}
-                <div
-                  className="absolute right-0 left-0"
-                  style={{ height: 1, background: "var(--fg-brand)", top: 33 }}
-                />
-                {timelineYears.map((year, i) => {
-                  const isCurrent = year === currentYear
-                  const isFirst = i === 0
-                  const label =
-                    isFirst && showBeforeHint
-                      ? `-'${year.toString().slice(2)}`
-                      : `'${year.toString().slice(2)}`
-                  return (
-                    <div
-                      key={year}
-                      className="group/dot flex flex-col items-center gap-2"
-                      style={{ cursor: "default", position: "relative", zIndex: 1 }}
-                    >
-                      <div
-                        style={{
-                          width: isCurrent ? 12 : 10,
-                          height: isCurrent ? 12 : 10,
-                          borderRadius: "50%",
-                          background: isCurrent ? "var(--fg-brand)" : "var(--fg-primary)",
-                          border: `2px solid ${isCurrent ? "var(--fg-brand)" : "var(--fg-secondary)"}`,
-                          transition: "transform 200ms ease, border-color 200ms ease",
-                          animation: isCurrent ? "dot-glow 2s ease-in-out infinite" : undefined,
-                        }}
-                        className={
-                          isCurrent
-                            ? ""
-                            : "group-hover/dot:scale-125 group-hover/dot:[border-color:var(--fg-brand)]"
-                        }
-                      />
-                      <span
-                        className="font-mono transition-colors duration-200 group-hover/dot:[color:var(--fg-brand)]"
-                        style={{
-                          fontSize: 10,
-                          color: isCurrent ? "var(--fg-brand)" : "var(--fg-muted)",
-                          fontWeight: isCurrent ? 600 : 400,
-                        }}
-                      >
-                        {label}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-
-              {/* Footer */}
-              <div
-                className="mt-4 flex items-center justify-between font-mono text-[11px]"
-                style={{
-                  color: "var(--fg-muted)",
-                  borderTop: "1px dashed var(--border-subtle)",
-                  paddingTop: 12,
-                }}
-              >
-                <span>
-                  <span style={{ opacity: 0.6 }}>{"// "}</span>
-                  full-stack · web products
-                </span>
                 <span
-                  className="inline-flex items-center gap-1.5"
-                  style={{ color: "var(--fg-brand)" }}
+                  className="font-mono tracking-[0.12em] uppercase"
+                  style={{ fontSize: 11, color: "var(--fg-secondary)" }}
                 >
-                  <span
-                    className="inline-block h-1.5 w-1.5 rounded-full"
-                    style={{
-                      background: "var(--fg-brand)",
-                      animation: "live-pulse 2s ease-in-out infinite",
-                    }}
-                  />
-                  live
+                  shipping
                 </span>
               </div>
             </div>
 
-            <div className="bento-card">
-              <CardHead label="stack" meta="14 tools" />
-              <div className="flex flex-wrap gap-1.5">
-                {["ts", "next", "react", "python", "django", "postgres", "drizzle", "hono"].map(
-                  (b) => (
-                    <Badge key={b}>{b}</Badge>
-                  ),
-                )}
-                <Badge variant="brand-soft">+6</Badge>
-              </div>
-              <CardFoot comment={`primary stack · ${currentYear}`}>
-                <Link
-                  href="/about"
-                  className="transition-colors hover:[color:var(--fg-brand-hover)]"
-                  style={{ color: "var(--fg-brand)", fontFamily: "var(--font-mono)", fontSize: 11 }}
-                >
-                  stack.json ↗
-                </Link>
-              </CardFoot>
+            {/* Timeline */}
+            <div className="relative mt-auto flex justify-between" style={{ paddingTop: 28 }}>
+              {/* Line */}
+              <div
+                className="absolute right-0 left-0"
+                style={{ height: 1, background: "var(--fg-brand)", top: 33 }}
+              />
+              {timelineYears.map((year, i) => {
+                const isCurrent = year === currentYear
+                const isFirst = i === 0
+                const label =
+                  isFirst && showBeforeHint
+                    ? `-'${year.toString().slice(2)}`
+                    : `'${year.toString().slice(2)}`
+                return (
+                  <div
+                    key={year}
+                    className="group/dot flex flex-col items-center gap-2"
+                    style={{ cursor: "default", position: "relative", zIndex: 1 }}
+                  >
+                    <div
+                      style={{
+                        width: isCurrent ? 12 : 10,
+                        height: isCurrent ? 12 : 10,
+                        borderRadius: "50%",
+                        background: isCurrent ? "var(--fg-brand)" : "var(--fg-primary)",
+                        border: `2px solid ${isCurrent ? "var(--fg-brand)" : "var(--fg-secondary)"}`,
+                        transition: "transform 200ms ease, border-color 200ms ease",
+                        animation: isCurrent ? "dot-glow 2s ease-in-out infinite" : undefined,
+                      }}
+                      className={
+                        isCurrent
+                          ? ""
+                          : "group-hover/dot:scale-125 group-hover/dot:[border-color:var(--fg-brand)]"
+                      }
+                    />
+                    <span
+                      className="font-mono transition-colors duration-200 group-hover/dot:[color:var(--fg-brand)]"
+                      style={{
+                        fontSize: 10,
+                        color: isCurrent ? "var(--fg-brand)" : "var(--fg-muted)",
+                        fontWeight: isCurrent ? 600 : 400,
+                      }}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Footer */}
+            <div
+              className="relative mt-4 flex items-center justify-between font-mono text-[11px]"
+              style={{
+                color: "var(--fg-muted)",
+                borderTop: "1px dashed var(--border-subtle)",
+                paddingTop: 12,
+              }}
+            >
+              <span>
+                <span style={{ opacity: 0.6 }}>{"// "}</span>
+                full-stack · web products
+              </span>
+              <span
+                className="inline-flex items-center gap-1.5"
+                style={{ color: "var(--fg-brand)" }}
+              >
+                <span
+                  className="inline-block h-1.5 w-1.5 rounded-full"
+                  style={{
+                    background: "var(--fg-brand)",
+                    animation: "live-pulse 2s ease-in-out infinite",
+                  }}
+                />
+                live
+              </span>
             </div>
           </div>
+        </div>
+
+        {/* Row 2: Stack — full width */}
+        <div className="mt-6">
+          <StackCard />
         </div>
       </section>
 
