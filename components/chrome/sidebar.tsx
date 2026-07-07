@@ -3,22 +3,22 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
-  HouseSimpleIcon,
-  UserIcon,
-  ArticleIcon,
-  FoldersIcon,
-  EnvelopeSimpleIcon,
+  HouseLineIcon,
+  UserSquareIcon,
+  FileMdIcon,
+  TerminalWindowIcon,
+  ChatsCircleIcon,
   PianoKeysIcon,
   BookBookmarkIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
-  { href: "/", icon: HouseSimpleIcon, label: "Home" },
-  { href: "/about", icon: UserIcon, label: "About" },
-  { href: "/blog", icon: ArticleIcon, label: "Blog" },
-  { href: "/projects", icon: FoldersIcon, label: "Projects" },
-  { href: "/contact", icon: EnvelopeSimpleIcon, label: "Contact" },
+  { href: "/", icon: HouseLineIcon, label: "Home" },
+  { href: "/about", icon: UserSquareIcon, label: "About" },
+  { href: "/blog", icon: FileMdIcon, label: "Blog" },
+  { href: "/projects", icon: TerminalWindowIcon, label: "Projects" },
+  { href: "/contact", icon: ChatsCircleIcon, label: "Contact" },
   { href: "/piano", icon: PianoKeysIcon, label: "Piano" },
   { href: "/log", icon: BookBookmarkIcon, label: "Log" },
 ]

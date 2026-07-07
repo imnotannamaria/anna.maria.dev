@@ -396,6 +396,18 @@ button:focus-visible,
   padding: 56px 48px 48px;
 }
 
+.featured-card {
+  transition:
+    border-color 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+.featured-card:hover {
+  border-color: rgba(124, 107, 255, 0.65) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(124, 107, 255, 0.2);
+}
+
 @keyframes cursor-blink {
   50% {
     opacity: 0;

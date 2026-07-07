@@ -472,7 +472,7 @@ export default async function Home() {
           {/* Featured project */}
           {featuredProject ? (
             <div
-              className="relative flex flex-col gap-4 overflow-hidden"
+              className="featured-card group/featured relative flex flex-col gap-4 overflow-hidden"
               style={{
                 background: "var(--bg-surface-brand)",
                 border: "1px solid rgba(124,107,255,0.35)",
@@ -481,6 +481,14 @@ export default async function Home() {
                 minHeight: 380,
               }}
             >
+              {/* Stretch link — covers whole card, inner links sit above it via z-index */}
+              <Link
+                href={`/projects/${featuredProject.slug}`}
+                className="absolute inset-0"
+                style={{ zIndex: 1 }}
+                aria-label={`View ${featuredProject.title}`}
+              />
+
               <div
                 aria-hidden
                 style={{
@@ -516,7 +524,6 @@ export default async function Home() {
               </p>
 
               <h2
-                className="relative z-10"
                 style={{
                   fontFamily: "var(--font-serif)",
                   fontWeight: 400,
@@ -543,7 +550,7 @@ export default async function Home() {
               </h2>
 
               <p
-                className="relative z-10 max-w-[44ch] text-sm leading-relaxed"
+                className="max-w-[44ch] text-sm leading-relaxed"
                 style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
               >
                 {featuredProject.description}
@@ -551,18 +558,20 @@ export default async function Home() {
 
               <div className="flex flex-wrap gap-1.5">
                 {featuredProject.tags.slice(0, 4).map((tag) => (
-                  <Badge key={tag}>{tag}</Badge>
+                  <Badge key={tag} variant="brand-soft">
+                    {tag}
+                  </Badge>
                 ))}
               </div>
 
               <CardFoot>
-                <div className="flex gap-6">
+                <div className="flex gap-6" style={{ position: "relative", zIndex: 2 }}>
                   {featuredProject.github && (
                     <Link
                       href={featuredProject.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="transition-colors hover:[color:var(--fg-brand)]"
+                      className="transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
                       style={{
                         color: "var(--fg-primary)",
                         fontFamily: "var(--font-mono)",
@@ -577,7 +586,7 @@ export default async function Home() {
                       href={featuredProject.live}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="transition-colors hover:[color:var(--fg-brand)]"
+                      className="transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
                       style={{
                         color: "var(--fg-primary)",
                         fontFamily: "var(--font-mono)",
@@ -607,53 +616,46 @@ export default async function Home() {
 
           {/* Stats column */}
           <div className="flex flex-col gap-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bento-card">
-                <CardHead
-                  label={`oss '${yrShort}`}
-                  meta={
-                    <Badge variant="success-soft">
-                      <span
-                        className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
-                        style={{ background: "currentColor" }}
-                      />
-                      +{ossGoal - ossCount}
-                    </Badge>
-                  }
-                />
+            {/* OSS card — full width */}
+            <div className="bento-card">
+              <CardHead
+                label={`oss '${yrShort}`}
+                meta={
+                  <Badge variant="success-soft">
+                    <span
+                      className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
+                      style={{ background: "currentColor" }}
+                    />
+                    {ossGoal - ossCount} to go
+                  </Badge>
+                }
+              />
+
+              <div className="flex items-end gap-4">
                 <StatNum serif={ossCount} sub={`/ ${ossGoal}`} />
-                <ProgressBar filled={ossCount} total={ossGoal} />
+                <span
+                  className="mb-1 font-mono text-[11px] tracking-[0.06em]"
+                  style={{ color: "var(--fg-muted)" }}
+                >
+                  shipped this year
+                </span>
               </div>
 
-              <div className="bento-card">
-                <CardHead
-                  label={`prs '${yrShort}`}
-                  meta={
-                    <Badge variant="success-soft">
-                      <span
-                        className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
-                        style={{ background: "currentColor" }}
-                      />
-                      +28
-                    </Badge>
-                  }
-                />
-                <StatNum serif={24} sub="/ 52" />
-                <ProgressBar filled={6} total={12} />
-              </div>
+              <ProgressBar filled={ossCount} total={ossGoal} />
             </div>
 
             {latestPost && (
               <Link
                 href={`/blog/${latestPost.slug}`}
-                className="block"
+                className="group/post flex flex-1 flex-col"
                 style={{ textDecoration: "none" }}
               >
-                <div className="bento-card">
+                <div className="bento-card flex flex-1 flex-col">
                   <CardHead
                     label="latest post"
                     meta={`${formatDate(latestPost.date)} · ${estimateReadingTime(latestPost.body)} min`}
                   />
+
                   <h3
                     style={{
                       fontFamily: "var(--font-serif)",
@@ -665,8 +667,37 @@ export default async function Home() {
                   >
                     {latestPost.title}
                   </h3>
+
+                  {latestPost.description && (
+                    <p
+                      className="line-clamp-3 text-sm leading-relaxed"
+                      style={{
+                        fontFamily: "var(--font-sans)",
+                        color: "var(--fg-secondary)",
+                        margin: 0,
+                      }}
+                    >
+                      {latestPost.description}
+                    </p>
+                  )}
+
+                  {latestPost.tags && latestPost.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {latestPost.tags.slice(0, 4).map((tag) => (
+                        <Badge key={tag} variant="brand-soft">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
                   <CardFoot comment="notes · public">
-                    <span style={{ color: "var(--fg-brand)" }}>read post →</span>
+                    <span
+                      className="transition-all duration-150 group-hover/post:tracking-[0.06em]"
+                      style={{ color: "var(--fg-brand)" }}
+                    >
+                      read post →
+                    </span>
                   </CardFoot>
                 </div>
               </Link>
