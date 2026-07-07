@@ -217,12 +217,12 @@ export function NowPlayingWidget({ className }: { className?: string }) {
         {/* Track info + progress */}
         <div
           className={cn(
-            "min-w-0 flex-1 pr-16 transition-opacity duration-[240ms]",
+            "min-w-0 flex-1 transition-opacity duration-[240ms]",
             fading ? "opacity-0" : "opacity-100",
           )}
         >
           {/* Equalizer + track name */}
-          <div className="mb-1 flex items-center gap-2">
+          <div className="mb-1 flex items-center gap-2 pr-16">
             <Equalizer />
             <span
               className="truncate font-mono text-sm font-medium"
@@ -233,7 +233,10 @@ export function NowPlayingWidget({ className }: { className?: string }) {
           </div>
 
           {/* Artist */}
-          <div className="mb-3 truncate font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+          <div
+            className="mb-3 truncate pr-16 font-mono text-xs"
+            style={{ color: "var(--fg-muted)" }}
+          >
             {track.artist}
           </div>
 

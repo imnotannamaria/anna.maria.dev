@@ -1,18 +1,15 @@
+"use client"
+
+import { useState } from "react"
 import type * as React from "react"
 import type { TodayData } from "./load"
 
 const colors = {
-  bg: "#0b0b0f",
-  panel: "rgba(255,255,255,0.03)",
-  border: "rgba(255,255,255,0.10)",
-  text: "rgba(255,255,255,0.88)",
-  muted: "rgba(255,255,255,0.55)",
-  subtle: "rgba(255,255,255,0.70)",
   move: "#7c6bff",
   exercise: "#10b981",
   steps: "#f59e0b",
-  warn: "#f59e0b",
   danger: "#f43f5e",
+  warn: "#f59e0b",
 }
 
 function clamp01(x: number): number {
@@ -64,18 +61,24 @@ function Ring({
 }
 
 function Panel({ className, children }: { className?: string; children: React.ReactNode }) {
+  const [hovered, setHovered] = useState(false)
   return (
     <section
       className={className}
       style={{
-        background: colors.panel,
-        border: `1px solid ${colors.border}`,
-        borderRadius: 18,
+        background: "var(--bg-surface)",
+        border: `1px solid ${hovered ? "var(--fg-brand)" : "var(--border-strong)"}`,
+        borderRadius: "var(--radius-xl)",
         padding: 18,
-        color: colors.text,
-        fontFamily:
-          'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"',
+        color: "var(--fg-primary)",
+        fontFamily: "var(--font-mono)",
+        display: "flex",
+        flexDirection: "column",
+        transition:
+          "border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out)",
       }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
       {children}
     </section>
@@ -87,7 +90,7 @@ function Header({ status, statusColor }: { status: string; statusColor: string }
     <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
       <span
         style={{
-          color: colors.muted,
+          color: "var(--fg-secondary)",
           fontSize: 11,
           letterSpacing: "0.12em",
           textTransform: "uppercase",
@@ -136,7 +139,7 @@ function MetricRow({
       />
       <span
         style={{
-          color: colors.muted,
+          color: "var(--fg-muted)",
           fontSize: 10,
           letterSpacing: "0.12em",
           minWidth: 78,
@@ -146,32 +149,48 @@ function MetricRow({
         {label}
       </span>
       <span style={{ flex: 1, minWidth: 0, textAlign: "right" }}>
-        <span style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 26, fontWeight: 500 }}>
+        <span
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: 26,
+            fontWeight: 400,
+            fontStyle: "italic",
+          }}
+        >
           {value}
         </span>
         {suffix ? (
-          <span style={{ color: colors.muted, marginLeft: 6, fontSize: 11 }}>{suffix}</span>
+          <span style={{ color: "var(--fg-muted)", marginLeft: 6, fontSize: 11 }}>{suffix}</span>
         ) : null}
       </span>
     </div>
   )
 }
 
-function Footer({ left, right }: { left: React.ReactNode; right: React.ReactNode }) {
+function Footer({
+  left,
+  right,
+  style: extraStyle,
+}: {
+  left: React.ReactNode
+  right: React.ReactNode
+  style?: React.CSSProperties
+}) {
   return (
     <div
       style={{
         marginTop: 14,
         paddingTop: 12,
-        borderTop: `1px dashed ${colors.border}`,
+        borderTop: "1px dashed var(--border-subtle)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         gap: 12,
+        ...extraStyle,
       }}
     >
-      <span style={{ color: colors.muted, fontSize: 11 }}>{left}</span>
-      <span style={{ color: colors.subtle, fontSize: 11 }}>{right}</span>
+      <span style={{ color: "var(--fg-muted)", fontSize: 11 }}>{left}</span>
+      <span style={{ color: "var(--fg-secondary)", fontSize: 11 }}>{right}</span>
     </div>
   )
 }
@@ -181,7 +200,7 @@ export function TodayActivityCardLoading({ className }: { className?: string }) 
     cy = 72
   return (
     <Panel className={className}>
-      <Header status="loading" statusColor={colors.muted} />
+      <Header status="loading" statusColor={"var(--fg-muted)"} />
       <div
         style={{
           marginTop: 12,
@@ -207,9 +226,9 @@ export function TodayActivityCardLoading({ className }: { className?: string }) 
         </div>
         <div style={{ opacity: 0.75 }}>
           <MetricRow dot={colors.move} label="Move" value="—" suffix="kcal" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${colors.border}` }} />
+          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow dot={colors.exercise} label="Exercise" value="—" suffix="min" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${colors.border}` }} />
+          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow dot={colors.steps} label="Steps" value="—" />
         </div>
       </div>
@@ -223,7 +242,7 @@ export function TodayActivityCardEmpty({ className }: { className?: string }) {
     cy = 72
   return (
     <Panel className={className}>
-      <Header status="empty" statusColor={colors.muted} />
+      <Header status="empty" statusColor={"var(--fg-muted)"} />
       <div
         style={{
           marginTop: 12,
@@ -249,15 +268,15 @@ export function TodayActivityCardEmpty({ className }: { className?: string }) {
         </div>
         <div>
           <MetricRow dot={colors.move} label="Move" value="—" suffix="kcal" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${colors.border}` }} />
+          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow dot={colors.exercise} label="Exercise" value="—" suffix="min" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${colors.border}` }} />
+          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow dot={colors.steps} label="Steps" value="—" />
         </div>
       </div>
       <Footer
         left="// no data yet — run the shortcut on iPhone"
-        right={<span style={{ color: colors.muted }}>install shortcut →</span>}
+        right={<span style={{ color: "var(--fg-muted)" }}>install shortcut →</span>}
       />
     </Panel>
   )
@@ -267,13 +286,13 @@ export function TodayActivityCardError({ className }: { className?: string }) {
   return (
     <Panel className={className}>
       <Header status="error" statusColor={colors.danger} />
-      <div style={{ marginTop: 12, color: colors.muted, fontSize: 13, lineHeight: 1.5 }}>
-        <div style={{ color: colors.text, marginBottom: 6 }}>Something went wrong.</div>
+      <div style={{ marginTop: 12, color: "var(--fg-muted)", fontSize: 13, lineHeight: 1.5 }}>
+        <div style={{ color: "var(--fg-primary)", marginBottom: 6 }}>Something went wrong.</div>
         <div>We couldn&apos;t load today&apos;s activity. Try again later.</div>
       </div>
       <Footer
         left="// showing nothing rather than guessing"
-        right={<span style={{ color: colors.muted }}>see docs</span>}
+        right={<span style={{ color: "var(--fg-muted)" }}>see docs</span>}
       />
     </Panel>
   )
@@ -337,14 +356,14 @@ export function TodayActivityCardStale({
         </div>
         <div>
           <MetricRow dot={colors.move} label="Move" value={Math.round(data.kcal)} suffix="kcal" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${colors.border}` }} />
+          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow
             dot={colors.exercise}
             label="Exercise"
             value={Math.round(data.exerciseMinutes)}
             suffix="min"
           />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${colors.border}` }} />
+          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow dot={colors.steps} label="Steps" value={Math.round(data.steps)} />
         </div>
       </div>
@@ -364,11 +383,13 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
       <Header status="synced" statusColor={colors.exercise} />
       <div
         style={{
+          flex: 1,
           marginTop: 12,
           display: "grid",
           gridTemplateColumns: "minmax(0,1fr) minmax(0,1.15fr)",
           gap: 20,
           alignItems: "center",
+          alignContent: "center",
         }}
       >
         <div style={{ display: "flex", justifyContent: "center" }}>
@@ -408,18 +429,22 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
         </div>
         <div>
           <MetricRow dot={colors.move} label="Move" value={Math.round(data.kcal)} suffix="kcal" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${colors.border}` }} />
+          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow
             dot={colors.exercise}
             label="Exercise"
             value={Math.round(data.exerciseMinutes)}
             suffix="min"
           />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${colors.border}` }} />
+          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow dot={colors.steps} label="Steps" value={Math.round(data.steps)} />
         </div>
       </div>
-      <Footer left="// up to date" right={`synced ${data.lastSyncLabel}`} />
+      <Footer
+        left="// up to date"
+        right={`synced ${data.lastSyncLabel}`}
+        style={{ marginTop: "auto" }}
+      />
     </Panel>
   )
 }

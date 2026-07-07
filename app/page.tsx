@@ -6,6 +6,7 @@ import { GithubCard } from "@/components/home/github-card"
 import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
 import { LinkButton } from "@/components/ui/button"
 import { StackCard } from "@/components/home/stack-card"
+import { MiniPianoCard } from "@/components/home/mini-piano-card"
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -679,7 +680,8 @@ export default async function Home() {
         <SectHead cmd="cat ./off-the-clock" meta="music · gym" />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <NowPlayingWidget />
-          <TodayActivityCard state={activityState} />
+          <TodayActivityCard state={activityState} className="lg:row-span-2 lg:h-full" />
+          <MiniPianoCard />
         </div>
       </section>
 
