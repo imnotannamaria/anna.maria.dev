@@ -461,8 +461,8 @@ export default async function Home() {
           meta={
             <Link
               href="/projects"
-              className="transition-colors hover:[color:var(--fg-brand-hover)]"
-              style={{ color: "var(--fg-brand)" }}
+              className="font-mono text-[11px] tracking-normal transition-all duration-150 hover:tracking-[0.08em]"
+              style={{ color: "var(--fg-brand)", textTransform: "none" }}
             >
               all projects ↗
             </Link>
@@ -719,12 +719,7 @@ export default async function Home() {
       {/* ═══════════════ GITHUB ═══════════════ */}
       <section>
         <SectHead cmd="git log --contributions" meta="github.com/imnotannamaria" />
-        <div className="bento-card">
-          <CardHead label="contributions" meta="imnotannamaria" />
-          <div className="overflow-x-auto">
-            <GithubCard username="imnotannamaria" />
-          </div>
-        </div>
+        <GithubCard username="imnotannamaria" />
       </section>
     </div>
   )

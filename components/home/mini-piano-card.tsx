@@ -52,15 +52,13 @@ export function MiniPianoCard() {
   return (
     <Link href="/piano" style={{ textDecoration: "none", display: "block" }}>
       <div
-        className="group/piano relative overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]"
+        className="group/piano relative overflow-hidden rounded-2xl border hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:[background:var(--bg-surface-elevated)]"
         style={{
           background: "var(--bg-surface)",
           borderColor: "var(--border-strong)",
           transition:
-            "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out)",
+            "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out)",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--fg-brand)")}
-        onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
       >
         {/* Toolbar */}
         <div
@@ -222,7 +220,7 @@ export function MiniPianoCard() {
         >
           <span>
             <span style={{ opacity: 0.6 }}>{"// "}</span>
-            no sound · G A G A
+            no sound
           </span>
           <span
             className="transition-colors duration-150 group-hover/piano:[color:var(--fg-brand)]"

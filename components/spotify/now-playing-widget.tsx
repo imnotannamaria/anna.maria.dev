@@ -166,18 +166,15 @@ export function NowPlayingWidget({ className }: { className?: string }) {
     <div
       className={cn(
         "group/card relative flex flex-col justify-center overflow-hidden rounded-2xl border p-5",
-        "transition-all duration-200",
-        "hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)]",
+        "hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:[background:var(--bg-surface-elevated)]",
         className,
       )}
       style={{
         background: "var(--bg-surface)",
         borderColor: "var(--border-strong)",
         transition:
-          "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), border-color 200ms var(--ease-out)",
+          "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out)",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--fg-brand)")}
-      onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border-strong)")}
     >
       {/* spotify ↗ — absolute, respects card padding */}
       <a

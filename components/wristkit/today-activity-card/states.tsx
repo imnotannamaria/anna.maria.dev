@@ -66,16 +66,18 @@ function Panel({ className, children }: { className?: string; children: React.Re
     <section
       className={className}
       style={{
-        background: "var(--bg-surface)",
-        border: `1px solid ${hovered ? "var(--fg-brand)" : "var(--border-strong)"}`,
+        background: hovered ? "var(--bg-surface-elevated)" : "var(--bg-surface)",
+        border: "1px solid var(--border-strong)",
         borderRadius: "var(--radius-xl)",
         padding: 18,
         color: "var(--fg-primary)",
         fontFamily: "var(--font-mono)",
         display: "flex",
         flexDirection: "column",
+        transform: hovered ? "translateY(-2px)" : "none",
+        boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.3)" : "none",
         transition:
-          "border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out)",
+          "background 200ms var(--ease-out), box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out)",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -85,9 +87,17 @@ function Panel({ className, children }: { className?: string; children: React.Re
   )
 }
 
-function Header({ status, statusColor }: { status: string; statusColor: string }) {
+function Header({
+  status,
+  statusColor,
+  live,
+}: {
+  status: string
+  statusColor: string
+  live?: boolean
+}) {
   return (
-    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
       <span
         style={{
           color: "var(--fg-secondary)",
@@ -100,12 +110,27 @@ function Header({ status, statusColor }: { status: string; statusColor: string }
       </span>
       <span
         style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 5,
           color: statusColor,
           fontSize: 11,
           letterSpacing: "0.12em",
           textTransform: "uppercase",
         }}
       >
+        {live && (
+          <span
+            style={{
+              display: "inline-block",
+              width: 5,
+              height: 5,
+              borderRadius: "50%",
+              background: "currentColor",
+              animation: "cursor-blink 1.2s step-start infinite",
+            }}
+          />
+        )}
         {status}
       </span>
     </div>
@@ -380,7 +405,7 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
     cy = 72
   return (
     <Panel className={className}>
-      <Header status="synced" statusColor={colors.exercise} />
+      <Header status="synced" statusColor={colors.exercise} live />
       <div
         style={{
           flex: 1,
