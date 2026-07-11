@@ -167,7 +167,7 @@ function MetricRow({
           color: "var(--fg-muted)",
           fontSize: 10,
           letterSpacing: "0.12em",
-          minWidth: 78,
+          minWidth: 64,
           textTransform: "uppercase",
         }}
       >
@@ -240,6 +240,7 @@ export function TodayActivityCardLoading({ className }: { className?: string }) 
             width={144}
             height={144}
             viewBox="0 0 144 144"
+            style={{ width: "100%", maxWidth: 144, height: "auto" }}
             role="img"
             aria-label="Activity rings"
           >
@@ -282,6 +283,7 @@ export function TodayActivityCardEmpty({ className }: { className?: string }) {
             width={144}
             height={144}
             viewBox="0 0 144 144"
+            style={{ width: "100%", maxWidth: 144, height: "auto" }}
             role="img"
             aria-label="No activity yet"
           >
@@ -349,6 +351,7 @@ export function TodayActivityCardStale({
             width={144}
             height={144}
             viewBox="0 0 144 144"
+            style={{ width: "100%", maxWidth: 144, height: "auto" }}
             role="img"
             aria-label="Activity rings"
           >
@@ -422,6 +425,7 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
             width={144}
             height={144}
             viewBox="0 0 144 144"
+            style={{ width: "100%", maxWidth: 144, height: "auto" }}
             role="img"
             aria-label="Activity rings"
           >

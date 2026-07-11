@@ -396,6 +396,16 @@ button:focus-visible,
   padding: 56px 48px 48px;
 }
 
+/* Tighten card padding on small screens so content isn't cramped */
+@media (max-width: 640px) {
+  .bento-card {
+    padding: 20px;
+  }
+  .bento-card-xl {
+    padding: 32px 20px 28px;
+  }
+}
+
 .featured-card {
   transition:
     border-color 200ms var(--ease-out),

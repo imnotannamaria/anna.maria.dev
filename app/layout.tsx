@@ -42,6 +42,7 @@ export default function RootLayout({
             inset: 0,
             display: "grid",
             gridTemplateRows: "40px 1fr 28px",
+            gridTemplateColumns: "minmax(0, 1fr)",
           }}
         >
           <Titlebar />
@@ -49,12 +50,13 @@ export default function RootLayout({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "56px 1fr",
+              gridTemplateColumns: "56px minmax(0, 1fr)",
               overflow: "hidden",
+              minWidth: 0,
             }}
           >
             <Sidebar />
-            <main style={{ overflowY: "auto" }}>{children}</main>
+            <main style={{ minWidth: 0, overflowX: "hidden", overflowY: "auto" }}>{children}</main>
           </div>
 
           <StatusBar
@@ -67,7 +69,7 @@ export default function RootLayout({
             }}
             left={
               <>
-                <StatusBarItem>◆ entrepta</StatusBarItem>
+                <StatusBarItem>◆ annamaria.app</StatusBarItem>
                 <StatusBarSeparator />
                 <StatusBarItem>main ✓</StatusBarItem>
               </>

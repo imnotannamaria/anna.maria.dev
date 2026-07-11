@@ -48,6 +48,8 @@ export function Sidebar() {
             lineHeight: 1,
             fontWeight: 500,
             color: "var(--bg-canvas)",
+            display: "block",
+            transform: "translateY(-0.5px)",
           }}
         >
           a

@@ -94,6 +94,16 @@ const BRANCHES: { id: string; label: string; comment: string; tools: Tool[] }[] 
 
 const TOTAL_TOOLS = BRANCHES.reduce((sum, b) => sum + b.tools.length, 0)
 
+// Divider borders per cell, adapting to the column count at each breakpoint:
+// 1 col (mobile) → bottom between rows · 2 col (sm) → right on col 0, bottom on row 0
+// 4 col (lg) → right between columns, no bottom
+const CELL_BORDERS = [
+  "border-b sm:border-r lg:border-b-0",
+  "border-b lg:border-r lg:border-b-0",
+  "border-b sm:border-r sm:border-b-0",
+  "",
+]
+
 const NUMBER_WORDS: Record<number, string> = {
   14: "fourteen",
   15: "fifteen",
@@ -216,7 +226,6 @@ export function StackCard() {
       >
         {BRANCHES.map((branch, i) => {
           const isOpen = open.has(branch.id)
-          const isLast = i === BRANCHES.length - 1
 
           return (
             <div
@@ -230,10 +239,7 @@ export function StackCard() {
                   toggle(branch.id)
                 }
               }}
-              className="group/branch flex cursor-pointer flex-col gap-3 p-4 transition-colors duration-150 outline-none hover:[background:var(--bg-hover-soft)] focus-visible:[background:var(--bg-hover-soft)]"
-              style={{
-                borderRight: !isLast ? "1px solid var(--border-subtle)" : undefined,
-              }}
+              className={`group/branch flex cursor-pointer flex-col gap-3 border-[var(--border-subtle)] p-4 transition-colors duration-150 outline-none hover:[background:var(--bg-hover-soft)] focus-visible:[background:var(--bg-hover-soft)] ${CELL_BORDERS[i]}`}
             >
               {/* Branch header */}
               <div className="flex w-full items-center gap-2">

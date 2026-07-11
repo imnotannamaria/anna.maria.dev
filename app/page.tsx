@@ -188,12 +188,15 @@ export default async function Home() {
   )
 
   return (
-    <div className="mx-auto flex flex-col gap-20 px-12 py-8" style={{ maxWidth: 1280 }}>
+    <div
+      className="mx-auto flex flex-col gap-14 px-4 py-6 sm:gap-16 sm:px-6 md:px-8 lg:gap-20 lg:px-12 lg:py-8"
+      style={{ maxWidth: 1280 }}
+    >
       {/* ═══════════════ WHOAMI ═══════════════ */}
       <section>
-        <SectHead cmd="whoami" meta="uptime · six years" />
+        <SectHead cmd="whoami" meta={`uptime · ${YEAR_WORDS[yearsOfExp] ?? yearsOfExp} years`} />
         {/* Row 1: hero + experience */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.5fr_1fr]">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
           {/* Hero card */}
           <div
             className="bento-card bento-card-xl relative overflow-hidden"
@@ -233,7 +236,7 @@ export default async function Home() {
               style={{
                 fontFamily: "var(--font-serif)",
                 fontWeight: 400,
-                fontSize: "clamp(56px, 7vw, 92px)",
+                fontSize: "clamp(44px, 9vw, 88px)",
                 lineHeight: 1,
                 letterSpacing: "-0.02em",
                 color: "var(--fg-primary)",
@@ -275,11 +278,21 @@ export default async function Home() {
               and always working on something open source on the side.
             </p>
 
-            <div className="relative z-10 flex flex-wrap gap-3">
-              <LinkButton href="/projects" variant="primary">
+            <div className="relative z-10 flex flex-nowrap gap-1.5 sm:flex-wrap sm:gap-3">
+              <LinkButton
+                href="/projects"
+                variant="primary"
+                className="h-10 min-w-0 flex-1 gap-1 overflow-hidden px-1.5 text-[11px] whitespace-nowrap sm:h-11 sm:flex-none sm:gap-2 sm:px-6 sm:text-sm"
+                style={{ height: undefined, paddingInline: undefined }}
+              >
                 browse projects →
               </LinkButton>
-              <LinkButton href="/contact" variant="ghost">
+              <LinkButton
+                href="/contact"
+                variant="ghost"
+                className="h-10 min-w-0 flex-1 gap-1 overflow-hidden px-1.5 text-[11px] whitespace-nowrap sm:h-11 sm:flex-none sm:gap-2 sm:px-6 sm:text-sm"
+                style={{ height: undefined, paddingInline: undefined }}
+              >
                 <span style={{ color: "var(--fg-brand)" }}>$</span> cat contact.txt
               </LinkButton>
             </div>
@@ -468,16 +481,15 @@ export default async function Home() {
             </Link>
           }
         />
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.35fr_1fr]">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.35fr_1fr]">
           {/* Featured project */}
           {featuredProject ? (
             <div
-              className="featured-card group/featured relative flex flex-col gap-4 overflow-hidden"
+              className="featured-card group/featured relative flex flex-col gap-4 overflow-hidden p-6 sm:p-8"
               style={{
                 background: "var(--bg-surface-brand)",
                 border: "1px solid rgba(124,107,255,0.35)",
                 borderRadius: "var(--radius-xl)",
-                padding: 32,
                 minHeight: 380,
               }}
             >
@@ -709,9 +721,9 @@ export default async function Home() {
       {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
       <section>
         <SectHead cmd="cat ./off-the-clock" meta="music · gym" />
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <NowPlayingWidget />
-          <TodayActivityCard state={activityState} className="lg:row-span-2 lg:h-full" />
+          <TodayActivityCard state={activityState} className="md:row-span-2 md:h-full" />
           <MiniPianoCard />
         </div>
       </section>
