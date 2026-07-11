@@ -39,6 +39,14 @@ export function MiniPianoCard() {
   const [step, setStep] = useState(0)
 
   useEffect(() => {
+    // Respect reduced-motion: skip the auto-play animation entirely (CSS
+    // media queries don't stop JS timers, so this has to be guarded here).
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return
+    }
     const t0 = setTimeout(() => setPressed(SEQ[step]), 0)
     const t1 = setTimeout(() => setPressed(null), 460)
     const t2 = setTimeout(() => setStep((s) => (s + 1) % SEQ.length), 680)
@@ -84,13 +92,18 @@ export function MiniPianoCard() {
             />
           </div>
           {/* Label */}
-          <span
-            className="font-mono text-[11px] tracking-[0.08em] uppercase"
-            style={{ color: "var(--fg-secondary)" }}
+          <h3
+            className="font-mono text-[11px] font-normal tracking-[0.08em] uppercase"
+            style={{ color: "var(--fg-secondary)", margin: 0 }}
           >
-            <span style={{ color: "var(--fg-brand)", marginRight: 5, fontSize: 9 }}>◆</span>
+            <span
+              aria-hidden="true"
+              style={{ color: "var(--fg-brand)", marginRight: 5, fontSize: 9 }}
+            >
+              ◆
+            </span>
             piano
-          </span>
+          </h3>
           <div className="flex-1" />
           {/* Hint */}
           <span className="font-mono text-[10px]" style={{ color: "var(--fg-muted)" }}>

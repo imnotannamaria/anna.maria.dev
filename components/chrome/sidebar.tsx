@@ -57,35 +57,38 @@ export function Sidebar() {
       </Link>
 
       {/* Nav buttons */}
-      {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
-        const active = isNavActive(href, pathname)
-        return (
-          <Link
-            key={href}
-            href={href}
-            aria-label={label}
-            title={label}
-            className={cn(
-              "relative grid h-9 w-9 place-items-center rounded-[var(--radius-md)]",
-              "transition-colors duration-[120ms]",
-              active
-                ? "text-[var(--fg-primary)]"
-                : "text-[var(--fg-muted)] hover:bg-[var(--bg-hover-soft)] hover:text-[var(--fg-primary)]",
-            )}
-          >
-            {active && (
-              <span
-                className="pointer-events-none absolute top-1/2 -left-2.5 -translate-y-1/2 text-[9px] leading-none"
-                style={{ color: "var(--fg-brand)" }}
-                aria-hidden
-              >
-                ◆
-              </span>
-            )}
-            <Icon size={18} weight={active ? "fill" : "regular"} />
-          </Link>
-        )
-      })}
+      <nav aria-label="Primary" className="flex flex-col items-center gap-1">
+        {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
+          const active = isNavActive(href, pathname)
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-label={label}
+              aria-current={active ? "page" : undefined}
+              title={label}
+              className={cn(
+                "relative grid h-9 w-9 place-items-center rounded-[var(--radius-md)]",
+                "transition-colors duration-[120ms]",
+                active
+                  ? "text-[var(--fg-primary)]"
+                  : "text-[var(--fg-muted)] hover:bg-[var(--bg-hover-soft)] hover:text-[var(--fg-primary)]",
+              )}
+            >
+              {active && (
+                <span
+                  className="pointer-events-none absolute top-1/2 -left-2.5 -translate-y-1/2 text-[9px] leading-none"
+                  style={{ color: "var(--fg-brand)" }}
+                  aria-hidden
+                >
+                  ◆
+                </span>
+              )}
+              <Icon size={18} weight={active ? "fill" : "regular"} />
+            </Link>
+          )
+        })}
+      </nav>
     </aside>
   )
 }

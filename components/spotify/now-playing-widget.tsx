@@ -176,6 +176,8 @@ export function NowPlayingWidget({ className }: { className?: string }) {
           "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out)",
       }}
     >
+      <h3 className="sr-only">Now playing on Spotify</h3>
+
       {/* spotify ↗ — absolute, respects card padding */}
       <a
         href={track.spotifyUrl}
@@ -242,6 +244,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
             className="relative h-px overflow-hidden rounded-full"
             style={{ background: "var(--bg-surface-elevated)" }}
             role="progressbar"
+            aria-label={`Playback progress: ${track.name} by ${track.artist}`}
             aria-valuenow={Math.round(progress * 100)}
             aria-valuemin={0}
             aria-valuemax={100}
@@ -254,10 +257,10 @@ export function NowPlayingWidget({ className }: { className?: string }) {
 
           {/* Time */}
           <div className="mt-1.5 flex justify-between">
-            <span className="font-mono text-[10px]" style={{ color: "var(--zinc-600)" }}>
+            <span className="font-mono text-[10px]" style={{ color: "var(--fg-secondary)" }}>
               {formatMs(elapsedMs)}
             </span>
-            <span className="font-mono text-[10px]" style={{ color: "var(--zinc-600)" }}>
+            <span className="font-mono text-[10px]" style={{ color: "var(--fg-secondary)" }}>
               -{formatMs(remaining)}
             </span>
           </div>

@@ -10,16 +10,37 @@ import { MiniPianoCard } from "@/components/home/mini-piano-card"
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
-function SectHead({ cmd, meta }: { cmd: string; meta?: React.ReactNode }) {
+function SectHead({
+  id,
+  cmd,
+  meta,
+  as = "h2",
+}: {
+  id: string
+  cmd: string
+  meta?: React.ReactNode
+  as?: "h2" | "span"
+}) {
+  const Label = as
   return (
     <div
       className="mb-6 flex items-baseline justify-between gap-4 border-b border-dashed pb-3"
       style={{ borderColor: "var(--border-subtle)" }}
     >
-      <span className="font-mono text-xs" style={{ color: "var(--fg-secondary)" }}>
-        <span style={{ color: "var(--fg-brand)" }}>$ </span>
+      <Label
+        id={id}
+        className="font-mono text-xs font-normal"
+        style={
+          as === "h2"
+            ? { margin: 0, color: "var(--fg-secondary)" }
+            : { color: "var(--fg-secondary)" }
+        }
+      >
+        <span aria-hidden="true" style={{ color: "var(--fg-brand)" }}>
+          ${" "}
+        </span>
         {cmd}
-      </span>
+      </Label>
       {meta && (
         <span
           className="font-mono text-[11px] tracking-[0.08em] uppercase"
@@ -32,16 +53,34 @@ function SectHead({ cmd, meta }: { cmd: string; meta?: React.ReactNode }) {
   )
 }
 
-function CardHead({ label, meta }: { label: string; meta?: React.ReactNode }) {
+function CardHead({
+  label,
+  meta,
+  as = "span",
+  id,
+}: {
+  label: string
+  meta?: React.ReactNode
+  as?: "span" | "h2" | "h3"
+  id?: string
+}) {
+  const Label = as
+  const isHeading = as !== "span"
   return (
     <div
       className="flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
       style={{ color: "var(--fg-secondary)" }}
     >
-      <span className="inline-flex items-center gap-1.5">
-        <span style={{ color: "var(--fg-brand)", fontSize: 10 }}>◆</span>
+      <Label
+        id={id}
+        className="inline-flex items-center gap-1.5"
+        style={isHeading ? { margin: 0, fontSize: "inherit", fontWeight: "inherit" } : undefined}
+      >
+        <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
+          ◆
+        </span>
         {label}
-      </span>
+      </Label>
       {meta && <span style={{ color: "var(--fg-muted)" }}>{meta}</span>}
     </div>
   )
@@ -193,8 +232,13 @@ export default async function Home() {
       style={{ maxWidth: 1280 }}
     >
       {/* ═══════════════ WHOAMI ═══════════════ */}
-      <section>
-        <SectHead cmd="whoami" meta={`uptime · ${YEAR_WORDS[yearsOfExp] ?? yearsOfExp} years`} />
+      <section aria-labelledby="sec-whoami">
+        <SectHead
+          id="sec-whoami"
+          as="span"
+          cmd="whoami"
+          meta={`uptime · ${YEAR_WORDS[yearsOfExp] ?? yearsOfExp} years`}
+        />
         {/* Row 1: hero + experience */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
           {/* Hero card */}
@@ -334,7 +378,7 @@ export default async function Home() {
             />
             {/* Header */}
             <div className="relative flex items-center justify-between">
-              <CardHead label="experience" />
+              <CardHead label="experience" as="h2" id="card-experience" />
               <span
                 className="font-mono text-[11px] tracking-[0.04em]"
                 style={{ color: "var(--fg-brand)" }}
@@ -468,8 +512,9 @@ export default async function Home() {
       </section>
 
       {/* ═══════════════ WORK ═══════════════ */}
-      <section>
+      <section aria-labelledby="sec-work">
         <SectHead
+          id="sec-work"
           cmd="ls ./work --featured"
           meta={
             <Link
@@ -523,7 +568,10 @@ export default async function Home() {
                   className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.08em] uppercase"
                   style={{ color: "var(--fg-secondary)" }}
                 >
-                  <span style={{ color: "var(--fg-brand)", fontSize: 10 }}>◆</span>featured
+                  <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
+                    ◆
+                  </span>
+                  featured
                 </span>
                 <Badge variant="brand-soft">SHIPPED</Badge>
               </div>
@@ -535,7 +583,7 @@ export default async function Home() {
                 01 / {getFeaturedProjects().length.toString().padStart(2, "0")}
               </p>
 
-              <h2
+              <h3
                 style={{
                   fontFamily: "var(--font-serif)",
                   fontWeight: 400,
@@ -559,7 +607,7 @@ export default async function Home() {
                     {featuredProject.title}
                   </em>
                 )}
-              </h2>
+              </h3>
 
               <p
                 className="max-w-[44ch] text-sm leading-relaxed"
@@ -632,6 +680,8 @@ export default async function Home() {
             <div className="bento-card">
               <CardHead
                 label={`oss '${yrShort}`}
+                as="h3"
+                id="card-oss"
                 meta={
                   <Badge variant="success-soft">
                     <span
@@ -719,8 +769,8 @@ export default async function Home() {
       </section>
 
       {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
-      <section>
-        <SectHead cmd="cat ./off-the-clock" meta="music · gym" />
+      <section aria-labelledby="sec-offclock">
+        <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym" />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <NowPlayingWidget />
           <TodayActivityCard state={activityState} className="md:row-span-2 md:h-full" />
@@ -729,8 +779,8 @@ export default async function Home() {
       </section>
 
       {/* ═══════════════ GITHUB ═══════════════ */}
-      <section>
-        <SectHead cmd="git log --contributions" meta="github.com/imnotannamaria" />
+      <section aria-labelledby="sec-github">
+        <SectHead id="sec-github" cmd="git log --contributions" meta="github.com/imnotannamaria" />
         <GithubCard username="imnotannamaria" />
       </section>
     </div>

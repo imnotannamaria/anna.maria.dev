@@ -189,13 +189,15 @@ export function StackCard() {
     <div className="bento-card">
       {/* Header */}
       <div className="mb-5 flex items-center gap-3">
-        <div
-          className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.08em] uppercase"
-          style={{ color: "var(--fg-secondary)" }}
+        <h2
+          className="inline-flex items-center gap-1.5 font-mono text-[11px] font-normal tracking-[0.08em] uppercase"
+          style={{ color: "var(--fg-secondary)", margin: 0 }}
         >
-          <span style={{ color: "var(--fg-brand)", fontSize: 10 }}>◆</span>
+          <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
+            ◆
+          </span>
           stack
-        </div>
+        </h2>
 
         <div
           className="flex items-center gap-2 font-mono text-[11px]"
@@ -232,6 +234,9 @@ export function StackCard() {
               key={branch.id}
               role="button"
               tabIndex={0}
+              aria-expanded={isOpen}
+              aria-controls={`stack-panel-${branch.id}`}
+              aria-label={`${branch.label} stack — ${branch.tools.length} tools`}
               onClick={() => toggle(branch.id)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -275,6 +280,7 @@ export function StackCard() {
 
               {/* Badges */}
               <div
+                id={`stack-panel-${branch.id}`}
                 className="flex flex-wrap gap-1.5 overflow-hidden transition-all duration-200"
                 style={{
                   maxHeight: isOpen ? 200 : 0,

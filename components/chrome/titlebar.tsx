@@ -52,7 +52,7 @@ export function Titlebar() {
 
   // Fade the scroll edges only when tabs actually overflow that side — on desktop
   // everything fits, so no fade; on mobile it signals the tabs are horizontally scrollable.
-  const scrollerRef = useRef<HTMLDivElement>(null)
+  const scrollerRef = useRef<HTMLElement>(null)
   const [edges, setEdges] = useState({ start: false, end: false })
 
   useEffect(() => {
@@ -80,16 +80,20 @@ export function Titlebar() {
 
   return (
     <div className="flex items-stretch border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)] select-none">
-      {/* Traffic lights */}
-      <div className="flex w-[84px] shrink-0 items-center gap-1.5 border-r border-[var(--border-subtle)] px-3">
+      {/* Traffic lights — decorative */}
+      <div
+        aria-hidden="true"
+        className="flex w-[84px] shrink-0 items-center gap-1.5 border-r border-[var(--border-subtle)] px-3"
+      >
         <span className="h-3 w-3 rounded-full bg-[var(--status-error)] opacity-85" />
         <span className="h-3 w-3 rounded-full bg-[var(--status-warning)] opacity-85" />
         <span className="h-3 w-3 rounded-full bg-[var(--status-success)] opacity-85" />
       </div>
 
       {/* Tabs */}
-      <div
+      <nav
         ref={scrollerRef}
+        aria-label="Pages"
         className="flex flex-1 items-stretch overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}
       >
@@ -101,6 +105,8 @@ export function Titlebar() {
               key={tab.href}
               href={tab.href}
               title={tab.name}
+              aria-label={tab.name}
+              aria-current={active ? "page" : undefined}
               className={cn(
                 "inline-flex h-full shrink-0 items-center gap-2 px-3 sm:px-4",
                 "border-r border-[var(--border-subtle)] font-mono text-[12px]",
@@ -120,6 +126,7 @@ export function Titlebar() {
               <span className={cn(active ? "inline" : "hidden sm:inline")}>{tab.name}</span>
               {active && (
                 <span
+                  aria-hidden="true"
                   className={cn(
                     "inline-grid h-3.5 w-3.5 place-items-center rounded-sm text-[12px]",
                     "text-[var(--fg-muted)] opacity-60 transition-opacity hover:opacity-100",
@@ -131,13 +138,13 @@ export function Titlebar() {
             </Link>
           )
         })}
-        <button
+        <span
+          aria-hidden="true"
           className="flex shrink-0 items-center px-3 font-mono text-sm text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
-          aria-label="New tab"
         >
           +
-        </button>
-      </div>
+        </span>
+      </nav>
 
       {/* Right meta */}
       <div className="hidden shrink-0 items-center gap-4 px-4 font-mono text-[11px] text-[var(--fg-muted)] md:flex">

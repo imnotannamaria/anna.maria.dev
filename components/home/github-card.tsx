@@ -40,10 +40,12 @@ export function GithubCard({ username }: { username: string }) {
         className="flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-secondary)" }}
       >
-        <span className="inline-flex items-center gap-1.5">
-          <span style={{ color: "var(--fg-brand)", fontSize: 10 }}>◆</span>
+        <h3 className="inline-flex items-center gap-1.5 font-normal" style={{ margin: 0 }}>
+          <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
+            ◆
+          </span>
           contributions
-        </span>
+        </h3>
         <span style={{ color: "var(--fg-muted)" }}>{username}</span>
       </div>
 

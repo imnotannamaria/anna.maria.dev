@@ -98,8 +98,10 @@ function Header({
 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <span
+      <h3
         style={{
+          margin: 0,
+          fontWeight: 400,
           color: "var(--fg-secondary)",
           fontSize: 11,
           letterSpacing: "0.12em",
@@ -107,7 +109,7 @@ function Header({
         }}
       >
         Today / Activity
-      </span>
+      </h3>
       <span
         style={{
           display: "inline-flex",
