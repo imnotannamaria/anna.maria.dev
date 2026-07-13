@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import {
   type Icon,
@@ -36,6 +36,17 @@ function getDynamicTab(pathname: string): Tab | null {
   return null
 }
 
+/**
+ * Where the × sends you when a tab is "closed". Dynamic detail tabs fall back to
+ * their parent listing (which also makes the tab disappear); the fixed nav tabs
+ * fall back to home. Home has no meaningful close, so it shows no ×.
+ */
+function closeTarget(href: string): string {
+  if (href.startsWith("/blog/")) return "/blog"
+  if (href.startsWith("/projects/")) return "/projects"
+  return "/"
+}
+
 function isTabActive(href: string, pathname: string): boolean {
   if (href === "/") return pathname === "/"
   if (href === pathname) return true
@@ -47,6 +58,7 @@ function isTabActive(href: string, pathname: string): boolean {
 
 export function Titlebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const dynamicTab = getDynamicTab(pathname)
   const tabs = dynamicTab ? [...NAV_TABS, dynamicTab] : NAV_TABS
 
@@ -100,42 +112,55 @@ export function Titlebar() {
         {tabs.map((tab) => {
           const active = isTabActive(tab.href, pathname)
           const TabIcon = tab.icon
+          // The × only shows on the active tab, and only where "closing" leads
+          // somewhere meaningful (everything except home).
+          const closable = active && tab.href !== "/"
           return (
-            <Link
+            <div
               key={tab.href}
-              href={tab.href}
-              title={tab.name}
-              aria-label={tab.name}
-              aria-current={active ? "page" : undefined}
               className={cn(
-                "inline-flex h-full shrink-0 items-center gap-2 px-3 sm:px-4",
-                "border-r border-[var(--border-subtle)] font-mono text-[12px]",
-                "transition-colors duration-[120ms]",
-                active
-                  ? "bg-[var(--bg-surface)] text-[var(--fg-primary)]"
-                  : "text-[var(--fg-muted)] hover:text-[var(--fg-secondary)]",
+                "inline-flex h-full shrink-0 items-center border-r border-[var(--border-subtle)]",
+                active && "bg-[var(--bg-surface)]",
               )}
             >
-              <TabIcon
-                size={15}
-                weight={active ? "fill" : "regular"}
-                style={{ color: active ? "var(--fg-brand)" : "currentColor" }}
-                className="shrink-0"
-              />
-              {/* Filename: always for the active tab, only on sm+ for inactive ones */}
-              <span className={cn(active ? "inline" : "hidden sm:inline")}>{tab.name}</span>
-              {active && (
-                <span
-                  aria-hidden="true"
+              <Link
+                href={tab.href}
+                title={tab.name}
+                aria-label={tab.name}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "inline-flex h-full items-center gap-2 pl-3 sm:pl-4",
+                  closable ? "pr-1.5" : "pr-3 sm:pr-4",
+                  "font-mono text-[12px] transition-colors duration-[120ms]",
+                  active
+                    ? "text-[var(--fg-primary)]"
+                    : "text-[var(--fg-muted)] hover:text-[var(--fg-secondary)]",
+                )}
+              >
+                <TabIcon
+                  size={15}
+                  weight={active ? "fill" : "regular"}
+                  style={{ color: active ? "var(--fg-brand)" : "currentColor" }}
+                  className="shrink-0"
+                />
+                {/* Filename: always for the active tab, only on sm+ for inactive ones */}
+                <span className={cn(active ? "inline" : "hidden sm:inline")}>{tab.name}</span>
+              </Link>
+              {closable && (
+                <button
+                  type="button"
+                  onClick={() => router.push(closeTarget(tab.href))}
+                  aria-label={`Close ${tab.name}`}
                   className={cn(
-                    "inline-grid h-3.5 w-3.5 place-items-center rounded-sm text-[12px]",
-                    "text-[var(--fg-muted)] opacity-60 transition-opacity hover:opacity-100",
+                    "mr-2 inline-grid h-4 w-4 shrink-0 place-items-center rounded-sm text-[12px]",
+                    "text-[var(--fg-muted)] opacity-60 transition-[opacity,background-color]",
+                    "hover:bg-[var(--bg-hover-strong)] hover:opacity-100",
                   )}
                 >
                   ×
-                </span>
+                </button>
               )}
-            </Link>
+            </div>
           )
         })}
         <span

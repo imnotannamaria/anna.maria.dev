@@ -1,7 +1,22 @@
 import * as runtime from "react/jsx-runtime"
 import Image from "next/image"
 import { InfoIcon } from "@phosphor-icons/react/dist/ssr"
-import { cn } from "@/lib/utils"
+import { cn, slugify } from "@/lib/utils"
+
+/** Derive a stable slug id from heading children so the outline/TOC can anchor to it. */
+function headingId(children: React.ReactNode): string | undefined {
+  const text = extractText(children)
+  return text ? slugify(text) : undefined
+}
+
+function extractText(node: React.ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node)
+  if (Array.isArray(node)) return node.map(extractText).join("")
+  if (node && typeof node === "object" && "props" in node) {
+    return extractText((node as { props: { children?: React.ReactNode } }).props.children)
+  }
+  return ""
+}
 
 function Callout({
   children,
@@ -40,40 +55,92 @@ function ImageCaption({ src, alt, caption }: { src: string; alt: string; caption
 const defaultComponents = {
   Callout,
   ImageCaption,
-  h1: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h1 className="font-display text-text-primary mt-8 mb-4 text-3xl font-bold" {...props} />
+  h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+    <h1
+      id={headingId(children)}
+      className="mt-12 mb-4 scroll-mt-6 text-3xl"
+      style={{
+        fontFamily: "var(--font-serif)",
+        fontWeight: 400,
+        letterSpacing: "-0.02em",
+        color: "var(--fg-primary)",
+      }}
+      {...props}
+    >
+      {children}
+    </h1>
   ),
-  h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
+  h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
-      className="font-display text-text-primary mt-10 mb-4 scroll-mt-20 text-2xl font-semibold"
+      id={headingId(children)}
+      className="mt-12 mb-4 scroll-mt-6 text-[28px]"
+      style={{
+        fontFamily: "var(--font-serif)",
+        fontWeight: 400,
+        lineHeight: 1.15,
+        letterSpacing: "-0.02em",
+        color: "var(--fg-primary)",
+      }}
       {...props}
-    />
+    >
+      {children}
+    </h2>
   ),
-  h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
+  h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
-      className="font-display text-text-primary mt-8 mb-3 scroll-mt-20 text-xl font-semibold"
+      id={headingId(children)}
+      className="mt-10 mb-3 scroll-mt-6 text-xl"
+      style={{
+        fontFamily: "var(--font-serif)",
+        fontWeight: 500,
+        color: "var(--fg-primary)",
+      }}
       {...props}
-    />
+    >
+      {children}
+    </h3>
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p className="text-text-secondary mb-4 leading-7" {...props} />
+    <p
+      className="mb-4 text-[16px] leading-[1.7]"
+      style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+      {...props}
+    />
+  ),
+  strong: (props: React.HTMLAttributes<HTMLElement>) => (
+    <strong style={{ color: "var(--fg-primary)", fontWeight: 500 }} {...props} />
+  ),
+  em: (props: React.HTMLAttributes<HTMLElement>) => (
+    <em
+      style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", color: "var(--fg-brand)" }}
+      {...props}
+    />
   ),
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
-      className="text-indigo-400 underline underline-offset-4 transition-colors hover:text-indigo-300"
+      className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand)]"
       {...props}
     />
   ),
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
-    <ul className="text-text-secondary mb-4 ml-6 list-disc space-y-1" {...props} />
+    <ul
+      className="mb-4 ml-6 list-disc space-y-1.5 text-[16px] leading-[1.7]"
+      style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+      {...props}
+    />
   ),
   ol: (props: React.HTMLAttributes<HTMLOListElement>) => (
-    <ol className="text-text-secondary mb-4 ml-6 list-decimal space-y-1" {...props} />
+    <ol
+      className="mb-4 ml-6 list-decimal space-y-1.5 text-[16px] leading-[1.7]"
+      style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+      {...props}
+    />
   ),
-  li: (props: React.HTMLAttributes<HTMLLIElement>) => <li className="leading-7" {...props} />,
+  li: (props: React.HTMLAttributes<HTMLLIElement>) => <li className="leading-[1.7]" {...props} />,
   blockquote: (props: React.HTMLAttributes<HTMLQuoteElement>) => (
     <blockquote
-      className="text-text-secondary my-6 border-l-4 border-indigo-500 pl-4 italic"
+      className="my-6 pl-4 italic"
+      style={{ borderLeft: "3px solid var(--fg-brand)", color: "var(--fg-secondary)" }}
       {...props}
     />
   ),
@@ -87,7 +154,12 @@ const defaultComponents = {
     if (!props.className) {
       return (
         <code
-          className="bg-bg-elevated rounded px-1.5 py-0.5 font-mono text-[13px] text-indigo-300"
+          className="rounded px-1.5 py-0.5 font-mono text-[13px]"
+          style={{
+            background: "var(--bg-surface)",
+            border: "1px solid var(--border-subtle)",
+            color: "var(--fg-primary)",
+          }}
           {...props}
         />
       )

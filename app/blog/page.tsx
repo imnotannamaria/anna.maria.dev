@@ -1,9 +1,9 @@
 import { Suspense } from "react"
 import Link from "next/link"
 import { createMetadata } from "@/lib/metadata"
-import { InlineArrow } from "@/components/ui/inline-arrow"
-import { getPublishedPosts } from "@/lib/velite"
-import { formatDate, estimateReadingTime } from "@/lib/utils"
+import { getPublishedPosts, getPostReadingStats } from "@/lib/velite"
+import { formatDate } from "@/lib/utils"
+import { Badge } from "@/app/components/entrepta/badge"
 import { TagFilter } from "./tag-filter"
 
 export const metadata = createMetadata({
@@ -14,22 +14,119 @@ export const metadata = createMetadata({
 
 export default function BlogPage({ searchParams }: { searchParams: Promise<{ tag?: string }> }) {
   const posts = getPublishedPosts()
-  const allTags = Array.from(new Set(posts.flatMap((p) => p.tags))).sort()
+
+  const tagCounts = new Map<string, number>()
+  for (const post of posts) {
+    for (const tag of post.tags) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1)
+  }
+  const tags = Array.from(tagCounts, ([name, count]) => ({ name, count })).sort((a, b) =>
+    a.name.localeCompare(b.name),
+  )
+
+  const latestYear = posts[0] ? new Date(posts[0].date).getFullYear() : new Date().getFullYear()
 
   return (
-    <div className="mx-auto w-full max-w-275 px-5 py-16">
-      <div className="mb-10">
-        <h1 className="font-display text-text-primary text-4xl font-bold">
-          Blog <span className="text-2xl font-normal text-indigo-500">({posts.length})</span>
-        </h1>
-        <p className="text-text-secondary mt-2">On development, architecture, and tooling.</p>
-      </div>
+    <div className="mx-auto w-full max-w-[920px] px-5 py-12 sm:px-8 lg:px-12">
+      {/* Breadcrumb */}
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-6 font-mono text-xs"
+        style={{ color: "var(--fg-muted)" }}
+      >
+        <span>~</span>
+        <span aria-hidden style={{ opacity: 0.5, margin: "0 6px" }}>
+          /
+        </span>
+        <span style={{ color: "var(--fg-primary)" }}>posts</span>
+      </nav>
+
+      {/* Page header */}
+      <header
+        className="mb-8 grid grid-cols-1 items-end gap-6 border-b pb-8 md:grid-cols-[1fr_auto]"
+        style={{ borderColor: "var(--border-subtle)" }}
+      >
+        <div>
+          <div
+            className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
+            style={{ color: "var(--fg-muted)" }}
+          >
+            <span style={{ color: "var(--fg-brand)" }}>$</span> ls ./posts --sort=date
+          </div>
+          <h1
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontWeight: 400,
+              fontSize: "clamp(48px, 6vw, 72px)",
+              lineHeight: 1,
+              letterSpacing: "-0.02em",
+              color: "var(--fg-primary)",
+              margin: 0,
+            }}
+          >
+            Posts
+          </h1>
+          <p
+            className="mt-4 text-[16px] leading-[1.6]"
+            style={{
+              fontFamily: "var(--font-sans)",
+              color: "var(--fg-secondary)",
+              maxWidth: "52ch",
+            }}
+          >
+            Notes on development, architecture, and the tools I reach for. Long-form thinking, build
+            logs, and the occasional{" "}
+            <em
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                color: "var(--fg-brand)",
+              }}
+            >
+              opinion.
+            </em>
+          </p>
+        </div>
+
+        <dl className="grid grid-cols-3 gap-2 md:self-end">
+          <Stat label="total" value={String(posts.length)} />
+          <Stat label="tags" value={String(tags.length)} />
+          <Stat label="latest" value={String(latestYear)} />
+        </dl>
+      </header>
 
       <Suspense>
-        <TagFilter tags={allTags} />
+        <TagFilter tags={tags} total={posts.length} />
       </Suspense>
 
       <PostList posts={posts} searchParams={searchParams} />
+    </div>
+  )
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div
+      className="rounded-[var(--radius-sm)] border px-4 py-3"
+      style={{ borderColor: "var(--border-subtle)" }}
+    >
+      <dt
+        className="mb-1 font-mono text-[10px] tracking-[0.08em] uppercase"
+        style={{ color: "var(--fg-muted)" }}
+      >
+        {label}
+      </dt>
+      <dd
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontSize: 28,
+          lineHeight: 1,
+          letterSpacing: "-0.02em",
+          color: "var(--fg-primary)",
+          margin: 0,
+        }}
+      >
+        {value}
+      </dd>
     </div>
   )
 }
@@ -46,50 +143,96 @@ async function PostList({
 
   if (filtered.length === 0) {
     return (
-      <p className="text-text-muted mt-12 text-center">
+      <p className="mt-12 text-center font-mono text-sm" style={{ color: "var(--fg-muted)" }}>
         {posts.length === 0
-          ? "No posts yet. When I publish something, it will show up here first."
-          : "No posts found for this tag."}
+          ? "// no posts yet. when I publish something, it shows up here first."
+          : "// no posts found for this tag."}
       </p>
     )
   }
 
   return (
-    <ul className="divide-border mt-8 divide-y">
+    <div className="flex flex-col">
       {filtered.map((post) => (
-        <li key={post.slug}>
-          <Link
-            href={`/blog/${post.slug}`}
-            className="group hover:bg-bg-surface flex items-center gap-6 border-l-[3px] border-transparent py-6 pl-4 transition-all duration-150 hover:border-indigo-500"
-          >
-            <time dateTime={post.date} className="text-text-muted w-28 shrink-0 font-mono text-xs">
-              {formatDate(post.date)}
-            </time>
-
-            <div className="flex-1 space-y-1">
-              <h2 className="text-text-primary text-base font-medium transition-colors group-hover:text-indigo-400">
-                {post.title}
-              </h2>
-              <p className="text-text-secondary text-sm">{post.description}</p>
-            </div>
-
-            <div className="text-text-muted hidden shrink-0 flex-col items-end gap-1 text-xs sm:flex">
-              <span>{estimateReadingTime(post.body)} min read</span>
-              <div className="flex gap-1">
-                {post.tags.slice(0, 2).map((t) => (
-                  <span key={t} className="rounded bg-indigo-900 px-1.5 py-0.5 text-indigo-300">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <span className="text-text-muted shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
-              <InlineArrow />
-            </span>
-          </Link>
-        </li>
+        <PostRow key={post.slug} post={post} />
       ))}
-    </ul>
+    </div>
+  )
+}
+
+function PostRow({ post }: { post: ReturnType<typeof getPublishedPosts>[number] }) {
+  const year = new Date(post.date).getFullYear()
+  const { minutes } = getPostReadingStats(post.slug)
+
+  return (
+    <Link
+      href={`/blog/${post.slug}`}
+      className="group grid grid-cols-1 gap-4 border-b py-7 transition-colors md:grid-cols-[1fr_auto] md:gap-8"
+      style={{ borderColor: "var(--border-subtle)" }}
+    >
+      <div className="flex min-w-0 flex-col gap-3">
+        <h2
+          className="text-[color:var(--fg-primary)] transition-colors group-hover:text-[color:var(--fg-brand)]"
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "clamp(24px, 3vw, 32px)",
+            lineHeight: 1.1,
+            letterSpacing: "-0.02em",
+            margin: 0,
+          }}
+        >
+          {post.title}
+        </h2>
+
+        <p
+          className="text-sm leading-[1.6]"
+          style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)", maxWidth: "64ch" }}
+        >
+          {post.description}
+        </p>
+
+        <div className="mt-1 flex flex-wrap gap-1.5">
+          {post.tags.map((t) => (
+            <Badge key={t} variant="outline" color="neutral" className="h-6 px-2.5 text-[11px]">
+              {t}
+            </Badge>
+          ))}
+        </div>
+
+        <div
+          className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px]"
+          style={{ color: "var(--fg-muted)" }}
+        >
+          <time dateTime={post.date}>{formatDate(post.date)}</time>
+          <span aria-hidden style={{ opacity: 0.5 }}>
+            ·
+          </span>
+          <span>{minutes} min read</span>
+        </div>
+      </div>
+
+      <div className="flex flex-row items-center justify-between gap-2 md:flex-col md:items-end">
+        <span
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: 32,
+            lineHeight: 1,
+            letterSpacing: "-0.02em",
+            color: "var(--fg-primary)",
+          }}
+        >
+          {year}
+        </span>
+        <span
+          className="inline-flex items-center gap-1.5 font-mono text-xs transition-[gap] md:mt-auto"
+          style={{ color: "var(--fg-brand)" }}
+        >
+          open .md
+          <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
+            →
+          </span>
+        </span>
+      </div>
+    </Link>
   )
 }

@@ -13,8 +13,22 @@ export function formatDate(date: string) {
   })
 }
 
+export function countWords(content: string): number {
+  return content.trim().split(/\s+/).filter(Boolean).length
+}
+
 export function estimateReadingTime(content: string): number {
   const wordsPerMinute = 200
-  const words = content.trim().split(/\s+/).length
-  return Math.ceil(words / wordsPerMinute)
+  return Math.ceil(countWords(content) / wordsPerMinute)
+}
+
+/** GitHub-style slug for heading anchors (matches the ids set on rendered headings). */
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
 }
