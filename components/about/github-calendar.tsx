@@ -5,8 +5,11 @@ import { useState, useEffect } from "react"
 
 export function GithubCalendar({ username }: { username: string }) {
   const [mode, setMode] = useState<"dark" | "light">("dark")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only mount guard to avoid hydration mismatch
+    setMounted(true)
     const update = () => {
       const m = document.documentElement.getAttribute("data-mode")
       setMode(m === "light" ? "light" : "dark")
@@ -19,6 +22,13 @@ export function GithubCalendar({ username }: { username: string }) {
     })
     return () => observer.disconnect()
   }, [])
+
+  // react-github-calendar fetches on the client and produces markup that can't
+  // match the server render, so we render nothing until mounted to avoid a
+  // hydration mismatch. A fixed-height placeholder keeps layout shift minimal.
+  if (!mounted) {
+    return <div aria-hidden style={{ height: 140 }} />
+  }
 
   return (
     <GitHubCalendar
