@@ -6,6 +6,7 @@ import {
   Heading,
   Hr,
   Html,
+  Link,
   Preview,
   Row,
   Section,
@@ -22,38 +23,49 @@ export function ContactEmail({ name, email, message }: ContactEmailProps) {
   return (
     <Html>
       <Head />
-      <Preview>New message from {name} via portfolio</Preview>
+      <Preview>New message from {name} via your portfolio</Preview>
       <Body style={body}>
         <Container style={container}>
-          {/* Header */}
-          <Section style={header}>
-            <Text style={logo}>am</Text>
+          {/* Titlebar chrome */}
+          <Section style={titlebar}>
+            <span style={{ ...dot, backgroundColor: "#ef4444" }} />
+            <span style={{ ...dot, backgroundColor: "#f59e0b" }} />
+            <span style={{ ...dot, backgroundColor: "#22c55e" }} />
+            <span style={tabLabel}>◆ contact.tsx</span>
           </Section>
 
           {/* Content */}
           <Section style={content}>
-            <Heading style={heading}>New message via portfolio</Heading>
+            <Text style={kicker}># new message</Text>
+            <Heading style={heading}>
+              A message via <span style={brandEm}>portfolio</span>.
+            </Heading>
 
-            <Row>
+            <Row style={fieldRow}>
               <Column style={fieldCol}>
-                <Text style={label}>From</Text>
+                <Text style={label}>{"// from"}</Text>
                 <Text style={value}>{name}</Text>
               </Column>
               <Column style={fieldCol}>
-                <Text style={label}>Email</Text>
-                <Text style={value}>{email}</Text>
+                <Text style={label}>{"// email"}</Text>
+                <Link href={`mailto:${email}`} style={emailLink}>
+                  {email}
+                </Link>
               </Column>
             </Row>
 
             <Hr style={divider} />
 
-            <Text style={label}>Message</Text>
+            <Text style={label}>{"// message"}</Text>
             <Text style={messageText}>{message}</Text>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
-            <Text style={footerText}>annamaria.app</Text>
+            <Text style={footerText}>
+              <span style={{ color: "#7c6bff" }}>◆</span> annamaria.app
+              <span style={footerSep}>·</span> reply directly to answer
+            </Text>
           </Section>
         </Container>
       </Body>
@@ -61,47 +73,79 @@ export function ContactEmail({ name, email, message }: ContactEmailProps) {
   )
 }
 
+const MONO = "'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace"
+const SERIF = "'Newsreader', Georgia, 'Times New Roman', serif"
+const SANS = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif"
+
 const body: React.CSSProperties = {
-  backgroundColor: "#f0f0f5",
-  fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
+  backgroundColor: "#09090b",
+  fontFamily: SANS,
   margin: 0,
   padding: "40px 0",
 }
 
 const container: React.CSSProperties = {
-  backgroundColor: "#ffffff",
+  backgroundColor: "#18181b",
   borderRadius: "12px",
   maxWidth: "560px",
   margin: "0 auto",
   overflow: "hidden",
-  border: "1px solid #e4e4f0",
+  border: "1px solid #27272a",
 }
 
-const header: React.CSSProperties = {
-  backgroundColor: "#0a0a0f",
-  padding: "20px 32px",
+const titlebar: React.CSSProperties = {
+  backgroundColor: "#09090b",
+  borderBottom: "1px solid #27272a",
+  padding: "14px 20px",
 }
 
-const logo: React.CSSProperties = {
-  color: "#818cf8",
-  fontFamily: "'Courier New', Courier, monospace",
-  fontSize: "22px",
-  fontWeight: 700,
-  margin: 0,
-  letterSpacing: "-1px",
-  lineHeight: 1,
+const dot: React.CSSProperties = {
+  display: "inline-block",
+  width: "10px",
+  height: "10px",
+  borderRadius: "50%",
+  marginRight: "6px",
+  verticalAlign: "middle",
+}
+
+const tabLabel: React.CSSProperties = {
+  fontFamily: MONO,
+  fontSize: "12px",
+  color: "#a1a1aa",
+  marginLeft: "10px",
+  verticalAlign: "middle",
 }
 
 const content: React.CSSProperties = {
   padding: "32px",
 }
 
+const kicker: React.CSSProperties = {
+  fontFamily: MONO,
+  fontSize: "12px",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "#7c6bff",
+  margin: "0 0 10px",
+}
+
 const heading: React.CSSProperties = {
-  color: "#0a0a0f",
-  fontSize: "20px",
-  fontWeight: 600,
+  fontFamily: SERIF,
+  fontSize: "28px",
+  fontWeight: 400,
+  letterSpacing: "-0.02em",
+  color: "#fafafa",
   margin: "0 0 28px",
-  lineHeight: 1.3,
+  lineHeight: 1.15,
+}
+
+const brandEm: React.CSSProperties = {
+  fontStyle: "italic",
+  color: "#7c6bff",
+}
+
+const fieldRow: React.CSSProperties = {
+  marginBottom: "4px",
 }
 
 const fieldCol: React.CSSProperties = {
@@ -111,27 +155,36 @@ const fieldCol: React.CSSProperties = {
 }
 
 const label: React.CSSProperties = {
-  color: "#8888aa",
+  fontFamily: MONO,
+  color: "#71717a",
   fontSize: "11px",
-  fontWeight: 500,
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  margin: "0 0 4px",
+  margin: "0 0 6px",
 }
 
 const value: React.CSSProperties = {
-  color: "#0a0a0f",
+  fontFamily: SANS,
+  color: "#fafafa",
   fontSize: "15px",
-  margin: "0 0 4px",
+  margin: 0,
+}
+
+const emailLink: React.CSSProperties = {
+  fontFamily: MONO,
+  color: "#9b8eff",
+  fontSize: "14px",
+  textDecoration: "underline",
 }
 
 const divider: React.CSSProperties = {
-  borderColor: "#e4e4f0",
+  borderColor: "#27272a",
   margin: "24px 0",
 }
 
 const messageText: React.CSSProperties = {
-  color: "#333355",
+  fontFamily: SANS,
+  color: "#a1a1aa",
   fontSize: "15px",
   lineHeight: 1.7,
   margin: 0,
@@ -139,13 +192,19 @@ const messageText: React.CSSProperties = {
 }
 
 const footer: React.CSSProperties = {
-  backgroundColor: "#f8f8fc",
-  borderTop: "1px solid #e4e4f0",
-  padding: "20px 32px",
+  backgroundColor: "#131316",
+  borderTop: "1px solid #27272a",
+  padding: "18px 32px",
 }
 
 const footerText: React.CSSProperties = {
-  color: "#8888aa",
+  fontFamily: MONO,
+  color: "#71717a",
   fontSize: "12px",
   margin: 0,
+}
+
+const footerSep: React.CSSProperties = {
+  color: "#3f3f46",
+  margin: "0 8px",
 }
