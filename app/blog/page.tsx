@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 import { createMetadata } from "@/lib/metadata"
 import { getPublishedPosts, getPostReadingStats } from "@/lib/velite"
-import { formatDate } from "@/lib/utils"
+import { formatDate, numberToWord } from "@/lib/utils"
 import { Badge } from "@/app/components/entrepta/badge"
 import { TagFilter } from "./tag-filter"
 
@@ -88,8 +88,8 @@ export default function BlogPage({ searchParams }: { searchParams: Promise<{ tag
         </div>
 
         <dl className="grid grid-cols-3 gap-2 md:self-end">
-          <Stat label="total" value={String(posts.length)} />
-          <Stat label="tags" value={String(tags.length)} />
+          <Stat label="total" value={numberToWord(posts.length)} />
+          <Stat label="tags" value={numberToWord(tags.length)} />
           <Stat label="latest" value={String(latestYear)} />
         </dl>
       </header>
@@ -110,7 +110,7 @@ function Stat({ label, value }: { label: string; value: string }) {
       style={{ borderColor: "var(--border-subtle)" }}
     >
       <dt
-        className="mb-1 font-mono text-[10px] tracking-[0.08em] uppercase"
+        className="mb-1.5 font-mono text-[10px] tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-muted)" }}
       >
         {label}
@@ -118,10 +118,11 @@ function Stat({ label, value }: { label: string; value: string }) {
       <dd
         style={{
           fontFamily: "var(--font-serif)",
-          fontSize: 28,
+          fontStyle: "italic",
+          fontSize: 34,
           lineHeight: 1,
           letterSpacing: "-0.02em",
-          color: "var(--fg-primary)",
+          color: "var(--fg-brand)",
           margin: 0,
         }}
       >

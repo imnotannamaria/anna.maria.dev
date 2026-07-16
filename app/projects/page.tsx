@@ -1,8 +1,8 @@
 import { Suspense } from "react"
-import { ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr"
 import { createMetadata } from "@/lib/metadata"
+import { numberToWord } from "@/lib/utils"
 import { getPublishedProjects } from "@/lib/velite"
-import { ProjectCard } from "@/components/projects/project-card"
+import { FeaturedProjectCard, ProjectCard } from "@/components/projects/project-card"
 import { TagFilter } from "./tag-filter"
 
 export const metadata = createMetadata({
@@ -17,48 +17,137 @@ export default function ProjectsPage({
   searchParams: Promise<{ tag?: string }>
 }) {
   const projects = getPublishedProjects()
-  const allTags = Array.from(new Set(projects.flatMap((p) => p.tags))).sort()
+
+  const tagCounts = new Map<string, number>()
+  for (const project of projects) {
+    for (const tag of project.tags) tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1)
+  }
+  const tags = Array.from(tagCounts, ([name, count]) => ({ name, count })).sort((a, b) =>
+    a.name.localeCompare(b.name),
+  )
+
+  const latestYear = projects[0]
+    ? new Date(projects[0].date).getFullYear()
+    : new Date().getFullYear()
 
   return (
-    <div className="mx-auto w-full max-w-275 px-5 py-16">
-      <div className="mb-10">
-        <h1 className="font-display text-text-primary text-4xl font-bold">
-          Projects <span className="text-2xl font-normal text-indigo-500">({projects.length})</span>
-        </h1>
-        <p className="text-text-secondary mt-2">
-          Open-source tools, libraries, and side projects. This list features my latest work from{" "}
-          <strong>2026</strong> onwards. For the full archive, check my{" "}
-          <a
-            href="https://github.com/imnotannamaria"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-0.5 text-indigo-400 transition-colors hover:text-indigo-300"
+    <div className="mx-auto w-full max-w-[920px] px-5 py-12 sm:px-8 lg:px-12">
+      {/* Breadcrumb */}
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-6 font-mono text-xs"
+        style={{ color: "var(--fg-muted)" }}
+      >
+        <span>~</span>
+        <span aria-hidden style={{ opacity: 0.5, margin: "0 6px" }}>
+          /
+        </span>
+        <span style={{ color: "var(--fg-primary)" }}>projects</span>
+      </nav>
+
+      {/* Page header */}
+      <header
+        className="mb-8 grid grid-cols-1 items-end gap-6 border-b pb-8 md:grid-cols-[1fr_auto]"
+        style={{ borderColor: "var(--border-subtle)" }}
+      >
+        <div>
+          <div
+            className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
+            style={{ color: "var(--fg-muted)" }}
           >
-            GitHub <ArrowSquareOutIcon size={13} />
-          </a>{" "}
-          or my{" "}
-          <a
-            href="https://anna-maria-portfolio.vercel.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-0.5 text-indigo-400 transition-colors hover:text-indigo-300"
+            <span style={{ color: "var(--fg-brand)" }}>$</span> ls ./projects --sort=date
+          </div>
+          <h1
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontWeight: 400,
+              fontSize: "clamp(48px, 6vw, 72px)",
+              lineHeight: 1,
+              letterSpacing: "-0.02em",
+              color: "var(--fg-primary)",
+              margin: 0,
+            }}
           >
-            old portfolio <ArrowSquareOutIcon size={13} />
-          </a>
-          .
-        </p>
-      </div>
+            Projects
+          </h1>
+          <p
+            className="mt-4 text-[16px] leading-[1.6]"
+            style={{
+              fontFamily: "var(--font-sans)",
+              color: "var(--fg-secondary)",
+              maxWidth: "56ch",
+            }}
+          >
+            Open-source tools, libraries, and side projects — my latest work from{" "}
+            <strong style={{ color: "var(--fg-primary)", fontWeight: 500 }}>2026</strong> onwards.
+            For the full archive, check my{" "}
+            <a
+              href="https://github.com/imnotannamaria"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand)]"
+            >
+              GitHub
+            </a>{" "}
+            or my{" "}
+            <a
+              href="https://anna-maria-portfolio.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand)]"
+            >
+              old portfolio
+            </a>
+            .
+          </p>
+        </div>
+
+        <dl className="grid grid-cols-3 gap-2 md:self-end">
+          <Stat label="total" value={numberToWord(projects.length)} />
+          <Stat label="tags" value={numberToWord(tags.length)} />
+          <Stat label="latest" value={String(latestYear)} />
+        </dl>
+      </header>
 
       <Suspense>
-        <TagFilter tags={allTags} />
+        <TagFilter tags={tags} total={projects.length} />
       </Suspense>
 
-      <ProjectGrid projects={projects} searchParams={searchParams} />
+      <ProjectList projects={projects} searchParams={searchParams} />
     </div>
   )
 }
 
-async function ProjectGrid({
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div
+      className="rounded-[var(--radius-sm)] border px-4 py-3"
+      style={{ borderColor: "var(--border-subtle)" }}
+    >
+      <dt
+        className="mb-1.5 font-mono text-[10px] tracking-[0.08em] uppercase"
+        style={{ color: "var(--fg-muted)" }}
+      >
+        {label}
+      </dt>
+      <dd
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontStyle: "italic",
+          fontSize: 34,
+          lineHeight: 1,
+          letterSpacing: "-0.02em",
+          color: "var(--fg-brand)",
+          margin: 0,
+        }}
+      >
+        {value}
+      </dd>
+    </div>
+  )
+}
+
+async function ProjectList({
   projects,
   searchParams,
 }: {
@@ -69,22 +158,25 @@ async function ProjectGrid({
   const filtered = tag ? projects.filter((p) => p.tags.includes(tag)) : projects
 
   if (filtered.length === 0) {
-    return <p className="text-text-muted mt-12 text-center">No projects found for this tag.</p>
+    return (
+      <p className="mt-12 text-center font-mono text-sm" style={{ color: "var(--fg-muted)" }}>
+        {"// no projects found for this tag."}
+      </p>
+    )
   }
 
+  // Featured first, then the rest by date — one card per row.
+  const ordered = [...filtered].sort((a, b) => Number(b.featured) - Number(a.featured))
+
   return (
-    <div className="mt-8 grid gap-6 sm:grid-cols-2">
-      {filtered.map((project) => (
-        <ProjectCard
-          key={project.slug}
-          slug={project.slug}
-          title={project.title}
-          description={project.description}
-          tags={project.tags}
-          github={project.github}
-          live={project.live}
-        />
-      ))}
+    <div className="flex flex-col gap-6">
+      {ordered.map((project) =>
+        project.featured ? (
+          <FeaturedProjectCard key={project.slug} project={project} />
+        ) : (
+          <ProjectCard key={project.slug} project={project} />
+        ),
+      )}
     </div>
   )
 }

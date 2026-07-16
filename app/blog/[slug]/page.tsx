@@ -5,7 +5,7 @@ import { getPublishedPosts, getPostBySlug, getPostToc, getPostReadingStats } fro
 import { formatDate } from "@/lib/utils"
 import { MDXContent } from "@/components/blog/mdx-content"
 import { ReadingProgress } from "@/components/blog/reading-progress"
-import { PostOutline } from "./post-outline"
+import { Outline } from "@/components/outline"
 import { Badge } from "@/app/components/entrepta/badge"
 
 type Props = {
@@ -56,7 +56,7 @@ export default async function BlogPostPage({ params }: Props) {
       <ReadingProgress />
 
       <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
-        <PostOutline slug={slug} items={toc} words={words} minutes={minutes} />
+        <Outline filename={`${slug}.mdx`} items={toc} words={words} minutes={minutes} />
 
         <div className="min-w-0">
           <article className="mx-auto max-w-[760px] px-5 py-12 sm:px-8 lg:px-12">
@@ -129,7 +129,7 @@ export default async function BlogPostPage({ params }: Props) {
             </header>
 
             {/* Prose */}
-            <div id="post-body">
+            <div id="doc-body">
               <MDXContent code={post.body} />
             </div>
 

@@ -9,10 +9,10 @@ function stripPrefix(slug: string) {
 
 export type TocItem = { id: string; label: string; level: 2 | 3 }
 
-/** Read a post's raw MDX, minus its frontmatter block. Returns "" if missing. */
-function readPostRaw(slug: string): string {
+/** Read a document's raw MDX from a content dir, minus frontmatter. "" if missing. */
+function readRaw(dir: "blog" | "projects", slug: string): string {
   try {
-    const raw = readFileSync(join(process.cwd(), "content", "blog", `${slug}.mdx`), "utf-8")
+    const raw = readFileSync(join(process.cwd(), "content", dir, `${slug}.mdx`), "utf-8")
     return raw.replace(/^---\n[\s\S]*?\n---/, "")
   } catch {
     return ""
@@ -20,12 +20,12 @@ function readPostRaw(slug: string): string {
 }
 
 /**
- * Word count + reading time from a post's actual prose. `post.body` is compiled
+ * Word count + reading time from a document's actual prose. `body` is compiled
  * MDX (a JS function body), so counting it would be wildly off — we read the raw
  * markdown instead, stripping code fences and the heaviest markdown syntax.
  */
-export function getPostReadingStats(slug: string): { words: number; minutes: number } {
-  const prose = readPostRaw(slug)
+function readingStats(body: string): { words: number; minutes: number } {
+  const prose = body
     .replace(/```[\s\S]*?```/g, "") // fenced code
     .replace(/`[^`]*`/g, "") // inline code
     .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1") // images/links → text
@@ -35,12 +35,11 @@ export function getPostReadingStats(slug: string): { words: number; minutes: num
 }
 
 /**
- * Extract h2/h3 headings from a post's raw MDX so the outline can render
- * server-side. Ids match the slugs mdx-content assigns to rendered headings.
- * Frontmatter and fenced code blocks are skipped.
+ * Extract h2/h3 headings from raw MDX so the outline can render server-side.
+ * Ids match the slugs mdx-content assigns to rendered headings. Frontmatter and
+ * fenced code blocks are skipped.
  */
-export function getPostToc(slug: string): TocItem[] {
-  const body = readPostRaw(slug)
+function extractToc(body: string): TocItem[] {
   const items: TocItem[] = []
   let inFence = false
 
@@ -59,6 +58,22 @@ export function getPostToc(slug: string): TocItem[] {
   }
 
   return items
+}
+
+export function getPostReadingStats(slug: string) {
+  return readingStats(readRaw("blog", slug))
+}
+
+export function getPostToc(slug: string): TocItem[] {
+  return extractToc(readRaw("blog", slug))
+}
+
+export function getProjectReadingStats(slug: string) {
+  return readingStats(readRaw("projects", slug))
+}
+
+export function getProjectToc(slug: string): TocItem[] {
+  return extractToc(readRaw("projects", slug))
 }
 
 export function getPublishedPosts() {

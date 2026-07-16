@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import type { Metadata } from "next"
-import { GithubLogoIcon, ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr"
-import { getPublishedProjects, getProjectBySlug } from "@/lib/velite"
+import {
+  getPublishedProjects,
+  getProjectBySlug,
+  getProjectToc,
+  getProjectReadingStats,
+} from "@/lib/velite"
 import { formatDate } from "@/lib/utils"
 import { MDXContent } from "@/components/blog/mdx-content"
-import { Badge } from "@/components/ui/badge"
-import { InlineArrow } from "@/components/ui/inline-arrow"
+import { Outline } from "@/components/outline"
+import { Badge } from "@/app/components/entrepta/badge"
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -47,75 +51,155 @@ export default async function ProjectPage({ params }: Props) {
 
   if (!project) notFound()
 
+  const { words, minutes } = getProjectReadingStats(slug)
+  const toc = getProjectToc(slug)
+
   return (
-    <div className="mx-auto w-full max-w-275 px-5 py-16">
-      <Link
-        href="/projects"
-        className="group text-text-muted hover:text-text-primary mb-10 inline-flex items-center gap-1.5 text-sm transition-colors"
-      >
-        <InlineArrow direction="left" />
-        All projects
-      </Link>
+    <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
+      <Outline filename={`${slug}.tsx`} items={toc} words={words} minutes={minutes} />
 
-      <div className="mt-6 flex flex-col gap-10 lg:flex-row lg:gap-16">
-        <aside className="shrink-0 lg:sticky lg:top-24 lg:w-56 lg:self-start">
-          <h1 className="font-display text-text-primary text-2xl leading-tight font-bold">
-            {project.title}
-          </h1>
-          <p className="text-text-secondary mt-2 text-sm leading-relaxed">{project.description}</p>
+      <div className="min-w-0">
+        <article className="mx-auto max-w-[760px] px-5 py-12 sm:px-8 lg:px-12">
+          {/* Breadcrumb */}
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-4 font-mono text-xs"
+            style={{ color: "var(--fg-muted)" }}
+          >
+            <Link
+              href="/projects"
+              className="transition-colors hover:text-[color:var(--fg-primary)]"
+            >
+              ~
+            </Link>
+            <span aria-hidden style={{ opacity: 0.5, margin: "0 6px" }}>
+              /
+            </span>
+            <Link
+              href="/projects"
+              className="transition-colors hover:text-[color:var(--fg-primary)]"
+            >
+              projects
+            </Link>
+            <span aria-hidden style={{ opacity: 0.5, margin: "0 6px" }}>
+              /
+            </span>
+            <span style={{ color: "var(--fg-primary)" }}>{slug}.tsx</span>
+          </nav>
 
-          <div className="mt-6 flex flex-col gap-2">
-            {project.github && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${project.title} on GitHub`}
-                className="text-text-secondary hover:text-text-primary flex items-center gap-2 text-sm transition-colors"
-              >
-                <GithubLogoIcon size={14} />
-                GitHub
-              </a>
-            )}
-            {project.live && (
-              <a
-                href={project.live}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${project.title} live demo`}
-                className="text-text-secondary hover:text-text-primary flex items-center gap-2 text-sm transition-colors"
-              >
-                <ArrowSquareOutIcon size={14} />
-                Live demo
-              </a>
-            )}
-          </div>
-
-          <div className="mt-6">
-            <p className="text-text-muted mb-2 text-xs font-medium tracking-widest uppercase">
-              Stack
-            </p>
-            <div className="flex flex-wrap gap-1.5">
+          {/* Hero */}
+          <header className="mb-12 border-b pb-8" style={{ borderColor: "var(--border-subtle)" }}>
+            <div className="mb-4 flex flex-wrap items-center gap-1.5">
+              {project.featured && (
+                <Badge variant="soft" color="brand" className="h-6 px-2.5 text-[11px]">
+                  featured
+                </Badge>
+              )}
               {project.tags.map((tag) => (
-                <Badge key={tag}>{tag}</Badge>
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  color="neutral"
+                  className="h-6 px-2.5 text-[11px]"
+                >
+                  {tag}
+                </Badge>
               ))}
             </div>
-          </div>
 
-          <div className="mt-6">
-            <p className="text-text-muted mb-1 text-xs font-medium tracking-widest uppercase">
-              Published
+            <h1
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontWeight: 400,
+                fontSize: "clamp(38px, 6vw, 68px)",
+                lineHeight: 1,
+                letterSpacing: "-0.02em",
+                color: "var(--fg-primary)",
+                margin: "0 0 16px",
+              }}
+            >
+              {project.title}
+            </h1>
+
+            <p
+              className="text-[19px] leading-[1.6]"
+              style={{
+                fontFamily: "var(--font-sans)",
+                color: "var(--fg-secondary)",
+                maxWidth: "56ch",
+                margin: "0 0 24px",
+              }}
+            >
+              {project.description}
             </p>
-            <time dateTime={project.date} className="text-text-secondary font-mono text-sm">
-              {formatDate(project.date)}
-            </time>
-          </div>
-        </aside>
 
-        <article className="min-w-0 flex-1 [&>*:first-child]:mt-0">
-          <MDXContent code={project.body} />
+            <dl
+              className="mb-6 grid grid-cols-2 gap-3 rounded-[var(--radius-lg)] border p-4 sm:grid-cols-4"
+              style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
+            >
+              <MetaCol label="published" value={formatDate(project.date)} />
+              <MetaCol label="read" value={`${minutes} min`} />
+              <MetaCol label="words" value={words.toLocaleString()} />
+              <MetaCol label="stack" value={String(project.tags.length)} />
+            </dl>
+
+            {(project.github || project.live) && (
+              <div className="flex flex-wrap gap-6">
+                {project.github && <CtaLink href={project.github} label="github ↗" />}
+                {project.live && <CtaLink href={project.live} label="live demo ↗" />}
+              </div>
+            )}
+          </header>
+
+          {/* Prose */}
+          <div id="doc-body">
+            <MDXContent code={project.body} />
+          </div>
+
+          {/* Footer nav */}
+          <div className="mt-16 border-t pt-6" style={{ borderColor: "var(--border-subtle)" }}>
+            <Link
+              href="/projects"
+              className="inline-flex items-center gap-1.5 font-mono text-xs text-[color:var(--fg-muted)] transition-colors hover:text-[color:var(--fg-primary)]"
+            >
+              <span aria-hidden style={{ color: "var(--fg-brand)" }}>
+                ←
+              </span>
+              back to projects/
+            </Link>
+          </div>
         </article>
       </div>
     </div>
+  )
+}
+
+function MetaCol({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <dt
+        className="font-mono text-[10px] tracking-[0.08em] uppercase"
+        style={{ color: "var(--fg-muted)" }}
+      >
+        {label}
+      </dt>
+      <dd className="font-mono text-[13px]" style={{ color: "var(--fg-primary)", margin: 0 }}>
+        {value}
+      </dd>
+    </div>
+  )
+}
+
+function CtaLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-mono text-[13px] transition-all duration-150 hover:tracking-[0.06em] hover:[color:var(--fg-brand)]"
+      style={{ color: "var(--fg-primary)" }}
+    >
+      {label}
+    </a>
   )
 }

@@ -6,20 +6,20 @@ import type { TocItem } from "@/lib/velite"
 const PREFIX: Record<2 | 3, string> = { 2: "##", 3: "###" }
 
 /**
- * Table of contents for a blog post — mirrors the editor "outline" panel.
- * Items come from the server (parsed from the raw MDX); ids match the slugs
- * set on the rendered headings. Highlights the section in view via
- * IntersectionObserver and scrolls the <main> container on click.
+ * Table of contents for a document page — mirrors the editor "outline" panel.
+ * Items come from the server (parsed from the raw MDX); ids match the slugs set
+ * on the rendered headings inside `#doc-body`. Highlights the section in view
+ * via IntersectionObserver and scrolls the <main> container on click.
  *
  * Sticky on ≥1100px, hidden below.
  */
-export function PostOutline({
-  slug,
+export function Outline({
+  filename,
   items,
   words,
   minutes,
 }: {
-  slug: string
+  filename: string
   items: TocItem[]
   words: number
   minutes: number
@@ -61,7 +61,7 @@ export function PostOutline({
 
   return (
     <nav
-      aria-label="Post outline"
+      aria-label="Page outline"
       className="sticky top-0 hidden self-start px-4 py-12 min-[1100px]:block"
       style={{ borderRight: "1px solid var(--border-subtle)" }}
     >
@@ -79,7 +79,7 @@ export function PostOutline({
         <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9 }}>
           ◆
         </span>
-        {slug}.mdx
+        {filename}
       </div>
 
       {items.length > 0 && (

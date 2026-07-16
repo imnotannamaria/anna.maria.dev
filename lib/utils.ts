@@ -22,6 +22,35 @@ export function estimateReadingTime(content: string): number {
   return Math.ceil(countWords(content) / wordsPerMinute)
 }
 
+const NUMBER_WORDS = [
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+  "thirteen",
+  "fourteen",
+  "fifteen",
+  "sixteen",
+  "seventeen",
+  "eighteen",
+  "nineteen",
+  "twenty",
+]
+
+/** Spell out small counts as words (0–20), falling back to digits beyond that. */
+export function numberToWord(n: number): string {
+  return NUMBER_WORDS[n] ?? String(n)
+}
+
 /** GitHub-style slug for heading anchors (matches the ids set on rendered headings). */
 export function slugify(text: string): string {
   return text
