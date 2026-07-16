@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/chrome/sidebar"
 import { StatusBar, StatusBarItem, StatusBarSeparator } from "@/app/components/entrepta/status-bar"
 import { ThemeScript } from "@/app/components/entrepta/theme-switcher"
 import { ThemeSwitcher } from "@/app/components/entrepta/theme-switcher"
+import { Toaster } from "@/app/components/entrepta/toast"
 import "./globals.css"
 
 const THEMES = [
@@ -76,6 +77,25 @@ export default function RootLayout({
             }
             right={
               <>
+                <StatusBarItem className="gap-1.5">
+                  <kbd
+                    className="rounded-[3px] px-1.5 py-px text-[10px]"
+                    style={{ border: "1px solid rgba(255,255,255,0.3)" }}
+                  >
+                    ⌘K
+                  </kbd>
+                  <span aria-hidden className="opacity-60">
+                    /
+                  </span>
+                  <kbd
+                    className="rounded-[3px] px-1.5 py-px text-[10px]"
+                    style={{ border: "1px solid rgba(255,255,255,0.3)" }}
+                  >
+                    Ctrl K
+                  </kbd>
+                  <span className="opacity-80">palette</span>
+                </StatusBarItem>
+                <StatusBarSeparator />
                 <StatusBarItem>UTF-8</StatusBarItem>
                 <StatusBarSeparator />
                 <StatusBarItem>TypeScript</StatusBarItem>
@@ -85,6 +105,8 @@ export default function RootLayout({
         </div>
 
         <ThemeSwitcher themes={THEMES} defaultTheme="entrepta" position="bottom-right" />
+
+        <Toaster position="top-center" />
 
         <Analytics />
       </body>

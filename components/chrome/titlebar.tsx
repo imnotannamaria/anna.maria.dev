@@ -14,8 +14,18 @@ import {
   FileIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
+import { toast } from "@/app/components/entrepta/toast"
+import { useCommandPalette } from "@/hooks/use-command-palette"
+import { CommandMenu } from "./command-menu"
 
 type Tab = { href: string; name: string; icon: Icon }
+
+/** Traffic-light easter egg — deduped by id so mashing the dots won't stack toasts. */
+function showEasterEgg() {
+  toast("Hey there, person testing a feature I haven't built yet 🤭", {
+    id: "traffic-light-easter-egg",
+  })
+}
 
 const NAV_TABS: Tab[] = [
   { href: "/", name: "home.tsx", icon: HouseLineIcon },
@@ -57,6 +67,7 @@ function isTabActive(href: string, pathname: string): boolean {
 export function Titlebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const { open, setOpen, toggle } = useCommandPalette()
   const dynamicTab = getDynamicTab(pathname)
   const tabs = dynamicTab ? [...NAV_TABS, dynamicTab] : NAV_TABS
 
@@ -90,14 +101,18 @@ export function Titlebar() {
 
   return (
     <div className="flex items-stretch border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)] select-none">
-      {/* Traffic lights — decorative */}
-      <div
-        aria-hidden="true"
-        className="flex w-[84px] shrink-0 items-center gap-1.5 border-r border-[var(--border-subtle)] px-3"
-      >
-        <span className="h-3 w-3 rounded-full bg-[var(--status-error)] opacity-85" />
-        <span className="h-3 w-3 rounded-full bg-[var(--status-warning)] opacity-85" />
-        <span className="h-3 w-3 rounded-full bg-[var(--status-success)] opacity-85" />
+      {/* Traffic lights — non-functional, but they say hi if you poke them */}
+      <div className="flex w-[84px] shrink-0 items-center gap-1.5 border-r border-[var(--border-subtle)] px-3">
+        {["var(--status-error)", "var(--status-warning)", "var(--status-success)"].map((color) => (
+          <button
+            key={color}
+            type="button"
+            aria-label="Window control"
+            onClick={showEasterEgg}
+            className="h-3 w-3 rounded-full opacity-85 transition-[opacity,transform] hover:scale-110 hover:opacity-100"
+            style={{ background: color }}
+          />
+        ))}
       </div>
 
       {/* Tabs */}
@@ -161,12 +176,15 @@ export function Titlebar() {
             </div>
           )
         })}
-        <span
-          aria-hidden="true"
-          className="flex shrink-0 items-center px-3 font-mono text-sm text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label="Open command palette"
+          title="Open command palette (⌘K)"
+          className="flex shrink-0 cursor-pointer items-center px-3 font-mono text-sm text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
         >
           +
-        </span>
+        </button>
       </nav>
 
       {/* Right meta */}
@@ -176,6 +194,8 @@ export function Titlebar() {
           main
         </span>
       </div>
+
+      <CommandMenu open={open} onOpenChange={setOpen} />
     </div>
   )
 }
