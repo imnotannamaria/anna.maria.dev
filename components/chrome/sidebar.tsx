@@ -9,7 +9,6 @@ import {
   TerminalWindowIcon,
   ChatsCircleIcon,
   PianoKeysIcon,
-  BookBookmarkIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 
@@ -20,7 +19,6 @@ const NAV_ITEMS = [
   { href: "/projects", icon: TerminalWindowIcon, label: "Projects" },
   { href: "/contact", icon: ChatsCircleIcon, label: "Contact" },
   { href: "/piano", icon: PianoKeysIcon, label: "Piano" },
-  { href: "/log", icon: BookBookmarkIcon, label: "Log" },
 ]
 
 function isNavActive(href: string, pathname: string): boolean {

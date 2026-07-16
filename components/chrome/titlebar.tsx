@@ -11,7 +11,6 @@ import {
   TerminalWindowIcon,
   ChatsCircleIcon,
   PianoKeysIcon,
-  BookBookmarkIcon,
   FileIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
@@ -25,7 +24,6 @@ const NAV_TABS: Tab[] = [
   { href: "/projects", name: "projects/", icon: TerminalWindowIcon },
   { href: "/contact", name: "contact.tsx", icon: ChatsCircleIcon },
   { href: "/piano", name: "piano.tsx", icon: PianoKeysIcon },
-  { href: "/log", name: "log.tsx", icon: BookBookmarkIcon },
 ]
 
 function getDynamicTab(pathname: string): Tab | null {
@@ -176,16 +174,6 @@ export function Titlebar() {
         <span className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--fg-brand)]" />
           main
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span
-            className="h-1.5 w-1.5 rounded-full bg-[var(--status-success)]"
-            style={{
-              animation: "pulse-ok 2.2s ease-out infinite",
-              boxShadow: "0 0 0 0 rgba(16,185,129,0.5)",
-            }}
-          />
-          live
         </span>
       </div>
     </div>
