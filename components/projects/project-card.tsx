@@ -55,6 +55,7 @@ function ExternalLink({
     >
       {icon === "github" ? <GithubLogoIcon size={13} /> : <ArrowSquareOutIcon size={12} />}
       {label}
+      <span className="sr-only"> (opens in a new tab)</span>
     </Link>
   )
 }

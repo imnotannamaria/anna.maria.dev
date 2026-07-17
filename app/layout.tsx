@@ -36,6 +36,10 @@ export default function RootLayout({
         <ThemeScript />
       </head>
       <body>
+        <a href="#main-content" className="skip-link">
+          skip to content
+        </a>
+
         {/* Editor chrome — fixed full-viewport grid */}
         <div
           style={{
@@ -57,7 +61,13 @@ export default function RootLayout({
             }}
           >
             <Sidebar />
-            <main style={{ minWidth: 0, overflowX: "hidden", overflowY: "auto" }}>{children}</main>
+            <main
+              id="main-content"
+              tabIndex={-1}
+              style={{ minWidth: 0, overflowX: "hidden", overflowY: "auto", outline: "none" }}
+            >
+              {children}
+            </main>
           </div>
 
           <StatusBar

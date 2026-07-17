@@ -58,7 +58,8 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-[var(--radius-sm)] border px-3 font-mono text-xs font-medium transition-colors"
+      className="focus-ring inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-[var(--radius-sm)] border px-3 font-mono text-xs font-medium transition-colors"
+      aria-pressed={active}
       style={{
         borderColor: active ? "var(--fg-brand)" : "var(--border-subtle)",
         background: active ? "var(--bg-surface-brand)" : "transparent",

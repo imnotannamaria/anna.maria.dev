@@ -499,6 +499,7 @@ export default function AboutPage() {
                     >
                       <Icon size={14} style={{ opacity: 0.7 }} />
                       <span>{label}</span>
+                      <span className="sr-only"> (opens in a new tab)</span>
                       <span aria-hidden className="ml-auto" style={{ opacity: 0.55 }}>
                         ↗
                       </span>

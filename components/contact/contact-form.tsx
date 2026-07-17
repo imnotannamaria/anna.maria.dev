@@ -153,7 +153,7 @@ export function ContactForm({ email }: { email: string }) {
               setErrorMessage("")
               setState("idle")
             }}
-            className="group inline-flex items-center gap-2 transition-colors hover:text-[color:var(--fg-brand)]"
+            className="focus-ring group inline-flex items-center gap-2 transition-colors hover:text-[color:var(--fg-brand)]"
           >
             <span
               aria-hidden
@@ -256,6 +256,7 @@ export function ContactForm({ email }: { email: string }) {
 
       {state === "error" && errorMessage && (
         <div
+          role="alert"
           className="mt-5 flex items-start gap-2.5 rounded-[var(--radius-md)] border px-4 py-3 font-mono text-[12px]"
           style={{
             borderColor: "var(--status-error)",

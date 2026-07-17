@@ -107,7 +107,8 @@ export function Titlebar() {
           <button
             key={color}
             type="button"
-            aria-label="Window control"
+            aria-hidden
+            tabIndex={-1}
             onClick={showEasterEgg}
             className="h-3 w-3 rounded-full opacity-85 transition-[opacity,transform] hover:scale-110 hover:opacity-100"
             style={{ background: color }}
@@ -165,7 +166,7 @@ export function Titlebar() {
                   onClick={() => router.push(closeTarget(tab.href))}
                   aria-label={`Close ${tab.name}`}
                   className={cn(
-                    "mr-2 inline-grid h-4 w-4 shrink-0 place-items-center rounded-sm text-[12px]",
+                    "focus-ring mr-2 inline-grid h-4 w-4 shrink-0 place-items-center rounded-sm text-[12px]",
                     "text-[var(--fg-muted)] opacity-60 transition-[opacity,background-color]",
                     "hover:bg-[var(--bg-hover-strong)] hover:opacity-100",
                   )}
@@ -181,7 +182,7 @@ export function Titlebar() {
           onClick={toggle}
           aria-label="Open command palette"
           title="Open command palette (⌘K)"
-          className="flex shrink-0 cursor-pointer items-center px-3 font-mono text-sm text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
+          className="focus-ring flex shrink-0 cursor-pointer items-center px-3 font-mono text-sm text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
         >
           +
         </button>

@@ -200,6 +200,7 @@ function CtaLink({ href, label }: { href: string; label: string }) {
       style={{ color: "var(--fg-primary)" }}
     >
       {label}
+      <span className="sr-only"> (opens in a new tab)</span>
     </a>
   )
 }

@@ -88,6 +88,7 @@ export default function ProjectsPage({
               className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand)]"
             >
               GitHub
+              <span className="sr-only"> (opens in a new tab)</span>
             </a>{" "}
             or my{" "}
             <a
@@ -97,6 +98,7 @@ export default function ProjectsPage({
               className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand)]"
             >
               old portfolio
+              <span className="sr-only"> (opens in a new tab)</span>
             </a>
             .
           </p>

@@ -56,7 +56,8 @@
   /* foreground */
   --fg-primary: var(--zinc-50);
   --fg-secondary: var(--zinc-400);
-  --fg-muted: var(--zinc-500);
+  /* lightened from zinc-500 (#71717a, ~4.1:1) to clear WCAG AA on dark canvas/surface */
+  --fg-muted: #8a8a92;
   --fg-brand: var(--violet-500); /* overridden by theme */
   --fg-brand-hover: var(--violet-400); /* overridden by theme — lighter shade for hover */
 
@@ -313,6 +314,50 @@
 :focus-visible {
   outline: 2px solid var(--fg-brand);
   outline-offset: 2px;
+}
+
+/* Skip link — visually hidden until focused, then slides in as an editor-style
+   chip in the top-left. Mono, subtle surface + brand accent, no bulky pill. */
+.skip-link {
+  position: fixed;
+  top: 6px;
+  left: 6px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--fg-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transform: translateY(-160%);
+  transition: transform 140ms var(--ease-out);
+}
+
+/* leading "$" prompt to match the section-header / breadcrumb metaphor */
+.skip-link::before {
+  content: "$";
+  color: var(--fg-brand);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  border-color: var(--fg-brand);
+  outline: none;
+}
+
+/* Raw buttons that don't ship their own focus treatment still need a visible ring.
+   Uses box-shadow (not outline) so it survives the `outline: none !important` reset
+   below, and pairs with a brand border where the element already has one. */
+.focus-ring:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--bg-canvas),
+    0 0 0 4px var(--fg-brand);
 }
 
 /* form fields, buttons, and menu items manage their own focus state */
@@ -670,7 +715,7 @@ button:focus-visible,
 
   --fg-primary: #fafafa;
   --fg-secondary: #a1a1aa;
-  --fg-muted: #71717a;
+  --fg-muted: #8a8a92;
 
   --border-subtle: #27272a;
   --border-strong: #3f3f46;

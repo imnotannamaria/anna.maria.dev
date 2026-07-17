@@ -177,6 +177,7 @@ function ChannelCard({ Icon, label, value, href, action, primary }: Channel) {
         <span className="truncate font-mono text-sm" style={{ color: "var(--fg-primary)" }}>
           {value}
         </span>
+        {external && <span className="sr-only">(opens in a new tab)</span>}
       </span>
 
       <span
