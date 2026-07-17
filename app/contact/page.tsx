@@ -151,7 +151,7 @@ function ChannelCard({ Icon, label, value, href, action, primary }: Channel) {
       className={cn(
         "group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 rounded-[var(--radius-lg)] border px-5 py-4 transition-colors duration-150",
         primary
-          ? "border-[rgba(124,107,255,0.35)] bg-[var(--bg-surface-brand)] hover:border-[rgba(124,107,255,0.6)]"
+          ? "border-[var(--border-brand)] bg-[var(--bg-surface-brand)] hover:border-[var(--border-brand-strong)]"
           : "border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface-elevated)]",
       )}
     >

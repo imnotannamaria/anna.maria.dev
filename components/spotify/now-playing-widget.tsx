@@ -37,7 +37,7 @@ function CoverFallback() {
         className="absolute inset-0"
         style={{
           background:
-            "repeating-linear-gradient(45deg, transparent 0 6px, rgba(124,107,255,0.06) 6px 7px)",
+            "repeating-linear-gradient(45deg, transparent 0 6px, color-mix(in srgb, var(--fg-brand) 6%, transparent) 6px 7px)",
         }}
       />
       <svg
@@ -166,7 +166,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
     <div
       className={cn(
         "group/card relative flex flex-col justify-center overflow-hidden rounded-2xl border p-5",
-        "hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:[background:var(--bg-surface-elevated)]",
+        "hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] hover:[background:var(--bg-surface-elevated)]",
         className,
       )}
       style={{

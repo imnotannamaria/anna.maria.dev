@@ -35,8 +35,24 @@ export function GithubCalendar({ username }: { username: string }) {
       username={username}
       colorScheme={mode}
       theme={{
-        dark: ["#18181b", "#2e1f7a", "#4338ca", "#6b5bff", "#9b8eff"],
-        light: ["#f0f0ff", "#c7d2fe", "#818cf8", "#6b5bff", "#4338ca"],
+        // The library writes each level straight into the SVG `fill`, so CSS
+        // vars / color-mix resolve there. Deriving the whole scale from
+        // --fg-brand (empty level uses --bg-surface) makes the heatmap follow
+        // both the active theme and light/dark mode with no hardcoded hues.
+        dark: [
+          "var(--bg-surface)",
+          "color-mix(in srgb, var(--fg-brand) 25%, var(--bg-surface))",
+          "color-mix(in srgb, var(--fg-brand) 50%, var(--bg-surface))",
+          "var(--fg-brand)",
+          "var(--fg-brand-hover)",
+        ],
+        light: [
+          "var(--bg-surface)",
+          "color-mix(in srgb, var(--fg-brand) 25%, var(--bg-surface))",
+          "color-mix(in srgb, var(--fg-brand) 50%, var(--bg-surface))",
+          "var(--fg-brand)",
+          "var(--fg-brand-hover)",
+        ],
       }}
       fontSize={12}
       blockSize={11}

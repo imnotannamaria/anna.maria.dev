@@ -533,7 +533,7 @@ export default async function Home() {
               className="featured-card group/featured relative flex flex-col gap-4 overflow-hidden p-6 sm:p-8"
               style={{
                 background: "var(--bg-surface-brand)",
-                border: "1px solid rgba(124,107,255,0.35)",
+                border: "1px solid var(--border-brand)",
                 borderRadius: "var(--radius-xl)",
                 minHeight: 380,
               }}

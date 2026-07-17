@@ -60,7 +60,7 @@ export function MiniPianoCard() {
   return (
     <Link href="/piano" style={{ textDecoration: "none", display: "block" }}>
       <div
-        className="group/piano relative overflow-hidden rounded-2xl border hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] hover:[background:var(--bg-surface-elevated)]"
+        className="group/piano relative overflow-hidden rounded-2xl border hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] hover:[background:var(--bg-surface-elevated)]"
         style={{
           background: "var(--bg-surface)",
           borderColor: "var(--border-strong)",
@@ -73,7 +73,7 @@ export function MiniPianoCard() {
           className="flex items-center gap-3 border-b px-4 py-2.5"
           style={{
             borderColor: "var(--border-subtle)",
-            background: "rgba(0,0,0,0.25)",
+            background: "var(--bg-chrome)",
           }}
         >
           {/* Traffic lights */}
@@ -112,18 +112,15 @@ export function MiniPianoCard() {
         </div>
 
         {/* Stage */}
-        <div
-          className="px-5 pt-4 pb-3"
-          style={{ background: "linear-gradient(180deg, #0a0a10 0%, #131320 100%)" }}
-        >
+        <div className="px-5 pt-4 pb-3" style={{ background: "var(--piano-stage)" }}>
           {/* Frame */}
           <div
             style={{
-              background: "linear-gradient(180deg, #1a1a24 0%, #0a0a10 100%)",
+              background: "var(--piano-frame)",
               padding: "10px 10px 8px",
               borderRadius: 6,
-              border: "1px solid #2a2a3a",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 20px rgba(0,0,0,0.5)",
+              border: "1px solid var(--piano-frame-border)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 20px var(--piano-frame-cast)",
             }}
           >
             {/* Keys */}
@@ -150,11 +147,11 @@ export function MiniPianoCard() {
                       top: 0,
                       width: WW,
                       height: WH,
-                      borderRight: i < 7 ? "1px solid #b9b2a5" : "none",
+                      borderRight: i < 7 ? "1px solid var(--piano-key-sep)" : "none",
                       borderRadius: "0 0 3px 3px",
                       background: isPressed
-                        ? "linear-gradient(180deg, #a597ff 0%, #7c6bff 100%)"
-                        : "linear-gradient(180deg, #f5f1e8 0%, #ddd8cc 100%)",
+                        ? "linear-gradient(180deg, var(--fg-brand-hover) 0%, var(--fg-brand) 100%)"
+                        : "var(--piano-white-key)",
                       boxShadow: isPressed
                         ? "inset 0 -3px 0 rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.2)"
                         : "inset 0 -3px 0 rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)",
@@ -175,7 +172,7 @@ export function MiniPianoCard() {
                         fontSize: 9,
                         letterSpacing: "0.04em",
                         textTransform: "uppercase",
-                        color: isPressed ? "rgba(255,255,255,0.85)" : "#888583",
+                        color: isPressed ? "rgba(255,255,255,0.85)" : "var(--piano-key-label)",
                         lineHeight: 1,
                         transition: "color 60ms ease",
                       }}
@@ -199,7 +196,7 @@ export function MiniPianoCard() {
                     borderRadius: "0 0 3px 3px",
                     border: "1px solid #000",
                     borderTop: "none",
-                    background: "linear-gradient(180deg, #2a2a30 0%, #0a0a12 60%, #1a1a24 100%)",
+                    background: "var(--piano-black-key)",
                     boxShadow:
                       "0 3px 5px rgba(0,0,0,0.5), inset 0 -2px 0 rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.08)",
                     zIndex: 2,
@@ -213,7 +210,7 @@ export function MiniPianoCard() {
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontSize: 7,
-                      color: "#6b6b80",
+                      color: "var(--piano-black-key-label)",
                       textTransform: "uppercase",
                       lineHeight: 1,
                     }}

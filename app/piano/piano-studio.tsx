@@ -549,7 +549,7 @@ export function PianoStudio() {
             className="flex flex-wrap items-center gap-4 border-b px-4 py-3 font-mono text-[11px]"
             style={{
               borderColor: "var(--border-subtle)",
-              background: "rgba(0,0,0,0.3)",
+              background: "var(--bg-chrome)",
               color: "var(--fg-secondary)",
             }}
           >
@@ -658,14 +658,15 @@ export function PianoStudio() {
           {/* stage */}
           <div
             className="px-6 pt-6 pb-4 max-[820px]:px-3"
-            style={{ background: "linear-gradient(180deg, #0a0a10 0%, #131320 100%)" }}
+            style={{ background: "var(--piano-stage)" }}
           >
             <div
               className="relative rounded-[var(--radius-md)] px-3.5 pt-3.5 pb-2.5"
               style={{
-                background: "linear-gradient(180deg, #1a1a24 0%, #0a0a10 100%)",
-                border: "1px solid #2a2a3a",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04), 0 12px 32px rgba(0,0,0,0.5)",
+                background: "var(--piano-frame)",
+                border: "1px solid var(--piano-frame-border)",
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.04), 0 12px 32px var(--piano-frame-cast)",
               }}
             >
               <div
@@ -690,9 +691,10 @@ export function PianoStudio() {
                       className="relative flex h-full flex-1 cursor-pointer touch-none flex-col items-center justify-end pb-3.5 select-none"
                       style={{
                         background: on
-                          ? "linear-gradient(180deg, #a597ff 0%, #7c6bff 100%)"
-                          : "linear-gradient(180deg, #f5f1e8 0%, #ddd8cc 100%)",
-                        borderRight: i === WHITE_COUNT - 1 ? "none" : "1px solid #b9b2a5",
+                          ? "linear-gradient(180deg, var(--fg-brand-hover) 0%, var(--fg-brand) 100%)"
+                          : "var(--piano-white-key)",
+                        borderRight:
+                          i === WHITE_COUNT - 1 ? "none" : "1px solid var(--piano-key-sep)",
                         boxShadow: on
                           ? "inset 0 -3px 0 rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.2)"
                           : "inset 0 -3px 0 rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)",
@@ -701,14 +703,14 @@ export function PianoStudio() {
                       {note === "C5" && (
                         <span
                           className="absolute top-2 font-mono text-[10px] tracking-[0.04em]"
-                          style={{ color: on ? "rgba(255,255,255,0.7)" : "#888583" }}
+                          style={{ color: on ? "rgba(255,255,255,0.7)" : "var(--piano-key-label)" }}
                         >
                           C5
                         </span>
                       )}
                       <span
                         className="font-mono text-[11px] tracking-[0.04em] uppercase"
-                        style={{ color: on ? "rgba(255,255,255,0.85)" : "#888583" }}
+                        style={{ color: on ? "rgba(255,255,255,0.85)" : "var(--piano-key-label)" }}
                       >
                         {kbd}
                       </span>
@@ -739,16 +741,18 @@ export function PianoStudio() {
                         border: "1px solid #000",
                         borderTop: "none",
                         background: on
-                          ? "linear-gradient(180deg, #9b8eff 0%, #6e5eea 60%, #4a3da8 100%)"
-                          : "linear-gradient(180deg, #2a2a30 0%, #0a0a12 60%, #1a1a24 100%)",
+                          ? "linear-gradient(180deg, var(--fg-brand-hover) 0%, var(--fg-brand) 60%, color-mix(in srgb, var(--fg-brand) 55%, #000) 100%)"
+                          : "var(--piano-black-key)",
                         boxShadow: on
-                          ? "0 4px 6px rgba(0,0,0,0.5), 0 0 16px rgba(124,107,255,0.5), inset 0 -2px 0 rgba(255,255,255,0.08)"
+                          ? "0 4px 6px rgba(0,0,0,0.5), 0 0 16px var(--fg-brand-glow), inset 0 -2px 0 rgba(255,255,255,0.08)"
                           : "0 4px 6px rgba(0,0,0,0.5), inset 0 -2px 0 rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.08)",
                       }}
                     >
                       <span
                         className="font-mono text-[10px] uppercase"
-                        style={{ color: on ? "rgba(255,255,255,0.9)" : "#6b6b80" }}
+                        style={{
+                          color: on ? "rgba(255,255,255,0.9)" : "var(--piano-black-key-label)",
+                        }}
                       >
                         {b.kbd}
                       </span>
@@ -764,7 +768,7 @@ export function PianoStudio() {
             className="px-4 pt-3 pb-4 text-center font-mono text-[11px]"
             style={{
               color: "var(--fg-muted)",
-              background: "linear-gradient(180deg, #131320 0%, #0a0a10 100%)",
+              background: "var(--piano-hint)",
             }}
           >
             {"// "}click keys or use your keyboard · press <Kbd>space</Kbd> to stop a song
@@ -858,7 +862,7 @@ export function PianoStudio() {
             className="mt-4 flex flex-wrap items-center gap-3 rounded-[var(--radius-md)] border px-4 py-3 font-mono text-[12px]"
             style={{
               background: "var(--bg-surface-brand)",
-              borderColor: "rgba(124,107,255,0.3)",
+              borderColor: "var(--border-brand)",
             }}
           >
             <span

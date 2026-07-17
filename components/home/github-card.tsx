@@ -28,7 +28,7 @@ export function GithubCard({ username }: { username: string }) {
         gap: 16,
         overflow: "hidden",
         transform: hovered ? "translateY(-2px)" : "none",
-        boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.3)" : "none",
+        boxShadow: hovered ? "var(--shadow-card-hover)" : "none",
         transition:
           "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out), border-color 200ms var(--ease-out)",
       }}

@@ -67,12 +67,38 @@
   /* focus ring */
   --ring: rgba(124, 107, 255, 0.5); /* overridden by theme */
 
+  /* brand-derived accents — auto-follow --fg-brand across every theme.
+     Declared once; color-mix re-resolves against the themed --fg-brand,
+     so borders/glows never get stuck on the entrepta violet. */
+  --border-brand: color-mix(in srgb, var(--fg-brand) 35%, transparent);
+  --border-brand-strong: color-mix(in srgb, var(--fg-brand) 60%, transparent);
+  --shadow-brand: color-mix(in srgb, var(--fg-brand) 20%, transparent);
+  --fg-brand-glow: color-mix(in srgb, var(--fg-brand) 50%, transparent);
+
   /* hover overlays (flip white→black in light mode) */
   --bg-hover-soft: rgba(255, 255, 255, 0.04);
   --bg-hover-strong: rgba(255, 255, 255, 0.08);
 
   /* recessed surface used in chrome bars (code-block head, terminal bar) */
   --bg-chrome: rgba(0, 0, 0, 0.3);
+
+  /* elevation shadow for lifted cards — softened in light mode (see below) */
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  /* ── Piano cabinet (skeuomorphic) ─────────────────────────────
+     Dark by default; the light-mode block swaps the wood tone to a
+     warm greige so the instrument reads on a light page. Black keys
+     and the ivory-key gradient stay put — they contrast in both. */
+  --piano-stage: linear-gradient(180deg, #0a0a10 0%, #131320 100%);
+  --piano-hint: linear-gradient(180deg, #131320 0%, #0a0a10 100%);
+  --piano-frame: linear-gradient(180deg, #1a1a24 0%, #0a0a10 100%);
+  --piano-frame-border: #2a2a3a;
+  --piano-frame-cast: rgba(0, 0, 0, 0.5);
+  --piano-white-key: linear-gradient(180deg, #ffffff 0%, #f4f4f5 100%);
+  --piano-key-sep: #d4d4d8;
+  --piano-key-label: #71717a;
+  --piano-black-key: linear-gradient(180deg, #2a2a30 0%, #0a0a12 60%, #1a1a24 100%);
+  --piano-black-key-label: #6b6b80;
 
   /* status */
   --status-success: var(--emerald-500);
@@ -413,9 +439,9 @@ button:focus-visible,
     transform 200ms var(--ease-out);
 }
 .featured-card:hover {
-  border-color: rgba(124, 107, 255, 0.65) !important;
+  border-color: var(--border-brand-strong) !important;
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(124, 107, 255, 0.2);
+  box-shadow: 0 12px 32px var(--shadow-brand);
 }
 
 @keyframes cursor-blink {
@@ -519,10 +545,10 @@ button:focus-visible,
 @keyframes dot-glow {
   0%,
   100% {
-    box-shadow: 0 0 0 0 var(--fg-brand-pulse, rgba(124, 107, 255, 0.5));
+    box-shadow: 0 0 0 0 var(--fg-brand-pulse, var(--fg-brand-glow));
   }
   50% {
-    box-shadow: 0 0 0 5px var(--fg-brand-pulse, rgba(124, 107, 255, 0));
+    box-shadow: 0 0 0 5px var(--fg-brand-pulse, transparent);
   }
 }
 
@@ -532,10 +558,10 @@ button:focus-visible,
 
 @keyframes piano-ping {
   0% {
-    box-shadow: 0 0 0 0 rgba(124, 107, 255, 0.5);
+    box-shadow: 0 0 0 0 var(--fg-brand-glow);
   }
   100% {
-    box-shadow: 0 0 0 10px rgba(124, 107, 255, 0);
+    box-shadow: 0 0 0 10px transparent;
   }
 }
 
@@ -576,7 +602,7 @@ button:focus-visible,
 }
 
 [data-highlighted-line] {
-  background-color: rgba(124, 107, 255, 0.08);
+  background-color: color-mix(in srgb, var(--fg-brand) 8%, transparent);
 }
 
 [data-rehype-pretty-code-title] {
@@ -617,6 +643,19 @@ button:focus-visible,
   --bg-hover-soft: rgba(0, 0, 0, 0.04);
   --bg-hover-strong: rgba(0, 0, 0, 0.08);
   --bg-chrome: rgba(0, 0, 0, 0.03);
+
+  /* black drop-shadows read as heavy smudges on a light canvas — soften them */
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  /* piano cabinet in light mode — mirrors the dark 3-tier depth with light zinc:
+     bezel/stage (visible border around the piano) is a touch darker than the
+     white card; the frame panel is lighter than the bezel; the keys (pure
+     white) sit brightest of all. Subtle, not a gray box. */
+  --piano-stage: linear-gradient(180deg, #ececef 0%, #e4e4e7 100%);
+  --piano-hint: linear-gradient(180deg, #e4e4e7 0%, #ececef 100%);
+  --piano-frame: linear-gradient(180deg, #f7f7f8 0%, #f1f1f3 100%);
+  --piano-frame-border: #d4d4d8;
+  --piano-frame-cast: rgba(0, 0, 0, 0.08);
 
   color-scheme: light;
 }

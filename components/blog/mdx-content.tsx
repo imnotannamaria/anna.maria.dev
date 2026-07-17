@@ -146,7 +146,7 @@ const defaultComponents = {
   ),
   pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
     <pre
-      className="border-border my-6 overflow-x-auto rounded-lg border bg-[#0d0d14] p-4 text-sm"
+      className="my-6 overflow-x-auto rounded-lg border border-[var(--border-subtle)] bg-[#0d0d14] p-4 text-sm"
       {...props}
     />
   ),

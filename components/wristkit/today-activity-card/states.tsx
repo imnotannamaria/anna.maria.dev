@@ -5,7 +5,7 @@ import type * as React from "react"
 import type { TodayData } from "./load"
 
 const colors = {
-  move: "#7c6bff",
+  move: "var(--fg-brand)",
   exercise: "#10b981",
   steps: "#f59e0b",
   danger: "#f43f5e",
@@ -75,7 +75,7 @@ function Panel({ className, children }: { className?: string; children: React.Re
         display: "flex",
         flexDirection: "column",
         transform: hovered ? "translateY(-2px)" : "none",
-        boxShadow: hovered ? "0 8px 24px rgba(0,0,0,0.3)" : "none",
+        boxShadow: hovered ? "var(--shadow-card-hover)" : "none",
         transition:
           "background 200ms var(--ease-out), box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out)",
       }}
