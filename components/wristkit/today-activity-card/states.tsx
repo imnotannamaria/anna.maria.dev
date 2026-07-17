@@ -69,6 +69,7 @@ function Panel({ className, children }: { className?: string; children: React.Re
         background: hovered ? "var(--bg-surface-elevated)" : "var(--bg-surface)",
         border: "1px solid var(--border-strong)",
         borderRadius: "var(--radius-xl)",
+        containerType: "inline-size",
         padding: 18,
         color: "var(--fg-primary)",
         fontFamily: "var(--font-mono)",
@@ -229,10 +230,10 @@ export function TodayActivityCardLoading({ className }: { className?: string }) 
     <Panel className={className}>
       <Header status="loading" statusColor={"var(--fg-muted)"} />
       <div
+        className="wk-activity-grid"
         style={{
           marginTop: 12,
           display: "grid",
-          gridTemplateColumns: "minmax(0,1fr) minmax(0,1.15fr)",
           gap: 20,
           alignItems: "center",
         }}
@@ -272,10 +273,10 @@ export function TodayActivityCardEmpty({ className }: { className?: string }) {
     <Panel className={className}>
       <Header status="empty" statusColor={"var(--fg-muted)"} />
       <div
+        className="wk-activity-grid"
         style={{
           marginTop: 12,
           display: "grid",
-          gridTemplateColumns: "minmax(0,1fr) minmax(0,1.15fr)",
           gap: 20,
           alignItems: "center",
         }}
@@ -340,10 +341,10 @@ export function TodayActivityCardStale({
     <Panel className={className}>
       <Header status="stale" statusColor={colors.warn} />
       <div
+        className="wk-activity-grid"
         style={{
           marginTop: 12,
           display: "grid",
-          gridTemplateColumns: "minmax(0,1fr) minmax(0,1.15fr)",
           gap: 20,
           alignItems: "center",
         }}
@@ -412,11 +413,11 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
     <Panel className={className}>
       <Header status="synced" statusColor={colors.exercise} live />
       <div
+        className="wk-activity-grid"
         style={{
           flex: 1,
           marginTop: 12,
           display: "grid",
-          gridTemplateColumns: "minmax(0,1fr) minmax(0,1.15fr)",
           gap: 20,
           alignItems: "center",
           alignContent: "center",

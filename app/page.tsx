@@ -24,7 +24,7 @@ function SectHead({
   const Label = as
   return (
     <div
-      className="mb-6 flex items-baseline justify-between gap-4 border-b border-dashed pb-3"
+      className="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-dashed pb-3"
       style={{ borderColor: "var(--border-subtle)" }}
     >
       <Label

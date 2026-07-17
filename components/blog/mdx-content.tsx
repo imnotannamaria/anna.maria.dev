@@ -103,7 +103,11 @@ const defaultComponents = {
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
       className="mb-4 text-[16px] leading-[1.7]"
-      style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+      style={{
+        fontFamily: "var(--font-sans)",
+        color: "var(--fg-secondary)",
+        overflowWrap: "break-word",
+      }}
       {...props}
     />
   ),
@@ -119,24 +123,35 @@ const defaultComponents = {
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
       className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand)]"
+      style={{ overflowWrap: "break-word" }}
       {...props}
     />
   ),
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
       className="mb-4 ml-6 list-disc space-y-1.5 text-[16px] leading-[1.7]"
-      style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+      style={{
+        fontFamily: "var(--font-sans)",
+        color: "var(--fg-secondary)",
+        overflowWrap: "break-word",
+      }}
       {...props}
     />
   ),
   ol: (props: React.HTMLAttributes<HTMLOListElement>) => (
     <ol
       className="mb-4 ml-6 list-decimal space-y-1.5 text-[16px] leading-[1.7]"
-      style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+      style={{
+        fontFamily: "var(--font-sans)",
+        color: "var(--fg-secondary)",
+        overflowWrap: "break-word",
+      }}
       {...props}
     />
   ),
-  li: (props: React.HTMLAttributes<HTMLLIElement>) => <li className="leading-[1.7]" {...props} />,
+  li: (props: React.HTMLAttributes<HTMLLIElement>) => (
+    <li className="leading-[1.7]" style={{ overflowWrap: "break-word" }} {...props} />
+  ),
   blockquote: (props: React.HTMLAttributes<HTMLQuoteElement>) => (
     <blockquote
       className="my-6 pl-4 italic"

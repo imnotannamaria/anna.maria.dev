@@ -360,6 +360,20 @@
     0 0 0 4px var(--fg-brand);
 }
 
+/* Wrist-kit activity card: rings + metrics sit side by side, but on a narrow
+   card (phones, tight bento cells) the metric values can't fit next to the
+   rings — so stack them. Keyed off the card's own width via a container query,
+   not the viewport, since the card is narrow on mobile AND in small grid cells. */
+.wk-activity-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+}
+@container (max-width: 360px) {
+  .wk-activity-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
 /* form fields, buttons, and menu items manage their own focus state */
 input:focus,
 input:focus-visible,

@@ -123,7 +123,7 @@ export default function ProjectsPage({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div
-      className="rounded-[var(--radius-sm)] border px-4 py-3"
+      className="overflow-hidden rounded-[var(--radius-sm)] border px-2 py-2.5 sm:px-4 sm:py-3"
       style={{ borderColor: "var(--border-subtle)" }}
     >
       <dt
@@ -133,10 +133,10 @@ function Stat({ label, value }: { label: string; value: string }) {
         {label}
       </dt>
       <dd
+        className="text-[20px] sm:text-[34px]"
         style={{
           fontFamily: "var(--font-serif)",
           fontStyle: "italic",
-          fontSize: 34,
           lineHeight: 1,
           letterSpacing: "-0.02em",
           color: "var(--fg-brand)",
