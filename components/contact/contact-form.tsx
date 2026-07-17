@@ -274,14 +274,17 @@ export function ContactForm({ email }: { email: string }) {
         </div>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Button type="submit" variant="primary" loading={disabled}>
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <Button type="submit" variant="primary" loading={disabled} className="w-full sm:w-auto">
           send message →
         </Button>
-        <a href={`mailto:${email}`} className={buttonVariants({ variant: "command" })}>
+        <a
+          href={`mailto:${email}`}
+          className={cn(buttonVariants({ variant: "command" }), "w-full sm:w-auto")}
+        >
           open in mail app
         </a>
-        <span className="ml-auto font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+        <span className="font-mono text-[11px] sm:ml-auto" style={{ color: "var(--fg-muted)" }}>
           {"// replies within "}
           <span style={{ color: "var(--fg-primary)" }}>a day</span>
         </span>

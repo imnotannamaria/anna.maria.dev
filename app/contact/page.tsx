@@ -225,28 +225,38 @@ export default function ContactPage() {
             <DocLabel level="#">contact</DocLabel>
 
             <div
-              className="mb-6 inline-flex flex-wrap items-center gap-3 rounded-full border px-4 py-2 font-mono text-xs"
+              className="mb-6 flex flex-col items-start gap-1.5 self-start rounded-2xl border px-4 py-3 font-mono text-xs sm:inline-flex sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:rounded-full sm:py-2"
               style={{
                 borderColor: "var(--border-subtle)",
                 background: "var(--bg-surface)",
                 color: "var(--fg-secondary)",
               }}
             >
+              <span className="inline-flex items-center gap-2">
+                <span
+                  aria-hidden
+                  className="inline-block size-2 animate-pulse rounded-full"
+                  style={{ background: "var(--status-success)" }}
+                />
+                <span>
+                  inbox <Strong>open</Strong>
+                </span>
+              </span>
               <span
                 aria-hidden
-                className="inline-block size-2 animate-pulse rounded-full"
-                style={{ background: "var(--status-success)" }}
-              />
-              <span>
-                inbox <Strong>open</Strong>
-              </span>
-              <span aria-hidden style={{ color: "var(--fg-muted)", opacity: 0.6 }}>
+                className="hidden sm:inline"
+                style={{ color: "var(--fg-muted)", opacity: 0.6 }}
+              >
                 ·
               </span>
               <span>
                 replies within <Strong>a day</Strong>
               </span>
-              <span aria-hidden style={{ color: "var(--fg-muted)", opacity: 0.6 }}>
+              <span
+                aria-hidden
+                className="hidden sm:inline"
+                style={{ color: "var(--fg-muted)", opacity: 0.6 }}
+              >
                 ·
               </span>
               <span>recife · brt</span>

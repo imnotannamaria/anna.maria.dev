@@ -575,7 +575,8 @@ export function PianoStudio() {
               <span aria-hidden style={{ color: "var(--fg-brand)", marginRight: 6, fontSize: 9 }}>
                 ◆
               </span>
-              piano · 2 oct
+              piano · <span className="min-[481px]:hidden">1</span>
+              <span className="hidden min-[481px]:inline">2</span> oct
             </span>
 
             {/* live note */}
@@ -670,7 +671,7 @@ export function PianoStudio() {
               }}
             >
               <div
-                className="relative flex h-[220px] max-[820px]:h-[180px]"
+                className="piano-keys relative flex h-[220px] max-[820px]:h-[180px]"
                 style={{ borderRadius: "0 0 6px 6px", overflow: "hidden", isolation: "isolate" }}
                 role="application"
                 aria-label="Piano keyboard"
@@ -688,7 +689,10 @@ export function PianoStudio() {
                         if (e.pointerType === "mouse" && e.button !== 0) return
                         pressNote(note)
                       }}
-                      className="relative flex h-full flex-1 cursor-pointer touch-none flex-col items-center justify-end pb-3.5 select-none"
+                      className={cn(
+                        "relative flex h-full flex-1 cursor-pointer touch-none flex-col items-center justify-end pb-3.5 select-none",
+                        i >= 7 && "piano-oct2",
+                      )}
                       style={{
                         background: on
                           ? "linear-gradient(180deg, var(--fg-brand-hover) 0%, var(--fg-brand) 100%)"
@@ -718,10 +722,10 @@ export function PianoStudio() {
                   )
                 })}
 
-                {/* black keys */}
+                {/* black keys — positioned from the --wk (white-key count) var so
+                    the layout recomputes when small screens drop to one octave */}
                 {BLACK_AFTER.map((b) => {
                   const on = activeNotes.has(b.note)
-                  const left = (b.i + 1) * (100 / WHITE_COUNT) - 2.5
                   return (
                     <button
                       key={b.note}
@@ -732,10 +736,14 @@ export function PianoStudio() {
                         e.stopPropagation()
                         pressNote(b.note)
                       }}
-                      className="absolute top-0 z-[3] flex cursor-pointer touch-none flex-col items-center justify-end pb-2.5 select-none"
+                      className={cn(
+                        "absolute top-0 z-[3] flex cursor-pointer touch-none flex-col items-center justify-end pb-2.5 select-none",
+                        b.i >= 7 && "piano-oct2",
+                      )}
                       style={{
-                        left: `${left.toFixed(3)}%`,
-                        width: "5%",
+                        ["--k" as string]: b.i + 1,
+                        left: "calc((var(--k) * 100% - 35%) / var(--wk))",
+                        width: "calc(70% / var(--wk))",
                         height: "60%",
                         borderRadius: "0 0 5px 5px",
                         border: "1px solid #000",

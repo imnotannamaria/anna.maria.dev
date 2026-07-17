@@ -360,6 +360,22 @@
     0 0 0 4px var(--fg-brand);
 }
 
+/* Piano keyboard: two octaves (14 white keys) by default. On very small
+   screens the keys get too thin to tap, so we drop to a single octave —
+   `--wk` (white-key count) drives the black-key positions via calc(), and
+   the octave-2 keys are hidden, letting the 7 remaining white keys expand. */
+.piano-keys {
+  --wk: 14;
+}
+@media (max-width: 480px) {
+  .piano-keys {
+    --wk: 7;
+  }
+  .piano-oct2 {
+    display: none;
+  }
+}
+
 /* Wrist-kit activity card: rings + metrics sit side by side, but on a narrow
    card (phones, tight bento cells) the metric values can't fit next to the
    rings — so stack them. Keyed off the card's own width via a container query,

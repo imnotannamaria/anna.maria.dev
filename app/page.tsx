@@ -322,21 +322,11 @@ export default async function Home() {
               and always working on something open source on the side.
             </p>
 
-            <div className="relative z-10 flex flex-nowrap gap-1.5 sm:flex-wrap sm:gap-3">
-              <LinkButton
-                href="/projects"
-                variant="primary"
-                className="h-10 min-w-0 flex-1 gap-1 overflow-hidden px-1.5 text-[11px] whitespace-nowrap sm:h-11 sm:flex-none sm:gap-2 sm:px-6 sm:text-sm"
-                style={{ height: undefined, paddingInline: undefined }}
-              >
+            <div className="relative z-10 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-3">
+              <LinkButton href="/projects" variant="primary" className="w-full sm:w-auto">
                 browse projects →
               </LinkButton>
-              <LinkButton
-                href="/contact"
-                variant="ghost"
-                className="h-10 min-w-0 flex-1 gap-1 overflow-hidden px-1.5 text-[11px] whitespace-nowrap sm:h-11 sm:flex-none sm:gap-2 sm:px-6 sm:text-sm"
-                style={{ height: undefined, paddingInline: undefined }}
-              >
+              <LinkButton href="/contact" variant="ghost" className="w-full sm:w-auto">
                 <span style={{ color: "var(--fg-brand)" }}>$</span> cat contact.txt
               </LinkButton>
             </div>
