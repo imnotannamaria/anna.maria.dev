@@ -2,6 +2,7 @@
 
 import { GitHubCalendar } from "react-github-calendar"
 import { useState, useEffect } from "react"
+import { Skeleton } from "@/app/components/entrepta/skeleton"
 
 export function GithubCalendar({ username }: { username: string }) {
   const [mode, setMode] = useState<"dark" | "light">("dark")
@@ -24,10 +25,10 @@ export function GithubCalendar({ username }: { username: string }) {
   }, [])
 
   // react-github-calendar fetches on the client and produces markup that can't
-  // match the server render, so we render nothing until mounted to avoid a
-  // hydration mismatch. A fixed-height placeholder keeps layout shift minimal.
+  // match the server render, so we render a shimmer until mounted to avoid a
+  // hydration mismatch. The fixed height matches the calendar to keep CLS ≈ 0.
   if (!mounted) {
-    return <div aria-hidden style={{ height: 140 }} />
+    return <Skeleton className="w-full rounded-lg" style={{ height: 140 }} />
   }
 
   return (

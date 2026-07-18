@@ -8,7 +8,7 @@ const GithubCalendarInner = dynamic(
   () => import("@/components/about/github-calendar").then((m) => m.GithubCalendar),
   {
     ssr: false,
-    loading: () => <Skeleton className="h-[112px] w-full rounded-lg" />,
+    loading: () => <Skeleton className="h-[140px] w-full rounded-lg" />,
   },
 )
 
