@@ -15,8 +15,13 @@ import {
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { toast } from "@/app/components/entrepta/toast"
+import dynamic from "next/dynamic"
 import { useCommandPalette } from "@/hooks/use-command-palette"
-import { CommandMenu } from "./command-menu"
+
+// cmdk + the palette only ship once the user actually opens it (⌘K / "+").
+const CommandMenu = dynamic(() => import("./command-menu").then((m) => m.CommandMenu), {
+  ssr: false,
+})
 
 type Tab = { href: string; name: string; icon: Icon }
 
@@ -68,6 +73,10 @@ export function Titlebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { open, setOpen, toggle } = useCommandPalette()
+  // Latch: mount the palette (and pull its chunk) only after the first open, then keep it.
+  // Guarded set-during-render — no effect needed, avoids the extra commit.
+  const [paletteMounted, setPaletteMounted] = useState(false)
+  if (open && !paletteMounted) setPaletteMounted(true)
   const dynamicTab = getDynamicTab(pathname)
   const tabs = dynamicTab ? [...NAV_TABS, dynamicTab] : NAV_TABS
 
@@ -166,7 +175,7 @@ export function Titlebar() {
                   onClick={() => router.push(closeTarget(tab.href))}
                   aria-label={`Close ${tab.name}`}
                   className={cn(
-                    "focus-ring mr-2 inline-grid h-4 w-4 shrink-0 place-items-center rounded-sm text-[12px]",
+                    "focus-ring mr-1.5 inline-grid h-6 w-6 shrink-0 place-items-center rounded-sm text-[12px]",
                     "text-[var(--fg-muted)] opacity-60 transition-[opacity,background-color]",
                     "hover:bg-[var(--bg-hover-strong)] hover:opacity-100",
                   )}
@@ -196,7 +205,7 @@ export function Titlebar() {
         </span>
       </div>
 
-      <CommandMenu open={open} onOpenChange={setOpen} />
+      {paletteMounted && <CommandMenu open={open} onOpenChange={setOpen} />}
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Newsreader, Inter, JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Titlebar } from "@/components/chrome/titlebar"
 import { Sidebar } from "@/components/chrome/sidebar"
@@ -6,7 +7,34 @@ import { StatusBar, StatusBarItem, StatusBarSeparator } from "@/app/components/e
 import { ThemeScript } from "@/app/components/entrepta/theme-switcher"
 import { ThemeSwitcher } from "@/app/components/entrepta/theme-switcher"
 import { Toaster } from "@/app/components/entrepta/toast"
+import { calcYearsOfExp } from "@/lib/experience"
 import "./globals.css"
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://annamaria.app"
+
+// Self-hosted via next/font — no render-blocking @import, no Google Fonts request.
+const serif = Newsreader({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-serif",
+  fallback: ["Times New Roman", "serif"],
+})
+
+const sans = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans",
+  fallback: ["-apple-system", "system-ui", "sans-serif"],
+})
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-mono",
+  fallback: ["SF Mono", "Menlo", "monospace"],
+})
 
 const THEMES = [
   { id: "entrepta", label: "entrepta", color: "#7c6bff", lightColor: "#6b5bff" },
@@ -18,11 +46,12 @@ const THEMES = [
 ] as const
 
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: {
     default: "Anna Maria",
     template: "%s · Anna Maria",
   },
-  description: "Full-stack Software Engineer with 5 years shipping web products.",
+  description: `Full-stack Software Engineer with ${calcYearsOfExp()} years shipping web products.`,
 }
 
 export default function RootLayout({
@@ -31,7 +60,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${serif.variable} ${sans.variable} ${mono.variable}`}
+    >
       <head>
         <ThemeScript />
       </head>
@@ -118,7 +151,8 @@ export default function RootLayout({
 
         <Toaster position="top-center" />
 
-        <Analytics />
+        {/* Vercel-only — the insights script 404s (and floods the console) off-platform */}
+        {process.env.VERCEL && <Analytics />}
       </body>
     </html>
   )

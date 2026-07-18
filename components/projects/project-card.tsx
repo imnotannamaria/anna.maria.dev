@@ -50,7 +50,7 @@ function ExternalLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative z-[2] inline-flex items-center gap-1.5 transition-all duration-150 hover:tracking-[0.06em] hover:[color:var(--fg-brand)]"
+      className="relative z-[2] inline-flex min-h-6 items-center gap-1.5 py-0.5 transition-all duration-150 hover:tracking-[0.06em] hover:[color:var(--fg-brand)]"
       style={{ color: "var(--fg-primary)", fontFamily: "var(--font-mono)", fontSize: 12 }}
     >
       {icon === "github" ? <GithubLogoIcon size={13} /> : <ArrowSquareOutIcon size={12} />}
@@ -64,7 +64,7 @@ function ExternalLink({
 function SplitTitle({ title, size }: { title: string; size: number }) {
   const hyphen = title.indexOf("-")
   return (
-    <h3
+    <h2
       className="transition-colors group-hover:[color:var(--fg-brand)]"
       style={{
         fontFamily: "var(--font-serif)",
@@ -87,7 +87,7 @@ function SplitTitle({ title, size }: { title: string; size: number }) {
       ) : (
         <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>{title}</em>
       )}
-    </h3>
+    </h2>
   )
 }
 
@@ -243,7 +243,7 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
         <span style={{ color: "var(--fg-muted)" }}>{year}</span>
       </div>
 
-      <h3
+      <h2
         className="relative transition-colors group-hover:[color:var(--fg-brand)]"
         style={{
           fontFamily: "var(--font-serif)",
@@ -256,7 +256,7 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
         }}
       >
         {project.title}
-      </h3>
+      </h2>
 
       <p
         className="relative line-clamp-2 text-sm leading-relaxed"

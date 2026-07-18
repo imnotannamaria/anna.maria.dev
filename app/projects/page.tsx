@@ -2,8 +2,9 @@ import { Suspense } from "react"
 import { createMetadata } from "@/lib/metadata"
 import { numberToWord } from "@/lib/utils"
 import { getPublishedProjects } from "@/lib/velite"
-import { FeaturedProjectCard, ProjectCard } from "@/components/projects/project-card"
+import type { ProjectCardData } from "@/components/projects/project-card"
 import { TagFilter } from "./tag-filter"
+import { ProjectList } from "./project-list"
 
 export const metadata = createMetadata({
   title: "Projects",
@@ -11,11 +12,7 @@ export const metadata = createMetadata({
   path: "/projects",
 })
 
-export default function ProjectsPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ tag?: string }>
-}) {
+export default function ProjectsPage() {
   const projects = getPublishedProjects()
 
   const tagCounts = new Map<string, number>()
@@ -29,6 +26,17 @@ export default function ProjectsPage({
   const latestYear = projects[0]
     ? new Date(projects[0].date).getFullYear()
     : new Date().getFullYear()
+
+  const projectItems: ProjectCardData[] = projects.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    description: p.description,
+    tags: p.tags,
+    github: p.github,
+    live: p.live,
+    date: p.date,
+    featured: p.featured,
+  }))
 
   return (
     <div className="mx-auto w-full max-w-[920px] px-5 py-12 sm:px-8 lg:px-12">
@@ -115,7 +123,9 @@ export default function ProjectsPage({
         <TagFilter tags={tags} total={projects.length} />
       </Suspense>
 
-      <ProjectList projects={projects} searchParams={searchParams} />
+      <Suspense>
+        <ProjectList projects={projectItems} />
+      </Suspense>
     </div>
   )
 }
@@ -145,40 +155,6 @@ function Stat({ label, value }: { label: string; value: string }) {
       >
         {value}
       </dd>
-    </div>
-  )
-}
-
-async function ProjectList({
-  projects,
-  searchParams,
-}: {
-  projects: ReturnType<typeof getPublishedProjects>
-  searchParams: Promise<{ tag?: string }>
-}) {
-  const { tag } = await searchParams
-  const filtered = tag ? projects.filter((p) => p.tags.includes(tag)) : projects
-
-  if (filtered.length === 0) {
-    return (
-      <p className="mt-12 text-center font-mono text-sm" style={{ color: "var(--fg-muted)" }}>
-        {"// no projects found for this tag."}
-      </p>
-    )
-  }
-
-  // Featured first, then the rest by date — one card per row.
-  const ordered = [...filtered].sort((a, b) => Number(b.featured) - Number(a.featured))
-
-  return (
-    <div className="flex flex-col gap-6">
-      {ordered.map((project) =>
-        project.featured ? (
-          <FeaturedProjectCard key={project.slug} project={project} />
-        ) : (
-          <ProjectCard key={project.slug} project={project} />
-        ),
-      )}
     </div>
   )
 }

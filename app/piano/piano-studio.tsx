@@ -684,7 +684,7 @@ export function PianoStudio() {
                     <button
                       key={note}
                       type="button"
-                      aria-label={`${note} (${kbd.toUpperCase()})`}
+                      aria-label={`${note} ${kbd.toUpperCase()}`}
                       onPointerDown={(e) => {
                         if (e.pointerType === "mouse" && e.button !== 0) return
                         pressNote(note)
@@ -730,7 +730,7 @@ export function PianoStudio() {
                     <button
                       key={b.note}
                       type="button"
-                      aria-label={`${b.note} (${b.kbd.toUpperCase()})`}
+                      aria-label={`${b.note} ${b.kbd.toUpperCase()}`}
                       onPointerDown={(e) => {
                         if (e.pointerType === "mouse" && e.button !== 0) return
                         e.stopPropagation()

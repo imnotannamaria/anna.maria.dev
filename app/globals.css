@@ -3,7 +3,8 @@
    Copie este arquivo para app/globals.css no seu projeto.
    ============================================================ */
 
-@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400;1,6..72,500&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap");
+/* Fonts are self-hosted via next/font (see app/layout.tsx), which sets
+   --font-serif / --font-sans / --font-mono on <html>. No @import → no render-blocking. */
 
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
@@ -150,10 +151,10 @@
 
   /* ============================================================
      TYPOGRAPHY
+     --font-serif / --font-mono / --font-sans are supplied by next/font
+     on <html> (app/layout.tsx). Declared there so the self-hosted
+     families + fallbacks resolve without a Google Fonts request.
      ============================================================ */
-  --font-serif: "Newsreader", "Times New Roman", serif;
-  --font-mono: "JetBrains Mono", "SF Mono", Menlo, monospace;
-  --font-sans: "Inter", -apple-system, system-ui, sans-serif;
 }
 
 /* ============================================================

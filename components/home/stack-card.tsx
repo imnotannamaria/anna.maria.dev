@@ -236,7 +236,6 @@ export function StackCard() {
               tabIndex={0}
               aria-expanded={isOpen}
               aria-controls={`stack-panel-${branch.id}`}
-              aria-label={`${branch.label} stack — ${branch.tools.length} tools`}
               onClick={() => toggle(branch.id)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {

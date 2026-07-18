@@ -78,11 +78,23 @@ export async function getPlaylistTracks(playlistId: string): Promise<SimplifiedT
         id: track.id,
         name: track.name,
         artist: track.artists[0]?.name ?? "Unknown",
-        coverUrl: track.album.images[0]?.url ?? "",
+        coverUrl: pickCover(track.album.images),
         durationMs: track.duration_ms,
         spotifyUrl: track.external_urls.spotify,
       }
     })
+}
+
+/**
+ * Spotify returns 3 sizes (≈640 / 300 / 64px). The widget renders the cover at 72px,
+ * so grab the smallest that still looks crisp on retina (≥144px) instead of the 640px hero.
+ * The image is still served intact from Spotify's CDN — no re-hosting, per their terms.
+ */
+function pickCover(images: Array<{ url: string; width?: number }>): string {
+  if (images.length === 0) return ""
+  const sorted = [...images].sort((a, b) => (a.width ?? 0) - (b.width ?? 0))
+  const retina = sorted.find((img) => (img.width ?? 0) >= 144)
+  return (retina ?? sorted[sorted.length - 1]).url
 }
 
 type SpotifyTrack = {
@@ -90,6 +102,6 @@ type SpotifyTrack = {
   name: string
   duration_ms: number
   artists: Array<{ name: string }>
-  album: { images: Array<{ url: string }> }
+  album: { images: Array<{ url: string; width?: number; height?: number }> }
   external_urls: { spotify: string }
 }

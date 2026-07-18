@@ -40,6 +40,8 @@ import {
   siFigma,
 } from "simple-icons"
 import { AboutOutline, type OutlineItem } from "./about-outline"
+import { calcYearsOfExp, yearsWord } from "@/lib/experience"
+import { siteConfig } from "@/lib/site-config"
 
 export const metadata = createMetadata({
   title: "About",
@@ -99,9 +101,9 @@ const outline: OutlineItem[] = [
 ]
 
 const socials = [
-  { label: "github", href: "https://github.com/imnotannamaria", Icon: GitHubIcon },
-  { label: "linkedin", href: "https://linkedin.com/in/imnotannamaria", Icon: LinkedInIcon },
-  { label: "x · twitter", href: "https://x.com/annamariadevbr", Icon: XIcon },
+  { label: "github", href: siteConfig.socials.github, Icon: GitHubIcon },
+  { label: "linkedin", href: siteConfig.socials.linkedin, Icon: LinkedInIcon },
+  { label: "x · twitter", href: siteConfig.socials.x, Icon: XIcon },
 ]
 
 type Entry = {
@@ -443,6 +445,9 @@ function Timeline({ entries }: { entries: Entry[] }) {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function AboutPage() {
+  const years = calcYearsOfExp()
+  const yearsLower = yearsWord(years).toLowerCase()
+
   return (
     <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
       <AboutOutline items={outline} />
@@ -468,7 +473,7 @@ export default function AboutPage() {
                   }}
                 >
                   <Image
-                    src="https://github.com/imnotannamaria.png"
+                    src="/images/avatar.png"
                     alt="Anna Maria"
                     fill
                     sizes="200px"
@@ -495,7 +500,7 @@ export default function AboutPage() {
                       href={href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 font-mono text-xs text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand)]"
+                      className="inline-flex min-h-6 items-center gap-2 py-0.5 font-mono text-xs text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand)]"
                     >
                       <Icon size={14} style={{ opacity: 0.7 }} />
                       <span>{label}</span>
@@ -530,7 +535,7 @@ export default function AboutPage() {
                   <span aria-hidden style={{ color: "var(--fg-brand)" }}>
                     {"// "}
                   </span>
-                  full-stack engineer · five years · ai &amp; saas
+                  full-stack engineer · {yearsLower} years · ai &amp; saas
                 </p>
 
                 <div
@@ -539,8 +544,8 @@ export default function AboutPage() {
                 >
                   <p style={{ margin: 0 }}>
                     I build and ship <Strong>web products</Strong>, end to end, from the data model
-                    to the pixel, and I&apos;ve been at it for about <Em>five</Em> years across
-                    startups and bigger enterprise teams.
+                    to the pixel, and I&apos;ve been at it for about <Em>{yearsLower}</Em> years
+                    across startups and bigger enterprise teams.
                   </p>
                   <p style={{ margin: 0 }}>
                     Right now I&apos;m at <Em>cesar</Em>, where I built <Em>ESG Carbon</Em>, a
@@ -569,7 +574,7 @@ export default function AboutPage() {
           <Section id="career">
             <DocLabel level="##">career &amp; education</DocLabel>
             <DisplayH2>
-              <Em>Five</Em> years of work.
+              <Em>{yearsWord(years)}</Em> years of work.
               <br />
               One academic track.
             </DisplayH2>

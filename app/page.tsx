@@ -4,9 +4,19 @@ import { formatDate, estimateReadingTime } from "@/lib/utils"
 import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
 import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
-import { LinkButton } from "@/components/ui/button"
+import { buttonVariants } from "@/app/components/entrepta/button-variants"
+import { cn } from "@/lib/utils"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
+import { createMetadata } from "@/lib/metadata"
+import { CAREER_START_YEAR, calcYearsOfExp, yearsWord } from "@/lib/experience"
+
+export const metadata = createMetadata({
+  title: "Anna Maria — Full-stack Software Engineer",
+  description: `Full-stack Software Engineer with ${calcYearsOfExp()} years shipping web products.`,
+  path: "/",
+  titleAbsolute: true,
+})
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -175,34 +185,8 @@ function ProgressBar({ filled, total }: { filled: number; total: number }) {
 
 // ─── Experience timeline constants ─────────────────────────────────────────────
 
-// Professional start: March 15, 2021
-const CAREER_START_DATE = new Date(2021, 2, 15) // month is 0-indexed
-const CAREER_START = CAREER_START_DATE.getFullYear()
+const CAREER_START = CAREER_START_YEAR
 const TIMELINE_WINDOW = 5 // intervals shown (= points - 1)
-
-const YEAR_WORDS: Record<number, string> = {
-  1: "One",
-  2: "Two",
-  3: "Three",
-  4: "Four",
-  5: "Five",
-  6: "Six",
-  7: "Seven",
-  8: "Eight",
-  9: "Nine",
-  10: "Ten",
-}
-
-function calcYearsOfExp(): number {
-  const now = new Date()
-  let years = now.getFullYear() - CAREER_START_DATE.getFullYear()
-  const hasPassedAnniversary =
-    now.getMonth() > CAREER_START_DATE.getMonth() ||
-    (now.getMonth() === CAREER_START_DATE.getMonth() &&
-      now.getDate() >= CAREER_START_DATE.getDate())
-  if (!hasPassedAnniversary) years--
-  return Math.max(0, years)
-}
 
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
@@ -237,7 +221,7 @@ export default async function Home() {
           id="sec-whoami"
           as="span"
           cmd="whoami"
-          meta={`uptime · ${YEAR_WORDS[yearsOfExp] ?? yearsOfExp} years`}
+          meta={`uptime · ${yearsWord(yearsOfExp)} years`}
         />
         {/* Row 1: hero + experience */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
@@ -306,7 +290,8 @@ export default async function Home() {
               className="relative z-10 mb-8 max-w-[52ch] text-base leading-relaxed"
               style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
             >
-              Full-stack Software Engineer with 5 years shipping web products. Currently at{" "}
+              Full-stack Software Engineer with {yearsOfExp} years shipping web products. Currently
+              at{" "}
               <Link
                 href="https://cesar.org.br"
                 target="_blank"
@@ -323,12 +308,24 @@ export default async function Home() {
             </p>
 
             <div className="relative z-10 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-3">
-              <LinkButton href="/projects" variant="primary" className="w-full sm:w-auto">
+              <Link
+                href="/projects"
+                className={cn(
+                  buttonVariants({ variant: "primary", size: "lg" }),
+                  "w-full sm:w-auto",
+                )}
+              >
                 browse projects →
-              </LinkButton>
-              <LinkButton href="/contact" variant="ghost" className="w-full sm:w-auto">
-                <span style={{ color: "var(--fg-brand)" }}>$</span> cat contact.txt
-              </LinkButton>
+              </Link>
+              <Link
+                href="/contact"
+                className={cn(
+                  buttonVariants({ variant: "command", size: "lg" }),
+                  "w-full sm:w-auto",
+                )}
+              >
+                cat contact.txt
+              </Link>
             </div>
           </div>
 
@@ -390,7 +387,7 @@ export default async function Home() {
                   letterSpacing: "-0.02em",
                 }}
               >
-                {YEAR_WORDS[yearsOfExp] ?? String(yearsOfExp)}
+                {yearsWord(yearsOfExp)}
               </em>
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                 <em
@@ -621,7 +618,7 @@ export default async function Home() {
                       href={featuredProject.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
+                      className="inline-flex min-h-6 items-center py-0.5 transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
                       style={{
                         color: "var(--fg-primary)",
                         fontFamily: "var(--font-mono)",
@@ -636,7 +633,7 @@ export default async function Home() {
                       href={featuredProject.live}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
+                      className="inline-flex min-h-6 items-center py-0.5 transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
                       style={{
                         color: "var(--fg-primary)",
                         fontFamily: "var(--font-mono)",

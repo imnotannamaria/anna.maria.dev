@@ -34,7 +34,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: project.title,
       description: project.description,
-      type: "website",
+      type: "article",
+      publishedTime: project.date,
       images: [`${baseUrl}/api/og?title=${encodeURIComponent(project.title)}`],
     },
     twitter: {

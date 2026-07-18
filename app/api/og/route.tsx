@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
           right: 0,
           bottom: 0,
           background:
-            "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(99,102,241,0.08) 0%, transparent 70%)",
+            "radial-gradient(ellipse 60% 60% at 50% 50%, rgba(124,107,255,0.10) 0%, transparent 70%)",
         }}
       />
 
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
             width={22}
             height={22}
             viewBox="0 0 256 256"
-            fill="#6366f1"
+            fill="#7c6bff"
           >
             <path d="M240,128v56a8,8,0,0,1-8,8H128a8,8,0,0,1-8-8V80H32v48a8,8,0,0,1-16,0V72a8,8,0,0,1,8-8H128a8,8,0,0,1,8,8V176h88V128a8,8,0,0,1,16,0Z" />
           </svg>
@@ -125,8 +125,8 @@ export async function GET(req: NextRequest) {
             display: "flex",
             alignItems: "center",
             gap: 8,
-            background: "#1e1b4b",
-            border: "1px solid rgba(99,102,241,0.4)",
+            background: "rgba(124,107,255,0.15)",
+            border: "1px solid rgba(124,107,255,0.4)",
             borderRadius: 999,
             padding: "6px 14px",
           }}
@@ -136,14 +136,14 @@ export async function GET(req: NextRequest) {
               width: 6,
               height: 6,
               borderRadius: "50%",
-              background: "#818cf8",
+              background: "#9b8eff",
             }}
           />
           <span
             style={{
               fontFamily: "Space Mono",
               fontSize: 13,
-              color: "#a5b4fc",
+              color: "#b3a8ff",
             }}
           >
             Open Source

@@ -1,7 +1,7 @@
 import * as runtime from "react/jsx-runtime"
 import Image from "next/image"
 import { InfoIcon } from "@phosphor-icons/react/dist/ssr"
-import { cn, slugify } from "@/lib/utils"
+import { slugify } from "@/lib/utils"
 
 /** Derive a stable slug id from heading children so the outline/TOC can anchor to it. */
 function headingId(children: React.ReactNode): string | undefined {
@@ -25,16 +25,35 @@ function Callout({
   children: React.ReactNode
   type?: "info" | "warning" | "danger"
 }) {
+  // Token-driven so it follows the active theme and reacts to light/dark.
   const styles = {
-    info: "border-indigo-500 bg-indigo-950/60",
-    warning: "border-yellow-500 bg-yellow-950/40",
-    danger: "border-red-500 bg-red-950/40",
-  }
+    info: { border: "var(--fg-brand)", bg: "var(--bg-surface-brand)", icon: "var(--fg-brand)" },
+    warning: {
+      border: "var(--status-warning)",
+      bg: "var(--status-warning-soft)",
+      icon: "var(--status-warning-fg)",
+    },
+    danger: {
+      border: "var(--status-error)",
+      bg: "var(--status-error-soft)",
+      icon: "var(--status-error-fg)",
+    },
+  }[type]
 
   return (
-    <div className={cn("my-6 flex gap-3 rounded-r-lg border-l-4 p-4", styles[type])}>
-      <InfoIcon size={16} className="mt-0.5 shrink-0 text-indigo-400" aria-hidden="true" />
-      <div className="text-text-secondary text-sm leading-relaxed [&>p]:mb-0">{children}</div>
+    <div
+      className="my-6 flex gap-3 rounded-r-lg border-l-4 p-4"
+      style={{ borderLeftColor: styles.border, background: styles.bg }}
+    >
+      <InfoIcon
+        size={16}
+        className="mt-0.5 shrink-0"
+        style={{ color: styles.icon }}
+        aria-hidden="true"
+      />
+      <div className="text-sm leading-relaxed [&>p]:mb-0" style={{ color: "var(--fg-secondary)" }}>
+        {children}
+      </div>
     </div>
   )
 }
@@ -52,9 +71,32 @@ function ImageCaption({ src, alt, caption }: { src: string; alt: string; caption
   )
 }
 
+/** Intrinsic dimensions for local content images — lets next/image reserve space (no CLS). */
+const IMG_DIMENSIONS: Record<string, { width: number; height: number }> = {
+  "/blog/new-ui-contact.webp": { width: 1400, height: 822 },
+  "/blog/new-ui-piano.webp": { width: 1400, height: 822 },
+  "/blog/resend-ecomemerce.webp": { width: 1400, height: 810 },
+  "/blog/resend-ecomemerce-draw.webp": { width: 1400, height: 2023 },
+}
+
 const defaultComponents = {
   Callout,
   ImageCaption,
+  // Markdown `![alt](src)` → optimized, lazy, dimensioned next/image (no raw <img>).
+  img: ({ src, alt }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+    if (typeof src !== "string") return null
+    const { width, height } = IMG_DIMENSIONS[src] ?? { width: 1600, height: 900 }
+    return (
+      <Image
+        src={src}
+        alt={alt ?? ""}
+        width={width}
+        height={height}
+        sizes="(max-width: 760px) 100vw, 760px"
+        className="my-8 h-auto w-full rounded-lg border border-[var(--border-subtle)]"
+      />
+    )
+  },
   h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1
       id={headingId(children)}

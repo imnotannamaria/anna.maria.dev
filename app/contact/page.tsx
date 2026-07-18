@@ -5,6 +5,7 @@ import { createMetadata } from "@/lib/metadata"
 import { ContactForm } from "@/components/contact/contact-form"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
 import { ContactOutline, type OutlineItem } from "./contact-outline"
+import { siteConfig } from "@/lib/site-config"
 
 export const metadata = createMetadata({
   title: "Contact",
@@ -12,7 +13,7 @@ export const metadata = createMetadata({
   path: "/contact",
 })
 
-const EMAIL = "anna.maria.dev.br@gmail.com"
+const EMAIL = siteConfig.email
 
 const outline: OutlineItem[] = [
   { id: "contact", label: "contact", level: 1 },
@@ -42,21 +43,21 @@ const channels: Channel[] = [
     Icon: GitHubIcon,
     label: "github · oss",
     value: "imnotannamaria",
-    href: "https://github.com/imnotannamaria",
+    href: siteConfig.socials.github,
     action: "open",
   },
   {
     Icon: LinkedInIcon,
     label: "linkedin · work",
     value: "in/imnotannamaria",
-    href: "https://linkedin.com/in/imnotannamaria",
+    href: siteConfig.socials.linkedin,
     action: "open",
   },
   {
     Icon: XIcon,
     label: "x · short pings",
     value: "@annamariadevbr",
-    href: "https://x.com/annamariadevbr",
+    href: siteConfig.socials.x,
     action: "open",
   },
 ]
@@ -182,12 +183,13 @@ function ChannelCard({ Icon, label, value, href, action, primary }: Channel) {
 
       <span
         className="inline-flex items-center gap-1 font-mono text-[11px]"
-        style={{ color: "var(--fg-brand)" }}
+        style={{ color: "var(--fg-primary)" }}
       >
         {action}
         <span
           aria-hidden
           className="transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          style={{ color: "var(--fg-brand)" }}
         >
           ↗
         </span>
