@@ -11,6 +11,8 @@ import { MiniPianoCard } from "@/components/home/mini-piano-card"
 import { createMetadata } from "@/lib/metadata"
 import { CAREER_START_YEAR, calcYearsOfExp, yearsWord } from "@/lib/experience"
 
+export const revalidate = 3600
+
 export const metadata = createMetadata({
   title: "Anna Maria — Full-stack Software Engineer",
   description: `Full-stack Software Engineer with ${calcYearsOfExp()} years shipping web products.`,
