@@ -1,93 +1,668 @@
+/* ============================================================
+   entrepta · globals.css
+   Copie este arquivo para app/globals.css no seu projeto.
+   ============================================================ */
+
+/* Fonts are self-hosted via next/font (see app/layout.tsx), which sets
+   --font-serif / --font-sans / --font-mono on <html>. No @import → no render-blocking. */
+
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-@theme inline {
-  --font-display: var(--font-poppins);
-  --font-sans: var(--font-space-grotesk);
-  --font-mono: var(--font-space-mono);
-}
+/* Scan all project TS/TSX files so Tailwind generates classes from components */
+@source "../**/*.{ts,tsx}";
+
+/* ============================================================
+   PRIMITIVE TOKENS
+   ============================================================ */
 
 :root {
-  --bg-base: #0a0a0f;
-  --bg-surface: #111118;
-  --bg-elevated: #1a1a24;
+  /* zinc (neutrals) */
+  --zinc-950: #09090b;
+  --zinc-900: #18181b;
+  --zinc-800: #27272a;
+  --zinc-700: #3f3f46;
+  --zinc-600: #52525b;
+  --zinc-500: #71717a;
+  --zinc-400: #a1a1aa;
+  --zinc-300: #d4d4d8;
+  --zinc-200: #e4e4e7;
+  --zinc-100: #f4f4f5;
+  --zinc-50: #fafafa;
 
-  --border: #2a2a3a;
-  --border-hover: #4a4a6a;
-
-  --text-primary: #f2f2f8;
-  --text-secondary: #8888aa;
-  --text-muted: #4a4a6a;
-
-  --indigo-300: #a5b4fc;
-  --indigo-400: #818cf8;
+  /* accents */
+  --violet-500: #7c6bff;
+  --violet-400: #9b8eff;
   --indigo-500: #6366f1;
-  --indigo-600: #4f46e5;
-  --indigo-900: #1e1b4b;
-  --indigo-950: #0f0c29;
+  --indigo-400: #818cf8;
+  --emerald-500: #10b981;
+  --emerald-400: #34d399;
+  --amber-500: #f59e0b;
+  --amber-400: #fbbf24;
+  --rose-500: #f43f5e;
+  --rose-400: #fb7185;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+
+  /* ============================================================
+     SEMANTIC TOKENS — dark (default)
+     ============================================================ */
+
+  /* surfaces */
+  --bg-canvas: var(--zinc-950);
+  --bg-surface: var(--zinc-900);
+  --bg-surface-elevated: rgba(39, 39, 42, 0.6);
+  --bg-surface-brand: rgba(124, 107, 255, 0.15); /* overridden by theme */
+
+  /* foreground */
+  --fg-primary: var(--zinc-50);
+  --fg-secondary: var(--zinc-400);
+  /* lightened from zinc-500 (#71717a, ~4.1:1) to clear WCAG AA on dark canvas/surface */
+  --fg-muted: #8a8a92;
+  --fg-brand: var(--violet-500); /* overridden by theme */
+  --fg-brand-hover: var(--violet-400); /* overridden by theme — lighter shade for hover */
+
+  /* borders */
+  --border-subtle: var(--zinc-800);
+  --border-strong: var(--zinc-700);
+
+  /* focus ring */
+  --ring: rgba(124, 107, 255, 0.5); /* overridden by theme */
+
+  /* brand-derived accents — auto-follow --fg-brand across every theme.
+     Declared once; color-mix re-resolves against the themed --fg-brand,
+     so borders/glows never get stuck on the entrepta violet. */
+  --border-brand: color-mix(in srgb, var(--fg-brand) 35%, transparent);
+  --border-brand-strong: color-mix(in srgb, var(--fg-brand) 60%, transparent);
+  --shadow-brand: color-mix(in srgb, var(--fg-brand) 20%, transparent);
+  --fg-brand-glow: color-mix(in srgb, var(--fg-brand) 50%, transparent);
+
+  /* hover overlays (flip white→black in light mode) */
+  --bg-hover-soft: rgba(255, 255, 255, 0.04);
+  --bg-hover-strong: rgba(255, 255, 255, 0.08);
+
+  /* recessed surface used in chrome bars (code-block head, terminal bar) */
+  --bg-chrome: rgba(0, 0, 0, 0.3);
+
+  /* elevation shadow for lifted cards — softened in light mode (see below) */
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  /* ── Piano cabinet (skeuomorphic) ─────────────────────────────
+     Dark by default; the light-mode block swaps the wood tone to a
+     warm greige so the instrument reads on a light page. Black keys
+     and the ivory-key gradient stay put — they contrast in both. */
+  --piano-stage: linear-gradient(180deg, #0a0a10 0%, #131320 100%);
+  --piano-hint: linear-gradient(180deg, #131320 0%, #0a0a10 100%);
+  --piano-frame: linear-gradient(180deg, #1a1a24 0%, #0a0a10 100%);
+  --piano-frame-border: #2a2a3a;
+  --piano-frame-cast: rgba(0, 0, 0, 0.5);
+  --piano-white-key: linear-gradient(180deg, #ffffff 0%, #f4f4f5 100%);
+  --piano-key-sep: #d4d4d8;
+  --piano-key-label: #71717a;
+  --piano-black-key: linear-gradient(180deg, #2a2a30 0%, #0a0a12 60%, #1a1a24 100%);
+  --piano-black-key-label: #6b6b80;
+
+  /* status */
+  --status-success: var(--emerald-500);
+  --status-warning: var(--amber-500);
+  --status-error: var(--rose-500);
+  --status-info: var(--indigo-400);
+
+  /* status — soft (translucent bg + lighter fg, for badge/toast soft variants) */
+  --status-success-fg: var(--emerald-400);
+  --status-warning-fg: var(--amber-400);
+  --status-error-fg: var(--rose-400);
+  --status-info-fg: var(--indigo-400);
+  --status-success-soft: rgba(16, 185, 129, 0.12);
+  --status-warning-soft: rgba(245, 158, 11, 0.12);
+  --status-error-soft: rgba(244, 63, 94, 0.12);
+  --status-info-soft: rgba(129, 140, 248, 0.12);
+
+  /* ============================================================
+     SPACING
+     ============================================================ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* ============================================================
+     RADIUS
+     ============================================================ */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ============================================================
+     MOTION
+     ============================================================ */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ============================================================
+     TYPOGRAPHY
+     --font-serif / --font-mono / --font-sans are supplied by next/font
+     on <html> (app/layout.tsx). Declared there so the self-hosted
+     families + fallbacks resolve without a Google Fonts request.
+     ============================================================ */
 }
 
-.light {
-  --bg-base: #fafafa;
-  --bg-surface: #ffffff;
-  --bg-elevated: #f4f4f8;
+/* ============================================================
+   RESET  — inside @layer base so Tailwind utilities can override
+   ============================================================ */
 
-  --border: #e4e4f0;
-  --border-hover: #c4c4e0;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-  --text-primary: #0a0a0f;
-  --text-secondary: #555577;
-  --text-muted: #9999bb;
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
 
-  --indigo-500: #4f46e5;
+  body {
+    background: var(--bg-canvas);
+    color: var(--fg-primary);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    outline: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+    font-weight: 400;
+  }
+
+  p {
+    margin: 0;
+  }
 }
 
-html {
-  color-scheme: dark;
+/* ============================================================
+   TYPE UTILITIES
+   ============================================================ */
+
+.t-display-xl {
+  font-family: var(--font-serif);
+  font-size: 80px;
+  line-height: 0.95;
+  font-weight: 400;
+  letter-spacing: -0.02em;
 }
 
-html.light {
-  color-scheme: light;
+.t-display-lg {
+  font-family: var(--font-serif);
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.02em;
 }
 
-body {
-  background-color: var(--bg-base);
-  color: var(--text-primary);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 15px;
+.t-display-md {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.t-heading-lg {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  line-height: 1.3;
+  font-weight: 400;
+}
+
+.t-heading-md {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.t-body-lg {
+  font-family: var(--font-sans);
+  font-size: 16px;
   line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-@theme inline {
-  --color-bg-base: var(--bg-base);
-  --color-bg-surface: var(--bg-surface);
-  --color-bg-elevated: var(--bg-elevated);
-  --color-border: var(--border);
-  --color-border-hover: var(--border-hover);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-text-muted: var(--text-muted);
-  --color-indigo-300: var(--indigo-300);
-  --color-indigo-400: var(--indigo-400);
-  --color-indigo-500: var(--indigo-500);
-  --color-indigo-600: var(--indigo-600);
-  --color-indigo-900: var(--indigo-900);
-  --color-indigo-950: var(--indigo-950);
+.t-body-md {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-:focus-visible:not(input, textarea, select) {
-  outline: 2px solid var(--indigo-500);
+.t-mono-md {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.t-mono-sm {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.t-mono-xs {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+/* helpers */
+.t-italic {
+  font-style: italic;
+}
+.t-muted {
+  color: var(--fg-muted);
+}
+.t-secondary {
+  color: var(--fg-secondary);
+}
+.t-brand {
+  color: var(--fg-brand);
+}
+
+/* ============================================================
+   FOCUS VISIBLE (global ring)
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--fg-brand);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
+/* Skip link — visually hidden until focused, then slides in as an editor-style
+   chip in the top-left. Mono, subtle surface + brand accent, no bulky pill. */
+.skip-link {
+  position: fixed;
+  top: 6px;
+  left: 6px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--fg-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transform: translateY(-160%);
+  transition: transform 140ms var(--ease-out);
+}
+
+/* leading "$" prompt to match the section-header / breadcrumb metaphor */
+.skip-link::before {
+  content: "$";
+  color: var(--fg-brand);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  border-color: var(--fg-brand);
   outline: none;
 }
+
+/* Raw buttons that don't ship their own focus treatment still need a visible ring.
+   Uses box-shadow (not outline) so it survives the `outline: none !important` reset
+   below, and pairs with a brand border where the element already has one. */
+.focus-ring:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--bg-canvas),
+    0 0 0 4px var(--fg-brand);
+}
+
+/* Piano keyboard: two octaves (14 white keys) by default. On very small
+   screens the keys get too thin to tap, so we drop to a single octave —
+   `--wk` (white-key count) drives the black-key positions via calc(), and
+   the octave-2 keys are hidden, letting the 7 remaining white keys expand. */
+.piano-keys {
+  --wk: 14;
+}
+@media (max-width: 480px) {
+  .piano-keys {
+    --wk: 7;
+  }
+  .piano-oct2 {
+    display: none;
+  }
+}
+
+/* Wrist-kit activity card: rings + metrics sit side by side, but on a narrow
+   card (phones, tight bento cells) the metric values can't fit next to the
+   rings — so stack them. Keyed off the card's own width via a container query,
+   not the viewport, since the card is narrow on mobile AND in small grid cells. */
+.wk-activity-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+}
+@container (max-width: 360px) {
+  .wk-activity-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
+
+/* form fields, buttons, and menu items manage their own focus state */
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible,
+button:focus,
+button:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible,
+[role="menuitem"]:focus,
+[role="menuitem"]:focus-visible,
+[role="menuitemcheckbox"]:focus,
+[role="menuitemcheckbox"]:focus-visible,
+[role="menuitemradio"]:focus,
+[role="menuitemradio"]:focus-visible,
+[role="option"]:focus,
+[role="option"]:focus-visible,
+[role="tab"]:focus,
+[role="tab"]:focus-visible,
+[cmdk-item]:focus,
+[cmdk-item]:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   SCROLLBARS  — themed to match the IDE chrome
+   ============================================================ */
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border: 2px solid var(--bg-canvas);
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--zinc-600);
+  }
+
+  *::-webkit-scrollbar-thumb:active {
+    background: var(--fg-brand);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+
+/* ─── Bento card hover ─────────────────────────────────────────────────────── */
+.bento-card {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+  transition:
+    border-color 200ms var(--ease-out),
+    background 200ms var(--ease-out);
+}
+.bento-card:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-surface-elevated);
+}
+.bento-card-xl {
+  border-radius: var(--radius-xl);
+  padding: 56px 48px 48px;
+}
+
+/* Tighten card padding on small screens so content isn't cramped */
+@media (max-width: 640px) {
+  .bento-card {
+    padding: 20px;
+  }
+  .bento-card-xl {
+    padding: 32px 20px 28px;
+  }
+}
+
+.featured-card {
+  transition:
+    border-color 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+.featured-card:hover {
+  border-color: var(--border-brand-strong) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px var(--shadow-brand);
+}
+
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes npw-eq-1 {
+  0%,
+  100% {
+    height: 30%;
+  }
+  50% {
+    height: 90%;
+  }
+}
+@keyframes npw-eq-2 {
+  0%,
+  100% {
+    height: 70%;
+  }
+  50% {
+    height: 25%;
+  }
+}
+@keyframes npw-eq-3 {
+  0%,
+  100% {
+    height: 45%;
+  }
+  50% {
+    height: 100%;
+  }
+}
+
+.npw-eq-bar {
+  display: block;
+  width: 3px;
+  border-radius: 1px;
+  background: var(--fg-brand);
+  transform-origin: bottom;
+  align-self: flex-end;
+}
+.npw-eq-1 {
+  animation: npw-eq-1 0.9s ease-in-out infinite;
+}
+.npw-eq-2 {
+  animation: npw-eq-2 0.9s ease-in-out infinite;
+  animation-delay: 0.15s;
+}
+.npw-eq-3 {
+  animation: npw-eq-3 0.9s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+@keyframes pulse-ok {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+@keyframes dot-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--fg-brand-pulse, var(--fg-brand-glow));
+  }
+  50% {
+    box-shadow: 0 0 0 5px var(--fg-brand-pulse, transparent);
+  }
+}
+
+/* ============================================================
+   PIANO — live-note ping + range slider thumb
+   ============================================================ */
+
+@keyframes piano-ping {
+  0% {
+    box-shadow: 0 0 0 0 var(--fg-brand-glow);
+  }
+  100% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+
+.piano-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--fg-brand);
+  cursor: pointer;
+}
+
+.piano-range::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: var(--fg-brand);
+  cursor: pointer;
+}
+
+/* ============================================================
+   REHYPE-PRETTY-CODE — code block overrides
+   ============================================================ */
 
 [data-rehype-pretty-code-figure] pre {
   background-color: #0d0d14 !important;
@@ -103,31 +678,171 @@ select:focus-visible {
 }
 
 [data-highlighted-line] {
-  background-color: rgba(99, 102, 241, 0.08);
+  background-color: color-mix(in srgb, var(--fg-brand) 8%, transparent);
 }
 
 [data-rehype-pretty-code-title] {
-  background-color: var(--bg-elevated);
-  border: 1px solid var(--border);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-bottom: none;
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
   padding: 0.5rem 1rem;
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--fg-muted);
 }
 
 [data-rehype-pretty-code-title] + pre {
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
   margin-top: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+/* ============================================================
+   LIGHT MODE — activated by data-mode="light" on <html>.
+   Dark is the default; the toggle is explicit, not OS-driven.
+   The theme block (--fg-brand etc.) lives separately, see your
+   chosen theme file in styles/themes/.
+   ============================================================ */
+
+:root[data-mode="light"] {
+  --bg-canvas: #fafafa;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f4f4f5;
+
+  --fg-primary: #09090b;
+  --fg-secondary: #52525b;
+  --fg-muted: #71717a;
+
+  --border-subtle: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  --bg-hover-soft: rgba(0, 0, 0, 0.04);
+  --bg-hover-strong: rgba(0, 0, 0, 0.08);
+  --bg-chrome: rgba(0, 0, 0, 0.03);
+
+  /* black drop-shadows read as heavy smudges on a light canvas — soften them */
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  /* piano cabinet in light mode — mirrors the dark 3-tier depth with light zinc:
+     bezel/stage (visible border around the piano) is a touch darker than the
+     white card; the frame panel is lighter than the bezel; the keys (pure
+     white) sit brightest of all. Subtle, not a gray box. */
+  --piano-stage: linear-gradient(180deg, #ececef 0%, #e4e4e7 100%);
+  --piano-hint: linear-gradient(180deg, #e4e4e7 0%, #ececef 100%);
+  --piano-frame: linear-gradient(180deg, #f7f7f8 0%, #f1f1f3 100%);
+  --piano-frame-border: #d4d4d8;
+  --piano-frame-cast: rgba(0, 0, 0, 0.08);
+
+  color-scheme: light;
+}
+
+/* Scoped "always dark" surface — for terminal cards, code blocks, tooltips
+   and any element that should feel like IDE chrome regardless of page mode.
+   Apply data-surface="dark" on the element root. */
+[data-surface="dark"] {
+  --bg-canvas: #09090b;
+  --bg-surface: #0e0e10;
+  --bg-surface-elevated: rgba(39, 39, 42, 0.6);
+
+  --fg-primary: #fafafa;
+  --fg-secondary: #a1a1aa;
+  --fg-muted: #8a8a92;
+
+  --border-subtle: #27272a;
+  --border-strong: #3f3f46;
+
+  --bg-hover-soft: rgba(255, 255, 255, 0.04);
+  --bg-hover-strong: rgba(255, 255, 255, 0.08);
+  --bg-chrome: rgba(0, 0, 0, 0.3);
+
+  color-scheme: dark;
+}
+
+/* theme */
+/* ============================================================
+   entrepta theme — violet/indigo (default)
+   ============================================================ */
+
+:root {
+  --fg-brand: #7c6bff;
+  --fg-brand-hover: #9b8eff;
+  --bg-surface-brand: rgba(124, 107, 255, 0.15);
+  --ring: rgba(124, 107, 255, 0.5);
+}
+
+:root[data-mode="light"] {
+  --fg-brand: #6b5bff;
+  --fg-brand-hover: #5848e0;
+  --bg-surface-brand: rgba(107, 91, 255, 0.08);
+  --ring: rgba(107, 91, 255, 0.4);
+}
+
+/* ============================================================
+   THEME OVERRIDES — swap --fg-brand only
+   Apply via data-theme="<id>" on <html>
+   ============================================================ */
+
+[data-theme="blossom"] {
+  --fg-brand: #cc2e36;
+  --fg-brand-hover: #e04750;
+  --bg-surface-brand: rgba(204, 46, 54, 0.14);
+  --ring: rgba(204, 46, 54, 0.45);
+}
+[data-theme="blossom"][data-mode="light"] {
+  --fg-brand: #b02028;
+  --fg-brand-hover: #cc2e36;
+  --bg-surface-brand: rgba(176, 32, 40, 0.08);
+  --ring: rgba(176, 32, 40, 0.4);
+}
+
+[data-theme="marmalade"] {
+  --fg-brand: #ff8213;
+  --fg-brand-hover: #ff9d45;
+  --bg-surface-brand: rgba(255, 130, 19, 0.14);
+  --ring: rgba(255, 130, 19, 0.45);
+}
+[data-theme="marmalade"][data-mode="light"] {
+  --fg-brand: #e06800;
+  --fg-brand-hover: #ff8213;
+  --bg-surface-brand: rgba(224, 104, 0, 0.08);
+  --ring: rgba(224, 104, 0, 0.4);
+}
+
+[data-theme="julia"] {
+  --fg-brand: #e85a8a;
+  --fg-brand-hover: #f178a0;
+  --bg-surface-brand: rgba(232, 90, 138, 0.14);
+  --ring: rgba(232, 90, 138, 0.45);
+}
+[data-theme="julia"][data-mode="light"] {
+  --fg-brand: #cc3a6a;
+  --fg-brand-hover: #e85a8a;
+  --bg-surface-brand: rgba(204, 58, 106, 0.08);
+  --ring: rgba(204, 58, 106, 0.4);
+}
+
+[data-theme="ivy"] {
+  --fg-brand: #35a365;
+  --fg-brand-hover: #4cba7c;
+  --bg-surface-brand: rgba(53, 163, 101, 0.14);
+  --ring: rgba(53, 163, 101, 0.45);
+}
+[data-theme="ivy"][data-mode="light"] {
+  --fg-brand: #258a50;
+  --fg-brand-hover: #35a365;
+  --bg-surface-brand: rgba(37, 138, 80, 0.08);
+  --ring: rgba(37, 138, 80, 0.4);
+}
+
+[data-theme="bosco"] {
+  --fg-brand: #2563eb;
+  --fg-brand-hover: #4f86f3;
+  --bg-surface-brand: rgba(37, 99, 235, 0.14);
+  --ring: rgba(37, 99, 235, 0.45);
+}
+[data-theme="bosco"][data-mode="light"] {
+  --fg-brand: #1d4ed8;
+  --fg-brand-hover: #2563eb;
+  --bg-surface-brand: rgba(29, 78, 216, 0.08);
+  --ring: rgba(29, 78, 216, 0.4);
 }

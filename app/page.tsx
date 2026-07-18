@@ -1,299 +1,775 @@
 import Link from "next/link"
-import Image from "next/image"
-import { siReact, siNextdotjs, siTypescript, siPython } from "simple-icons"
-import { BlurFade } from "@/components/ui/blur-fade"
-import { LinkButton } from "@/components/ui/button"
-import { InlineArrow } from "@/components/ui/inline-arrow"
-import { ProjectCard } from "@/components/projects/project-card"
 import { getFeaturedProjects, getPublishedPosts, getPublishedProjects } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/utils"
+import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
+import { GithubCard } from "@/components/home/github-card"
+import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
+import { buttonVariants } from "@/app/components/entrepta/button-variants"
+import { cn } from "@/lib/utils"
+import { StackCard } from "@/components/home/stack-card"
+import { MiniPianoCard } from "@/components/home/mini-piano-card"
+import { createMetadata } from "@/lib/metadata"
+import { CAREER_START_YEAR, calcYearsOfExp, yearsWord } from "@/lib/experience"
 
-const mainStack = [
-  { name: "React", path: siReact.path },
-  { name: "Next.js", path: siNextdotjs.path },
-  { name: "TypeScript", path: siTypescript.path },
-  { name: "Python", path: siPython.path },
-]
+export const metadata = createMetadata({
+  title: "Anna Maria — Full-stack Software Engineer",
+  description: `Full-stack Software Engineer with ${calcYearsOfExp()} years shipping web products.`,
+  path: "/",
+  titleAbsolute: true,
+})
 
-const career = [
-  {
-    company: "CESAR",
-    role: "Full-stack Software Engineer",
-    period: "2024 — present",
-  },
-  {
-    company: "Avanade",
-    role: "Full-stack Software Engineer",
-    period: "2021 — 2024",
-  },
-]
+// ─── Helpers ───────────────────────────────────────────────────────────────────
 
-export default function Home() {
-  const featuredProjects = getFeaturedProjects()
-  const recentPosts = getPublishedPosts().slice(0, 3)
-  const currentYear = new Date().getFullYear()
-  const thisYearProjects = getPublishedProjects().filter(
-    (p) => new Date(p.date).getFullYear() === currentYear,
-  )
-  const openSourceGoal = 12
-  const openSourceProgress = thisYearProjects.length
-  const stats = [
-    { value: "5", label: "years of experience" },
-    {
-      value: `${openSourceProgress}/${openSourceGoal}`,
-      label: "open source projects this year",
-    },
-  ]
-
+function SectHead({
+  id,
+  cmd,
+  meta,
+  as = "h2",
+}: {
+  id: string
+  cmd: string
+  meta?: React.ReactNode
+  as?: "h2" | "span"
+}) {
+  const Label = as
   return (
-    <div className="mx-auto w-full max-w-275 px-5">
-      <section className="flex min-h-[88vh] items-center py-16">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center"
+    <div
+      className="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-dashed pb-3"
+      style={{ borderColor: "var(--border-subtle)" }}
+    >
+      <Label
+        id={id}
+        className="font-mono text-xs font-normal"
+        style={
+          as === "h2"
+            ? { margin: 0, color: "var(--fg-secondary)" }
+            : { color: "var(--fg-secondary)" }
+        }
+      >
+        <span aria-hidden="true" style={{ color: "var(--fg-brand)" }}>
+          ${" "}
+        </span>
+        {cmd}
+      </Label>
+      {meta && (
+        <span
+          className="font-mono text-[11px] tracking-[0.08em] uppercase"
+          style={{ color: "var(--fg-muted)" }}
         >
-          <div className="h-150 w-150 rounded-full bg-indigo-500/5 blur-[120px] dark:bg-indigo-950/50" />
-        </div>
-
-        <div className="flex w-full flex-col-reverse gap-12 lg:flex-row lg:items-center lg:gap-16">
-          <div className="flex-1">
-            <BlurFade delay={0}>
-              <span className="inline-flex items-center gap-2 rounded-full border border-indigo-500/40 bg-indigo-950 px-4 py-1.5 text-xs font-medium text-indigo-300">
-                <span className="size-1.5 rounded-full bg-indigo-400" />
-                Full-stack Software Engineer · Brazil — Remote
-              </span>
-            </BlurFade>
-
-            <BlurFade delay={0.1}>
-              <h1 className="font-display text-text-primary mt-6 text-5xl leading-tight font-bold sm:text-6xl lg:text-7xl">
-                Anna Maria
-              </h1>
-            </BlurFade>
-
-            <BlurFade delay={0.2}>
-              <p className="mt-3 text-lg text-indigo-400 sm:text-xl">
-                I build things I wish existed.
-              </p>
-            </BlurFade>
-
-            <BlurFade delay={0.3}>
-              <p className="text-text-primary/80 mt-4 max-w-lg text-sm leading-relaxed">
-                Full-stack Software Engineer with 5 years shipping web products. Currently at CESAR
-                and always working on something open source on the side.
-              </p>
-            </BlurFade>
-
-            <BlurFade delay={0.4}>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <LinkButton href="/projects" variant="primary">
-                  View projects
-                </LinkButton>
-                <LinkButton href="/contact" variant="ghost">
-                  Get in touch
-                </LinkButton>
-              </div>
-            </BlurFade>
-
-            <BlurFade delay={0.5}>
-              <div className="text-text-muted mt-5 flex flex-wrap items-center gap-2 text-xs">
-                <span>Press</span>
-                <span className="border-border bg-bg-surface text-text-secondary inline-flex items-center gap-1 rounded-md border px-2 py-1 font-mono shadow-sm">
-                  <kbd className="leading-none">Command</kbd>
-                  <span className="text-text-muted">+</span>
-                  <kbd className="leading-none">P</kbd>
-                </span>
-                <span>to play piano</span>
-              </div>
-            </BlurFade>
-          </div>
-
-          <BlurFade delay={0.2} className="flex justify-center lg:justify-end">
-            <div className="relative size-56 shrink-0 sm:size-64 lg:size-72">
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 rounded-2xl bg-indigo-500/10 blur-2xl"
-              />
-              <div className="group relative overflow-hidden rounded-2xl">
-                <Image
-                  src="https://github.com/imnotannamaria.png"
-                  alt="Anna Maria"
-                  width={288}
-                  height={288}
-                  className="h-full w-full object-cover grayscale transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0"
-                  priority
-                />
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 bg-indigo-950/10 mix-blend-color transition-opacity duration-500 group-hover:opacity-0"
-                />
-              </div>
-            </div>
-          </BlurFade>
-        </div>
-      </section>
-
-      <section className="border-border border-y py-14">
-        <BlurFade delay={0.5}>
-          <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
-            <div className="flex-1">
-              <div className="mb-6 flex gap-8">
-                {stats.map((stat, i) => (
-                  <div key={i} className="flex flex-col gap-0.5">
-                    <span className="font-display text-text-primary text-2xl font-bold">
-                      {stat.value}
-                    </span>
-                    <span className="text-text-secondary text-xs">{stat.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-text-secondary space-y-3 text-sm leading-relaxed">
-                <p>
-                  I&apos;m a Full-Stack Software Engineer based in Pernambuco, Brazil. I currently
-                  work at CESAR on ESG Carbon, a platform I helped architect from zero. Before that,
-                  I spent three years at Avanade delivering chatbot and RAG-based AI products for
-                  large enterprise clients.
-                </p>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {mainStack.map(({ name, path }) => (
-                  <span
-                    key={name}
-                    className="border-border bg-bg-surface text-text-secondary inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 font-mono text-[11px]"
-                  >
-                    <svg
-                      viewBox="0 0 24 24"
-                      width={11}
-                      height={11}
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path d={path} />
-                    </svg>
-                    {name}
-                  </span>
-                ))}
-              </div>
-
-              <Link
-                href="/about"
-                className="group mt-6 inline-flex items-center gap-1.5 text-sm text-indigo-400 transition-colors hover:text-indigo-300"
-              >
-                More about me <InlineArrow />
-              </Link>
-            </div>
-
-            <div className="shrink-0 lg:w-64">
-              <p className="text-text-muted mb-5 font-mono text-xs tracking-widest uppercase">
-                Experience
-              </p>
-              <ol className="space-y-0">
-                {career.map((item, i) => (
-                  <BlurFade key={item.company} delay={0.6 + i * 0.12}>
-                    <li className="flex gap-3">
-                      <div className="flex flex-col items-center">
-                        <span className="bg-bg-base mt-1 size-2.5 shrink-0 rounded-full border-2 border-indigo-500" />
-                        {i < career.length - 1 && (
-                          <span className="mt-1.5 w-px flex-1 bg-indigo-900/70" />
-                        )}
-                      </div>
-                      <div className="pb-6">
-                        <p className="text-text-primary text-sm font-medium">{item.company}</p>
-                        <p className="text-text-secondary text-xs">{item.role}</p>
-                        <time className="text-text-muted font-mono text-xs">{item.period}</time>
-                      </div>
-                    </li>
-                  </BlurFade>
-                ))}
-              </ol>
-            </div>
-          </div>
-        </BlurFade>
-      </section>
-
-      {featuredProjects.length > 0 && (
-        <section className="py-16">
-          <BlurFade delay={0.65}>
-            <SectionHeader title="Featured Projects" href="/projects" linkLabel="All projects" />
-          </BlurFade>
-
-          <BlurFade delay={0.7}>
-            <div className="mt-8 grid gap-6 sm:grid-cols-2">
-              {featuredProjects.slice(0, 2).map((project) => (
-                <ProjectCard
-                  key={project.slug}
-                  slug={project.slug}
-                  title={project.title}
-                  description={project.description}
-                  tags={project.tags}
-                  github={project.github}
-                  live={project.live}
-                />
-              ))}
-            </div>
-          </BlurFade>
-        </section>
-      )}
-
-      {recentPosts.length > 0 && (
-        <section className="py-16">
-          <BlurFade delay={0.75}>
-            <SectionHeader title="Recent Posts" href="/blog" linkLabel="All posts" />
-          </BlurFade>
-
-          <BlurFade delay={0.8}>
-            <ul className="divide-border mt-6 divide-y">
-              {recentPosts.map((post) => (
-                <li key={post.slug}>
-                  <Link
-                    href={`/blog/${post.slug}`}
-                    className="group flex items-center gap-6 py-5 transition-colors"
-                  >
-                    <time
-                      dateTime={post.date}
-                      className="text-text-muted hidden w-28 shrink-0 font-mono text-xs sm:block"
-                    >
-                      {formatDate(post.date)}
-                    </time>
-                    <span className="text-text-primary flex-1 text-sm font-medium transition-colors group-hover:text-indigo-400">
-                      {post.title}
-                    </span>
-                    <span className="text-text-muted hidden shrink-0 text-xs sm:block">
-                      {estimateReadingTime(post.body)} min
-                    </span>
-                    <span className="text-text-muted shrink-0 opacity-0 transition-opacity group-hover:opacity-100">
-                      <InlineArrow />
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </BlurFade>
-        </section>
+          {meta}
+        </span>
       )}
     </div>
   )
 }
 
-function SectionHeader({
-  title,
-  href,
-  linkLabel,
+function CardHead({
+  label,
+  meta,
+  as = "span",
+  id,
 }: {
-  title: string
-  href: string
-  linkLabel: string
+  label: string
+  meta?: React.ReactNode
+  as?: "span" | "h2" | "h3"
+  id?: string
 }) {
+  const Label = as
+  const isHeading = as !== "span"
   return (
-    <div className="flex items-baseline justify-between">
-      <h2 className="font-display text-text-primary text-xl font-semibold">{title}</h2>
-      <Link
-        href={href}
-        className="group text-text-muted inline-flex items-center gap-1.5 text-sm transition-colors hover:text-indigo-400"
+    <div
+      className="flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
+      style={{ color: "var(--fg-secondary)" }}
+    >
+      <Label
+        id={id}
+        className="inline-flex items-center gap-1.5"
+        style={isHeading ? { margin: 0, fontSize: "inherit", fontWeight: "inherit" } : undefined}
       >
-        {linkLabel} <InlineArrow />
-      </Link>
+        <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
+          ◆
+        </span>
+        {label}
+      </Label>
+      {meta && <span style={{ color: "var(--fg-muted)" }}>{meta}</span>}
+    </div>
+  )
+}
+
+function CardFoot({ comment, children }: { comment?: string; children?: React.ReactNode }) {
+  return (
+    <div
+      className="mt-auto flex items-center justify-between gap-3 font-mono text-[11px]"
+      style={{ color: "var(--fg-muted)" }}
+    >
+      {comment && (
+        <span>
+          <span style={{ opacity: 0.6 }}>{"// "}</span>
+          {comment}
+        </span>
+      )}
+      {children}
+    </div>
+  )
+}
+
+function Badge({
+  children,
+  variant = "default",
+}: {
+  children: React.ReactNode
+  variant?: "default" | "brand-soft" | "success-soft"
+}) {
+  const styles: Record<string, { bg: string; fg: string }> = {
+    default: { bg: "rgba(255,255,255,0.06)", fg: "var(--fg-secondary)" },
+    "brand-soft": { bg: "var(--bg-surface-brand)", fg: "var(--fg-brand-hover)" },
+    "success-soft": { bg: "var(--status-success-soft)", fg: "var(--status-success-fg)" },
+  }
+  const { bg, fg } = styles[variant]
+  return (
+    <span
+      className="inline-flex h-[22px] items-center rounded-[var(--radius-sm)] px-2 font-mono text-[11px] font-medium"
+      style={{ background: bg, color: fg }}
+    >
+      {children}
+    </span>
+  )
+}
+
+function StatNum({ serif, sub }: { serif: React.ReactNode; sub: string }) {
+  return (
+    <div
+      style={{
+        fontFamily: "var(--font-serif)",
+        fontSize: 48,
+        lineHeight: 1,
+        color: "var(--fg-primary)",
+        letterSpacing: "-0.02em",
+        fontWeight: 400,
+      }}
+    >
+      <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>{serif}</em>
+      <sub
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 12,
+          color: "var(--fg-muted)",
+          fontWeight: 400,
+          marginLeft: 4,
+          letterSpacing: 0,
+          verticalAlign: "baseline",
+        }}
+      >
+        {sub}
+      </sub>
+    </div>
+  )
+}
+
+function ProgressBar({ filled, total }: { filled: number; total: number }) {
+  return (
+    <div style={{ display: "flex", gap: 3, height: 6, marginTop: "auto" }}>
+      {Array.from({ length: total }, (_, i) => (
+        <span
+          key={i}
+          style={{
+            flex: 1,
+            background: i < filled ? "var(--fg-brand)" : "var(--border-subtle)",
+            borderRadius: 2,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// ─── Experience timeline constants ─────────────────────────────────────────────
+
+const CAREER_START = CAREER_START_YEAR
+const TIMELINE_WINDOW = 5 // intervals shown (= points - 1)
+
+// ─── Page ──────────────────────────────────────────────────────────────────────
+
+export default async function Home() {
+  const activityState = await loadTodayActivity({ tz: "America/Sao_Paulo" })
+  const featuredProject = getFeaturedProjects()[0]
+  const latestPost = getPublishedPosts()[0]
+  const currentYear = new Date().getFullYear()
+  const ossCount = getPublishedProjects().filter(
+    (p) => new Date(p.date).getFullYear() === currentYear,
+  ).length
+  const ossGoal = 6
+  const yrShort = currentYear.toString().slice(2)
+
+  // Experience timeline — counts from exact date (March 15 2021), not just year
+  const yearsOfExp = calcYearsOfExp()
+  const windowStart = Math.max(CAREER_START, currentYear - TIMELINE_WINDOW)
+  const showBeforeHint = windowStart > CAREER_START
+  const timelineYears = Array.from(
+    { length: currentYear - windowStart + 1 },
+    (_, i) => windowStart + i,
+  )
+
+  return (
+    <div
+      className="mx-auto flex flex-col gap-14 px-4 py-6 sm:gap-16 sm:px-6 md:px-8 lg:gap-20 lg:px-12 lg:py-8"
+      style={{ maxWidth: 1280 }}
+    >
+      {/* ═══════════════ WHOAMI ═══════════════ */}
+      <section aria-labelledby="sec-whoami">
+        <SectHead
+          id="sec-whoami"
+          as="span"
+          cmd="whoami"
+          meta={`uptime · ${yearsWord(yearsOfExp)} years`}
+        />
+        {/* Row 1: hero + experience */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
+          {/* Hero card */}
+          <div
+            className="bento-card bento-card-xl relative overflow-hidden"
+            style={{ minHeight: 420, borderRadius: "var(--radius-xl)" }}
+          >
+            {/* Radial glow */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                right: -120,
+                bottom: -120,
+                width: 360,
+                height: 360,
+                borderRadius: "50%",
+                background: "radial-gradient(circle, var(--bg-surface-brand), transparent 65%)",
+                pointerEvents: "none",
+              }}
+            />
+
+            <p
+              className="mb-2 inline-flex items-center gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
+              style={{ color: "var(--fg-muted)" }}
+            >
+              <span>{"// "}hello, i&apos;m</span>
+              <span
+                className="rounded-[3px] px-1.5 py-0.5 font-mono tracking-normal normal-case"
+                style={{ border: "1px solid var(--border-subtle)", color: "var(--fg-brand)" }}
+              >
+                v1.0
+              </span>
+              <span>· Pernambuco, Brasil</span>
+            </p>
+
+            <h1
+              className="relative z-10"
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontWeight: 400,
+                fontSize: "clamp(44px, 9vw, 88px)",
+                lineHeight: 1,
+                letterSpacing: "-0.02em",
+                color: "var(--fg-primary)",
+                margin: "24px 0",
+              }}
+            >
+              Anna <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>Maria</em>
+              <span
+                aria-hidden
+                style={{
+                  display: "inline-block",
+                  width: "0.55ch",
+                  color: "var(--fg-brand)",
+                  animation: "cursor-blink 1.1s steps(2) infinite",
+                  marginLeft: 2,
+                }}
+              >
+                _
+              </span>
+            </h1>
+
+            <p
+              className="relative z-10 mb-8 max-w-[52ch] text-base leading-relaxed"
+              style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+            >
+              Full-stack Software Engineer with {yearsOfExp} years shipping web products. Currently
+              at{" "}
+              <Link
+                href="https://cesar.org.br"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:[border-bottom-color:var(--fg-brand)] hover:[color:var(--fg-brand)]"
+                style={{
+                  color: "var(--fg-primary)",
+                  borderBottom: "1px solid var(--border-strong)",
+                }}
+              >
+                CESAR
+              </Link>{" "}
+              and always working on something open source on the side.
+            </p>
+
+            <div className="relative z-10 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-3">
+              <Link
+                href="/projects"
+                className={cn(
+                  buttonVariants({ variant: "primary", size: "lg" }),
+                  "w-full sm:w-auto",
+                )}
+              >
+                browse projects →
+              </Link>
+              <Link
+                href="/contact"
+                className={cn(
+                  buttonVariants({ variant: "command", size: "lg" }),
+                  "w-full sm:w-auto",
+                )}
+              >
+                cat contact.txt
+              </Link>
+            </div>
+          </div>
+
+          {/* Experience card — directly in grid, stretches to hero height */}
+          <div className="bento-card relative flex flex-col overflow-hidden">
+            {/* Dot pattern decoration */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: "28%",
+                width: "80%",
+                aspectRatio: "1",
+                opacity: 0.18,
+                pointerEvents: "none",
+                backgroundImage: "radial-gradient(var(--fg-brand) 1px, transparent 1.4px)",
+                backgroundSize: "18px 18px",
+                maskImage: "radial-gradient(circle, #000 0%, transparent 65%)",
+                WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 65%)",
+              }}
+            />
+            {/* Radial glow */}
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: "30%",
+                top: "10%",
+                width: 260,
+                height: 260,
+                borderRadius: "50%",
+                background: "radial-gradient(circle, var(--bg-surface-brand), transparent 70%)",
+                pointerEvents: "none",
+                opacity: 0.7,
+              }}
+            />
+            {/* Header */}
+            <div className="relative flex items-center justify-between">
+              <CardHead label="experience" as="h2" id="card-experience" />
+              <span
+                className="font-mono text-[11px] tracking-[0.04em]"
+                style={{ color: "var(--fg-brand)" }}
+              >
+                {CAREER_START} → NOW
+              </span>
+            </div>
+
+            {/* Display number */}
+            <div className="relative mt-3 flex items-baseline gap-3">
+              <em
+                style={{
+                  fontFamily: "var(--font-serif)",
+                  fontSize: 72,
+                  fontStyle: "italic",
+                  fontWeight: 400,
+                  lineHeight: 0.9,
+                  color: "var(--fg-brand)",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                {yearsWord(yearsOfExp)}
+              </em>
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <em
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    fontSize: 24,
+                    fontStyle: "italic",
+                    fontWeight: 400,
+                    color: "var(--fg-secondary)",
+                    lineHeight: 1,
+                  }}
+                >
+                  years
+                </em>
+                <span
+                  className="font-mono tracking-[0.12em] uppercase"
+                  style={{ fontSize: 11, color: "var(--fg-secondary)" }}
+                >
+                  shipping
+                </span>
+              </div>
+            </div>
+
+            {/* Timeline */}
+            <div className="relative mt-auto flex justify-between" style={{ paddingTop: 28 }}>
+              {/* Line */}
+              <div
+                className="absolute right-0 left-0"
+                style={{ height: 1, background: "var(--fg-brand)", top: 33 }}
+              />
+              {timelineYears.map((year, i) => {
+                const isCurrent = year === currentYear
+                const isFirst = i === 0
+                const label =
+                  isFirst && showBeforeHint
+                    ? `-'${year.toString().slice(2)}`
+                    : `'${year.toString().slice(2)}`
+                return (
+                  <div
+                    key={year}
+                    className="group/dot flex flex-col items-center gap-2"
+                    style={{ cursor: "default", position: "relative", zIndex: 1 }}
+                  >
+                    <div
+                      style={{
+                        width: isCurrent ? 12 : 10,
+                        height: isCurrent ? 12 : 10,
+                        borderRadius: "50%",
+                        background: isCurrent ? "var(--fg-brand)" : "var(--fg-primary)",
+                        border: `2px solid ${isCurrent ? "var(--fg-brand)" : "var(--fg-secondary)"}`,
+                        transition: "transform 200ms ease, border-color 200ms ease",
+                        animation: isCurrent ? "dot-glow 2s ease-in-out infinite" : undefined,
+                      }}
+                      className={
+                        isCurrent
+                          ? ""
+                          : "group-hover/dot:scale-125 group-hover/dot:[border-color:var(--fg-brand)]"
+                      }
+                    />
+                    <span
+                      className="font-mono transition-colors duration-200 group-hover/dot:[color:var(--fg-brand)]"
+                      style={{
+                        fontSize: 10,
+                        color: isCurrent ? "var(--fg-brand)" : "var(--fg-muted)",
+                        fontWeight: isCurrent ? 600 : 400,
+                      }}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Footer */}
+            <div
+              className="relative mt-4 flex items-center justify-between font-mono text-[11px]"
+              style={{
+                color: "var(--fg-muted)",
+                borderTop: "1px dashed var(--border-subtle)",
+                paddingTop: 12,
+              }}
+            >
+              <span>
+                <span style={{ opacity: 0.6 }}>{"// "}</span>
+                full-stack · web products
+              </span>
+              <span
+                className="inline-flex items-center gap-1.5"
+                style={{ color: "var(--fg-brand)" }}
+              >
+                <span
+                  className="inline-block h-1.5 w-1.5 rounded-full"
+                  style={{
+                    background: "var(--fg-brand)",
+                    animation: "live-pulse 2s ease-in-out infinite",
+                  }}
+                />
+                live
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 2: Stack — full width */}
+        <div className="mt-6">
+          <StackCard />
+        </div>
+      </section>
+
+      {/* ═══════════════ WORK ═══════════════ */}
+      <section aria-labelledby="sec-work">
+        <SectHead
+          id="sec-work"
+          cmd="ls ./work --featured"
+          meta={
+            <Link
+              href="/projects"
+              className="font-mono text-[11px] tracking-normal transition-all duration-150 hover:tracking-[0.08em]"
+              style={{ color: "var(--fg-brand)", textTransform: "none" }}
+            >
+              all projects ↗
+            </Link>
+          }
+        />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.35fr_1fr]">
+          {/* Featured project */}
+          {featuredProject ? (
+            <div
+              className="featured-card group/featured relative flex flex-col gap-4 overflow-hidden p-6 sm:p-8"
+              style={{
+                background: "var(--bg-surface-brand)",
+                border: "1px solid var(--border-brand)",
+                borderRadius: "var(--radius-xl)",
+                minHeight: 380,
+              }}
+            >
+              {/* Stretch link — covers whole card, inner links sit above it via z-index */}
+              <Link
+                href={`/projects/${featuredProject.slug}`}
+                className="absolute inset-0"
+                style={{ zIndex: 1 }}
+                aria-label={`View ${featuredProject.title}`}
+              />
+
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  right: "-10%",
+                  bottom: "-30%",
+                  width: "60%",
+                  aspectRatio: "1",
+                  opacity: 0.35,
+                  pointerEvents: "none",
+                  backgroundImage: "radial-gradient(var(--fg-brand) 1px, transparent 1.4px)",
+                  backgroundSize: "22px 22px",
+                  maskImage: "radial-gradient(circle, #000 0%, transparent 60%)",
+                  WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 60%)",
+                }}
+              />
+
+              <div className="flex items-center justify-between">
+                <span
+                  className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.08em] uppercase"
+                  style={{ color: "var(--fg-secondary)" }}
+                >
+                  <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
+                    ◆
+                  </span>
+                  featured
+                </span>
+                <Badge variant="brand-soft">SHIPPED</Badge>
+              </div>
+
+              <p
+                className="font-mono text-xs tracking-[0.04em]"
+                style={{ color: "var(--fg-brand)" }}
+              >
+                01 / {getFeaturedProjects().length.toString().padStart(2, "0")}
+              </p>
+
+              <h3
+                style={{
+                  fontFamily: "var(--font-serif)",
+                  fontWeight: 400,
+                  fontSize: 48,
+                  lineHeight: 1,
+                  letterSpacing: "-0.02em",
+                  color: "var(--fg-primary)",
+                  margin: 0,
+                }}
+              >
+                {featuredProject.title.includes("-") ? (
+                  <>
+                    <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>
+                      {featuredProject.title.split("-")[0]}-
+                    </em>
+                    <br />
+                    {featuredProject.title.split("-").slice(1).join("-")}
+                  </>
+                ) : (
+                  <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>
+                    {featuredProject.title}
+                  </em>
+                )}
+              </h3>
+
+              <p
+                className="max-w-[44ch] text-sm leading-relaxed"
+                style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+              >
+                {featuredProject.description}
+              </p>
+
+              <div className="flex flex-wrap gap-1.5">
+                {featuredProject.tags.slice(0, 4).map((tag) => (
+                  <Badge key={tag} variant="brand-soft">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+
+              <CardFoot>
+                <div className="flex gap-6" style={{ position: "relative", zIndex: 2 }}>
+                  {featuredProject.github && (
+                    <Link
+                      href={featuredProject.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-6 items-center py-0.5 transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
+                      style={{
+                        color: "var(--fg-primary)",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: 12,
+                      }}
+                    >
+                      github ↗
+                    </Link>
+                  )}
+                  {featuredProject.live && (
+                    <Link
+                      href={featuredProject.live}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-6 items-center py-0.5 transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
+                      style={{
+                        color: "var(--fg-primary)",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: 12,
+                      }}
+                    >
+                      live demo ↗
+                    </Link>
+                  )}
+                </div>
+                <span style={{ color: "var(--fg-muted)", marginLeft: "auto" }}>
+                  {"// "}mit · open source
+                </span>
+              </CardFoot>
+            </div>
+          ) : (
+            <div className="bento-card">
+              <CardHead label="featured" />
+              <p
+                className="text-sm"
+                style={{ color: "var(--fg-muted)", fontFamily: "var(--font-sans)" }}
+              >
+                No featured projects yet.
+              </p>
+            </div>
+          )}
+
+          {/* Stats column */}
+          <div className="flex flex-col gap-3">
+            {/* OSS card — full width */}
+            <div className="bento-card">
+              <CardHead
+                label={`oss '${yrShort}`}
+                as="h3"
+                id="card-oss"
+                meta={
+                  <Badge variant="success-soft">
+                    <span
+                      className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
+                      style={{ background: "currentColor" }}
+                    />
+                    {ossGoal - ossCount} to go
+                  </Badge>
+                }
+              />
+
+              <div className="flex items-end gap-4">
+                <StatNum serif={ossCount} sub={`/ ${ossGoal}`} />
+                <span
+                  className="mb-1 font-mono text-[11px] tracking-[0.06em]"
+                  style={{ color: "var(--fg-muted)" }}
+                >
+                  shipped this year
+                </span>
+              </div>
+
+              <ProgressBar filled={ossCount} total={ossGoal} />
+            </div>
+
+            {latestPost && (
+              <Link
+                href={`/blog/${latestPost.slug}`}
+                className="group/post flex flex-1 flex-col"
+                style={{ textDecoration: "none" }}
+              >
+                <div className="bento-card flex flex-1 flex-col">
+                  <CardHead
+                    label="latest post"
+                    meta={`${formatDate(latestPost.date)} · ${estimateReadingTime(latestPost.body)} min`}
+                  />
+
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-serif)",
+                      fontSize: 22,
+                      lineHeight: 1.2,
+                      color: "var(--fg-primary)",
+                      margin: 0,
+                    }}
+                  >
+                    {latestPost.title}
+                  </h3>
+
+                  {latestPost.description && (
+                    <p
+                      className="line-clamp-3 text-sm leading-relaxed"
+                      style={{
+                        fontFamily: "var(--font-sans)",
+                        color: "var(--fg-secondary)",
+                        margin: 0,
+                      }}
+                    >
+                      {latestPost.description}
+                    </p>
+                  )}
+
+                  {latestPost.tags && latestPost.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {latestPost.tags.slice(0, 4).map((tag) => (
+                        <Badge key={tag} variant="brand-soft">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  <CardFoot comment="notes · public">
+                    <span
+                      className="transition-all duration-150 group-hover/post:tracking-[0.06em]"
+                      style={{ color: "var(--fg-brand)" }}
+                    >
+                      read post →
+                    </span>
+                  </CardFoot>
+                </div>
+              </Link>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
+      <section aria-labelledby="sec-offclock">
+        <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym" />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <NowPlayingWidget />
+          <TodayActivityCard state={activityState} className="md:row-span-2 md:h-full" />
+          <MiniPianoCard />
+        </div>
+      </section>
+
+      {/* ═══════════════ GITHUB ═══════════════ */}
+      <section aria-labelledby="sec-github">
+        <SectHead id="sec-github" cmd="git log --contributions" meta="github.com/imnotannamaria" />
+        <GithubCard username="imnotannamaria" />
+      </section>
     </div>
   )
 }

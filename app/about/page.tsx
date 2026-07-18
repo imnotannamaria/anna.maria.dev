@@ -2,10 +2,12 @@ import Image from "next/image"
 import { createMetadata } from "@/lib/metadata"
 import { GithubCalendar } from "@/components/about/github-calendar"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
+import { Badge } from "@/app/components/entrepta/badge"
 import {
   BarbellIcon,
   FilmSlateIcon,
-  MapPinSimpleIcon,
+  MapPinIcon,
+  StarIcon,
   VinylRecordIcon,
 } from "@phosphor-icons/react/dist/ssr"
 import {
@@ -22,21 +24,24 @@ import {
   siDotnet,
   siGraphql,
   siHono,
-  siDrizzle,
   siNestjs,
+  siFastapi,
   siPostgresql,
   siMongodb,
   siMysql,
   siFirebase,
+  siDrizzle,
   siPrisma,
   siLangchain,
   siPandas,
-  siFastapi,
   siDocker,
   siVercel,
   siResend,
   siFigma,
 } from "simple-icons"
+import { AboutOutline, type OutlineItem } from "./about-outline"
+import { calcYearsOfExp, yearsWord } from "@/lib/experience"
+import { siteConfig } from "@/lib/site-config"
 
 export const metadata = createMetadata({
   title: "About",
@@ -44,350 +49,677 @@ export const metadata = createMetadata({
   path: "/about",
 })
 
-const timeline = [
+// ─── Tech icon registry ──────────────────────────────────────────────────────
+
+const ICONS: Record<string, string> = {
+  typescript: siTypescript.path,
+  javascript: siJavascript.path,
+  python: siPython.path,
+  react: siReact.path,
+  "react native": siReact.path,
+  "next.js": siNextdotjs.path,
+  tailwind: siTailwindcss.path,
+  redux: siRedux.path,
+  jest: siJest.path,
+  "node.js": siNodedotjs.path,
+  django: siDjango.path,
+  "django rest": siDjango.path,
+  ".net": siDotnet.path,
+  graphql: siGraphql.path,
+  hono: siHono.path,
+  nestjs: siNestjs.path,
+  fastapi: siFastapi.path,
+  postgres: siPostgresql.path,
+  postgresql: siPostgresql.path,
+  mongodb: siMongodb.path,
+  mysql: siMysql.path,
+  firebase: siFirebase.path,
+  drizzle: siDrizzle.path,
+  prisma: siPrisma.path,
+  langchain: siLangchain.path,
+  pandas: siPandas.path,
+  docker: siDocker.path,
+  vercel: siVercel.path,
+  resend: siResend.path,
+  "react email": siResend.path,
+  figma: siFigma.path,
+}
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const outline: OutlineItem[] = [
+  { id: "whoami", label: "whoami", level: 1 },
+  { id: "career", label: "career", level: 2 },
+  { id: "cesar", label: "cesar", level: 3 },
+  { id: "avanade", label: "avanade", level: 3 },
+  { id: "education", label: "education", level: 2 },
+  { id: "fiap", label: "fiap", level: 3 },
+  { id: "descomplica", label: "descomplica", level: 3 },
+  { id: "stack", label: "stack", level: 2 },
+  { id: "outside", label: "outside of code", level: 2 },
+  { id: "contributions", label: "contributions", level: 2 },
+]
+
+const socials = [
+  { label: "github", href: siteConfig.socials.github, Icon: GitHubIcon },
+  { label: "linkedin", href: siteConfig.socials.linkedin, Icon: LinkedInIcon },
+  { label: "x · twitter", href: siteConfig.socials.x, Icon: XIcon },
+]
+
+type Entry = {
+  id: string
+  org: string
+  role: string
+  from: string
+  to: string
+  present?: boolean
+  body: React.ReactNode
+  tags?: string[]
+}
+
+const career: Entry[] = [
   {
-    company: "CESAR",
-    role: "Full-stack Software Engineer",
-    period: "2024 — present",
-    description:
-      "At CESAR, one of Brazil's top innovation centers, I work as a Full-Stack Software Engineer on ESG Carbon, a platform ranked top-5 in ESGTech in Brazil serving 140+ companies. I architected and shipped the product from zero using React, Next.js, TypeScript, Python, and Django, turning complex GHG Protocol rules into a self-serve tool that reduced manual reporting from 3 hours to 5 minutes.",
+    id: "cesar",
+    org: "cesar",
+    role: "full-stack engineer",
+    from: "2024",
+    to: "present",
+    present: true,
+    body: (
+      <>
+        CESAR is one of Brazil&apos;s top innovation centers, and it&apos;s where I spent most of my
+        time on <Strong>ESG Carbon</Strong>, a platform ranked top 5 in ESGTech in Brazil that
+        serves <Strong>140+</Strong> companies. I architected and shipped it from zero with React,
+        Next.js, TypeScript, Python and Django, turning a maze of GHG Protocol rules into a
+        self-serve tool that <Strong>cut manual reporting from 3 hours down to 5 minutes.</Strong>{" "}
+        These days I&apos;m on a personal-finance fintech app, working end to end across a React
+        Native app and a FastAPI backend on the Open Finance consent flow.
+      </>
+    ),
+    tags: ["react", "next.js", "django", "react native", "fastapi"],
   },
   {
-    company: "Avanade",
-    role: "Full-stack Software Engineer",
-    period: "2021 — 2024",
-    description:
-      "At Avanade, a Microsoft and Accenture joint venture, I grew from intern to mid-level engineer over three years delivering chatbot and AI products for large enterprise clients. I led the technical delivery of a production WhatsApp chatbot that drove 97K+ re-engagements in 3 months, and built secure RAG-based AI assistants using LangChain, Azure OpenAI, and embeddings that gave internal teams controlled access to private knowledge bases.",
+    id: "avanade",
+    org: "avanade",
+    role: "full-stack engineer",
+    from: "2021",
+    to: "2024",
+    body: (
+      <>
+        Avanade is a Microsoft and Accenture joint venture, and over three years there I went from
+        intern to mid level building chatbot and AI products for large enterprise clients. I led the
+        delivery of a production WhatsApp chatbot that drove <Strong>97k+ re-engagements</Strong> in
+        three months, and built secure RAG assistants with <Em>LangChain</Em>, <Em>Azure OpenAI</Em>{" "}
+        and embeddings.
+      </>
+    ),
+    tags: ["langchain", "azure openai", "rag", ".net"],
   },
 ]
 
-const education = [
+const education: Entry[] = [
   {
-    institution: "FIAP",
-    degree: "Postgraduate Certificate in AI Engineering",
-    period: "2026 — 2027",
-    description:
-      "I'm currently doing a Postgraduate Certificate in AI Engineering at FIAP, with coursework spanning the full modern AI stack, from Machine Learning fundamentals and Computer Vision to LLMs, Generative AI, Prompt Engineering, Fine-tuning, RAG, and LangChain. Expected completion: March 2027.",
+    id: "fiap",
+    org: "fiap",
+    role: "postgrad in ai engineering",
+    from: "2026",
+    to: "2027",
+    present: true,
+    body: (
+      <>
+        A postgrad certificate in <Em>AI Engineering</Em> that covers pretty much the whole modern
+        AI stack, from machine learning fundamentals and computer vision to <Em>LLMs</Em>,
+        generative AI, prompt engineering, fine-tuning, RAG and <Em>LangChain</Em>. I should wrap it
+        up around <Strong>march 2027</Strong>.
+      </>
+    ),
   },
   {
-    institution: "Descomplica",
-    degree: "Bachelor's Degree in Information Systems",
-    period: "2021 — 2025",
-    description:
-      "I hold a Bachelor's Degree in Information Systems from Descomplica, completed in December 2025. The program covered the full software engineering stack, from Data Structures, Databases, and Cloud Computing to Software Design, AI Algorithms, and Data Science, giving me the foundation to work across the entire product lifecycle.",
+    id: "descomplica",
+    org: "descomplica",
+    role: "bs in information systems",
+    from: "2021",
+    to: "2025",
+    body: (
+      <>
+        My bachelor&apos;s in <Em>Information Systems</Em>, finished in december 2025. It covered a
+        bit of everything, from data structures, databases and cloud computing to software design,
+        AI algorithms and data science, which gave me the base to work across the whole product
+        lifecycle.
+      </>
+    ),
   },
 ]
 
-type TechItem = { name: string; href: string; iconPath?: string }
-
-const stackCategories: { label: string; items: TechItem[] }[] = [
+const stack: { key: string; items: string[] }[] = [
+  { key: "languages", items: ["typescript", "javascript", "python", "sql", "c#"] },
   {
-    label: "Languages",
+    key: "frontend",
     items: [
-      { name: "TypeScript", href: "https://typescriptlang.org", iconPath: siTypescript.path },
-      {
-        name: "JavaScript",
-        href: "https://developer.mozilla.org/docs/Web/JavaScript",
-        iconPath: siJavascript.path,
-      },
-      { name: "Python", href: "https://python.org", iconPath: siPython.path },
-      { name: "SQL", href: "https://en.wikipedia.org/wiki/SQL" },
-      { name: "C#", href: "https://learn.microsoft.com/dotnet/csharp" },
+      "react",
+      "react native",
+      "next.js",
+      "tailwind",
+      "zustand",
+      "redux",
+      "playwright",
+      "jest",
     ],
   },
   {
-    label: "Frontend",
-    items: [
-      { name: "React", href: "https://react.dev", iconPath: siReact.path },
-      { name: "Next.js", href: "https://nextjs.org", iconPath: siNextdotjs.path },
-      { name: "Tailwind CSS", href: "https://tailwindcss.com", iconPath: siTailwindcss.path },
-      { name: "Zustand", href: "https://zustand-demo.pmnd.rs" },
-      { name: "Redux", href: "https://redux.js.org", iconPath: siRedux.path },
-      { name: "Playwright", href: "https://playwright.dev" },
-      { name: "Jest", href: "https://jestjs.io", iconPath: siJest.path },
-    ],
+    key: "backend",
+    items: ["node.js", "django", "django rest", ".net", "graphql", "hono", "nestjs", "fastapi"],
   },
+  { key: "databases", items: ["postgresql", "mongodb", "mysql", "firebase", "drizzle", "prisma"] },
   {
-    label: "Backend",
-    items: [
-      { name: "Node.js", href: "https://nodejs.org", iconPath: siNodedotjs.path },
-      { name: "Django", href: "https://djangoproject.com", iconPath: siDjango.path },
-      { name: "Django REST", href: "https://django-rest-framework.org", iconPath: siDjango.path },
-      { name: ".NET", href: "https://dotnet.microsoft.com", iconPath: siDotnet.path },
-      { name: "GraphQL", href: "https://graphql.org", iconPath: siGraphql.path },
-      { name: "Hono", href: "https://hono.dev", iconPath: siHono.path },
-      { name: "NestJS", href: "https://nestjs.com", iconPath: siNestjs.path },
-      { name: "FastAPI", href: "https://fastapi.tiangolo.com", iconPath: siFastapi.path },
-    ],
+    key: "ai / llm",
+    items: ["langchain", "pandas", "azure openai", "rag", "prompt eng.", "embeddings"],
   },
-  {
-    label: "Databases",
-    items: [
-      { name: "PostgreSQL", href: "https://postgresql.org", iconPath: siPostgresql.path },
-      { name: "MongoDB", href: "https://mongodb.com", iconPath: siMongodb.path },
-      { name: "MySQL", href: "https://mysql.com", iconPath: siMysql.path },
-      { name: "Firebase", href: "https://firebase.google.com", iconPath: siFirebase.path },
-      { name: "Drizzle ORM", href: "https://orm.drizzle.team", iconPath: siDrizzle.path },
-      { name: "Prisma", href: "https://prisma.io", iconPath: siPrisma.path },
-    ],
-  },
-  {
-    label: "AI / LLM",
-    items: [
-      { name: "LangChain", href: "https://langchain.com", iconPath: siLangchain.path },
-      { name: "Pandas", href: "https://pandas.pydata.org", iconPath: siPandas.path },
-      {
-        name: "Azure OpenAI",
-        href: "https://azure.microsoft.com/products/ai-services/openai-service",
-      },
-      { name: "RAG", href: "https://en.wikipedia.org/wiki/Retrieval-augmented_generation" },
-      { name: "Prompt Eng.", href: "https://en.wikipedia.org/wiki/Prompt_engineering" },
-      { name: "Embeddings", href: "https://platform.openai.com/docs/guides/embeddings" },
-    ],
-  },
-  {
-    label: "DevOps & Cloud",
-    items: [
-      { name: "Docker", href: "https://docker.com", iconPath: siDocker.path },
-      { name: "Azure", href: "https://azure.microsoft.com" },
-      { name: "Vercel", href: "https://vercel.com", iconPath: siVercel.path },
-    ],
-  },
-  {
-    label: "Email",
-    items: [
-      { name: "Resend", href: "https://resend.com", iconPath: siResend.path },
-      { name: "React Email", href: "https://react.email", iconPath: siResend.path },
-    ],
-  },
-  {
-    label: "Design",
-    items: [{ name: "Figma", href: "https://figma.com", iconPath: siFigma.path }],
-  },
+  { key: "devops · cloud", items: ["docker", "azure", "vercel"] },
+  { key: "email · design", items: ["resend", "react email", "figma"] },
 ]
 
 const interests = [
   {
-    emoji: <VinylRecordIcon size={32} />,
-    label: "Music",
-    description: "I play guitar, ukulele and piano at a self-described mediocre level.",
+    Icon: VinylRecordIcon,
+    title: "Music",
+    desc: (
+      <>
+        I play guitar, ukulele and piano, honestly not that well, but I have a great time doing it.
+        Some of it even ends up as background noise while I code.
+      </>
+    ),
+    foot: "// three instruments",
+    glyph: "♪",
   },
   {
-    emoji: <BarbellIcon size={32} />,
-    label: "Gym",
-    description: "Strength training is my daily reset. Non-negotiable.",
+    Icon: BarbellIcon,
+    title: "Gym",
+    desc: (
+      <>
+        Lifting is my daily reset button, and it&apos;s pretty much non negotiable. I train five
+        times a week, mostly compound lifts.
+      </>
+    ),
+    foot: "// mostly compound lifts",
+    glyph: "5×",
   },
   {
-    emoji: <FilmSlateIcon size={32} />,
-    label: "Films and Tv Shows",
-    description: "Big fan of Mike Flanagan and Game of Thrones; my comfort show is Modern Family.",
+    Icon: FilmSlateIcon,
+    title: "Films & TV",
+    desc: (
+      <>
+        I&apos;m a big fan of <Em>Mike Flanagan</Em> and <Em>Game of Thrones</Em>, and my comfort
+        show is <Em>Modern Family</Em> on an endless loop. Always up for recommendations.
+      </>
+    ),
+    foot: "// always taking recs",
+    glyph: "★",
   },
 ]
 
-export default function AboutPage() {
+// ─── Inline text helpers ─────────────────────────────────────────────────────
+
+function Strong({ children }: { children: React.ReactNode }) {
+  return <strong style={{ color: "var(--fg-primary)", fontWeight: 500 }}>{children}</strong>
+}
+
+function Em({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto w-full max-w-275 px-5 py-16">
-      <section className="flex flex-col gap-10 lg:flex-row lg:gap-16">
-        <div className="flex shrink-0 flex-col items-start gap-4 lg:w-56">
-          <div className="border-border relative size-40 overflow-hidden rounded-2xl border lg:size-48">
-            <Image
-              src="https://github.com/imnotannamaria.png"
-              alt="Anna Maria"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+    <em style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", color: "var(--fg-brand)" }}>
+      {children}
+    </em>
+  )
+}
 
-          <div className="flex flex-wrap gap-2">
-            <span className="border-border bg-bg-surface text-text-secondary inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs">
-              <MapPinSimpleIcon /> Pernambuco, BR
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-indigo-400/50 bg-indigo-100 px-3 py-1 text-xs text-indigo-700 dark:border-indigo-500/40 dark:bg-indigo-950/60 dark:text-indigo-300">
-              ✦ Building in public
-            </span>
-          </div>
+// ─── Building blocks ─────────────────────────────────────────────────────────
 
-          <div className="flex flex-col gap-2 pt-1">
-            <a
-              href="https://github.com/imnotannamaria"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-text-secondary hover:text-text-primary flex items-center gap-2 text-sm transition-colors"
-            >
-              <GitHubIcon size={14} />
-              GitHub
-            </a>
-            <a
-              href="https://linkedin.com/in/imnotannamaria"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-text-secondary hover:text-text-primary flex items-center gap-2 text-sm transition-colors"
-            >
-              <LinkedInIcon size={14} />
-              LinkedIn
-            </a>
-            <a
-              href="https://x.com/annamariadevbr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-text-secondary hover:text-text-primary flex items-center gap-2 text-sm transition-colors"
-            >
-              <XIcon size={14} />X (Twitter)
-            </a>
-          </div>
-        </div>
-
-        <div className="text-text-secondary flex-1 space-y-4 text-sm leading-relaxed">
-          <h1 className="font-display text-text-primary text-3xl font-bold">Anna Maria</h1>
-          <p>
-            I&apos;m a Full-Stack Software Engineer based in Pernambuco, Brazil, with 5 years of
-            experience building SaaS and AI products across startup and enterprise environments. I
-            currently work at CESAR on ESG Carbon, a platform serving 140+ companies that I helped
-            architect from zero using React, Next.js, TypeScript, Python, and Django. Before that, I
-            spent three years at Avanade, a Microsoft and Accenture joint venture, where I grew from
-            intern to mid-level engineer delivering chatbot and RAG-based AI products for large
-            enterprise clients.
-          </p>
-          <p>
-            On the academic side, I hold a Bachelor&apos;s Degree in Information Systems from
-            Descomplica and I&apos;m currently doing a Postgraduate Certificate in AI Engineering at
-            FIAP, with coursework covering LLMs, Generative AI, RAG, LangChain, and the full modern
-            AI stack.
-          </p>
-          <p>
-            Outside of work, I contribute to open source, play guitar, ukulele and piano at a
-            self-described mediocre level, and spend part of my free time at the gym.
-          </p>
-        </div>
-      </section>
-
-      <Divider />
-
-      <section className="grid gap-12 lg:grid-cols-2">
-        <div>
-          <SectionHeading>Career</SectionHeading>
-          <ol className="mt-8 space-y-0">
-            {timeline.map((item, i) => (
-              <li key={item.company} className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <span className="bg-bg-base mt-1 size-3 shrink-0 rounded-full border-2 border-indigo-500" />
-                  {i < timeline.length - 1 && (
-                    <span className="mt-2 w-px flex-1 bg-indigo-900/70" />
-                  )}
-                </div>
-                <div className="pb-8">
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                    <span className="text-text-primary text-sm font-semibold">{item.company}</span>
-                    <span className="text-text-secondary text-sm">{item.role}</span>
-                  </div>
-                  <time className="text-text-muted font-mono text-xs">{item.period}</time>
-                  <p className="text-text-secondary mt-2 text-sm">{item.description}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        <div>
-          <SectionHeading>Education</SectionHeading>
-          <ol className="mt-8 space-y-0">
-            {education.map((item, i) => (
-              <li key={item.institution} className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <span className="bg-bg-base mt-1 size-3 shrink-0 rounded-full border-2 border-indigo-400" />
-                  {i < education.length - 1 && (
-                    <span className="mt-2 w-px flex-1 bg-indigo-900/70" />
-                  )}
-                </div>
-                <div className="pb-8">
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                    <span className="text-text-primary text-sm font-semibold">
-                      {item.institution}
-                    </span>
-                    <span className="text-text-secondary text-sm">{item.degree}</span>
-                  </div>
-                  <time className="text-text-muted font-mono text-xs">{item.period}</time>
-                  <p className="text-text-secondary mt-2 text-sm">{item.description}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <Divider />
-
-      <section>
-        <SectionHeading>Stack</SectionHeading>
-        <div className="mt-6 space-y-4">
-          {stackCategories.map((cat) => (
-            <div key={cat.label} className="flex flex-col gap-2 sm:flex-row sm:gap-4">
-              <span className="text-text-muted w-28 shrink-0 pt-0.5 font-mono text-xs">
-                {cat.label}
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {cat.items.map((tech) => (
-                  <TechLink key={tech.name} {...tech} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <Divider />
-
-      <section>
-        <SectionHeading>Outside of code</SectionHeading>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          {interests.map((item) => (
-            <div key={item.label} className="border-border bg-bg-surface rounded-xl border p-5">
-              <span className="text-2xl text-indigo-500">{item.emoji}</span>
-              <p className="text-text-primary mt-3 text-sm font-medium">{item.label}</p>
-              <p className="text-text-secondary mt-1 text-sm">{item.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <Divider />
-
-      <section>
-        <SectionHeading>Contributions</SectionHeading>
-        <p className="text-text-secondary mt-2 mb-6 text-sm">
-          My open-source activity on GitHub over the past year.
-        </p>
-        <div className="overflow-x-auto">
-          <GithubCalendar username="imnotannamaria" />
-        </div>
-      </section>
+function DocLabel({ level, children }: { level: "#" | "##"; children: React.ReactNode }) {
+  return (
+    <div
+      className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
+      style={{ color: "var(--fg-muted)" }}
+    >
+      <span aria-hidden style={{ color: "var(--fg-brand)" }}>
+        {level}
+      </span>{" "}
+      {children}
     </div>
   )
 }
 
-function TechLink({ name, href, iconPath }: TechItem) {
+function DisplayH2({ children }: { children: React.ReactNode }) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="border-border bg-bg-surface text-text-secondary hover:text-text-primary inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 font-mono text-[11px] transition-colors hover:border-indigo-500/50"
+    <h2
+      style={{
+        fontFamily: "var(--font-serif)",
+        fontWeight: 400,
+        fontSize: 40,
+        lineHeight: 1.1,
+        letterSpacing: "-0.02em",
+        color: "var(--fg-primary)",
+        margin: 0,
+      }}
     >
-      {iconPath && (
-        <svg viewBox="0 0 24 24" width={11} height={11} fill="currentColor" aria-hidden="true">
-          <path d={iconPath} />
-        </svg>
-      )}
-      {name}
-    </a>
+      {children}
+    </h2>
   )
 }
 
-function Divider() {
-  return <hr className="border-border my-14" />
+function Section({
+  id,
+  first,
+  children,
+}: {
+  id: string
+  first?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <section
+      id={id}
+      style={{
+        scrollMarginTop: 24,
+        paddingTop: first ? 0 : 64,
+        paddingBottom: 64,
+        borderTop: first ? "none" : "1px solid var(--border-subtle)",
+      }}
+    >
+      {children}
+    </section>
+  )
 }
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return <h2 className="font-display text-text-primary text-xl font-semibold">{children}</h2>
+/** Tech pill — entrepta soft-brand Badge with a simple-icons glyph when available. */
+function TechBadge({ name }: { name: string }) {
+  const icon = ICONS[name]
+  return (
+    <Badge
+      variant="soft"
+      color="brand"
+      className="h-[26px] cursor-default gap-1.5 border border-transparent px-2.5 transition-[border-color,transform,color] duration-150 hover:-translate-y-px hover:border-[var(--fg-brand)] hover:text-[var(--fg-brand)]"
+    >
+      {icon && (
+        <svg
+          viewBox="0 0 24 24"
+          width={10}
+          height={10}
+          fill="currentColor"
+          aria-hidden
+          style={{ opacity: 0.85, flexShrink: 0 }}
+        >
+          <path d={icon} />
+        </svg>
+      )}
+      {name}
+    </Badge>
+  )
+}
+
+function Timeline({ entries }: { entries: Entry[] }) {
+  return (
+    <div className="flex flex-col">
+      {entries.map((entry, i) => (
+        <div
+          key={entry.id}
+          id={entry.id}
+          className="relative pb-6 pl-6 last:pb-0"
+          style={{ scrollMarginTop: 24 }}
+        >
+          {/* Diamond marker */}
+          <span
+            aria-hidden
+            className="absolute top-0.5 left-0"
+            style={{ color: "var(--fg-brand)", fontSize: 12, lineHeight: 1 }}
+          >
+            ◆
+          </span>
+          {/* Connecting line */}
+          {i < entries.length - 1 && (
+            <span
+              aria-hidden
+              className="absolute"
+              style={{
+                left: 5,
+                top: 22,
+                bottom: 0,
+                width: 1,
+                background: "var(--border-subtle)",
+              }}
+            />
+          )}
+
+          <div className="mb-0.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+            <span
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontStyle: "italic",
+                fontSize: 22,
+                lineHeight: 1.2,
+                color: "var(--fg-primary)",
+              }}
+            >
+              {entry.org}
+            </span>
+            <span className="font-mono text-[13px]" style={{ color: "var(--fg-secondary)" }}>
+              <span aria-hidden style={{ opacity: 0.5, marginRight: 6 }}>
+                ·
+              </span>
+              {entry.role}
+            </span>
+          </div>
+
+          <div
+            className="mb-3 font-mono text-[11px] tracking-[0.04em]"
+            style={{ color: "var(--fg-muted)" }}
+          >
+            <span style={{ color: entry.present ? "var(--status-success-fg)" : undefined }}>
+              {entry.from}
+            </span>
+            <span style={{ opacity: 0.5, margin: "0 4px" }}>&rarr;</span>
+            <span style={{ color: entry.present ? "var(--status-success-fg)" : undefined }}>
+              {entry.to}
+            </span>
+          </div>
+
+          <p
+            className="text-sm leading-relaxed"
+            style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)", margin: 0 }}
+          >
+            {entry.body}
+          </p>
+
+          {entry.tags && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {entry.tags.map((tag) => (
+                <TechBadge key={tag} name={tag} />
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
+
+export default function AboutPage() {
+  const years = calcYearsOfExp()
+  const yearsLower = yearsWord(years).toLowerCase()
+
+  return (
+    <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
+      <AboutOutline items={outline} />
+
+      <div className="min-w-0">
+        <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
+          {/* ══════════ WHOAMI ══════════ */}
+          <Section id="whoami" first>
+            <DocLabel level="#">whoami</DocLabel>
+
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
+              {/* Photo + meta */}
+              <div className="flex flex-col gap-3">
+                <div
+                  className="relative overflow-hidden"
+                  style={{
+                    width: 200,
+                    maxWidth: "100%",
+                    aspectRatio: "10 / 11",
+                    borderRadius: "var(--radius-lg)",
+                    border: "1px solid var(--border-strong)",
+                    background: "var(--bg-surface)",
+                  }}
+                >
+                  <Image
+                    src="/images/avatar.png"
+                    alt="Anna Maria"
+                    fill
+                    sizes="200px"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+
+                <div className="flex flex-wrap gap-1.5">
+                  <Badge variant="outline" color="neutral" className="h-6 gap-1 px-2.5 text-[11px]">
+                    <MapPinIcon size={11} weight="fill" style={{ color: "var(--fg-brand)" }} />
+                    pernambuco · br
+                  </Badge>
+                  <Badge variant="soft" color="brand" className="h-6 gap-1 px-2.5 text-[11px]">
+                    <StarIcon size={11} weight="fill" />
+                    building in public
+                  </Badge>
+                </div>
+
+                <div className="mt-1 flex flex-col gap-1.5">
+                  {socials.map(({ label, href, Icon }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-6 items-center gap-2 py-0.5 font-mono text-xs text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand)]"
+                    >
+                      <Icon size={14} style={{ opacity: 0.7 }} />
+                      <span>{label}</span>
+                      <span className="sr-only"> (opens in a new tab)</span>
+                      <span aria-hidden className="ml-auto" style={{ opacity: 0.55 }}>
+                        ↗
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bio */}
+              <div>
+                <h1
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    fontWeight: 400,
+                    fontSize: "clamp(44px, 6vw, 72px)",
+                    lineHeight: 1,
+                    letterSpacing: "-0.02em",
+                    color: "var(--fg-primary)",
+                    margin: "0 0 12px",
+                  }}
+                >
+                  Anna <Em>Maria</Em>.
+                </h1>
+                <p
+                  className="mb-6 font-mono text-xs tracking-[0.08em] uppercase"
+                  style={{ color: "var(--fg-muted)" }}
+                >
+                  <span aria-hidden style={{ color: "var(--fg-brand)" }}>
+                    {"// "}
+                  </span>
+                  full-stack engineer · {yearsLower} years · ai &amp; saas
+                </p>
+
+                <div
+                  className="flex flex-col gap-4 text-base leading-[1.7]"
+                  style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+                >
+                  <p style={{ margin: 0 }}>
+                    I build and ship <Strong>web products</Strong>, end to end, from the data model
+                    to the pixel, and I&apos;ve been at it for about <Em>{yearsLower}</Em> years
+                    across startups and bigger enterprise teams.
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    Right now I&apos;m at <Em>cesar</Em>, where I built <Em>ESG Carbon</Em>, a
+                    platform used by <Strong>140+</Strong> companies, and these days I&apos;m on a
+                    personal-finance fintech app across React Native and a FastAPI backend. Before
+                    that I spent three years at <Em>Avanade</Em>, the Microsoft and Accenture joint
+                    venture, shipping chatbots and RAG-based AI products for big enterprise clients.
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    On the study side, I have a BS in Information Systems from <Em>Descomplica</Em>,
+                    and I&apos;m currently doing a postgrad in <Em>AI Engineering</Em> at{" "}
+                    <Em>FIAP</Em>, digging into LLMs, generative AI, RAG, LangChain and the whole
+                    modern AI stack.
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    When I&apos;m not working I like to contribute to open source, play a bit of
+                    guitar, ukulele and piano (badly, but happily), and I spend a good chunk of my
+                    free time at the gym.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Section>
+
+          {/* ══════════ CAREER & EDUCATION ══════════ */}
+          <Section id="career">
+            <DocLabel level="##">career &amp; education</DocLabel>
+            <DisplayH2>
+              <Em>{yearsWord(years)}</Em> years of work.
+              <br />
+              One academic track.
+            </DisplayH2>
+
+            <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
+              <div>
+                <DocLabel level="##">career</DocLabel>
+                <div className="mt-6">
+                  <Timeline entries={career} />
+                </div>
+              </div>
+
+              <div id="education" style={{ scrollMarginTop: 24 }}>
+                <DocLabel level="##">education</DocLabel>
+                <div className="mt-6">
+                  <Timeline entries={education} />
+                </div>
+              </div>
+            </div>
+          </Section>
+
+          {/* ══════════ STACK ══════════ */}
+          <Section id="stack">
+            <DocLabel level="##">stack</DocLabel>
+            <DisplayH2>
+              <Em>What</Em> I reach for.
+            </DisplayH2>
+
+            <div className="mt-8 flex flex-col">
+              {stack.map((row, i) => (
+                <div
+                  key={row.key}
+                  className="grid grid-cols-1 gap-2 py-3 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4"
+                  style={{
+                    borderTop: i === 0 ? "none" : "1px dashed var(--border-subtle)",
+                    paddingTop: i === 0 ? 0 : 12,
+                  }}
+                >
+                  <span
+                    className="pt-1.5 font-mono text-[11px] tracking-[0.08em] uppercase"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    <span aria-hidden style={{ opacity: 0.7 }}>
+                      {"// "}
+                    </span>
+                    {row.key}
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {row.items.map((item) => (
+                      <TechBadge key={item} name={item} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          {/* ══════════ OUTSIDE OF CODE ══════════ */}
+          <Section id="outside">
+            <DocLabel level="##">outside of code</DocLabel>
+            <DisplayH2>
+              <Em>Three</Em> things I do
+              <br />
+              when I&apos;m not shipping.
+            </DisplayH2>
+
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {interests.map(({ Icon, title, desc, foot, glyph }) => (
+                <div key={title} className="bento-card">
+                  <span
+                    className="grid place-items-center"
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: "var(--radius-md)",
+                      background: "var(--bg-surface-brand)",
+                      color: "var(--fg-brand)",
+                    }}
+                  >
+                    <Icon size={18} />
+                  </span>
+                  <h3
+                    style={{
+                      fontFamily: "var(--font-serif)",
+                      fontStyle: "italic",
+                      fontSize: 22,
+                      lineHeight: 1.2,
+                      color: "var(--fg-brand)",
+                      margin: 0,
+                    }}
+                  >
+                    {title}
+                  </h3>
+                  <p
+                    className="text-[13px] leading-relaxed"
+                    style={{
+                      fontFamily: "var(--font-sans)",
+                      color: "var(--fg-secondary)",
+                      margin: 0,
+                    }}
+                  >
+                    {desc}
+                  </p>
+                  <div
+                    className="mt-auto flex items-center justify-between pt-3 font-mono text-[11px]"
+                    style={{
+                      borderTop: "1px dashed var(--border-subtle)",
+                      color: "var(--fg-muted)",
+                    }}
+                  >
+                    <span>{foot}</span>
+                    <span aria-hidden style={{ color: "var(--fg-brand)" }}>
+                      {glyph}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          {/* ══════════ CONTRIBUTIONS ══════════ */}
+          <Section id="contributions">
+            <DocLabel level="##">contributions</DocLabel>
+            <DisplayH2>
+              Open source.
+              <br />
+              <Em>A year</Em> in commits.
+            </DisplayH2>
+            <p
+              className="mt-4 max-w-[60ch] text-sm leading-relaxed"
+              style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+            >
+              My <Em>GitHub</Em> activity over the past year. It&apos;s a rough snapshot of the side
+              projects, open source PRs and weekend tinkering that don&apos;t really fit anywhere
+              else.
+            </p>
+
+            <div className="bento-card mt-8">
+              <div className="overflow-x-auto">
+                <GithubCalendar username="imnotannamaria" />
+              </div>
+            </div>
+          </Section>
+        </div>
+      </div>
+    </div>
+  )
 }

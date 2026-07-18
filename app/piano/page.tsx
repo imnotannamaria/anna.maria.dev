@@ -1,477 +1,195 @@
-"use client"
+import Link from "next/link"
+import { createMetadata } from "@/lib/metadata"
+import { PianoStudio } from "./piano-studio"
+import { PianoOutline, type OutlineItem } from "./piano-outline"
+import { DisplayH2, DocLabel, Em, Kbd, Prose, Section, Strong } from "./parts"
 
-import { useRef, useState } from "react"
-import { useRouter } from "next/navigation"
-import { PlayIcon, StopIcon } from "@phosphor-icons/react"
-import { PianoKeyboard, playPianoNote, NOTE_FREQ_MAP } from "@/components/ui/piano-modal"
-import { cn } from "@/lib/utils"
+export const metadata = createMetadata({
+  title: "Piano",
+  description: "An offline, two-octave piano built with the Web Audio API — play it or watch it.",
+  path: "/piano",
+})
 
-type WebkitWindow = Window &
-  typeof globalThis & {
-    webkitAudioContext?: typeof AudioContext
-  }
-
-const KEYBOARD_MAP: Record<string, string> = {
-  C4: "Z",
-  D4: "X",
-  E4: "C",
-  F4: "V",
-  G4: "B",
-  "G#4": "H",
-  A4: "N",
-  "A#4": "J",
-  B4: "M",
-  C5: "Q",
-  D5: "W",
-  "D#5": "3",
-  E5: "E",
-  F5: "R",
-  G5: "T",
-  A5: "Y",
-}
-
-const SONGS = [
-  {
-    id: "twinkle",
-    title: "Twinkle Twinkle Little Star",
-    notes: [
-      "C4",
-      "C4",
-      "G4",
-      "G4",
-      "A4",
-      "A4",
-      "G4",
-      "|",
-      "F4",
-      "F4",
-      "E4",
-      "E4",
-      "D4",
-      "D4",
-      "C4",
-      "|",
-      "G4",
-      "G4",
-      "F4",
-      "F4",
-      "E4",
-      "E4",
-      "D4",
-      "|",
-      "G4",
-      "G4",
-      "F4",
-      "F4",
-      "E4",
-      "E4",
-      "D4",
-      "|",
-      "C4",
-      "C4",
-      "G4",
-      "G4",
-      "A4",
-      "A4",
-      "G4",
-      "|",
-      "F4",
-      "F4",
-      "E4",
-      "E4",
-      "D4",
-      "D4",
-      "C4",
-    ],
-  },
-  {
-    id: "birthday",
-    title: "Happy Birthday",
-    notes: [
-      "C4",
-      "C4",
-      "D4",
-      "C4",
-      "F4",
-      "E4",
-      "|",
-      "C4",
-      "C4",
-      "D4",
-      "C4",
-      "G4",
-      "F4",
-      "|",
-      "C4",
-      "C4",
-      "C5",
-      "A4",
-      "F4",
-      "E4",
-      "D4",
-      "|",
-      "A#4",
-      "A#4",
-      "A4",
-      "F4",
-      "G4",
-      "F4",
-    ],
-  },
-  {
-    id: "ode",
-    title: "Ode to Joy",
-    notes: [
-      "E4",
-      "E4",
-      "F4",
-      "G4",
-      "G4",
-      "F4",
-      "E4",
-      "D4",
-      "C4",
-      "C4",
-      "D4",
-      "E4",
-      "E4",
-      "D4",
-      "D4",
-      "|",
-      "E4",
-      "E4",
-      "F4",
-      "G4",
-      "G4",
-      "F4",
-      "E4",
-      "D4",
-      "C4",
-      "C4",
-      "D4",
-      "E4",
-      "D4",
-      "C4",
-      "C4",
-    ],
-  },
-  {
-    id: "mary",
-    title: "Mary Had a Little Lamb",
-    notes: [
-      "E4",
-      "D4",
-      "C4",
-      "D4",
-      "E4",
-      "E4",
-      "E4",
-      "|",
-      "D4",
-      "D4",
-      "D4",
-      "|",
-      "E4",
-      "G4",
-      "G4",
-      "|",
-      "E4",
-      "D4",
-      "C4",
-      "D4",
-      "E4",
-      "E4",
-      "E4",
-      "E4",
-      "D4",
-      "D4",
-      "E4",
-      "D4",
-      "C4",
-    ],
-  },
-  {
-    id: "jingle",
-    title: "Jingle Bells",
-    notes: [
-      "E4",
-      "E4",
-      "E4",
-      "|",
-      "E4",
-      "E4",
-      "E4",
-      "|",
-      "E4",
-      "G4",
-      "C4",
-      "D4",
-      "E4",
-      "|",
-      "F4",
-      "F4",
-      "F4",
-      "F4",
-      "|",
-      "F4",
-      "E4",
-      "E4",
-      "E4",
-      "|",
-      "E4",
-      "D4",
-      "D4",
-      "E4",
-      "D4",
-      "G4",
-      "|",
-      "E4",
-      "E4",
-      "E4",
-      "|",
-      "E4",
-      "E4",
-      "E4",
-      "|",
-      "E4",
-      "G4",
-      "C4",
-      "D4",
-      "E4",
-      "|",
-      "F4",
-      "F4",
-      "F4",
-      "F4",
-      "|",
-      "F4",
-      "E4",
-      "E4",
-      "E4",
-      "|",
-      "G4",
-      "G4",
-      "F4",
-      "D4",
-      "C4",
-    ],
-  },
-  {
-    id: "fur-elise",
-    title: "Für Elise",
-    notes: [
-      "E5",
-      "D#5",
-      "E5",
-      "D#5",
-      "E5",
-      "B4",
-      "D5",
-      "C5",
-      "A4",
-      "|",
-      "C4",
-      "E4",
-      "A4",
-      "B4",
-      "|",
-      "E4",
-      "G#4",
-      "B4",
-      "C5",
-      "|",
-      "E4",
-      "E5",
-      "D#5",
-      "E5",
-      "D#5",
-      "E5",
-      "B4",
-      "D5",
-      "C5",
-      "A4",
-      "|",
-      "C4",
-      "E4",
-      "A4",
-      "B4",
-      "|",
-      "E4",
-      "C5",
-      "B4",
-      "A4",
-    ],
-  },
+const outline: OutlineItem[] = [
+  { id: "piano", label: "piano", level: 1 },
+  { id: "keyboard", label: "keyboard", level: 2 },
+  { id: "songs", label: "songs", level: 2 },
+  { id: "controls", label: "key mapping", level: 2 },
 ]
 
-function formatNote(note: string) {
-  return note.replace(/\d$/, "")
+// ─── Key mapping reference data ───────────────────────────────────────────────
+
+type KeyLine = { kbd: string; note: string; hint?: string }
+
+const OCTAVE_4_WHITE: KeyLine[] = [
+  { kbd: "Z", note: "C4", hint: "do" },
+  { kbd: "X", note: "D4", hint: "re" },
+  { kbd: "C", note: "E4", hint: "mi" },
+  { kbd: "V", note: "F4", hint: "fa" },
+  { kbd: "B", note: "G4", hint: "sol" },
+  { kbd: "N", note: "A4", hint: "la · 440 hz" },
+  { kbd: "M", note: "B4", hint: "si" },
+]
+const OCTAVE_4_BLACK: KeyLine[] = [
+  { kbd: "S", note: "C#4" },
+  { kbd: "D", note: "D#4" },
+  { kbd: "G", note: "F#4" },
+  { kbd: "H", note: "G#4" },
+  { kbd: "J", note: "A#4" },
+]
+const OCTAVE_5_WHITE: KeyLine[] = [
+  { kbd: "Q", note: "C5", hint: "middle-C +1" },
+  { kbd: "W", note: "D5" },
+  { kbd: "E", note: "E5" },
+  { kbd: "R", note: "F5" },
+  { kbd: "T", note: "G5" },
+  { kbd: "Y", note: "A5" },
+  { kbd: "U", note: "B5" },
+]
+const OCTAVE_5_BLACK: KeyLine[] = [
+  { kbd: "2", note: "C#5" },
+  { kbd: "3", note: "D#5" },
+  { kbd: "5", note: "F#5" },
+  { kbd: "6", note: "G#5" },
+  { kbd: "7", note: "A#5" },
+]
+
+function KeymapGroup({ title, lines }: { title: string; lines: KeyLine[] }) {
+  return (
+    <>
+      <h3
+        className="mb-2 font-mono text-[11px] font-medium tracking-[0.08em] uppercase"
+        style={{ color: "var(--fg-brand)" }}
+      >
+        <span aria-hidden>◆ </span>
+        {title}
+      </h3>
+      <div className="flex flex-col">
+        {lines.map((line, i) => (
+          <div
+            key={line.kbd}
+            className="grid grid-cols-[40px_1fr] items-baseline gap-3 py-1"
+            style={{ borderTop: i === 0 ? "none" : "1px dashed var(--border-subtle)" }}
+          >
+            <span
+              className="rounded-[3px] border px-1.5 py-0.5 text-center font-mono text-[11px] uppercase"
+              style={{
+                color: "var(--fg-primary)",
+                background: "var(--bg-canvas)",
+                borderColor: "var(--border-strong)",
+              }}
+            >
+              {line.kbd}
+            </span>
+            <span className="font-mono text-[12px]" style={{ color: "var(--fg-secondary)" }}>
+              <Em>{line.note}</Em>
+              {line.hint ? ` · ${line.hint}` : ""}
+            </span>
+          </div>
+        ))}
+      </div>
+    </>
+  )
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function PianoPage() {
-  const router = useRouter()
-  const [selectedSong, setSelectedSong] = useState<string | null>(null)
-  const [playing, setPlaying] = useState(false)
-  const [activeIndex, setActiveIndex] = useState<number | null>(null)
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([])
-  const audioCtxRef = useRef<AudioContext | null>(null)
-
-  function getAudioCtx() {
-    if (!audioCtxRef.current) {
-      const AudioContextCtor = window.AudioContext || (window as WebkitWindow).webkitAudioContext
-      if (!AudioContextCtor) {
-        throw new Error("AudioContext is not supported in this browser")
-      }
-      audioCtxRef.current = new AudioContextCtor()
-    }
-    const ctx = audioCtxRef.current
-    if (ctx.state === "suspended") {
-      void ctx.resume()
-    }
-    return ctx
-  }
-
-  function stopPlayback() {
-    for (const t of timersRef.current) clearTimeout(t)
-    timersRef.current = []
-    setPlaying(false)
-    setActiveIndex(null)
-  }
-
-  function playSong(notes: string[]) {
-    if (playing) {
-      stopPlayback()
-      return
-    }
-
-    setPlaying(true)
-    const ctx = getAudioCtx()
-    let delay = 0
-
-    notes.forEach((note, i) => {
-      if (note === "|") {
-        delay += 150
-        return
-      }
-
-      const freq = NOTE_FREQ_MAP[note]
-      const t = delay
-
-      timersRef.current.push(
-        setTimeout(() => {
-          setActiveIndex(i)
-          if (freq) playPianoNote(ctx, freq)
-        }, t),
-      )
-
-      delay += 420
-    })
-
-    timersRef.current.push(
-      setTimeout(() => {
-        setPlaying(false)
-        setActiveIndex(null)
-      }, delay + 300),
-    )
-  }
-
-  const song = SONGS.find((s) => s.id === selectedSong)
-
-  function selectSong(id: string) {
-    if (selectedSong === id) {
-      stopPlayback()
-      setSelectedSong(null)
-    } else {
-      stopPlayback()
-      setSelectedSong(id)
-    }
-  }
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 py-16">
-      <div className="w-full max-w-3xl">
-        <PianoKeyboard onClose={() => router.back()} />
-      </div>
+    <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
+      <PianoOutline items={outline} />
 
-      <div className="w-full max-w-3xl">
-        <p className="text-text-muted mb-4 font-mono text-xs tracking-widest uppercase">Songs</p>
+      <div className="min-w-0">
+        <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
+          {/* Breadcrumb */}
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-8 font-mono text-xs"
+            style={{ color: "var(--fg-muted)" }}
+          >
+            <Link href="/" className="transition-colors hover:text-[color:var(--fg-primary)]">
+              ~
+            </Link>
+            <span aria-hidden style={{ opacity: 0.5, margin: "0 6px" }}>
+              /
+            </span>
+            <span style={{ color: "var(--fg-primary)" }}>piano.tsx</span>
+          </nav>
 
-        <div className="mb-6 flex flex-wrap gap-2">
-          {SONGS.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => selectSong(s.id)}
-              className={cn(
-                "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                selectedSong === s.id
-                  ? "bg-indigo-500 text-white"
-                  : "border-border text-text-secondary hover:border-border-hover hover:text-text-primary border",
-              )}
+          {/* ══════════ HERO ══════════ */}
+          <Section id="piano" first>
+            <DocLabel level="#">piano</DocLabel>
+            <h1
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontWeight: 400,
+                fontSize: "clamp(56px, 8vw, 92px)",
+                lineHeight: 0.98,
+                letterSpacing: "-0.02em",
+                color: "var(--fg-primary)",
+                margin: "0 0 16px",
+              }}
             >
-              {s.title}
-            </button>
-          ))}
-        </div>
+              Tap to <Em>play.</Em>
+            </h1>
+            <p
+              className="text-[17px] leading-[1.65]"
+              style={{
+                fontFamily: "var(--font-sans)",
+                color: "var(--fg-secondary)",
+                maxWidth: "56ch",
+              }}
+            >
+              An offline piano across <Em>two</Em> octaves. Click the keys, use your physical
+              keyboard, or trigger one of the songs below. The bottom row <Kbd>Z</Kbd>–<Kbd>M</Kbd>{" "}
+              plays <Strong>C4–B4</Strong>, the top row <Kbd>Q</Kbd>–<Kbd>U</Kbd> plays{" "}
+              <Strong>C5–B5</Strong>.
+            </p>
+          </Section>
 
-        {song && (
-          <div className="border-border bg-bg-surface rounded-xl border p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-text-secondary font-mono text-xs">{song.title}</p>
-              <button
-                onClick={() => playSong(song.notes)}
-                aria-label={playing ? "Stop" : "Play"}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                  playing
-                    ? "bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30"
-                    : "border-border text-text-secondary hover:border-border-hover hover:text-text-primary border",
-                )}
-              >
-                {playing ? (
-                  <StopIcon size={12} weight="fill" />
-                ) : (
-                  <PlayIcon size={12} weight="fill" />
-                )}
-                {playing ? "Stop" : "Play"}
-              </button>
-            </div>
+          {/* ══════════ KEYBOARD + SONGS (interactive) ══════════ */}
+          <PianoStudio />
 
-            <div className="flex flex-wrap gap-1.5">
-              {song.notes.map((note, i) =>
-                note === "|" ? (
-                  <div key={i} className="border-border mx-1 self-stretch border-l" />
-                ) : (
-                  <div
-                    key={i}
-                    className={cn(
-                      "flex min-w-9 flex-col items-center rounded-md border px-2 py-1.5 transition-colors duration-100",
-                      activeIndex === i
-                        ? "border-indigo-500 bg-indigo-500/20"
-                        : "border-border bg-bg-elevated",
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "font-mono text-[10px] font-medium transition-colors",
-                        activeIndex === i ? "text-indigo-300" : "text-text-primary",
-                      )}
-                    >
-                      {formatNote(note)}
-                    </span>
-                    <span
-                      className={cn(
-                        "font-mono text-[10px] transition-colors",
-                        activeIndex === i ? "text-indigo-400" : "text-indigo-400",
-                      )}
-                    >
-                      {KEYBOARD_MAP[note] ?? "?"}
-                    </span>
+          {/* ══════════ KEY MAPPING ══════════ */}
+          <Section id="controls">
+            <DocLabel level="##">key mapping</DocLabel>
+            <DisplayH2>
+              Where every <Em>note</Em> lives.
+            </DisplayH2>
+            <Prose>
+              Two QWERTY rows, one per octave. Black keys sit above their white-key neighbours,
+              exactly like a real piano.
+            </Prose>
+
+            <div
+              className="rounded-[var(--radius-lg)] border p-6"
+              style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
+            >
+              <div className="grid grid-cols-1 gap-6 min-[821px]:grid-cols-2">
+                <div className="flex flex-col gap-2">
+                  <KeymapGroup title="octave 4 · white" lines={OCTAVE_4_WHITE} />
+                  <div className="mt-2">
+                    <KeymapGroup title="octave 4 · black" lines={OCTAVE_4_BLACK} />
                   </div>
-                ),
-              )}
+                </div>
+                <div className="flex flex-col gap-2">
+                  <KeymapGroup title="octave 5 · white" lines={OCTAVE_5_WHITE} />
+                  <div className="mt-2">
+                    <KeymapGroup title="octave 5 · black" lines={OCTAVE_5_BLACK} />
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="mt-6 pt-3 font-mono text-[11px]"
+                style={{ borderTop: "1px dashed var(--border-subtle)", color: "var(--fg-muted)" }}
+              >
+                {"// "}triangle fundamental + additive harmonics · adsr envelope · sustain extends
+                release from 1.2s to 3.4s
+              </div>
             </div>
-          </div>
-        )}
+          </Section>
+        </div>
       </div>
     </div>
   )

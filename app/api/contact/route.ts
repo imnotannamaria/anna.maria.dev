@@ -1,27 +1,39 @@
 import { Resend } from "resend"
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { ContactEmail } from "@/emails/contact-email"
+import { contactSchema } from "@/lib/contact-schema"
 
 export async function POST(req: Request) {
   const resend = new Resend(process.env.RESEND_API_KEY)
-  const body = await req.json()
-  const { name, email, message, website } = body
 
-  if (website) {
+  let payload: unknown
+  try {
+    payload = await req.json()
+  } catch {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 })
+  }
+
+  // Honeypot — bots fill the hidden field; pretend success so they don't retry.
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "website" in payload &&
+    (payload as Record<string, unknown>).website
+  ) {
     return NextResponse.json({ success: true })
   }
 
-  if (!name || !email || !message) {
-    return NextResponse.json({ error: "All fields are required." }, { status: 400 })
+  const parsed = contactSchema.safeParse(payload)
+  if (!parsed.success) {
+    const { fieldErrors } = z.flattenError(parsed.error)
+    return NextResponse.json(
+      { error: "Please check the highlighted fields.", fieldErrors },
+      { status: 400 },
+    )
   }
 
-  if (typeof name !== "string" || typeof email !== "string" || typeof message !== "string") {
-    return NextResponse.json({ error: "Invalid input." }, { status: 400 })
-  }
-
-  if (name.length > 100 || email.length > 200 || message.length > 5000) {
-    return NextResponse.json({ error: "Input too long." }, { status: 400 })
-  }
+  const { name, email, message } = parsed.data
 
   const { error } = await resend.emails.send({
     from: "onboarding@resend.dev",
