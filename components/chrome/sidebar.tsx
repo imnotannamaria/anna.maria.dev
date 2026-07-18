@@ -31,27 +31,40 @@ export function Sidebar() {
 
   return (
     <aside className="flex flex-col items-center gap-1 border-r border-[var(--border-subtle)] bg-[var(--bg-canvas)] py-3">
-      {/* Logo */}
+      {/* Logo — gradient mark, matches the favicon. Gradient stops derive from
+          --fg-brand so it still follows the active theme; the 'a' is centred by
+          its baseline (y=67.25 on a 100 box) not the em-box, so it isn't low. */}
       <Link
         href="/"
         aria-label="Home"
-        className="mb-2 grid h-8 w-8 shrink-0 place-items-center rounded-[var(--radius-md)] transition-opacity hover:opacity-80"
-        style={{ background: "var(--fg-brand)" }}
+        className="mb-2 block h-8 w-8 shrink-0 transition-opacity hover:opacity-80"
       >
-        <span
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontSize: "20px",
-            lineHeight: 1,
-            fontWeight: 500,
-            color: "var(--bg-canvas)",
-            display: "block",
-            transform: "translateY(-0.5px)",
-          }}
-        >
-          a
-        </span>
+        <svg viewBox="0 0 100 100" width={32} height={32} aria-hidden style={{ display: "block" }}>
+          <defs>
+            <linearGradient id="sidebar-logo-a" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" style={{ stopColor: "var(--fg-brand-hover)" }} />
+              <stop
+                offset="1"
+                style={{ stopColor: "color-mix(in srgb, var(--fg-brand) 55%, #09090b)" }}
+              />
+            </linearGradient>
+          </defs>
+          <rect width="100" height="100" rx="26" fill="url(#sidebar-logo-a)" />
+          <text
+            x="50"
+            y="67.25"
+            textAnchor="middle"
+            fill="var(--zinc-50)"
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontStyle: "italic",
+              fontWeight: 500,
+              fontSize: "72px",
+            }}
+          >
+            a
+          </text>
+        </svg>
       </Link>
 
       {/* Nav buttons */}

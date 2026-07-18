@@ -198,7 +198,7 @@ export default async function Home() {
   const ossCount = getPublishedProjects().filter(
     (p) => new Date(p.date).getFullYear() === currentYear,
   ).length
-  const ossGoal = 12
+  const ossGoal = 6
   const yrShort = currentYear.toString().slice(2)
 
   // Experience timeline — counts from exact date (March 15 2021), not just year
