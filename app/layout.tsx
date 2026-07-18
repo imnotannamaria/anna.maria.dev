@@ -52,6 +52,24 @@ export const metadata: Metadata = {
     template: "%s · Anna Maria",
   },
   description: `Full-stack Software Engineer with ${calcYearsOfExp()} years shipping web products.`,
+  openGraph: {
+    siteName: "Anna Maria",
+    locale: "en_US",
+    type: "website",
+    url: baseUrl,
+    images: [
+      {
+        url: "/images/og-cover.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Anna Maria — Full-stack Software Engineer",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/images/og-cover.jpg"],
+  },
 }
 
 export default function RootLayout({
