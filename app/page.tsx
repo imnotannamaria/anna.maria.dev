@@ -762,7 +762,15 @@ export default async function Home() {
         <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym" />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <NowPlayingWidget />
-          <TodayActivityCard state={activityState} className="md:row-span-2 md:h-full" />
+          <Link
+            href="https://wristkit-web.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View wristkit"
+            className="md:row-span-2 md:h-full"
+          >
+            <TodayActivityCard state={activityState} className="h-full" />
+          </Link>
           <MiniPianoCard />
         </div>
       </section>
