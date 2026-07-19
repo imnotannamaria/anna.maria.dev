@@ -17,8 +17,12 @@ import {
   siReact,
   siNextdotjs,
   siTailwindcss,
+  siRadixui,
   siRedux,
   siJest,
+  siPytest,
+  siCypress,
+  siSonarqubeserver,
   siNodedotjs,
   siDjango,
   siDotnet,
@@ -32,8 +36,11 @@ import {
   siFirebase,
   siDrizzle,
   siPrisma,
+  siRedis,
+  siPlotly,
   siLangchain,
   siPandas,
+  siClaude,
   siDocker,
   siVercel,
   siResend,
@@ -59,8 +66,12 @@ const ICONS: Record<string, string> = {
   "react native": siReact.path,
   "next.js": siNextdotjs.path,
   tailwind: siTailwindcss.path,
+  "radix ui": siRadixui.path,
   redux: siRedux.path,
   jest: siJest.path,
+  pytest: siPytest.path,
+  cypress: siCypress.path,
+  sonarqube: siSonarqubeserver.path,
   "node.js": siNodedotjs.path,
   django: siDjango.path,
   "django rest": siDjango.path,
@@ -76,9 +87,13 @@ const ICONS: Record<string, string> = {
   firebase: siFirebase.path,
   drizzle: siDrizzle.path,
   prisma: siPrisma.path,
+  redis: siRedis.path,
+  plotly: siPlotly.path,
   langchain: siLangchain.path,
   pandas: siPandas.path,
+  "claude code": siClaude.path,
   docker: siDocker.path,
+  "docker compose": siDocker.path,
   vercel: siVercel.path,
   resend: siResend.path,
   "react email": siResend.path,
@@ -147,10 +162,11 @@ const career: Entry[] = [
     body: (
       <>
         Avanade is a Microsoft and Accenture joint venture, and over three years there I went from
-        intern to mid level building chatbot and AI products for large enterprise clients. I led the
-        delivery of a production WhatsApp chatbot that drove <Strong>97k+ re-engagements</Strong> in
-        three months, and built secure RAG assistants with <Em>LangChain</Em>, <Em>Azure OpenAI</Em>{" "}
-        and embeddings.
+        intern to mid level building chatbot and AI products for large enterprise clients. I co-led
+        the delivery of a production WhatsApp chatbot that drove{" "}
+        <Strong>97k+ re-engagements</Strong> in three months, cut response time by{" "}
+        <Strong>44%</Strong>, and lifted NPS by <Strong>5 points</Strong>. I also built secure RAG
+        assistants with <Em>LangChain</Em>, <Em>Azure OpenAI</Em> and embeddings.
       </>
     ),
     tags: ["langchain", "azure openai", "rag", ".net"],
@@ -202,20 +218,44 @@ const stack: { key: string; items: string[] }[] = [
       "tailwind",
       "zustand",
       "redux",
+      "radix ui",
       "playwright",
       "jest",
+      "cypress",
     ],
   },
   {
     key: "backend",
     items: ["node.js", "django", "django rest", ".net", "graphql", "hono", "nestjs", "fastapi"],
   },
-  { key: "databases", items: ["postgresql", "mongodb", "mysql", "firebase", "drizzle", "prisma"] },
+  {
+    key: "databases",
+    items: [
+      "postgresql",
+      "sql server",
+      "mongodb",
+      "redis",
+      "mysql",
+      "firebase",
+      "drizzle",
+      "prisma",
+    ],
+  },
   {
     key: "ai / llm",
-    items: ["langchain", "pandas", "azure openai", "rag", "prompt eng.", "embeddings"],
+    items: [
+      "langchain",
+      "pandas",
+      "plotly",
+      "azure openai",
+      "rag",
+      "prompt eng.",
+      "embeddings",
+      "claude code",
+    ],
   },
-  { key: "devops · cloud", items: ["docker", "azure", "vercel"] },
+  { key: "devops · cloud", items: ["docker", "docker compose", "azure", "vercel", "ci/cd"] },
+  { key: "testing · quality", items: ["pytest", "sonarqube"] },
   { key: "email · design", items: ["resend", "react email", "figma"] },
 ]
 
