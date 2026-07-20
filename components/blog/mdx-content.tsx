@@ -73,10 +73,14 @@ function ImageCaption({ src, alt, caption }: { src: string; alt: string; caption
 
 /** Intrinsic dimensions for local content images — lets next/image reserve space (no CLS). */
 const IMG_DIMENSIONS: Record<string, { width: number; height: number }> = {
-  "/blog/new-ui-contact.webp": { width: 1400, height: 822 },
-  "/blog/new-ui-piano.webp": { width: 1400, height: 822 },
   "/blog/resend-ecomemerce.webp": { width: 1400, height: 810 },
   "/blog/resend-ecomemerce-draw.webp": { width: 1400, height: 2023 },
+  "/blog/ui-refactor/before-1.png": { width: 3020, height: 1490 },
+  "/blog/ui-refactor/before-2.png": { width: 3020, height: 1490 },
+  "/blog/ui-refactor/before-3.png": { width: 3020, height: 1490 },
+  "/blog/ui-refactor/before-4.png": { width: 3020, height: 1490 },
+  "/blog/ui-refactor/lighthouse/before.png": { width: 2406, height: 1268 },
+  "/blog/ui-refactor/lighthouse/after.png": { width: 2406, height: 1268 },
 }
 
 const defaultComponents = {

@@ -1,10 +1,12 @@
 ---
 title: "Building a portfolio that doesn't look like it was made with AI in 30 minutes"
-description: "My process for refactoring my portfolio so it actually feels like me. A design system, a wrist kit, and a new UI."
+description: "My process for refactoring my portfolio so it actually feels like me. A design system, wrist kit, and a new UI."
 date: "2026-06-09"
 tags: ["portfolio", "design-system", "ui", "process"]
 published: true
 ---
+
+Well well well, if you are reading this, I already finished the refactor, and I hope you are thinking "wow." right now.
 
 ## How I got here
 
@@ -12,7 +14,7 @@ I finished my portfolio. When I looked at it, I noticed something. It felt gener
 
 It had fun features, like the piano, but the UI was not me. I wanted something more unique. Something that actually came from me.
 
-So I started refactoring it. I am splitting the work into 3 parts (or I have already finished them, depending on when you are reading this).
+So I started refactoring it. I split the work into 3 parts.
 
 ## 1. A design system
 
@@ -28,60 +30,57 @@ While looking for inspiration for my new portfolio, I came across a personal sit
 
 Two things in particular caught my attention.
 
-1. **The bento grid.** I had not seen this layout before. It is a grid of cards in different sizes that fit together like little boxes. I plan to use something similar.
+1. **The bento grid.** I had not seen this layout before. It is a grid of cards in different sizes that fit together like little boxes. I ended up using something similar on my own home page.
 2. **The Apple Fitness ring.** That little ring on the Apple Watch with your activity data.
 
-I searched for a ready-made solution that gives you that Apple ring filled with your Apple Watch data, and I could not find one. So I built it myself. That is how the **wrist kit** was born.
+I searched for a ready-made solution that gives you that Apple ring filled with your Apple Watch data, and I could not find one. So I built it myself. That is how **wristkit** was born.
 
 The idea is simple. I use Apple Shortcuts to send my data to an endpoint. Every day the endpoint updates a ring component that lives on my site.
 
-At the time I am writing this, the design system is already live. I am still working on the wrist kit.
+Both the design system and wristkit are live now. You can see wristkit in action on my home page, under `$ cat ./off-the-clock`, next to the Spotify widget and the mini piano.
+
+If you want to use it on your own site: https://wristkit-web.vercel.app/
 
 ## 3. Prototyping and UI
 
-For this part I am using Claude Design to turn my ideas into something visual. I do not know yet how the final UI will look, but it will be close to what I describe below.
+For this part I used Claude to turn my ideas into something visual before writing a line of code. The plan: a bento grid on the home page, an editor metaphor chrome (titlebar, sidebar, status bar) wrapping every page, and the same content everywhere, just wearing a new skin. Blog, projects, about, contact, and piano all got the same treatment.
 
-### Home
+## Before and after
 
-A lot of bento grid here. I want to show:
+Here is the actual comparison. These four screenshots are the old site, right before the refactor. The "after" is whatever you are looking at right now, since you are already on the new one.
 
-- The wrist kit
-- A favorite project
-- My GitHub contributions
-- A Spotify card. Maybe a playlist where the song on display keeps shuffling on its own.
+![Old home page](/blog/ui-refactor/before-1.png)
 
-### About
+_Before: home page_
 
-A bit about me. A short summary, my professional and academic background, and my tech stack.
+![Old projects page](/blog/ui-refactor/before-2.png)
 
-### Projects
+_Before: projects page_
 
-Personal projects and some public projects I worked on at CESAR.
+![Old contact page](/blog/ui-refactor/before-3.png)
 
-### Posts
+_Before: contact page_
 
-The blog list and the post page (yes, the one you are reading right now), with the new UI applied. Same content, new skin.
+![Old piano page](/blog/ui-refactor/before-4.png)
 
-### Contact
+_Before: piano page_
 
-A nice form and badges with my socials.
+## Lighthouse scores
 
-### Piano
+I also ran PageSpeed Insights before and after, just to make sure the new UI did not tank performance.
 
-The piano stays. Same piano, just with the refactored UI.
+![Lighthouse report before the refactor](/blog/ui-refactor/lighthouse/before.png)
 
-### Log
+_Before: 100 performance, 85 accessibility, 100 best practices, 100 SEO_
 
-I am thinking of something like Letterboxd, but for everything. Movies, series, albums, places I went to.
+![Lighthouse report after the refactor](/blog/ui-refactor/lighthouse/after.png)
 
-## Spoiler alert
+_After: 100 performance, 100 accessibility, 100 best practices, 100 SEO_
 
-A small preview of where I am at. These are still drafts, so things will probably change before launch.
-
-![New contact page preview](/blog/new-ui-contact.webp)
-
-![New piano page preview](/blog/new-ui-piano.webp)
+Accessibility went from 85 to 100. Everything else was already at 100 and stayed there.
 
 ## What is next
 
-When I finish the whole process, I will come back to this post and add the before and after, so you can see how far it went.
+The log page is still on my roadmap. Something like Letterboxd, but for everything: movies, series, albums, places I went to.
+
+Past that, I want to add more personal stuff to the site. Not just the dev side of me, but who I actually am outside of code too.
