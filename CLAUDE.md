@@ -41,11 +41,20 @@ The site uses entrepta for design. It is not an installed dependency, the compon
 Defined in `app/globals.css`. Primitive colors (zinc, violet, indigo, etc) feed semantic tokens:
 
 ```css
---bg-canvas: zinc-950 /* global background */ --bg-surface: zinc-900 /* cards, panels */
-  --bg-surface-elevated: rgba(39, 39, 42, 0.6) --fg-primary: zinc-50 --fg-secondary: zinc-400
-  --fg-muted: #8a8a92 /* lightened from zinc-500 to clear WCAG AA */ --fg-brand: violet-500
-  /* overridden per theme */ --fg-brand-hover: violet-400 /* overridden per theme */
-  --border-subtle: zinc-800 --border-strong: zinc-700;
+:root {
+  --bg-canvas: #09090b; /* zinc-950, global background */
+  --bg-surface: #18181b; /* zinc-900, cards and panels */
+  --bg-surface-elevated: rgba(39, 39, 42, 0.6);
+
+  --fg-primary: #fafafa; /* zinc-50 */
+  --fg-secondary: #a1a1aa; /* zinc-400 */
+  --fg-muted: #8a8a92; /* lightened from zinc-500 to clear WCAG AA */
+  --fg-brand: #7c6bff; /* violet-500, overridden per theme */
+  --fg-brand-hover: #9b8eff; /* violet-400, overridden per theme */
+
+  --border-subtle: #27272a; /* zinc-800 */
+  --border-strong: #3f3f46; /* zinc-700 */
+}
 ```
 
 Brand-derived accents (`--border-brand`, `--shadow-brand`, `--fg-brand-glow`) are built with `color-mix()` against `--fg-brand`, so they follow whatever theme is active. Never hardcode the violet hex for a brand accent, always derive it from `--fg-brand` so it reacts to theme changes.
