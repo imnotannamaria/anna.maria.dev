@@ -232,10 +232,12 @@ export function TodayActivityCardLoading({ className }: { className?: string }) 
       <div
         className="wk-activity-grid"
         style={{
+          flex: 1,
           marginTop: 12,
           display: "grid",
           gap: 20,
           alignItems: "center",
+          alignContent: "center",
         }}
       >
         <div style={{ display: "flex", justifyContent: "center" }}>
@@ -261,7 +263,11 @@ export function TodayActivityCardLoading({ className }: { className?: string }) 
           <MetricRow dot={colors.steps} label="Steps" value="—" />
         </div>
       </div>
-      <Footer left="// syncing…" right={<output>waiting for data</output>} />
+      <Footer
+        left="// syncing…"
+        right={<output>waiting for data</output>}
+        style={{ marginTop: "auto" }}
+      />
     </Panel>
   )
 }
@@ -275,10 +281,12 @@ export function TodayActivityCardEmpty({ className }: { className?: string }) {
       <div
         className="wk-activity-grid"
         style={{
+          flex: 1,
           marginTop: 12,
           display: "grid",
           gap: 20,
           alignItems: "center",
+          alignContent: "center",
         }}
       >
         <div style={{ display: "flex", justifyContent: "center" }}>
@@ -307,6 +315,7 @@ export function TodayActivityCardEmpty({ className }: { className?: string }) {
       <Footer
         left="// no data yet — run the shortcut on iPhone"
         right={<span style={{ color: "var(--fg-muted)" }}>install shortcut →</span>}
+        style={{ marginTop: "auto" }}
       />
     </Panel>
   )
@@ -316,13 +325,16 @@ export function TodayActivityCardError({ className }: { className?: string }) {
   return (
     <Panel className={className}>
       <Header status="error" statusColor={colors.danger} />
-      <div style={{ marginTop: 12, color: "var(--fg-muted)", fontSize: 13, lineHeight: 1.5 }}>
+      <div
+        style={{ flex: 1, marginTop: 12, color: "var(--fg-muted)", fontSize: 13, lineHeight: 1.5 }}
+      >
         <div style={{ color: "var(--fg-primary)", marginBottom: 6 }}>Something went wrong.</div>
         <div>We couldn&apos;t load today&apos;s activity. Try again later.</div>
       </div>
       <Footer
         left="// showing nothing rather than guessing"
         right={<span style={{ color: "var(--fg-muted)" }}>see docs</span>}
+        style={{ marginTop: "auto" }}
       />
     </Panel>
   )
@@ -343,10 +355,12 @@ export function TodayActivityCardStale({
       <div
         className="wk-activity-grid"
         style={{
+          flex: 1,
           marginTop: 12,
           display: "grid",
           gap: 20,
           alignItems: "center",
+          alignContent: "center",
         }}
       >
         <div style={{ display: "flex", justifyContent: "center" }}>
@@ -401,6 +415,7 @@ export function TodayActivityCardStale({
       <Footer
         left={`// last sync ${data.hoursSinceSync}h ago`}
         right={<span style={{ color: colors.warn }}>run shortcut</span>}
+        style={{ marginTop: "auto" }}
       />
     </Panel>
   )
