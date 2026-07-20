@@ -87,16 +87,23 @@ function useTheme(options: UseThemeOptions): UseThemeReturn {
   const [theme, setThemeState] = React.useState<string>(initialTheme)
   const [mode, setModeState] = React.useState<ThemeMode>(defaultMode)
 
-  // Hydrate from storage once on mount. The ThemeScript already applied the
-  // attribute pre-paint; this just syncs React state to match.
+  // Hydrate from storage once on mount, syncing BOTH React state and the DOM
+  // attributes. The ThemeScript applies them pre-paint, but if it ever fails to
+  // stick (script timing on a cold mobile refresh) the switcher would show the
+  // saved theme while the page rendered the default. Re-applying here keeps the
+  // two from diverging: state and visual always come from the same read.
   React.useEffect(() => {
     const storedTheme = safeRead(themeKey)
     if (storedTheme && themes.some((t) => t.id === storedTheme)) {
       setThemeState(storedTheme)
+      applyThemeAttribute(storedTheme)
     }
     if (!disableMode) {
       const storedMode = safeRead(modeKey)
-      if (storedMode === "dark" || storedMode === "light") setModeState(storedMode)
+      if (storedMode === "dark" || storedMode === "light") {
+        setModeState(storedMode)
+        applyModeAttribute(storedMode)
+      }
     }
   }, [themeKey, modeKey, themes, disableMode])
 
