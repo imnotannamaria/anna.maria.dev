@@ -1,0 +1,41 @@
+---
+title: "Spreadsheets aren't the problem"
+description: "What I learned building a tool around a very complicated spreadsheet, and why I stopped trying to replace it."
+date: "2026-07-20"
+tags: ["spreadsheets", "engineering", "product", "lessons"]
+published: true
+---
+
+A while back I worked on a project built around one very complicated spreadsheet.
+
+It was the GHG Protocol spreadsheet from FGV. If you have never seen it, picture hundreds of cells, formulas stacked on top of formulas, and numbers that have to be exactly right because they turn into real carbon reports. My job was to turn all of that into software.
+
+## My first instinct was to kill the spreadsheet
+
+When I looked at it, my first thought was the obvious one. Get rid of the spreadsheet. Build clean dynamic forms, move every calculation into code, and never make the user touch a cell again.
+
+It sounds right. It is the kind of thing you say in a pitch. "We replaced their messy spreadsheet with a real product."
+
+But the more I sat with it, the more that plan started to crack. Two things changed my mind.
+
+The first was the future. Those formulas were not random. They followed a standard, and standards change. Every time the protocol updated, I would have to go back into the code and redo the math by hand. The spreadsheet, as messy as it was, was also the thing that made those rules easy to see and easy to change.
+
+The second was the user. They were not scared of spreadsheets. They lived in them. The spreadsheet was where they thought. Taking it away would not feel like an upgrade to them. It would feel like losing the tool they trusted.
+
+## So we did not replace it, we reshaped it
+
+Instead of one giant form that pretended the spreadsheet did not exist, we built templates. Each template was a smaller, cleaner version of the spreadsheet, one per calculation. Simple, focused, and still familiar enough that the user did not feel lost.
+
+We kept what made the spreadsheet good, which is the flexibility and a mental model the user already had. We cut what made it painful, which is the mess and the room for mistakes.
+
+That felt like the right line. Not automate everything. Not automate nothing. Automate the parts that hurt, and leave the parts that help.
+
+## What I actually learned
+
+Two things stuck with me from that project.
+
+The first is small and practical. I learned Excel formulas fast, faster than I ever expected, because I had no choice. When a number is wrong and someone is counting on it, you learn how the formula works very quickly.
+
+The second is bigger. Automating a spreadsheet is not always the win. Sometimes the spreadsheet is the smart part, and the job is not to delete it but to make it better. The real skill is knowing the difference before you write any code.
+
+Spreadsheets are not a sign that people are behind. They are a sign that people found something flexible that works. The interesting work is not throwing that away. It is meeting people where they already are, and making that place a little better.

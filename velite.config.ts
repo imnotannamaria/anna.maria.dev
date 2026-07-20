@@ -9,6 +9,7 @@ const blog = defineCollection({
     description: s.string(),
     date: s.isodate(),
     tags: s.array(s.string()),
+    featured: s.boolean().default(false),
     published: s.boolean().default(true),
     slug: s.path(),
     body: s.mdx(),

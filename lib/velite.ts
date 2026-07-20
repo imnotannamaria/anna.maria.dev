@@ -83,6 +83,13 @@ export function getPublishedPosts() {
     .map((post) => ({ ...post, slug: stripPrefix(post.slug) }))
 }
 
+export function getFeaturedPosts() {
+  return blog
+    .filter((post) => post.published && post.featured)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .map((post) => ({ ...post, slug: stripPrefix(post.slug) }))
+}
+
 export function getFeaturedProjects() {
   return projects
     .filter((project) => project.published && project.featured)

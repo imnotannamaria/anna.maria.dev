@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getFeaturedProjects, getPublishedPosts, getPublishedProjects } from "@/lib/velite"
+import { getFeaturedPosts, getFeaturedProjects, getPublishedProjects } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/utils"
 import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
@@ -195,7 +195,7 @@ const TIMELINE_WINDOW = 5 // intervals shown (= points - 1)
 export default async function Home() {
   const activityState = await loadTodayActivity({ tz: "America/Sao_Paulo" })
   const featuredProject = getFeaturedProjects()[0]
-  const latestPost = getPublishedPosts()[0]
+  const featuredPost = getFeaturedPosts()[0]
   const currentYear = new Date().getFullYear()
   const ossCount = getPublishedProjects().filter(
     (p) => new Date(p.date).getFullYear() === currentYear,
@@ -695,16 +695,16 @@ export default async function Home() {
               <ProgressBar filled={ossCount} total={ossGoal} />
             </div>
 
-            {latestPost && (
+            {featuredPost && (
               <Link
-                href={`/blog/${latestPost.slug}`}
+                href={`/blog/${featuredPost.slug}`}
                 className="group/post flex flex-1 flex-col"
                 style={{ textDecoration: "none" }}
               >
                 <div className="bento-card flex flex-1 flex-col">
                   <CardHead
-                    label="latest post"
-                    meta={`${formatDate(latestPost.date)} · ${estimateReadingTime(latestPost.body)} min`}
+                    label="featured post"
+                    meta={`${formatDate(featuredPost.date)} · ${estimateReadingTime(featuredPost.body)} min`}
                   />
 
                   <h3
@@ -716,10 +716,10 @@ export default async function Home() {
                       margin: 0,
                     }}
                   >
-                    {latestPost.title}
+                    {featuredPost.title}
                   </h3>
 
-                  {latestPost.description && (
+                  {featuredPost.description && (
                     <p
                       className="line-clamp-3 text-sm leading-relaxed"
                       style={{
@@ -728,13 +728,13 @@ export default async function Home() {
                         margin: 0,
                       }}
                     >
-                      {latestPost.description}
+                      {featuredPost.description}
                     </p>
                   )}
 
-                  {latestPost.tags && latestPost.tags.length > 0 && (
+                  {featuredPost.tags && featuredPost.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
-                      {latestPost.tags.slice(0, 4).map((tag) => (
+                      {featuredPost.tags.slice(0, 4).map((tag) => (
                         <Badge key={tag} variant="brand-soft">
                           {tag}
                         </Badge>
