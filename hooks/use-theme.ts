@@ -1,8 +1,7 @@
 "use client"
 
 import * as React from "react"
-
-type ThemeMode = "dark" | "light"
+import { type ThemeMode, useMode } from "./use-mode"
 
 interface ThemeOption {
   /** Stable identifier written to `data-theme` and persisted. */
@@ -43,12 +42,6 @@ function applyThemeAttribute(theme: string) {
   document.documentElement.setAttribute("data-theme", theme)
 }
 
-function applyModeAttribute(mode: ThemeMode) {
-  if (typeof document === "undefined") return
-  if (mode === "light") document.documentElement.setAttribute("data-mode", "light")
-  else document.documentElement.removeAttribute("data-mode")
-}
-
 function safeRead(key: string): string | null {
   try {
     return typeof window === "undefined" ? null : window.localStorage.getItem(key)
@@ -77,7 +70,7 @@ function useTheme(options: UseThemeOptions): UseThemeReturn {
   }
 
   const themeKey = `${storageKey}:theme`
-  const modeKey = `${storageKey}:mode`
+  const { mode, setMode, toggleMode } = useMode({ defaultMode, storageKey, disableMode })
 
   const initialTheme = React.useMemo(() => {
     const fallback = defaultTheme ?? themes[0].id
@@ -85,27 +78,15 @@ function useTheme(options: UseThemeOptions): UseThemeReturn {
   }, [defaultTheme, themes])
 
   const [theme, setThemeState] = React.useState<string>(initialTheme)
-  const [mode, setModeState] = React.useState<ThemeMode>(defaultMode)
 
-  // Hydrate from storage once on mount, syncing BOTH React state and the DOM
-  // attributes. The ThemeScript applies them pre-paint, but if it ever fails to
-  // stick (script timing on a cold mobile refresh) the switcher would show the
-  // saved theme while the page rendered the default. Re-applying here keeps the
-  // two from diverging: state and visual always come from the same read.
+  // Hydrate from storage once on mount. The ThemeScript already applied the
+  // attribute pre-paint; this just syncs React state to match.
   React.useEffect(() => {
     const storedTheme = safeRead(themeKey)
     if (storedTheme && themes.some((t) => t.id === storedTheme)) {
       setThemeState(storedTheme)
-      applyThemeAttribute(storedTheme)
     }
-    if (!disableMode) {
-      const storedMode = safeRead(modeKey)
-      if (storedMode === "dark" || storedMode === "light") {
-        setModeState(storedMode)
-        applyModeAttribute(storedMode)
-      }
-    }
-  }, [themeKey, modeKey, themes, disableMode])
+  }, [themeKey, themes])
 
   const setTheme = React.useCallback(
     (id: string) => {
@@ -116,20 +97,6 @@ function useTheme(options: UseThemeOptions): UseThemeReturn {
     },
     [themes, themeKey],
   )
-
-  const setMode = React.useCallback(
-    (next: ThemeMode) => {
-      if (disableMode) return
-      setModeState(next)
-      applyModeAttribute(next)
-      safeWrite(modeKey, next)
-    },
-    [modeKey, disableMode],
-  )
-
-  const toggleMode = React.useCallback(() => {
-    setMode(mode === "dark" ? "light" : "dark")
-  }, [mode, setMode])
 
   const current = React.useMemo(
     () => themes.find((t) => t.id === theme) ?? themes[0],

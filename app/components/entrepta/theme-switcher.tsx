@@ -1,6 +1,8 @@
 "use client"
 
+import { Moon, Sun } from "lucide-react"
 import * as React from "react"
+import type { ThemeMode } from "@/hooks/use-mode"
 import { type ThemeOption, type UseThemeOptions, useTheme } from "@/hooks/use-theme"
 import { cn } from "@/lib/utils"
 
@@ -14,6 +16,30 @@ interface ThemeSwitcherProps
   hideModeToggle?: boolean
   /** Label for the screen-reader-only live region. Default `"Active theme"`. */
   liveLabel?: string
+}
+
+// Both icons stay mounted and stacked so the swap can cross-fade. They turn in
+// opposite directions, which reads like a dial. The globals.css reduced-motion
+// block flattens the transition for anyone who asks for less movement.
+const ICON_BASE =
+  "col-start-1 row-start-1 text-[var(--fg-primary)] transition-[opacity,rotate,scale] duration-[var(--motion-base)] ease-[var(--ease-out)]"
+const ICON_IN = "opacity-100 rotate-0 scale-100"
+const ICON_STYLE = { width: 14, height: 14, strokeWidth: 1.5 }
+
+/** Sun in light mode, moon in dark mode. Shows the mode you are in, not the one you get. */
+function ModeIcon({ mode }: { mode: ThemeMode }) {
+  return (
+    <span aria-hidden className="relative inline-grid h-4 w-4 shrink-0 place-items-center">
+      <Moon
+        className={cn(ICON_BASE, mode === "dark" ? ICON_IN : "scale-50 rotate-90 opacity-0")}
+        style={ICON_STYLE}
+      />
+      <Sun
+        className={cn(ICON_BASE, mode === "light" ? ICON_IN : "scale-50 -rotate-90 opacity-0")}
+        style={ICON_STYLE}
+      />
+    </span>
+  )
 }
 
 const POSITION_CLASS: Record<SwitcherPosition, string> = {
@@ -100,19 +126,13 @@ const ThemeSwitcher = React.forwardRef<HTMLDivElement, ThemeSwitcherProps>(
                 <button
                   type="button"
                   aria-pressed={mode === "light"}
+                  data-mode={mode}
                   onClick={toggleMode}
                   className="flex items-center justify-between gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--bg-hover-soft)] focus-visible:bg-[var(--bg-hover-soft)] focus-visible:outline-none"
                 >
                   <span className="flex items-center gap-2.5">
-                    <span
-                      aria-hidden
-                      className="inline-grid h-4 w-4 place-items-center rounded-full border border-[var(--border-subtle)] text-[10px] leading-none"
-                      style={{
-                        background: mode === "dark" ? "#09090b" : "#fafafa",
-                        color: mode === "dark" ? "#fafafa" : "#09090b",
-                      }}
-                    >
-                      {mode === "dark" ? "◗" : "◖"}
+                    <span aria-hidden className="inline-grid h-4 w-4 shrink-0 place-items-center">
+                      <ModeIcon mode={mode} />
                     </span>
                     <span className="text-[var(--fg-primary)]">{mode}</span>
                   </span>
