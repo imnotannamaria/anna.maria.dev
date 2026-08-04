@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto"
 import { NextResponse } from "next/server"
-import { createDb } from "@/lib/wristkit/db"
+import { createDb, dbUrl } from "@/lib/db/client"
 import { samples } from "@/lib/wristkit/schema"
 import { IngestPayloadSchema } from "@/lib/wristkit/validation"
 
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 })
   }
 
-  const url = process.env.WRISTKIT_DATABASE_URL
+  const url = dbUrl()
   if (!url) {
     return NextResponse.json({ error: "db not configured" }, { status: 500 })
   }

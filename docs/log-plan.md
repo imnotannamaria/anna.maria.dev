@@ -19,6 +19,11 @@ Line 393 holds the page template as a JSON string. Line 381 holds the assets (fo
 React) as gzipped base64, and you don't need those. The template has two layout options,
 `1a` and `1b`. **We are building `1b`.** Ignore everything under the `1a` comment.
 
+> `log-design.html` weighs 4.1MB, almost all of it embedded fonts and a copy of React.
+> It gets deleted once `/log` is built and the layout is settled. Everything worth keeping
+> from it should live in this plan or in the code by then, so read it early rather than
+> counting on it being there later. Deleting it is a Phase 6 checklist item.
+
 ---
 
 ## What we decided
@@ -55,15 +60,13 @@ Verified before writing this: `hono@4.13.0` ships a `./vercel` export, and
 ### New dependencies
 
 ```bash
-pnpm add hono @hono/zod-validator @workos-inc/authkit-nextjs react-hook-form @hookform/resolvers
+npm install hono @hono/zod-validator @workos-inc/authkit-nextjs react-hook-form @hookform/resolvers
 ```
 
 `zod@4`, `drizzle-orm`, and `postgres` are already installed.
 
-> Check that `@hono/zod-validator` works with zod v4 before you commit to it. If it only
-> supports zod v3, skip the package and validate by hand inside each handler:
-> `const parsed = Schema.safeParse(await c.req.json())`. That is three lines and removes
-> the dependency question entirely.
+`@hono/zod-validator@0.9.0` declares `zod: ^3.25.0 || ^4.0.0` in its peer deps, so it works
+with the zod 4 already installed here. Checked, not assumed.
 
 ### Environment variables
 
@@ -136,9 +139,9 @@ the fallback once `DATABASE_URL` is set in Vercel.
 - [ ] `.env.example` lists every new variable with a comment
 - [ ] `lib/db/client.ts` exists and exports `createDb` and `dbUrl`
 - [ ] `lib/wristkit/db.ts` re-exports from the new file, nothing else
-- [ ] `pnpm build` passes
+- [ ] `npm run build` passes
 - [ ] The wristkit card on the homepage still shows real data locally
-- [ ] `pnpm lint` clean
+- [ ] `npm run lint` clean
 
 ---
 
@@ -364,7 +367,7 @@ faster, and it gives you every type at least twice so the filters have something
 - [ ] Seed script ran, 14 rows present, every type represented
 - [ ] `getPublishedEntries()` returns `rating` as a number, `loggedAt` as `YYYY-MM-DD`
 - [ ] Drafts (`published = false`) never appear in `getPublishedEntries()`
-- [ ] `pnpm lint` clean, no `any` in the new files
+- [ ] `npm run lint` clean, no `any` in the new files
 
 ---
 
@@ -771,7 +774,7 @@ Delete goes through the dialog, never `window.confirm`.
 - [ ] The six new entrepta components contain zero hardcoded hex colors
 - [ ] Admin renders correctly in all six themes and in light mode
 - [ ] `view-source` on `/admin` shows `noindex`
-- [ ] `pnpm build && pnpm postbuild`, then confirm `/admin` is absent from `sitemap.xml`
+- [ ] `npm run build && npm run postbuild`, then confirm `/admin` is absent from `sitemap.xml`
       and present in `robots.txt` as disallowed
 
 ---
@@ -949,14 +952,14 @@ If it overflows, the fix is horizontal scroll on the tab strip, not a smaller fo
 - [ ] Type-specific palette entries land on the filtered URL
 - [ ] Titlebar does not overflow at 1024px or at 1280px
 - [ ] `/admin` appears in no navigation anywhere
-- [ ] `/log` is in `sitemap.xml` after `pnpm build && pnpm postbuild`
+- [ ] `/log` is in `sitemap.xml` after `npm run build && npm run postbuild`
 
 ---
 
 ## Phase 6 — polish and what comes after
 
 - Error boundary and a loading skeleton, following `components/wristkit/today-activity-card/states.tsx`.
-- `pnpm lint` and `prettier --check .` clean across everything new.
+- `npm run lint` and `prettier --check .` clean across everything new.
 - Update `CLAUDE.md`: `/log` in the pages section, `log_entries` in the stack table, the
   new env vars, and a note that the API lives in Hono under `/api/v1`.
 - Update `README.md` so a fork can turn the whole thing off. `/log` should degrade the same
@@ -989,10 +992,11 @@ Ideas for later, none of them blocking:
 
 ### Checklist — Phase 6
 
-- [ ] `/log` renders an empty state with `DATABASE_URL` unset, and `pnpm build` still passes
+- [ ] `/log` renders an empty state with `DATABASE_URL` unset, and `npm run build` still passes
 - [ ] `CLAUDE.md` and `README.md` updated
-- [ ] `pnpm lint` clean
+- [ ] `npm run lint` clean
 - [ ] Full pass on the deployed preview, phone and desktop
+- [ ] `docs/log-design.html` deleted, and nothing in the codebase still references it
 - [ ] `/api/v1/wristkit/sync` verified in production with the real key
 - [ ] Shortcut URL updated on the phone and run once, new row confirmed in the database
 - [ ] `app/api/wristkit-sync/route.ts` deleted after a day with no traffic on the old path
