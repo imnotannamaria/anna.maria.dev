@@ -31,6 +31,7 @@ import {
   siNestjs,
   siFastapi,
   siPostgresql,
+  siSupabase,
   siMongodb,
   siMysql,
   siFirebase,
@@ -82,6 +83,7 @@ const ICONS: Record<string, string> = {
   fastapi: siFastapi.path,
   postgres: siPostgresql.path,
   postgresql: siPostgresql.path,
+  supabase: siSupabase.path,
   mongodb: siMongodb.path,
   mysql: siMysql.path,
   firebase: siFirebase.path,
@@ -232,6 +234,7 @@ const stack: { key: string; items: string[] }[] = [
     key: "databases",
     items: [
       "postgresql",
+      "supabase",
       "sql server",
       "mongodb",
       "redis",

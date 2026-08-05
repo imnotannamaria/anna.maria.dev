@@ -205,6 +205,21 @@ const defaultComponents = {
       {...props}
     />
   ),
+  hr: () => (
+    <div className="my-14 flex items-center gap-3" role="separator">
+      <span
+        className="h-px flex-1"
+        style={{ background: "linear-gradient(to right, transparent, var(--border-strong))" }}
+      />
+      <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 9, lineHeight: 1 }}>
+        ◆
+      </span>
+      <span
+        className="h-px flex-1"
+        style={{ background: "linear-gradient(to left, transparent, var(--border-strong))" }}
+      />
+    </div>
+  ),
   pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
     <pre
       className="my-6 overflow-x-auto rounded-lg border border-[var(--border-subtle)] bg-[#0d0d14] p-4 text-sm"

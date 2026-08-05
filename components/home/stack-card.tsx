@@ -18,6 +18,7 @@ import {
   siHono,
   siNestjs,
   siPostgresql,
+  siSupabase,
   siMongodb,
   siMysql,
   siFirebase,
@@ -70,6 +71,7 @@ const BRANCHES: { id: string; label: string; comment: string; tools: Tool[] }[] 
     comment: "storage",
     tools: [
       { name: "postgres", icon: siPostgresql.path },
+      { name: "supabase", icon: siSupabase.path },
       { name: "mongodb", icon: siMongodb.path },
       { name: "mysql", icon: siMysql.path },
       { name: "drizzle", icon: siDrizzle.path },
@@ -119,6 +121,7 @@ const NUMBER_WORDS: Record<number, string> = {
   25: "twenty-five",
   26: "twenty-six",
   27: "twenty-seven",
+  28: "twenty-eight",
 }
 
 // ─── Sub-components ────────────────────────────────────────────────────────────

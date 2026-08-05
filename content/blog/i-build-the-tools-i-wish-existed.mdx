@@ -6,7 +6,7 @@ tags: ["dx", "developer-experience", "building", "open-source"]
 published: true
 ---
 
-I have a pattern. Every time I want something and cannot find it, I end up building it myself. It has happened enough times now that I stopped calling it a coincidence.
+I have a pattern. Every time I want something and can't find it, I end up building it myself. It has happened enough times now that I stopped calling it a coincidence.
 
 Here are three of them.
 
@@ -22,36 +22,36 @@ So I built it. wristkit uses an Apple Shortcut to send my data to an endpoint, a
 
 This one was less about a missing feature and more about identity. I always wanted a design system, but not a generic one. One with my face on it. Dark first, my tokens, my components, my opinions baked in.
 
-The design systems out there are good. They are just not mine. So I built entrepta the way I would want to use it. You copy the components into your project and own the code, no runtime SDK, no black box, one command to set the whole thing up. Those are not random choices. Each one is a small opinion about how a tool should treat the person using it.
+The design systems out there are good. They're just not mine. So I built entrepta the way I'd want to use it. You copy the components into your project and own the code, no runtime SDK, no black box, one command to set the whole thing up. Those aren't random choices. Each one is a small opinion about how a tool should treat the person using it.
 
 ## pinggy: I wanted my finance data to be mine
 
-This is the one I am building right now, so consider it a small spoiler.
+This is the one I'm building right now, so consider it a small spoiler.
 
-I wanted to track my personal finances. Every tracker I found was a closed product where my data lives on someone else's server, under someone else's terms. I did not want that.
+I wanted to track my personal finances. Every tracker I found was a closed product where my data lives on someone else's server, under someone else's terms. I didn't want that.
 
-So pinggy is the opposite. It is a self hosted finance API. You bring your own Supabase database, deploy it wherever you want, and connect whatever you like on top, a dashboard, a mobile app, or an Apple automation.
+So pinggy is the opposite. It's a self hosted finance API. You bring your own Supabase database, deploy it wherever you want, and connect whatever you like on top, a dashboard, a mobile app, or an Apple automation.
 
-The automation is my favorite part. Every time I pay with Apple Pay, a Shortcut fires on its own and logs the payment to my database as an expense or income. If I feel like it, it asks me a couple of quick questions right there, the category, the type, that kind of thing. If I am in a hurry, I skip them and fill them in later. Either way the payment is already saved. The tracking happens as I live my day, not at the end of the month when I have already forgotten half of it.
+The automation is my favorite part. Every time I pay with Apple Pay, a Shortcut fires on its own and logs the payment to my database as an expense or income. If I feel like it, it asks me a couple of quick questions right there, the category, the type, that kind of thing. If I'm in a hurry, I skip them and fill them in later. Either way the payment is already saved. The tracking happens as I live my day, not at the end of the month when I've already forgotten half of it.
 
-There is one detail I really like. That automation is not a person. Nobody is there to type a password or click a sign-in button, so it cannot log in the normal way. Instead it carries its own secret token that basically says "this is Anna's automation, let it in," kept separate from how a real user signs in. It made me sit with a question I had never really faced before. When the thing calling your API is not a human, how does it prove who it is?
+There's one detail I really like. That automation isn't a person. Nobody is there to type a password or click a sign-in button, so it can't log in the normal way. Instead it carries its own secret token that basically says "this is Anna's automation, let it in," kept separate from how a real user signs in. It made me sit with a question I had never really faced before. When the thing calling your API isn't a human, how does it prove who it is?
 
 ## It was never really about the projects
 
-Line the three up and the pattern is not "I like building." It is ownership. wristkit is my data on my site. entrepta is my code that I own outright. pinggy is my finances on my own database.
+Line the three up and the pattern isn't "I like building." It's ownership. wristkit is my data on my site. entrepta is my code that I own outright. pinggy is my finances on my own database.
 
-That is what developer experience means to me. Not the polish on top, the ownership underneath. A good tool belongs to the person using it. It does not hold your data hostage, hide its own source, or make you depend on it forever. The best DX is the one where you stay in control.
+That's what developer experience means to me. Not the polish on top, the ownership underneath. A good tool belongs to the person using it. It doesn't hold your data hostage, hide its own source, or make you depend on it forever. The best DX is the one where you stay in control.
 
-## Building for yourself is not an excuse to be sloppy
+## Building for yourself isn't an excuse to be sloppy
 
-Here is the trap. When you build for yourself, it is easy to let quality slide, because who is going to complain.
+Here's the trap. When you build for yourself, it's easy to let quality slide, because who is going to complain.
 
-I try not to. When something feels slow, I do not wave it away. I open Lighthouse, or I just feel it by hand, find the part that is dragging, and fix it. A skeleton here, static generation there. When I redid my portfolio I pushed the accessibility score from 85 to 100, which meant actually fixing the contrast, the focus states, and the labels, not chasing a number.
+I try not to. When something feels slow, I don't wave it away. I open Lighthouse, or I just feel it by hand, find the part that's dragging, and fix it. A skeleton here, static generation there. When I redid my portfolio I pushed the accessibility score from 85 to 100, which meant actually fixing the contrast, the focus states, and the labels, not chasing a number.
 
-Because if I am going to build the thing I wish existed, the least I can do is make it something I would be happy to use.
+Because if I'm going to build the thing I wish existed, the least I can do is make it something I would be happy to use.
 
 ## The short version
 
 Every project I care about started with the same sentence. I wish this existed. Then, instead of waiting for someone else to build it, I opened an editor.
 
-That is the developer experience I believe in. The one you build for yourself, and then get to share.
+That's the developer experience I believe in. The one you build for yourself, and then get to share.

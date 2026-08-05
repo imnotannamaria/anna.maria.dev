@@ -1,0 +1,125 @@
+---
+title: "Auditing accessibility in a codebase that already cares"
+description: "What changes when the accessibility gate already exists, and why most of the work becomes deciding what not to fix."
+date: "2026-08-05"
+tags: ["accessibility", "a11y", "open-source", "eslint"]
+published: true
+---
+
+Most accessibility audit posts follow the same shape. Someone opens a popular app, runs axe, finds a pile of missing labels and bad contrast, and writes it up. That works when nobody has looked before.
+
+It doesn't work when someone already has.
+
+I spent a few days auditing the Supabase dashboard, which they call Studio. It's open source, so I could read the whole thing instead of guessing from the outside. What I found on day one changed what the rest of the audit was for.
+
+## They already built the gate
+
+Studio runs 15 `jsx-a11y` ESLint rules. That alone is more than most codebases. But the interesting part is what they do with them.
+
+There's a script at `apps/studio/scripts/ratchet-eslint-rules.ts` that counts violations per rule and stores a baseline. A CI workflow fails the build if any count goes up. A separate weekly cron job lowers the baselines as things get fixed.
+
+It's a ratchet. Numbers only go down.
+
+This is a smart answer to a real problem. If you turn on 15 rules in a codebase with thousands of existing violations, CI is red forever and everyone learns to ignore it. If you turn them on as warnings, nothing ever gets fixed. The ratchet lets you stop the bleeding today and drain the debt on a schedule.
+
+Thirteen of those rules landed in one PR in July 2026, after an internal axe-core audit found 1,733 failing elements across 126 surfaces. So they measured, they knew the size of the problem, and they built machinery to shrink it.
+
+Which meant my original plan was useless. "Add accessibility linting" isn't a contribution here. It exists, and it's better than what I would have proposed.
+
+## So the audit became a different question
+
+Not "where are the accessibility bugs." But: where does the gate not reach?
+
+That question has better answers, because a hole in a quality system is worth more than a single bug. A bug is one fix. A hole keeps producing bugs.
+
+I found two.
+
+### Hole one: a rule that is enabled and enforced by nothing
+
+`jsx-a11y/alt-text` is set to `warn` in the ESLint config. It's not listed in the ratchet's rule file.
+
+Warnings don't fail CI. The ratchet only tracks rules that are listed. So this rule sits in the config, runs on every file, produces output, and nothing anywhere reacts to it. A new `<img>` with no `alt` ships freely and forever.
+
+It's the only one of the 15 with no enforcement at all. Thirteen are ratcheted. One is set to `error`, so lint fails on it. This one is neither.
+
+Reading the history explains it without needing a villain. `alt-text` was added in an unrelated PR about nested component rendering, long before the ratchet existed. The PR that built the ratchet enrolled exactly the 13 rules it was adding. Nobody swept the older ones. That's not carelessness, that's what happens when tooling arrives in layers.
+
+The nice part: the current violation count is zero. I checked it twice, once through the ratchet's own counter and once with an independent scan.
+
+Zero is the best possible moment to close a hole like this. Turning the rule into a hard error today costs nothing, breaks nobody, and locks the count at zero. Do it a year from now and you're negotiating over 40 existing violations.
+
+There's precedent in their own history for exactly this move: another rule was promoted from warning to error once its count hit zero.
+
+### Hole two: the shared component package isn't linted at all
+
+Every app in the monorepo has an ESLint config. The packages don't. The shared UI package that every app imports has no lint config and no lint script.
+
+So the primitives, the pieces reused everywhere, get zero accessibility checking. The gate covers the apps but not the thing the apps are built from.
+
+This one is too big to fix in a drive-by pull request. Turning on lint there would surface a large batch of violations at once and needs a maintainer to decide how to absorb them. But it's the biggest gap in the whole audit, and it's worth saying out loud.
+
+## The part that took the longest was deciding what not to fix
+
+This is the thing I didn't expect, and it's the reason this post exists.
+
+In a codebase with no tooling, everything the linter flags is probably real. In a codebase with a lot of tooling, a meaningful share of what it flags is wrong, and "fixing" it makes the product worse.
+
+Three examples.
+
+### The lists that look redundant and aren't
+
+Four places had `<ul role="list">`, which the linter flags as a redundant role, because a `ul` already has that role. Removing it looks like free cleanup.
+
+It would have been a regression. Tailwind v4's preflight sets `list-style: none` on every `ul`. Safari, when a list has no list style, drops the list semantics entirely. VoiceOver stops announcing "list, 4 items." The explicit `role="list"` is the standard workaround for exactly that bug.
+
+So the linter is right about the HTML spec and wrong about the browser. Those four stay.
+
+### The rule whose name lies
+
+One rule showed a baseline of 76 and a current count of 0, which looks like a rule that silently stopped working. It hasn't. Despite being named `no-use-watch`, it flags `watch`, not `useWatch`. Its own error message tells you to use `useWatch` instead. There really are zero remaining calls. The baseline is just stale debt waiting for the weekly job to lower it.
+
+### The number that looks like a broken build
+
+Running lint directly reports 1,329 violations of a rule whose baseline is 875. That reads as "CI should be red and isn't."
+
+It should not be red. The ratchet deliberately skips test files. Its own count is 865. The 464 difference is 92 test files. Neither number is wrong. They measure different things, and I measured the wrong one first.
+
+I logged all three, including the fact that they were false alarms and why. That record is worth as much as the real findings, because the next person to run this audit will hit the same three and can skip them.
+
+## Where the real gap turned out to be
+
+I expected dark mode text contrast to be a weak spot. It usually is. Muted text, placeholder text, and disabled states are where design systems quietly fail.
+
+I computed it properly, converting the live OKLCH tokens to sRGB and running the WCAG ratio, rather than eyeballing screenshots. All three text tokens pass AA against the canvas: 16.44, 8.23, and 4.60. The lightest one clears 4.5 by a hair, which suggests someone chose it on purpose.
+
+Credit where it's due. That's better than most.
+
+The failure is one level down, in the non-text tokens. The input border sits at 1.46:1 against a threshold of 3.0. That criterion, WCAG 1.4.11, applies to the visual boundary of a control when the boundary is what identifies the control. A text field whose edge is at 1.46 is close to invisible.
+
+Purely decorative dividers are exempt, so the honest framing is narrower than "the borders fail." It's one token, and raising its alpha is the targeted change. But it's a design system decision with visual consequences on every screen, so it belongs in a discussion, not in a surprise pull request.
+
+## What I actually shipped
+
+One pull request. Four `aria-label` attributes on icon-only buttons in the storage file picker, which a screen reader was announcing as "button, button, button, button."
+
+That's a small change, and small is correct. Supabase writes about a Kaizen mindset, small frequent changes over large ones, and says new contributors should be able to ship in their first week. A stranger arriving with a 40-file refactor isn't reading the room.
+
+The line I care most about in that PR is the one about testing. I didn't add a test, and I said why: the rule that catches this class of bug is already ratcheted, so fixing these four lowers the count, the weekly job lowers the baseline, and they can't come back. The cheapest layer that can catch it already exists. Adding a bespoke test on top would be worse, not better.
+
+## What I didn't do
+
+I didn't do a live keyboard pass. No browser in that session, so focus return on modal close, arrow keys in comboboxes, and focus ring visibility against the dark canvas are all untested by me.
+
+That's the most useful work left, and it's usually where the best findings are. Static analysis and color math find the systemic things. Only a person with their hands off the mouse finds the ones that actually ruin someone's day.
+
+## The thing I'd take to the next audit
+
+When the tooling is absent, the job is finding violations.
+
+When the tooling is present, the job is finding the seams: the rule that runs but isn't enforced, the package the config never reached, the baseline that's stale for a boring reason. And, just as much, the job is knowing which of the linter's complaints to leave alone.
+
+The second job is harder and less satisfying. Nobody writes a thread about the four warnings they correctly ignored. But on a mature codebase it's most of the work, and getting it wrong means shipping a regression while believing you shipped a fix.
+
+---
+
+_The pull request is [supabase/supabase#48769](https://github.com/supabase/supabase/pull/48769). Audited at commit `d101d6f3de` on 5 August 2026. If you maintain Studio and I got something wrong here, I'd rather know._

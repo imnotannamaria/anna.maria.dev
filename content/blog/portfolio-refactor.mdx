@@ -7,19 +7,19 @@ featured: true
 published: true
 ---
 
-Well well well, if you are reading this, I already finished the refactor, and I hope you are thinking "wow." right now.
+Well well well, if you're reading this, I already finished the refactor, and I hope you're thinking "wow." right now.
 
 ## How I got here
 
 I finished my portfolio. When I looked at it, I noticed something. It felt generic. The kind of site that looks like it was "made with AI in 30 minutes."
 
-It had fun features, like the piano, but the UI was not me. I wanted something more unique. Something that actually came from me.
+It had fun features, like the piano, but the UI wasn't me. I wanted something more unique. Something that actually came from me.
 
 So I started refactoring it. I split the work into 3 parts.
 
 ## 1. A design system
 
-The first part is something that had been in my head for a long time: **entrepta**.
+The first part is something that had been in my head for a long time: entrepta.
 
 entrepta is a dark-first design system. You copy the components into your project and own the code. No SDK, no black box. It ships with 14 components, 6 theme presets, and a CLI to set the whole thing up in one command.
 
@@ -27,14 +27,14 @@ If you want to look at it: https://entrepta.vercel.app
 
 ## 2. Wrist kit
 
-While looking for inspiration for my new portfolio, I came across a personal site that made me stop and think "wow." That is the reaction I want people to have when they land on mine.
+While looking for inspiration for my new portfolio, I came across a personal site that made me stop and think "wow." That's the reaction I want people to have when they land on mine.
 
 Two things in particular caught my attention.
 
-1. **The bento grid.** I had not seen this layout before. It is a grid of cards in different sizes that fit together like little boxes. I ended up using something similar on my own home page.
-2. **The Apple Fitness ring.** That little ring on the Apple Watch with your activity data.
+1. The bento grid. I hadn't seen this layout before. It's a grid of cards in different sizes that fit together like little boxes. I ended up using something similar on my own home page.
+2. The Apple Fitness ring. That little ring on the Apple Watch with your activity data.
 
-I searched for a ready-made solution that gives you that Apple ring filled with your Apple Watch data, and I could not find one. So I built it myself. That is how **wristkit** was born.
+I searched for a ready-made solution that gives you that Apple ring filled with your Apple Watch data, and I couldn't find one. So I built it myself. That's how wristkit was born.
 
 The idea is simple. I use Apple Shortcuts to send my data to an endpoint. Every day the endpoint updates a ring component that lives on my site.
 
@@ -48,7 +48,7 @@ For this part I used Claude to turn my ideas into something visual before writin
 
 ## Before and after
 
-Here is the actual comparison. These four screenshots are the old site, right before the refactor. The "after" is whatever you are looking at right now, since you are already on the new one.
+Here's the actual comparison. These four screenshots are the old site, right before the refactor. The "after" is whatever you're looking at right now, since you're already on the new one.
 
 ![Old home page](/blog/ui-refactor/before-1.png)
 
@@ -68,7 +68,7 @@ _Before: piano page_
 
 ## Lighthouse scores
 
-I also ran PageSpeed Insights before and after, just to make sure the new UI did not tank performance.
+I also ran PageSpeed Insights before and after, just to make sure the new UI didn't tank performance.
 
 ![Lighthouse report before the refactor](/blog/ui-refactor/lighthouse/before.png)
 
