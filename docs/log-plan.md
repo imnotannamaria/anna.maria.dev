@@ -116,11 +116,12 @@ export function createDb(url: string): AppDb {
   return entry
 }
 
-/** Single place that resolves the connection string. */
-export function dbUrl(): string {
-  const url = process.env.DATABASE_URL ?? process.env.WRISTKIT_DATABASE_URL
-  if (!url) throw new Error("DATABASE_URL is not set")
-  return url
+/**
+ * Single place that resolves the connection string. Returns null rather than throwing so
+ * callers can degrade to an empty state — a missing database should not take down a page.
+ */
+export function dbUrl(): string | null {
+  return process.env.DATABASE_URL ?? process.env.WRISTKIT_DATABASE_URL ?? null
 }
 ```
 
@@ -479,63 +480,54 @@ export const apiKeyAuth = (envVar: string) =>
 rate limit, content type, body size, API key, then parse. Do not reorder them. The order is
 what stops an unauthenticated caller from making you parse a large body.
 
-### Spike: does `withAuth()` work inside a Hono handler?
+### Spike: does `withAuth()` work inside a Hono handler? — answered, yes
 
-Phase 3 assumes it does. Find out here, while the API is small and changing it is cheap.
+The worry was whether `next/headers` still resolves once a request has been handed from the
+Next route handler to `app.fetch()`. `withAuth()` reads the session cookie through
+`cookies()`, which depends on async local storage that Next sets up per request.
 
-The question is whether `next/headers` still resolves once a request has been handed from
-the Next route handler to `app.fetch()`. `withAuth()` reads the session cookie through
-`cookies()`, and `cookies()` depends on async local storage that Next sets up per request.
-Hono runs inside the same call stack, so it should be there. Should is not the same as is.
+It works. `/api/v1/whoami` returned `{ ok: true, email: null }` signed out and the real
+email signed in, with no exception either way. Hono runs in the same call stack, so the
+storage is there. **The `c.env.user` fallback is not needed and has been dropped from this
+plan.** `requireAdminApi` can call `withAuth()` directly.
 
-Do the WorkOS setup from Phase 3 part A first (dashboard app, callback route, middleware,
-env vars). That is maybe twenty minutes and it is work Phase 3 needs anyway. Then add a
-throwaway route:
+`lib/api/routes/whoami.ts` is the throwaway that proved it. Delete it, and its entry in the
+`proxy.ts` matcher, before the phase closes. A route that prints your email is not
+something to leave lying around.
+
+### Two Next 16 renames worth knowing
+
+Both were found while wiring this up, and both bite silently.
+
+**`middleware.ts` is now `proxy.ts`.** Next 16 deprecated the old filename. AuthKit
+deprecated `authkitMiddleware` in the same direction, in favour of `authkitProxy`. Same
+signature, so it is a rename and nothing more, but the old names each emit a warning.
+
+**`middlewareAuth` has to be enabled.** Without it, `withAuth({ ensureSignedIn: true })`
+inside a server component tries to write the session cookie during render, and Next kills
+the request:
+
+```
+Error: Cookies can only be modified in a Server Action or Route Handler
+```
+
+That is a 500 on `/admin`, not a redirect to sign-in. The proxy has to do the bouncing:
 
 ```ts
-// lib/api/routes/whoami.ts — delete this once the spike is done
-import { Hono } from "hono"
-import { withAuth } from "@workos-inc/authkit-nextjs"
+// proxy.ts — repo root
+import { authkitProxy } from "@workos-inc/authkit-nextjs"
 
-export const whoami = new Hono().get("/", async (c) => {
-  try {
-    const { user } = await withAuth()
-    return c.json({ ok: true, email: user?.email ?? null })
-  } catch (err) {
-    return c.json({ ok: false, error: String(err) }, 500)
-  }
+export default authkitProxy({
+  middlewareAuth: { enabled: true, unauthenticatedPaths: [] },
 })
-```
 
-Mount it at `/whoami`, add `/api/v1/whoami` to the middleware matcher, then check three
-things in a browser (not curl, because you need the session cookie):
-
-1. Signed out: `{ ok: true, email: null }` or a redirect. Either is fine. A thrown error is
-   not.
-2. Signed in: `{ ok: true, email: "your@email" }`. This is the answer we want.
-3. `ok: false` with a message about `headers()` or async storage means the assumption is
-   wrong.
-
-If it fails, the fallback is to read the user once in the Next route handler, where
-`next/headers` definitely works, and pass it into Hono through the context:
-
-```ts
-// app/api/v1/[[...route]]/route.ts
-import { withAuth } from "@workos-inc/authkit-nextjs"
-
-async function handler(req: Request) {
-  const { user } = await withAuth().catch(() => ({ user: null }))
-  return app.fetch(req, { user })
+export const config = {
+  matcher: ["/admin/:path*", "/api/v1/admin/:path*", "/api/v1/whoami", "/api/auth/:path*"],
 }
-export const GET = handler
-export const POST = handler
 ```
 
-Then `requireAdminApi` reads `c.env.user` instead of calling `withAuth()` itself. Same
-allowlist logic, one less assumption. Type it by declaring `Bindings` on the Hono generic.
-
-Delete `whoami.ts` before the phase closes. A route that prints your email is not something
-to leave lying around.
+Keep that matcher narrow. The public site is static and cached at the edge, and running the
+proxy across all of it would throw that away for nothing.
 
 ### Checklist — Phase 2
 
@@ -549,38 +541,34 @@ to leave lying around.
 - [ ] The homepage wristkit card still renders with real data
 - [ ] The iPhone Shortcut still works against the old URL, tested on the phone
 - [ ] `/api/contact` and `/api/og` are untouched and still work
-- [ ] Spike done: `/api/v1/whoami` returns the signed-in email from inside a Hono handler
-- [ ] If it failed, the `c.env.user` fallback is in place and documented in this file
-- [ ] `whoami.ts` deleted and removed from the middleware matcher
+- [x] Spike done: `/api/v1/whoami` returns the signed-in email from inside a Hono handler
+- [x] `/admin` signed out redirects to WorkOS instead of 500ing
+- [ ] `whoami.ts` deleted and removed from the `proxy.ts` matcher
 
 ---
 
 ## Phase 3 — auth and admin
 
-### Part A: AuthKit
+### Part A: AuthKit — done in Phase 2
 
-1. In the WorkOS dashboard, create the app. Add both redirect URIs:
-   `http://localhost:3000/api/auth/callback` and
-   `https://annamaria.app/api/auth/callback`. Enable Google OAuth as the sign-in method.
-   One click, no password to manage.
-2. `app/api/auth/callback/route.ts` exports `handleAuth()` from the package.
-3. `middleware.ts` at the repo root:
+The spike needed a real session, so this all landed early and works end to end:
 
-```ts
-import { authkitMiddleware } from "@workos-inc/authkit-nextjs"
+- WorkOS app created, Google OAuth on demo credentials, both redirect URIs registered
+  (`http://localhost:3000/api/auth/callback` and
+  `https://annamaria.app/api/auth/callback`)
+- `app/api/auth/callback/route.ts` → `handleAuth({ returnPathname: "/admin" })`
+- `proxy.ts` with `middlewareAuth` enabled, matcher scoped to the admin paths
+- `lib/auth/require-admin.ts` with the allowlist
+- `app/admin/page.tsx` as a placeholder landing page, replaced by Part C
 
-export default authkitMiddleware()
+Two things still owed here. Google is on **demo credentials**, which are staging-only and
+show WorkOS branding on the consent screen — swap them for a real Google Cloud OAuth client
+before production. And the Production environment in WorkOS has its own keys, so the Vercel
+env vars are a separate set from `.env.local`.
 
-export const config = {
-  matcher: ["/admin/:path*", "/api/v1/admin/:path*", "/api/auth/:path*"],
-}
-```
-
-Keep that matcher narrow. The public site is static and cached at the edge, and running
-middleware across all of it would throw that away for nothing.
-
-4. The allowlist. AuthKit signs people in. It does not decide who is allowed. Without this
-   step, anyone who creates an account in my WorkOS org lands in the admin.
+The allowlist, since it is the part that actually matters. AuthKit signs people in. It does
+not decide who is allowed. Without it, anyone who creates an account in the WorkOS org lands
+in the admin.
 
 ```ts
 // lib/auth/require-admin.ts
@@ -609,19 +597,20 @@ The Hono version, for `/api/v1/admin/*`:
 import { createMiddleware } from "hono/factory"
 import { withAuth } from "@workos-inc/authkit-nextjs"
 
+import { isAdminEmail } from "@/lib/auth/require-admin"
+
 export const requireAdminApi = createMiddleware(async (c, next) => {
   const { user } = await withAuth()
-  const allowed = (process.env.ADMIN_EMAILS ?? "").split(",").map((s) => s.trim().toLowerCase())
-  if (!user?.email || !allowed.includes(user.email.toLowerCase())) {
-    return c.json({ error: "not_found" }, 404)
-  }
+  if (!isAdminEmail(user?.email)) return c.json({ error: "not_found" }, 404)
   await next()
 })
 ```
 
-The Phase 2 spike already answered whether `withAuth()` works here. If it didn't, use the
-`c.env.user` fallback documented there instead of calling `withAuth()` inside the
-middleware. The allowlist logic is identical either way.
+Reuse `isAdminEmail` from `lib/auth/require-admin.ts` rather than re-parsing `ADMIN_EMAILS`
+here. Two copies of an allowlist is two places to get it wrong.
+
+Calling `withAuth()` straight from the Hono middleware is safe — the Phase 2 spike proved
+it resolves correctly inside `app.fetch()`.
 
 ### Part B: UI components
 
@@ -760,7 +749,7 @@ Delete goes through the dialog, never `window.confirm`.
 - [ ] Signed in with an email **not** in `ADMIN_EMAILS`, `/admin` returns 404
 - [ ] Signed in with an allowed email, `/admin/log` lists every entry including drafts
 - [ ] `POST /api/v1/admin/log` from an unauthenticated curl returns 404, not 401 and not 200
-- [ ] Editing `middleware.ts` to remove the `/admin` matcher still leaves the API protected
+- [ ] Editing `proxy.ts` to remove the `/admin` matcher still leaves the API protected
 - [ ] Create, edit, and delete all work end to end
 - [ ] After a create, `/log` shows the new entry without a redeploy
 - [ ] Saving a poster URL from an unlisted host fails in the form with a readable message
@@ -1017,13 +1006,12 @@ Phase 1, so the public page can be finished before the admin exists.
 
 ## Risks
 
-| Risk                                            | What we do about it                                                 |
-| ----------------------------------------------- | ------------------------------------------------------------------- |
-| AuthKit authenticates but doesn't authorize     | Email allowlist checked in every route, not just middleware         |
-| `withAuth()` may not work inside a Hono handler | Spike in Phase 2; fallback is passing the user through `c.env`      |
-| `@hono/zod-validator` may not support zod v4    | Drop the package and call `safeParse` by hand                       |
-| A poster host outside `remotePatterns` throws   | Host validated in zod at write time, plus a visual fallback at read |
-| Supabase pooler rejects prepared statements     | Port 6543 connection string, `prepare: false` already set           |
-| `/admin` gets indexed                           | `noindex` metadata, sitemap exclude, robots disallow                |
-| entrepta CLI overwrites `globals.css`           | Review the diff before committing, keep only the component files    |
-| Hand-written SQL drifts from `schema.ts`        | SQL committed under `docs/sql/`                                     |
+| Risk                                          | What we do about it                                                 |
+| --------------------------------------------- | ------------------------------------------------------------------- |
+| AuthKit authenticates but doesn't authorize   | Email allowlist checked in every route, not just middleware         |
+| `@hono/zod-validator` may not support zod v4  | Drop the package and call `safeParse` by hand                       |
+| A poster host outside `remotePatterns` throws | Host validated in zod at write time, plus a visual fallback at read |
+| Supabase pooler rejects prepared statements   | Port 6543 connection string, `prepare: false` already set           |
+| `/admin` gets indexed                         | `noindex` metadata, sitemap exclude, robots disallow                |
+| entrepta CLI overwrites `globals.css`         | Review the diff before committing, keep only the component files    |
+| Hand-written SQL drifts from `schema.ts`      | SQL committed under `docs/sql/`                                     |
