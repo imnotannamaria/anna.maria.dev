@@ -2,7 +2,7 @@
  * Seeds log_entries with the 14 sample entries from docs/log-design.html, so the UI can be
  * built against real-shaped data before the admin exists.
  *
- *   npx tsx scripts/seed-log.ts
+ *   npm run seed:log
  *
  * Safe to re-run: it skips slugs that already exist. It never deletes anything.
  * Run docs/sql/001-log-entries.sql first.

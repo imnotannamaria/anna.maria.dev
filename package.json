@@ -12,6 +12,7 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "email:dev": "email dev --dir emails",
+    "seed:log": "tsx scripts/seed-log.ts",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -81,6 +82,7 @@
     "prettier": "^3.8.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
+    "tsx": "^4.23.9",
     "typescript": "^5"
   }
 }

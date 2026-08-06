@@ -353,22 +353,33 @@ Every one of them maps `rating` to a number and returns a clean `LogEntry` type.
 
 ### Seed
 
-Write `scripts/seed-log.ts` that inserts the 14 entries from the design file (Perfect Days,
-The Pragmatic Programmer, Severance S2, In Rainbows, Outer Wilds, Dune Part Two, and so
-on). Grab them from the `entries` array in the template. Real data makes the UI phase much
-faster, and it gives you every type at least twice so the filters have something to do.
+`scripts/seed-log.ts` inserts the 14 entries from the design file (Perfect Days, The
+Pragmatic Programmer, Severance S2, In Rainbows, Outer Wilds, Dune Part Two, and so on),
+lifted from the `entries` array in the template. Real data makes the UI phase much faster,
+and every type appears at least twice so the filters have something to do.
+
+```bash
+npm run seed:log
+```
+
+It skips slugs that already exist and never deletes anything, so re-running is safe.
+
+`tsx` is a devDependency rather than an `npx` call, so the script is reproducible for a
+fork and does not stop on an install prompt.
 
 ### Checklist — Phase 1
 
 - [x] SQL written to `docs/sql/001-log-entries.sql`
-- [ ] SQL run against Supabase
-- [ ] All three indexes and all three CHECK constraints exist (`\d log_entries`)
-- [ ] Inserting `rating = 4.3` fails, `rating = 4.5` succeeds
-- [ ] Inserting `type = 'movie'` fails
-- [ ] Two rows with the same slug fail
-- [ ] Seed script ran, 14 rows present, every type represented
-- [ ] `getPublishedEntries()` returns `rating` as a number, `loggedAt` as `YYYY-MM-DD`
-- [ ] Drafts (`published = false`) never appear in `getPublishedEntries()`
+- [x] SQL run against Supabase
+- [x] All three indexes and all three CHECK constraints exist, plus the `updated_at` trigger
+- [x] Inserting `rating = 4.3`, `6` or `0` fails; `4.5` succeeds and stores as `4.5`
+- [x] Inserting `type = 'movie'` fails
+- [x] Inserting `year = 1500` fails
+- [x] Two rows with the same slug fail
+- [x] Seed ran: 14 rows, all six types present, re-running inserts nothing
+- [x] `getPublishedEntries()` returns `rating` as a number, `loggedAt` as `YYYY-MM-DD`
+- [x] Drafts (`published = false`) never appear in `getPublishedEntries()` but do appear in
+      `getAllEntries()`
 - [x] `slugify` handles accents, punctuation and em dashes; `uniqueSlug` appends a suffix
 - [x] `starString` renders half stars; `starLabel` gives screen readers a number
 - [x] zod rejects `rating: 4.3`, `type: "movie"`, a non-ISO date, and a poster host that
