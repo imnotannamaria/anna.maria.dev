@@ -5,8 +5,9 @@ import { useId, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { CaretDownIcon } from "@phosphor-icons/react"
 import { formatLoggedAt } from "@/lib/log/date"
-import { starLabel, starString } from "@/lib/log/stars"
+import { starLabel } from "@/lib/log/stars"
 import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
+import { StarRating } from "./star-rating"
 
 /** The "1b" catalog card from docs/log-design.html. */
 export function LogCard({ entry }: { entry: LogEntry }) {
@@ -15,7 +16,6 @@ export function LogCard({ entry }: { entry: LogEntry }) {
   const panelId = useId()
 
   const hasNote = Boolean(entry.note)
-  const stars = starString(entry.rating)
 
   return (
     <article
@@ -65,11 +65,8 @@ export function LogCard({ entry }: { entry: LogEntry }) {
         )}
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-2.5">
-          {stars ? (
-            <span className="text-sm tracking-[0.04em]" style={{ color: "var(--fg-brand)" }}>
-              <span aria-hidden>{stars}</span>
-              <span className="sr-only">{starLabel(entry.rating)}</span>
-            </span>
+          {entry.rating != null ? (
+            <StarRating rating={entry.rating} size={18} />
           ) : (
             <span className="sr-only">{starLabel(entry.rating)}</span>
           )}

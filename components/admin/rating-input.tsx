@@ -59,7 +59,7 @@ export function RatingInput({
           const half = !filled && (value ?? 0) >= star - 0.5
 
           return (
-            <span key={star} className="relative inline-block h-6 w-6">
+            <span key={star} className="relative inline-block h-8 w-8">
               {/* Two hit areas per star: left half sets x.5, right half sets x.0 */}
               <button
                 type="button"
@@ -83,7 +83,7 @@ export function RatingInput({
                   half-star glyph exists but does not render in every font. */}
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-0 grid place-items-center text-lg leading-none"
+                className="pointer-events-none absolute inset-0 grid place-items-center text-[26px] leading-none"
                 style={{ color: "var(--border-strong)" }}
               >
                 ★
@@ -95,7 +95,7 @@ export function RatingInput({
                   style={{ width: half ? "50%" : "100%" }}
                 >
                   <span
-                    className="grid h-6 w-6 place-items-center text-lg leading-none"
+                    className="grid h-8 w-8 place-items-center text-[26px] leading-none"
                     style={{ color: "var(--fg-brand)" }}
                   >
                     ★

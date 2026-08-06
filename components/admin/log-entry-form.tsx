@@ -7,19 +7,14 @@ import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/app/components/entrepta/button"
 import { Input } from "@/app/components/entrepta/input"
-import { Select } from "@/app/components/entrepta/select"
 import { Switch } from "@/app/components/entrepta/switch"
 import { Textarea } from "@/app/components/entrepta/textarea"
 import { toast } from "@/app/components/entrepta/toast"
 import { Field } from "@/components/ui/form-field"
 import { slugify } from "@/lib/log/slug"
-import {
-  LOG_TYPES,
-  logEntryInputSchema,
-  type LogEntry,
-  type LogEntryInput,
-} from "@/lib/log/validation"
+import { logEntryInputSchema, type LogEntry, type LogEntryInput } from "@/lib/log/validation"
 import { RatingInput } from "./rating-input"
+import { TypePicker } from "./type-picker"
 
 function toDefaults(entry?: LogEntry): LogEntryInput {
   return {
@@ -87,13 +82,18 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
       <div className="grid gap-5 sm:grid-cols-2">
         <Field id="type" label="type" required error={errors.type?.message}>
-          <Select id="type" aria-invalid={Boolean(errors.type)} {...register("type")}>
-            {LOG_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </Select>
+          <Controller
+            control={control}
+            name="type"
+            render={({ field }) => (
+              <TypePicker
+                id="type"
+                value={field.value}
+                onChange={field.onChange}
+                invalid={Boolean(errors.type)}
+              />
+            )}
+          />
         </Field>
 
         <Field id="loggedAt" label="logged on" required error={errors.loggedAt?.message}>

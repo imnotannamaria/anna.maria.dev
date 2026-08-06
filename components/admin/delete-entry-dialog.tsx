@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { TrashIcon } from "@phosphor-icons/react"
 import {
   Dialog,
   DialogContent,
@@ -41,9 +42,15 @@ export function DeleteEntryDialog({ id, title }: { id: string; title: string }) 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label={`Delete ${title}`}>
-          delete
-        </Button>
+        <button
+          type="button"
+          aria-label={`Delete ${title}`}
+          title="Delete"
+          className="grid h-8 w-8 cursor-pointer place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft) hover:text-(--status-error-fg)"
+          style={{ color: "var(--fg-muted)" }}
+        >
+          <TrashIcon size={15} aria-hidden />
+        </button>
       </DialogTrigger>
 
       <DialogContent>

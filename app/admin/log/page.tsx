@@ -1,9 +1,10 @@
 import Link from "next/link"
+import { PencilSimpleIcon } from "@phosphor-icons/react/dist/ssr"
 import { Button } from "@/app/components/entrepta/button"
 import { DeleteEntryDialog } from "@/components/admin/delete-entry-dialog"
+import { StarRating } from "@/components/log/star-rating"
 import { formatLoggedAt } from "@/lib/log/date"
 import { getAllEntries } from "@/lib/log/queries"
-import { starString } from "@/lib/log/stars"
 import { TYPE_LABEL } from "@/lib/log/validation"
 
 /** Drafts included — seeing them is the point of this screen. */
@@ -93,9 +94,11 @@ export default async function AdminLogPage() {
                   </td>
 
                   <td className="px-2 py-3 whitespace-nowrap">
-                    <span className="text-[13px]" style={{ color: "var(--fg-brand)" }}>
-                      {starString(entry.rating) || "—"}
-                    </span>
+                    {entry.rating == null ? (
+                      <span style={{ color: "var(--fg-muted)" }}>—</span>
+                    ) : (
+                      <StarRating rating={entry.rating} size={15} />
+                    )}
                     {entry.favorite && (
                       <>
                         <span aria-hidden className="ml-1.5" style={{ color: "var(--fg-brand)" }}>
@@ -125,10 +128,14 @@ export default async function AdminLogPage() {
 
                   <td className="px-2 py-3 text-right whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1">
-                      <Link href={`/admin/log/${entry.id}`}>
-                        <Button variant="ghost" size="sm">
-                          edit
-                        </Button>
+                      <Link
+                        href={`/admin/log/${entry.id}`}
+                        aria-label={`Edit ${entry.title}`}
+                        title="Edit"
+                        className="grid h-8 w-8 place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft)"
+                        style={{ color: "var(--fg-muted)" }}
+                      >
+                        <PencilSimpleIcon size={15} aria-hidden />
                       </Link>
                       <DeleteEntryDialog id={entry.id} title={entry.title} />
                     </div>

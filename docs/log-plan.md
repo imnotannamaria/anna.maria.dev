@@ -671,9 +671,17 @@ It copied `app/components/entrepta/dialog.tsx` and bumped `@radix-ui/react-dialo
 `lucide-react`. It did **not** touch `globals.css` or `lib/utils.ts`, so that risk did not
 materialise — still worth checking `git status` after running it.
 
-Dropdown and Tooltip were planned and then skipped. A table row with two actions reads
-better as two plain buttons than as a menu behind a trigger, and the titles are short
-enough that a tooltip has nothing to add.
+Dropdown came in too, for the type field. A styled native `<select>` was tried first and
+rejected: it renders the platform's control, which looks nothing like the rest of the
+design system. `components/admin/type-picker.tsx` wraps `DropdownMenuRadioGroup`, and Radix
+supplies the listbox semantics, roving focus, type-ahead and Escape handling that the
+native element would have given for free.
+
+One catch — `aria-invalid` is not valid on a `button`, and the Radix trigger is one. The
+error is announced through `aria-describedby` and shown through the border colour instead.
+
+Tooltip stayed out. The row actions are icon buttons with `aria-label` and `title`, and the
+titles are short enough that a tooltip has nothing to add.
 
 | Need                | Where it comes from          |
 | ------------------- | ---------------------------- |
@@ -686,9 +694,8 @@ enough that a tooltip has nothing to add.
 | Save feedback       | `toast`, already here        |
 | Loading rows        | `skeleton`, already here     |
 
-Three form controls are not in the registry at all: **select, textarea, and switch**. They
-are written into `app/components/entrepta/` as owned code, matching what the registry does
-elsewhere:
+Two form controls are not in the registry at all: **textarea and switch**. They are written
+into `app/components/entrepta/` as owned code, matching what the registry does elsewhere:
 
 - `cva` for variants, `cn()` to merge classes, `React.forwardRef`, props extend the native
   element's props.
@@ -730,6 +737,18 @@ The fix is to keep input and output identical:
 - `favorite` and `published` are `z.boolean().optional()` with the defaults applied in
   `lib/log/mutations.ts` instead. Optional keeps the API pleasant to call; moving the
   default out of zod keeps the types symmetric.
+
+### Stars are drawn, not typed
+
+`starString()` produces `"★★★★½"`. It matches the mock but reads as text rather than as a
+rating, and the `½` codepoint renders inconsistently across fonts.
+
+`components/log/star-rating.tsx` draws them instead: a full star clipped to 50% width over
+a dimmed one. It renders `ceil(rating)` glyphs, so 3.5 is four stars and 4 is four stars —
+no empty trailing stars, which is what the mock shows. One `role="img"` with
+`aria-label="4.5 out of 5"` wraps the lot, so a screen reader hears the number.
+
+`starString` stays in `lib/log/stars.ts` for anywhere text is genuinely wanted.
 
 ### Part C: the admin screens
 
