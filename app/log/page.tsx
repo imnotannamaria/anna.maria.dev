@@ -6,7 +6,7 @@ import { LogStats } from "@/components/log/log-stats"
 export const metadata = createMetadata({
   title: "Log",
   description:
-    "Everything I finish — films, series, books, albums, podcasts and games — rated the day I close them.",
+    "Everything I finish — films, series, books, albums, podcasts and games — rated when my heart demands.",
   path: "/log",
 })
 

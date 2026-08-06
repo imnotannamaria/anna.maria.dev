@@ -8,6 +8,8 @@ import { buttonVariants } from "@/app/components/entrepta/button-variants"
 import { cn } from "@/lib/utils"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
+import { LatestLogCard } from "@/components/home/latest-log-card"
+import { getPublishedEntries } from "@/lib/log/queries"
 import { createMetadata } from "@/lib/metadata"
 import { CAREER_START_YEAR, calcYearsOfExp, yearsWord } from "@/lib/experience"
 
@@ -193,7 +195,10 @@ const TIMELINE_WINDOW = 5 // intervals shown (= points - 1)
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Home() {
-  const activityState = await loadTodayActivity({ tz: "America/Sao_Paulo" })
+  const [activityState, logEntries] = await Promise.all([
+    loadTodayActivity({ tz: "America/Sao_Paulo" }),
+    getPublishedEntries(),
+  ])
   const featuredProject = getFeaturedProjects()[0]
   const featuredPost = getFeaturedPosts()[0]
   const currentYear = new Date().getFullYear()
@@ -759,8 +764,13 @@ export default async function Home() {
 
       {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
       <section aria-labelledby="sec-offclock">
-        <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym" />
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym · log" />
+        {/* Three columns at lg: the log and wristkit panels each take a full-height
+            column, with now-playing and the piano stacked between them. */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="lg:row-span-2 lg:h-full">
+            <LatestLogCard entries={logEntries} />
+          </div>
           <NowPlayingWidget />
           <Link
             href="https://wristkit-web.vercel.app/"
