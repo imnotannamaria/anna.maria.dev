@@ -1,5 +1,6 @@
 import { Hono } from "hono"
 import { whoami } from "./routes/whoami"
+import { wristkit } from "./routes/wristkit"
 
 /**
  * The app's API. Mounted once, at app/api/v1/[[...route]]/route.ts.
@@ -8,6 +9,8 @@ import { whoami } from "./routes/whoami"
  * and moving them would add risk without buying anything.
  */
 export const app = new Hono().basePath("/api/v1")
+
+app.route("/wristkit", wristkit)
 
 // Phase 2 spike. Goes away with lib/api/routes/whoami.ts.
 app.route("/whoami", whoami)

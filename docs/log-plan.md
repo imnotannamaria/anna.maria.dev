@@ -531,18 +531,25 @@ proxy across all of it would throw that away for nothing.
 
 ### Checklist — Phase 2
 
-- [ ] `POST /api/v1/wristkit/sync` with a valid key inserts three rows
+- [ ] `POST /api/v1/wristkit/sync` with a valid key inserts three rows — **only test this by
+      firing the real Shortcut.** A curl with the real key writes into live health data, and
+      the card would then show a fake reading for the rest of the day.
 - [ ] `POST /api/wristkit-sync` (old path) does the same thing
-- [ ] Wrong key returns 401, missing key returns 401
-- [ ] `content-type: text/plain` returns 415
-- [ ] 31 requests in five minutes returns 429 with a `retry-after` header
-- [ ] Bad payload returns 400 with zod issues in the body
-- [ ] Unknown path under `/api/v1` returns JSON 404, not an HTML error page
-- [ ] The homepage wristkit card still renders with real data
+- [x] Wrong key returns 401, missing key returns 401 — on both paths
+- [x] `content-type: text/plain` returns 415
+- [x] 31 requests in five minutes returns 429 with a `retry-after` header
+- [x] Bad payload returns 400 with zod issues in the body
+- [x] `GET` on a POST-only route returns JSON 404
+- [x] Unknown path under `/api/v1` returns JSON 404, not an HTML error page
+- [x] The homepage wristkit card still renders through the shared client
 - [ ] The iPhone Shortcut still works against the old URL, tested on the phone
-- [ ] `/api/contact` and `/api/og` are untouched and still work
-- [x] Spike done: `/api/v1/whoami` returns the signed-in email from inside a Hono handler
+- [x] `/api/contact`, `/api/og` and `/api/now-playing` are untouched and still work
+- [x] Spike: `withAuth()` inside a Hono handler resolves without throwing (signed out
+      returns `email: null`, which is the part that proves async storage survives
+      `app.fetch()`)
+- [ ] Spike, signed in: `/api/v1/whoami` returns the real email
 - [x] `/admin` signed out redirects to WorkOS instead of 500ing
+- [x] `/admin` signed in with an allowlisted email renders
 - [ ] `whoami.ts` deleted and removed from the `proxy.ts` matcher
 
 ---
