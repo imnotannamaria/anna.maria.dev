@@ -11,6 +11,7 @@ import {
   TerminalWindowIcon,
   ChatsCircleIcon,
   PianoKeysIcon,
+  SquaresFourIcon,
   FileIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
@@ -39,6 +40,7 @@ const NAV_TABS: Tab[] = [
   { href: "/projects", name: "projects/", icon: TerminalWindowIcon },
   { href: "/contact", name: "contact.tsx", icon: ChatsCircleIcon },
   { href: "/piano", name: "piano.tsx", icon: PianoKeysIcon },
+  { href: "/log", name: "log.tsx", icon: SquaresFourIcon },
 ]
 
 function getDynamicTab(pathname: string): Tab | null {

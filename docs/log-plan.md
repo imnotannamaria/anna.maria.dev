@@ -800,10 +800,10 @@ Depends on Phase 1 only. You can build it against the seed data before the admin
 ```
 app/log/page.tsx
 components/log/
-  log-feed.tsx       # client: filter state + list
-  log-card.tsx       # the 1b card
-  log-stats.tsx      # the stat boxes in the header
-  log-filters.tsx    # filter pills with counts
+  log-feed.tsx       # client: filter pills + the grid
+  log-card.tsx       # client: the 1b card, owns the note expand
+  log-stats.tsx      # server: the stat boxes in the header
+lib/log/date.ts      # date-only formatter
 ```
 
 ### Data flow
@@ -820,11 +820,49 @@ The page stays static and cheap. The admin's `revalidatePath("/log")` handles fr
 when I actually publish something.
 
 Filtering happens on the client. The dataset is small, a few hundred rows at worst, so
-`log-feed.tsx` receives everything and filters in memory, the same way the design mock
-does. Mirror the active filter into the URL (`/log?type=film`) with
-`router.replace(url, { scroll: false })` so a filtered view can be linked. Read the initial
-value from `searchParams` so a direct hit on `/log?type=book` renders correctly on the
-server.
+`log-feed.tsx` receives everything and filters in memory, the same way the design mock does.
+
+### Do not reach for `useSearchParams` here
+
+This looks like the obvious hook and it is the wrong one. In a statically rendered route it
+makes the nearest Suspense boundary emit its fallback during prerender, so **every card is
+missing from the server HTML.** The cards are the entire point of this page for a crawler.
+`/blog` has the same shape and gets away with it because SEO was never a goal there.
+
+Read the URL through `useSyncExternalStore` instead, subscribed to `popstate` plus a custom
+event:
+
+```ts
+function readFilter(): LogType | null {
+  const v = new URLSearchParams(window.location.search).get("type")
+  return v && LOG_TYPES.includes(v) ? (v as LogType) : null
+}
+
+// Nothing is filtered during prerender, which is what puts every card in the HTML.
+const serverFilter = () => null
+
+const active = useSyncExternalStore(subscribe, readFilter, serverFilter)
+```
+
+Writing goes through `history.pushState` plus a dispatched event, so the back button undoes
+a filter and the store stays in step.
+
+Two things this buys and one it costs. All 14 cards land in the HTML, and the page stays
+`○ Static`. The cost is one frame of the unfiltered list when someone opens
+`/log?type=film` directly, because the server snapshot is always `null`. Worth it.
+
+`setState` inside a `useEffect` is the other tempting shortcut, and eslint rejects it here
+(`react-hooks/set-state-in-effect`).
+
+### Dates: do not use `formatDate` from lib/utils
+
+`loggedAt` is a `"YYYY-MM-DD"` string. `new Date("2026-07-28")` is UTC midnight, so
+`toLocaleDateString` renders **July 27** in any negative-offset timezone — the exact bug
+the `date` column was chosen to avoid — and it mismatches between a UTC server and a local
+client during hydration.
+
+`lib/log/date.ts` splits the string instead. Verified: `TZ=America/Sao_Paulo` renders
+`Jul 28, 2026`.
 
 ### Building the card
 
@@ -923,12 +961,20 @@ Chrome will not resize below about 550px, so check 375px with the device toolbar
 
 ### Checklist — Phase 4
 
-- [ ] `/log` renders all seeded entries, newest first
-- [ ] Every filter pill shows the right count and filters correctly
-- [ ] `/log?type=book` renders filtered on first load, server side
-- [ ] Clicking a pill updates the URL without scrolling the page
+- [x] `/log` renders all 14 seeded entries, newest first
+- [x] All 14 cards are present in the **server** HTML, not just after hydration
+- [x] `/log` builds as `○ Static` with a 5m revalidate
+- [x] Every filter pill shows the right count
+- [x] Types with no entries produce no pill (no dead buttons)
+- [x] `/log?type=bogus` falls back to showing everything
+- [x] An entry with no poster shows the type-label fallback
+- [x] Dates render `Jul 28, 2026` under `TZ=America/Sao_Paulo`, no off-by-one
+- [x] Zero hardcoded hex colors in `components/log/`, `app/log/`, `lib/log/`
+- [x] `npx tsc --noEmit`, `npm run build` and `npm run lint` clean
+- [x] `/log` is in `sitemap.xml`
+- [ ] Clicking a pill filters and updates the URL without scrolling
+- [ ] Back button undoes a filter
 - [ ] A filter with no matches shows `// nothing logged in this category yet.`
-- [ ] An entry with no poster shows the type-label fallback, and the layout doesn't shift
 - [ ] A broken poster URL falls back instead of showing a broken image icon
 - [ ] Cards with a note expand; cards without one show no trigger
 - [ ] `prefers-reduced-motion: reduce` skips the expand animation
@@ -938,8 +984,7 @@ Chrome will not resize below about 550px, so check 375px with the device toolbar
 - [ ] CLS is 0 with a cold image cache (throttle to Slow 3G to check)
 - [ ] Looks right at 375px, 768px, and 1440px
 - [ ] Looks right in all six themes, dark and light
-- [ ] Zero hardcoded hex colors in `components/log/`
-- [ ] OG image renders at `/api/og?...` and previews correctly in a link debugger
+- [ ] OG image renders and previews correctly in a link debugger
 
 ---
 
@@ -1019,15 +1064,21 @@ Ideas for later, none of them blocking:
 
 ## Order
 
+Phases are numbered by dependency, not by the order they get built.
+
 ```
-Phase 0
-  ├─ Phase 1 (data) ──┬─ Phase 3 (auth + admin) ─┐
-  └─ Phase 2 (Hono) ──┘                          ├─ Phase 5 ─ Phase 6
-                       └─ Phase 4 (public page) ─┘
+Phase 0 ─┬─ Phase 1 (data) ──┬─ Phase 4 (public page) ─┐
+         └─ Phase 2 (Hono) ──┴─ Phase 3 (admin) ───────┴─ Phase 5 ─ Phase 6
 ```
 
-Phases 1 and 2 don't touch each other and can go in either order. Phase 4 needs only
-Phase 1, so the public page can be finished before the admin exists.
+**Phase 4 comes before Phase 3.** The admin is a form, and until the public page exists
+there is no way to look at what a form submission produced. Building the page first means
+every admin change can be checked against something real. Phase 4 only needs Phase 1, so
+this costs nothing.
+
+Phases 1 and 2 don't touch each other and can go in either order.
+
+Actual build order: 0, 2, 1, 4, 3, 5, 6.
 
 ## Risks
 
