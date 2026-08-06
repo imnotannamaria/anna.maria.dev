@@ -1,14 +1,13 @@
 import { type PostgresJsDatabase, drizzle } from "drizzle-orm/postgres-js"
 import postgres, { type Sql } from "postgres"
+import * as logSchema from "@/lib/log/schema"
 import * as wristkitSchema from "@/lib/wristkit/schema"
 
 /**
  * Every feature that talks to Postgres goes through here. wristkit and /log share one
  * Supabase database, so they should also share one connection pool.
- *
- * Phase 1 of docs/log-plan.md adds the log tables: `{ ...wristkitSchema, ...logSchema }`.
  */
-const schema = { ...wristkitSchema }
+const schema = { ...wristkitSchema, ...logSchema }
 
 export type AppDb = {
   db: PostgresJsDatabase<typeof schema>

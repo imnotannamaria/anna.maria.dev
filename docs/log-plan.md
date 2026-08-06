@@ -360,7 +360,8 @@ faster, and it gives you every type at least twice so the filters have something
 
 ### Checklist — Phase 1
 
-- [ ] SQL run against Supabase, saved to `docs/sql/001-log-entries.sql`
+- [x] SQL written to `docs/sql/001-log-entries.sql`
+- [ ] SQL run against Supabase
 - [ ] All three indexes and all three CHECK constraints exist (`\d log_entries`)
 - [ ] Inserting `rating = 4.3` fails, `rating = 4.5` succeeds
 - [ ] Inserting `type = 'movie'` fails
@@ -368,7 +369,12 @@ faster, and it gives you every type at least twice so the filters have something
 - [ ] Seed script ran, 14 rows present, every type represented
 - [ ] `getPublishedEntries()` returns `rating` as a number, `loggedAt` as `YYYY-MM-DD`
 - [ ] Drafts (`published = false`) never appear in `getPublishedEntries()`
-- [ ] `npm run lint` clean, no `any` in the new files
+- [x] `slugify` handles accents, punctuation and em dashes; `uniqueSlug` appends a suffix
+- [x] `starString` renders half stars; `starLabel` gives screen readers a number
+- [x] zod rejects `rating: 4.3`, `type: "movie"`, a non-ISO date, and a poster host that
+      is not in `remotePatterns`
+- [x] `npx tsc --noEmit` clean
+- [x] `npm run lint` clean, no `any` in the new files
 
 ---
 
