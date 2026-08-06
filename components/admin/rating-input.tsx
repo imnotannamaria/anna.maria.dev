@@ -44,7 +44,7 @@ export function RatingInput({
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
       <div
         ref={ref}
         id={id}

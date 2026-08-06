@@ -9,6 +9,8 @@ import {
   TerminalWindowIcon,
   ChatsCircleIcon,
   PianoKeysIcon,
+  SquaresFourIcon,
+  LockSimpleIcon,
 } from "@phosphor-icons/react"
 import {
   CommandDialog,
@@ -30,6 +32,16 @@ const PAGES: Page[] = [
   { href: "/projects", name: "projects/", hint: "~/projects", icon: TerminalWindowIcon },
   { href: "/contact", name: "contact.tsx", hint: "~/contact", icon: ChatsCircleIcon },
   { href: "/piano", name: "piano.tsx", hint: "~/piano", icon: PianoKeysIcon },
+  { href: "/log", name: "log.tsx", hint: "~/log", icon: SquaresFourIcon },
+]
+
+/**
+ * Listed rather than hidden. /admin is a 404 for anyone not on the allowlist, so showing
+ * it costs nothing — and hiding it would only hide it from me. The padlock says up front
+ * that it will ask for a sign-in.
+ */
+const PRIVATE_PAGES: Page[] = [
+  { href: "/admin/log", name: "admin/log.tsx", hint: "~/admin", icon: SquaresFourIcon },
 ]
 
 /**
@@ -68,6 +80,32 @@ export function CommandMenu({
                   shortcut={page.hint}
                 >
                   {page.name}
+                </CommandItem>
+              )
+            })}
+          </CommandGroup>
+
+          <CommandGroup heading="private">
+            {PRIVATE_PAGES.map((page) => {
+              const PageIcon = page.icon
+              return (
+                <CommandItem
+                  key={page.href}
+                  value={`${page.name} ${page.hint} admin private`}
+                  onSelect={() => go(page.href)}
+                  icon={<PageIcon size={15} />}
+                  shortcut={page.hint}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    {page.name}
+                    <LockSimpleIcon
+                      size={11}
+                      weight="fill"
+                      aria-hidden
+                      style={{ color: "var(--fg-muted)" }}
+                    />
+                    <span className="sr-only">requires sign in</span>
+                  </span>
                 </CommandItem>
               )
             })}

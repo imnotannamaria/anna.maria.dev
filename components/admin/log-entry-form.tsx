@@ -12,7 +12,12 @@ import { Textarea } from "@/app/components/entrepta/textarea"
 import { toast } from "@/app/components/entrepta/toast"
 import { Field } from "@/components/ui/form-field"
 import { slugify } from "@/lib/log/slug"
-import { logEntryInputSchema, type LogEntry, type LogEntryInput } from "@/lib/log/validation"
+import {
+  POSTER_HOSTS,
+  logEntryInputSchema,
+  type LogEntry,
+  type LogEntryInput,
+} from "@/lib/log/validation"
 import { RatingInput } from "./rating-input"
 import { TypePicker } from "./type-picker"
 
@@ -155,11 +160,14 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
         id="posterUrl"
         label="poster url"
         error={errors.posterUrl?.message}
-        hint="image.tmdb.org, covers.openlibrary.org or i.scdn.co"
+        // Derived, not typed out — a hardcoded list goes stale the moment a host is added.
+        hint={POSTER_HOSTS.join(", ")}
       >
         <div className="flex items-start gap-3">
+          {/* min-w-0 so a long URL shrinks the field instead of pushing the preview out. */}
           <Input
             id="posterUrl"
+            className="min-w-0 flex-1"
             placeholder="https://image.tmdb.org/..."
             state={errors.posterUrl ? "error" : "default"}
             aria-invalid={Boolean(errors.posterUrl)}
@@ -258,17 +266,22 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
  */
 function PosterPreview({ url }: { url?: string }) {
   const [failed, setFailed] = useState(false)
-  const valid = Boolean(url && /^https:\/\//.test(url))
+
+  // Nothing typed yet means no box. An empty 52x78 placeholder next to a 40px-tall input
+  // is just a hole in the layout, and it says nothing the label hasn't already said.
+  if (!url?.trim()) return null
+
+  const valid = /^https:\/\//.test(url)
 
   return (
     <div
-      className="relative aspect-[2/3] w-[52px] shrink-0 overflow-hidden rounded-[5px] border"
+      className="relative aspect-2/3 w-13 shrink-0 overflow-hidden rounded-[5px] border"
       style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }}
     >
       {valid && !failed ? (
         <Image
           key={url}
-          src={url as string}
+          src={url}
           alt="Poster preview"
           fill
           sizes="52px"
@@ -279,10 +292,10 @@ function PosterPreview({ url }: { url?: string }) {
       ) : (
         <span
           aria-hidden
-          className="absolute inset-0 grid place-items-center font-mono text-[8px] uppercase"
-          style={{ color: "var(--fg-muted)" }}
+          className="absolute inset-0 grid place-items-center px-1 text-center font-mono text-[8px] leading-tight uppercase"
+          style={{ color: "var(--status-error-fg)" }}
         >
-          {failed ? "broken" : "none"}
+          {failed ? "broken" : "bad url"}
         </span>
       )}
     </div>

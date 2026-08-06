@@ -1001,12 +1001,34 @@ Clicking it opens the note with a height animation from Motion.
 
 ### Responsive
 
-The `1b` grid is `repeat(auto-fill, minmax(320px, 1fr))`. Below roughly 640px that becomes
-one column on its own. Two things still need attention: the 64px serif heading should step
-down to about 40px on small screens, and the filter pills should scroll horizontally
-instead of wrapping into four rows.
+Chrome's GUI will not resize below about 550px, and `--window-size` in headless lies — it
+enforces a minimum and then crops the screenshot, which reads as an overflow bug that isn't
+there. Drive it over the DevTools Protocol instead:
 
-Chrome will not resize below about 550px, so check 375px with the device toolbar.
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu \
+  --remote-debugging-port=9222 --user-data-dir=/tmp/probe about:blank &
+```
+
+Then `Emulation.setDeviceMetricsOverride` with `mobile: true` gives a real 320/375/414
+viewport, and `Runtime.evaluate` can compare `main.scrollWidth` against `main.clientWidth`.
+`main` has `overflowX: hidden`, so overflow there is silently **clipped** rather than
+scrolled — comparing the two is the only way to catch it.
+
+Measured at 320, 375, 414 and 768: no overflow on `/log` or on the admin screens.
+
+Three things the layout needed:
+
+- The note panel sits **outside** the poster/text row. Nested beside a 92px poster it got
+  about 200px on a phone, roughly 25 characters a line. Full card width instead.
+- The stars row wraps (`flex-wrap`), because five 18px stars plus the `// note` trigger do
+  not always share a 200px line.
+- The rating input in the admin wraps for the same reason.
+
+The admin table scrolls sideways below roughly 700px. Six columns have nowhere useful to go
+on a phone, and the title cell links to the edit page, so the main action is reachable
+without scrolling. If that ever grates, the fix is a card layout below `sm`, not a smaller
+font.
 
 ### Checklist — Phase 4
 

@@ -31,7 +31,12 @@ export const TYPE_PLURAL: Record<LogType, string> = {
  * runtime for an unlisted host, so validating here turns a broken production page into a
  * form error the moment a bad URL is pasted.
  */
-export const POSTER_HOSTS = ["image.tmdb.org", "covers.openlibrary.org", "i.scdn.co"] as const
+export const POSTER_HOSTS = [
+  "image.tmdb.org",
+  "covers.openlibrary.org",
+  "i.scdn.co",
+  "image-cdn-ak.spotifycdn.com",
+] as const
 
 /** Optional text field: empty string and undefined both mean "not set". */
 const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(""))
