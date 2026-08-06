@@ -24,37 +24,25 @@ export const TYPE_PLURAL: Record<LogType, string> = {
   game: "games",
 }
 
-/**
- * Poster hosts we allow.
- *
- * KEEP IN SYNC with `images.remotePatterns` in next.config.ts. next/image throws at
- * runtime for an unlisted host, so validating here turns a broken production page into a
- * form error the moment a bad URL is pasted.
- */
-export const POSTER_HOSTS = [
-  "image.tmdb.org",
-  "covers.openlibrary.org",
-  "i.scdn.co",
-  "image-cdn-ak.spotifycdn.com",
-] as const
-
 /** Optional text field: empty string and undefined both mean "not set". */
 const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(""))
 
+/**
+ * Any https URL. There is deliberately no host allowlist.
+ *
+ * There used to be one, mirroring `images.remotePatterns`, so that next/image could not
+ * throw on an unlisted host. It was unwinnable: Spotify alone serves art from i.scdn.co,
+ * image-cdn-ak.spotifycdn.com, image-cdn-fa.spotifycdn.com and mosaic.scdn.co, and every
+ * new source meant editing two files before a poster would save.
+ *
+ * The posters render through a plain <img> now, so no host list is needed anywhere, and a
+ * URL that does not load falls back to the type label. One check, one failure mode.
+ */
 const posterUrlSchema = z
   .string()
   .trim()
   .url("that doesn't look like a URL")
-  .refine(
-    (v) => {
-      try {
-        return (POSTER_HOSTS as readonly string[]).includes(new URL(v).hostname)
-      } catch {
-        return false
-      }
-    },
-    { message: `poster must come from: ${POSTER_HOSTS.join(", ")}` },
-  )
+  .refine((v) => v.startsWith("https://"), "must be an https URL")
 
 /** What the admin form submits. The server re-parses it; the client copy is for feedback. */
 export const logEntryInputSchema = z.object({
@@ -90,12 +78,15 @@ export const logEntryInputSchema = z.object({
     .or(z.literal("")),
   loggedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "use YYYY-MM-DD"),
   published: z.boolean().optional(),
+  // `.or(z.literal(""))` matters: the form always sends a string, and "" fails the regex
+  // on its own. Without it the field is advertised as optional and then rejected empty.
   slug: z
     .string()
     .trim()
     .regex(/^[a-z0-9-]+$/, "lowercase letters, numbers and dashes only")
     .max(120)
-    .optional(),
+    .optional()
+    .or(z.literal("")),
 })
 
 export type LogEntryInput = z.infer<typeof logEntryInputSchema>

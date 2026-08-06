@@ -19,8 +19,8 @@ const NAV_ITEMS = [
   { href: "/blog", icon: FileMdIcon, label: "Blog" },
   { href: "/projects", icon: TerminalWindowIcon, label: "Projects" },
   { href: "/contact", icon: ChatsCircleIcon, label: "Contact" },
-  { href: "/piano", icon: PianoKeysIcon, label: "Piano" },
   { href: "/log", icon: SquaresFourIcon, label: "Log" },
+  { href: "/piano", icon: PianoKeysIcon, label: "Piano" },
 ]
 
 function isNavActive(href: string, pathname: string): boolean {

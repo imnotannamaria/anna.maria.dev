@@ -56,12 +56,16 @@ export default async function LogPage() {
           <em className="font-serif italic" style={{ color: "var(--fg-brand)" }}>
             everything
           </em>{" "}
-          I finish — films, series, books, albums, podcasts and games. Rated the day I close them,
+          I finish — films, series, books, albums, podcasts and games. Rated when my heart demands,
           favorites marked{" "}
           <span aria-hidden style={{ color: "var(--fg-brand)" }}>
             ♥
           </span>
           <span className="sr-only">with a heart</span>.
+        </p>
+
+        <p className="mt-3 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+          {"// still adding some favorite stuff."}
         </p>
 
         <LogStats counts={counts} total={entries.length} />

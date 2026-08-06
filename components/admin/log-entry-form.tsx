@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -12,12 +11,7 @@ import { Textarea } from "@/app/components/entrepta/textarea"
 import { toast } from "@/app/components/entrepta/toast"
 import { Field } from "@/components/ui/form-field"
 import { slugify } from "@/lib/log/slug"
-import {
-  POSTER_HOSTS,
-  logEntryInputSchema,
-  type LogEntry,
-  type LogEntryInput,
-} from "@/lib/log/validation"
+import { logEntryInputSchema, type LogEntry, type LogEntryInput } from "@/lib/log/validation"
 import { RatingInput } from "./rating-input"
 import { TypePicker } from "./type-picker"
 
@@ -160,8 +154,7 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
         id="posterUrl"
         label="poster url"
         error={errors.posterUrl?.message}
-        // Derived, not typed out — a hardcoded list goes stale the moment a host is added.
-        hint={POSTER_HOSTS.join(", ")}
+        hint="any https image url — it falls back to the type label if it doesn't load"
       >
         <div className="flex items-start gap-3">
           {/* min-w-0 so a long URL shrinks the field instead of pushing the preview out. */}
@@ -279,15 +272,15 @@ function PosterPreview({ url }: { url?: string }) {
       style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface)" }}
     >
       {valid && !failed ? (
-        <Image
+        // Plain <img>, matching the public card. next/image would need every poster host
+        // in remotePatterns, and Spotify alone uses four.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           key={url}
           src={url}
           alt="Poster preview"
-          fill
-          sizes="52px"
-          className="object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           onError={() => setFailed(true)}
-          unoptimized
         />
       ) : (
         <span

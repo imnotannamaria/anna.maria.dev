@@ -2,19 +2,14 @@ import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   images: {
-    // KEEP IN SYNC with POSTER_HOSTS in lib/log/validation.ts. next/image throws at
-    // runtime for an unlisted host, so the zod check is what keeps a bad paste in the
-    // admin from becoming a broken page in production.
+    // Only for next/image. /log posters render through a plain <img> precisely so they
+    // do not need an entry here — a poster can come from any host without a config edit.
     remotePatterns: [
       {
         protocol: "https",
         hostname: "github.com",
         pathname: "/**",
       },
-      { protocol: "https", hostname: "image.tmdb.org", pathname: "/**" },
-      { protocol: "https", hostname: "covers.openlibrary.org", pathname: "/**" },
-      { protocol: "https", hostname: "i.scdn.co", pathname: "/**" },
-      { protocol: "https", hostname: "image-cdn-ak.spotifycdn.com", pathname: "/**" },
     ],
   },
 }

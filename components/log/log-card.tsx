@@ -1,9 +1,9 @@
 "use client"
 
-import Image from "next/image"
 import { useId, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { CaretDownIcon } from "@phosphor-icons/react"
+import { ArrowUpRightIcon, CaretDownIcon } from "@phosphor-icons/react"
+import { cn } from "@/lib/utils"
 import { formatLoggedAt } from "@/lib/log/date"
 import { starLabel } from "@/lib/log/stars"
 import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
@@ -16,15 +16,32 @@ export function LogCard({ entry }: { entry: LogEntry }) {
   const panelId = useId()
 
   const hasNote = Boolean(entry.note)
+  const link = entry.externalUrl
 
   return (
     <article
-      className="flex flex-col rounded-[14px] border p-3.5 transition-colors"
+      className={cn(
+        "group relative flex flex-col rounded-[14px] border p-3.5 transition-colors",
+        link && "hover:border-(--border-brand-strong)",
+      )}
       style={{
         borderColor: "var(--border-subtle)",
         background: "var(--bg-surface)",
       }}
     >
+      {/* Stretched link: it sits above the content so the whole card is clickable, and
+          the note trigger is lifted above it again. Without an external URL there is no
+          link at all, so no pointer cursor and nothing to tab to. */}
+      {link && (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${entry.title} — opens in a new tab`}
+          className="absolute inset-0 z-10 rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--fg-brand)"
+        />
+      )}
+
       <div className="flex gap-3.5">
         <Poster entry={entry} />
 
@@ -54,6 +71,15 @@ export function LogCard({ entry }: { entry: LogEntry }) {
             style={{ color: "var(--fg-primary)" }}
           >
             {entry.title}
+            {link && (
+              <ArrowUpRightIcon
+                size={13}
+                weight="bold"
+                aria-hidden
+                className="ml-1.5 inline-block align-middle opacity-0 transition-opacity group-hover:opacity-100"
+                style={{ color: "var(--fg-brand)" }}
+              />
+            )}
           </h3>
 
           {(entry.creator || entry.year) && (
@@ -81,7 +107,8 @@ export function LogCard({ entry }: { entry: LogEntry }) {
                 onClick={() => setOpen((v) => !v)}
                 aria-expanded={open}
                 aria-controls={panelId}
-                className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded font-mono text-[10px] transition-colors"
+                // z-20 keeps it above the stretched link, so the note still toggles.
+                className="relative z-20 inline-flex shrink-0 cursor-pointer items-center gap-1 rounded font-mono text-[10px] transition-colors"
                 style={{ color: open ? "var(--fg-secondary)" : "var(--fg-muted)" }}
               >
                 {"// note"}
@@ -110,7 +137,8 @@ export function LogCard({ entry }: { entry: LogEntry }) {
             animate={{ height: "auto", opacity: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
             transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.2, 0.8, 0.2, 1] }}
-            className="overflow-hidden"
+            // Above the stretched link too, so the note text stays selectable.
+            className="relative z-20 overflow-hidden"
           >
             <p
               className="mt-3 border-t pt-3 font-sans text-[13px] leading-relaxed"
@@ -140,12 +168,17 @@ function Poster({ entry }: { entry: LogEntry }) {
       style={{ borderColor: "var(--border-subtle)", background: "var(--bg-canvas)" }}
     >
       {showImage ? (
-        <Image
+        // Plain <img> rather than next/image. Optimising would mean listing every poster
+        // host in remotePatterns, and Spotify alone serves art from four of them — a list
+        // that has to be edited before a poster can even be saved. These are 92px wide
+        // and already come from a CDN, so there is little left to optimise.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           src={entry.posterUrl as string}
           alt=""
-          fill
-          sizes="92px"
-          className="object-cover"
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
           onError={() => setFailed(true)}
         />
       ) : (

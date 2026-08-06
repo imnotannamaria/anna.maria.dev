@@ -39,8 +39,8 @@ const NAV_TABS: Tab[] = [
   { href: "/blog", name: "posts/", icon: FileMdIcon },
   { href: "/projects", name: "projects/", icon: TerminalWindowIcon },
   { href: "/contact", name: "contact.tsx", icon: ChatsCircleIcon },
-  { href: "/piano", name: "piano.tsx", icon: PianoKeysIcon },
   { href: "/log", name: "log.tsx", icon: SquaresFourIcon },
+  { href: "/piano", name: "piano.tsx", icon: PianoKeysIcon },
 ]
 
 function getDynamicTab(pathname: string): Tab | null {

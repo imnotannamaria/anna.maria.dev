@@ -932,27 +932,17 @@ rebuild it. Only the `<main>` content of the `1b` block is new.
 
 ### Posters
 
-Add the three hosts to `next.config.ts`, alongside the `github.com` entry that is already
-there:
+Rendered with a plain `<img>`, not `next/image`, and validated only as an https URL.
 
-```ts
-images: {
-  remotePatterns: [
-    { protocol: "https", hostname: "github.com", pathname: "/**" },
-    { protocol: "https", hostname: "image.tmdb.org", pathname: "/**" },
-    { protocol: "https", hostname: "covers.openlibrary.org", pathname: "/**" },
-    { protocol: "https", hostname: "i.scdn.co", pathname: "/**" },
-  ],
-}
-```
+There was a host allowlist, mirrored between `images.remotePatterns` and a zod `refine`, so
+that `next/image` could never throw on an unlisted host. It was unwinnable. Spotify alone
+serves art from `i.scdn.co`, `image-cdn-ak.spotifycdn.com`, `image-cdn-fa.spotifycdn.com`
+and `mosaic.scdn.co` — every new source meant editing two files before a poster would save,
+and the two lists drifted within a day of being written.
 
-Keep this list and `POSTER_HOSTS` in `lib/log/validation.ts` identical. Put a comment in
-both files pointing at the other one.
-
-When `posterUrl` is null or the image fails, fall back to the type label centered on
-`--bg-surface`, which is what the design already shows as its placeholder. The `1b` card
-was chosen partly because it reads fine without a poster, so this is a real state and not
-an edge case.
+Posters are 92px wide and already come from a CDN, so optimisation was buying very little.
+One validation (is it an https URL), one failure mode (`onError` falls back to the type
+label). `remotePatterns` is back to just `github.com`.
 
 ### Inline expand
 
