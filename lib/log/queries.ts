@@ -1,4 +1,4 @@
-import { count, desc, eq } from "drizzle-orm"
+import { count, desc, eq, sql } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
 import { logEntries } from "./schema"
 import type { LogEntry, LogType } from "./validation"
@@ -36,16 +36,38 @@ function db() {
   return url ? createDb(url).db : null
 }
 
-/** The public feed: published only, newest first. */
+/**
+ * The public feed. Albums lead, then favorites, then newest.
+ *
+ * Plain recency puts whatever I happened to finish last at the top, which is rarely what I
+ * want someone landing on /log to see. Music goes first deliberately; within that, and
+ * within everything after it, the ♥ wins and date breaks the tie.
+ *
+ * To lead with a different type, change TYPE_ORDER — anything not listed sorts after
+ * everything that is.
+ */
+const TYPE_ORDER: LogType[] = ["music"]
+
 export async function getPublishedEntries(): Promise<LogEntry[]> {
   const conn = db()
   if (!conn) return []
+
+  // A CASE giving each listed type its index and everything else a rank past the end.
+  const typeRank = sql`case ${logEntries.type} ${sql.join(
+    TYPE_ORDER.map((t, i) => sql`when ${t} then ${i}`),
+    sql` `,
+  )} else ${TYPE_ORDER.length} end`
 
   const rows = await conn
     .select()
     .from(logEntries)
     .where(eq(logEntries.published, true))
-    .orderBy(desc(logEntries.loggedAt), desc(logEntries.createdAt))
+    .orderBy(
+      typeRank,
+      desc(logEntries.favorite),
+      desc(logEntries.loggedAt),
+      desc(logEntries.createdAt),
+    )
 
   return rows.map(toEntry)
 }

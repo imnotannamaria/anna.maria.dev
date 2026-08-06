@@ -38,7 +38,7 @@ export default async function LogPage() {
           className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
           style={{ color: "var(--fg-muted)" }}
         >
-          <span style={{ color: "var(--fg-brand)" }}>$</span> log --all --sort=recent
+          <span style={{ color: "var(--fg-brand)" }}>$</span> log --all --sort=albums,favorites
         </div>
 
         <h1

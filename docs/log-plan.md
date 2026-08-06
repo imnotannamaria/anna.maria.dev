@@ -861,6 +861,20 @@ lib/log/date.ts      # date-only formatter
 `getTypeCounts()` directly. No fetch to our own API, which would only add a network hop
 and a serialization round trip.
 
+**Albums lead, then favorites, then newest.** Plain recency puts whatever I happened to
+finish last at the top, which is rarely what I want someone landing on `/log` to see.
+
+`TYPE_ORDER` in `queries.ts` drives it — a `case` expression gives each listed type its
+index and everything else a rank past the end, so leading with a different type is a
+one-line change. After that, booleans sort false < true in Postgres, so `desc(favorite)`
+puts the ♥ on top, and date breaks the remaining tie.
+
+The header reads `--sort=albums,favorites`, not `--sort=recent`, because it would otherwise
+be describing something the page does not do.
+
+The admin list stays in date order. That one is a work tool, and the thing you just added
+should be at the top of it.
+
 ```ts
 export const revalidate = 300
 ```
