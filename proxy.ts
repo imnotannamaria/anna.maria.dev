@@ -19,8 +19,8 @@ export default authkitProxy({
  * Deliberately narrow. The public site is static and cached at the edge, and running this
  * across all of it would throw that away for no reason.
  *
- * /api/v1/whoami is the Phase 2 spike route and comes out of this list with it.
+ * /api/v1/wristkit stays out: it authenticates with an API key, not a session.
  */
 export const config = {
-  matcher: ["/admin/:path*", "/api/v1/admin/:path*", "/api/v1/whoami", "/api/auth/:path*"],
+  matcher: ["/admin/:path*", "/api/v1/admin/:path*", "/api/auth/:path*"],
 }
