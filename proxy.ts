@@ -12,7 +12,13 @@ import { authkitProxy } from "@workos-inc/authkit-nextjs"
  * unauthenticatedPaths is empty because every path this matcher covers needs a session.
  */
 export default authkitProxy({
-  middlewareAuth: { enabled: true, unauthenticatedPaths: [] },
+  middlewareAuth: {
+    enabled: true,
+    // The API is listed here so the proxy resolves the session but does not redirect.
+    // A JSON endpoint answering with a 303 to an HTML login page is useless to a fetch;
+    // requireAdminApi returns a JSON 404 instead. Pages still get bounced to sign-in.
+    unauthenticatedPaths: ["/api/v1/admin/:path*"],
+  },
 })
 
 /**

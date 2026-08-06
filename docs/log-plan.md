@@ -546,6 +546,19 @@ export const config = {
 Keep that matcher narrow. The public site is static and cached at the edge, and running the
 proxy across all of it would throw that away for nothing.
 
+**The API has to opt out of the redirect.** With `middlewareAuth.enabled` and an empty
+`unauthenticatedPaths`, a signed-out `POST /api/v1/admin/log` answers **303 to the WorkOS
+login page**, which is useless to a `fetch`. Listing the API in `unauthenticatedPaths` lets
+the proxy still resolve the session while leaving the response to `requireAdminApi`, which
+returns a JSON 404. Pages keep getting bounced to sign-in.
+
+```ts
+middlewareAuth: {
+  enabled: true,
+  unauthenticatedPaths: ["/api/v1/admin/:path*"],
+}
+```
+
 ### Checklist — Phase 2
 
 - [x] Ingest inserts three rows — verified by firing the real Shortcut. Do not test this
@@ -643,21 +656,24 @@ The admin has no design of its own, and it shouldn't get one. It reuses entrepta
 reuses the editor chrome. Someone landing on `/admin/log` should see the same product as
 someone landing on `/blog`.
 
-entrepta ships 16 components. This project has copied in 11 of them:
+entrepta ships 16 components. This project had copied in 11 of them:
 badge, button, card, code-block, command-palette, input, skeleton, status-bar,
 theme-switcher, toast, top-nav.
 
-Five are in the registry but not in this repo yet: **Dialog, Dropdown, Tooltip, Tabs,
-ModeToggle**. Pull the ones the admin needs from the registry rather than writing them:
+Five are in the registry but were not here: **Dialog, Dropdown, Tooltip, Tabs,
+ModeToggle**. Only Dialog was actually needed:
 
 ```bash
-npx @entrepta/cli@latest add dialog dropdown tooltip
+npx --yes @entrepta/cli@latest add dialog
 ```
 
-The CLI copies the source into the project and installs its peer deps. It does not add a
-runtime dependency. Check what it wrote before committing, since the CLI also touches
-`globals.css` and `lib/utils.ts`, and both already exist here in a customized form. If it
-tries to overwrite either, take the component files and discard the rest.
+It copied `app/components/entrepta/dialog.tsx` and bumped `@radix-ui/react-dialog` and
+`lucide-react`. It did **not** touch `globals.css` or `lib/utils.ts`, so that risk did not
+materialise — still worth checking `git status` after running it.
+
+Dropdown and Tooltip were planned and then skipped. A table row with two actions reads
+better as two plain buttons than as a menu behind a trigger, and the titles are short
+enough that a tooltip has nothing to add.
 
 | Need                | Where it comes from          |
 | ------------------- | ---------------------------- |
@@ -670,8 +686,8 @@ tries to overwrite either, take the component files and discard the rest.
 | Save feedback       | `toast`, already here        |
 | Loading rows        | `skeleton`, already here     |
 
-Three form controls are not in the registry at all: **select, textarea, and switch**. Write
-those into `app/components/entrepta/` as owned code, matching what the registry does
+Three form controls are not in the registry at all: **select, textarea, and switch**. They
+are written into `app/components/entrepta/` as owned code, matching what the registry does
 elsewhere:
 
 - `cva` for variants, `cn()` to merge classes, `React.forwardRef`, props extend the native
@@ -698,6 +714,22 @@ and the type badge can use it directly. No new token needed.
 Reuse from the contact form (`components/contact/`): the `FieldLabel` with the `◆` glyph
 and the `FieldError` with the `//` prefix. Lift both into `components/ui/form-field.tsx`
 and import them in both places rather than copying.
+
+### zod: no `.default()` and no `z.coerce` in the form schema
+
+Both make zod's **input** type differ from its **output** type, and react-hook-form types
+the form against one schema. `z.coerce.number()` has an input of `unknown`; `.default()`
+makes a field optional going in and required coming out. Either one produces a wall of
+`Resolver<...> is not assignable to Resolver<...>` from `zodResolver`.
+
+The fix is to keep input and output identical:
+
+- `year` and `rating` are plain `z.number()`. The form converts the string from the input
+  with `register("year", { setValueAs: v => v === "" ? null : Number(v) })`, and API
+  callers send real JSON numbers, so coercion was never buying anything.
+- `favorite` and `published` are `z.boolean().optional()` with the defaults applied in
+  `lib/log/mutations.ts` instead. Optional keeps the API pleasant to call; moving the
+  default out of zod keeps the types symmetric.
 
 ### Part C: the admin screens
 
@@ -770,10 +802,15 @@ Delete goes through the dialog, never `window.confirm`.
 
 ### Checklist — Phase 3
 
-- [ ] Signed out, `/admin` redirects to the WorkOS sign-in page
+- [x] Signed out, `/admin`, `/admin/log` and `/admin/log/new` all redirect to WorkOS
+- [x] Signed out, the admin API answers a JSON 404 — not a 303 to an HTML login page
+- [x] `/log` and the wristkit route are unaffected by the admin work
+- [x] `dialog` pulled from the entrepta registry without touching `globals.css`
+- [x] `select`, `textarea` and `switch` written by hand, tokens only, no hex
+- [x] `/admin*` excluded from `sitemap.xml` and disallowed in `robots.txt`
+- [x] `npx tsc --noEmit`, `npm run build`, `npm run lint` clean
 - [ ] Signed in with an email **not** in `ADMIN_EMAILS`, `/admin` returns 404
 - [ ] Signed in with an allowed email, `/admin/log` lists every entry including drafts
-- [ ] `POST /api/v1/admin/log` from an unauthenticated curl returns 404, not 401 and not 200
 - [ ] Editing `proxy.ts` to remove the `/admin` matcher still leaves the API protected
 - [ ] Create, edit, and delete all work end to end
 - [ ] After a create, `/log` shows the new entry without a redeploy
@@ -781,15 +818,8 @@ Delete goes through the dialog, never `window.confirm`.
 - [ ] Rating input reaches every value from 0.5 to 5 using only the keyboard
 - [ ] Slug collision appends a suffix instead of erroring
 - [ ] Delete dialog: Escape closes it, focus returns to the trigger
-- [ ] `dialog`, `dropdown`, and `tooltip` pulled from the entrepta registry, and the CLI
-      did not overwrite `globals.css` or `lib/utils.ts`
-- [ ] `select`, `textarea`, and `switch` written by hand, matching registry conventions
-      (cva, `cn()`, forwardRef, lucide-react icons at 1.5px stroke)
-- [ ] The six new entrepta components contain zero hardcoded hex colors
 - [ ] Admin renders correctly in all six themes and in light mode
 - [ ] `view-source` on `/admin` shows `noindex`
-- [ ] `npm run build && npm run postbuild`, then confirm `/admin` is absent from `sitemap.xml`
-      and present in `robots.txt` as disallowed
 
 ---
 

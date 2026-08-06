@@ -14,7 +14,9 @@ module.exports = {
   siteUrl: resolveSiteUrl(),
   generateRobotsTxt: true,
   robotsTxtOptions: {
-    policies: [{ userAgent: "*", allow: "/" }],
+    policies: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/admin/*"] }],
   },
-  exclude: ["/api/*"],
+  // /admin is already a 404 for anyone not on the allowlist, and its layout sends
+  // noindex. This is the third layer, so it never reaches an index by accident.
+  exclude: ["/api/*", "/admin", "/admin/*"],
 }

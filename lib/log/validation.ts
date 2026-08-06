@@ -56,21 +56,24 @@ export const logEntryInputSchema = z.object({
   type: LogTypeSchema,
   title: z.string().trim().min(1, "title is required").max(200, "that title is too long"),
   creator: optionalText(150),
-  year: z.coerce
+  // No z.coerce and no .default() anywhere in this schema. Both make zod's input type
+  // differ from its output type, which breaks react-hook-form's generics. Callers send
+  // JSON with real numbers and booleans, so neither buys anything.
+  year: z
     .number()
     .int("years don't have decimals")
     .min(1800, "too far back")
     .max(2200, "too far ahead")
     .nullable()
     .optional(),
-  rating: z.coerce
+  rating: z
     .number()
     .min(0.5, "half a star is the minimum")
     .max(5, "five is the maximum")
     .refine((v) => (v * 2) % 1 === 0, "half stars only")
     .nullable()
     .optional(),
-  favorite: z.boolean().default(false),
+  favorite: z.boolean().optional(),
   note: optionalText(2000),
   posterUrl: posterUrlSchema.optional().or(z.literal("")),
   externalUrl: z
@@ -81,7 +84,7 @@ export const logEntryInputSchema = z.object({
     .optional()
     .or(z.literal("")),
   loggedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "use YYYY-MM-DD"),
-  published: z.boolean().default(true),
+  published: z.boolean().optional(),
   slug: z
     .string()
     .trim()
