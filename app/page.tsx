@@ -767,32 +767,27 @@ export default async function Home() {
       {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
       <section aria-labelledby="sec-offclock">
         <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym · log" />
-        {/* Masonry via CSS columns, not grid.
-            These four cards have genuinely different natural heights, and grid can only
-            reconcile that by stretching something — which left a hole under the shortest
-            column and thinned out the wristkit rings. Columns let every card keep the
-            height its content asks for and balances them itself. */}
-        <div className="columns-1 gap-6 md:columns-2 lg:columns-3">
-          <div className="mb-6 break-inside-avoid">
-            <LatestLogCard entries={logEntries} />
-          </div>
-          <div className="mb-6 break-inside-avoid">
-            <NowPlayingWidget />
-          </div>
-          <div className="mb-6 break-inside-avoid">
-            <Link
-              href="https://wristkit-web.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="View wristkit"
-              className="block"
-            >
-              <TodayActivityCard state={activityState} />
-            </Link>
-          </div>
-          <div className="mb-6 break-inside-avoid">
-            <MiniPianoCard />
-          </div>
+        {/* Back to the arrangement that worked: now-playing and the piano stacked beside a
+            full-height wristkit. Those three balance because the stack of two roughly
+            matches the tall one — putting them in three equal columns instead would leave
+            a ~450px hole under now-playing, since wristkit is about 2.5x its height. */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <NowPlayingWidget />
+          <Link
+            href="https://wristkit-web.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View wristkit"
+            className="md:row-span-2 md:h-full"
+          >
+            <TodayActivityCard state={activityState} className="h-full" />
+          </Link>
+          <MiniPianoCard />
+        </div>
+
+        {/* The log gets the full width underneath, laid out as a shelf. */}
+        <div className="mt-6">
+          <LatestLogCard entries={logEntries} />
         </div>
       </section>
 
