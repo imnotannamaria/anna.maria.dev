@@ -521,32 +521,32 @@ button:focus-visible,
 }
 
 /* ============================================================
-   WORKBENCH  — the file tree card on the home page
+   SITE_TREE  — the file tree card on the home page
    ============================================================ */
 
-.wb-tree {
+.tree-root {
   /* One indent step = guide + gap. Tighter on phones, where the sidebar
      already took 56px off the card. */
-  --wb-guide: 7px;
-  --wb-gap: 11px;
+  --tree-guide: 7px;
+  --tree-gap: 11px;
 }
 
 @media (max-width: 640px) {
-  .wb-tree {
-    --wb-guide: 5px;
-    --wb-gap: 7px;
+  .tree-root {
+    --tree-guide: 5px;
+    --tree-gap: 7px;
   }
 }
 
 /* Nested list. `overflow: hidden` is what lets the height animation clip. */
-.wb-children {
-  margin-left: var(--wb-guide);
-  padding-left: var(--wb-gap);
+.tree-children {
+  margin-left: var(--tree-guide);
+  padding-left: var(--tree-gap);
   border-left: 1px solid var(--border-subtle);
   overflow: hidden;
 }
 
-.wb-row {
+.tree-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -567,42 +567,42 @@ button:focus-visible,
 
 /* Not --bg-surface-elevated: .bento-card:hover already paints the whole card
    that color, so a row using it would vanish exactly when you hover it. */
-.wb-row:hover {
+.tree-row:hover {
   background: var(--bg-surface-brand);
   color: var(--fg-brand);
 }
 
-.wb-row:focus-visible {
+.tree-row:focus-visible {
   outline: 2px solid var(--fg-brand);
   outline-offset: -2px;
 }
 
-.wb-row-locked {
+.tree-row-locked {
   color: var(--fg-muted);
   opacity: 0.55;
   cursor: default;
 }
 
-.wb-row-locked:hover {
+.tree-row-locked:hover {
   background: transparent;
   color: var(--fg-muted);
 }
 
-.wb-glyph {
+.tree-glyph {
   flex-shrink: 0;
   transition: transform 200ms var(--ease-out);
 }
 
-.wb-row:hover .wb-glyph-shift {
+.tree-row:hover .tree-glyph-shift {
   transform: translateX(1px);
 }
 
-.wb-caret {
+.tree-caret {
   flex-shrink: 0;
   transition: transform 200ms var(--ease-out);
 }
 
-.wb-caret-open {
+.tree-caret-open {
   transform: rotate(90deg);
 }
 

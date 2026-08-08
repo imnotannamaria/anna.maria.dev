@@ -1,4 +1,4 @@
-# The workbench — implementation plan
+# The tree — implementation plan
 
 Replace the experience card on the home page with a file tree of the site itself. Folders
 open and close, files are links to the real routes, and the counts beside them come from
@@ -32,7 +32,7 @@ section header carries `uptime · N years`. Both already exist.
 | Topic       | Choice                                                             |
 | ----------- | ------------------------------------------------------------------ |
 | Content     | The site's own routes: a browsable sitemap, not a list of repos    |
-| Data        | Hand-written tree in `lib/workbench.ts`, counts injected at render |
+| Data        | Hand-written tree in `lib/site-tree.ts`, counts injected at render |
 | Interaction | Folders expand in place, files navigate                            |
 | Slot        | Replaces the experience card, same `1fr` column beside the hero    |
 | Animation   | Height + stagger on expand, via Motion                             |
@@ -60,10 +60,10 @@ count is enough. The route itself is the detail view.
 
 ## Data model
 
-`lib/workbench.ts`:
+`lib/site-tree.ts`:
 
 ```ts
-export type WorkbenchNode = {
+export type TreeNode = {
   /** Rendered label. Folders end in "/", files carry an extension. */
   name: string
   kind: "folder" | "file"
@@ -73,7 +73,7 @@ export type WorkbenchNode = {
   countKey?: "posts" | "projects" | "log"
   /** Rendered dimmed with a lock glyph. No href, not focusable as a link. */
   locked?: boolean
-  children?: WorkbenchNode[]
+  children?: TreeNode[]
   /** Folders start open when true. */
   defaultOpen?: boolean
 }
@@ -96,11 +96,11 @@ a `… all N →` row at the end that links to the index page. The root folder i
 `defaultOpen`, the two content folders are not, so the card opens at seven visible rows
 and grows from there.
 
-Counts don't live in the config. `WORKBENCH` is a plain data structure with `countKey`
+Counts don't live in the config. `SITE_TREE` is a plain data structure with `countKey`
 strings, and `app/page.tsx` passes a `counts` record into the component:
 
 ```tsx
-<WorkbenchCard
+<TreeCard
   counts={{ posts: posts.length, projects: projects.length, log: logEntries.length }}
   recentPosts={posts.slice(0, 3)}
   recentProjects={projects.slice(0, 3)}
@@ -127,10 +127,10 @@ The row still links to `/log`, which has its own error boundary.
 
 Two files under `components/home/`:
 
-**`workbench-card.tsx`** — `"use client"`. Owns the open/closed set, renders the card
-chrome (`CardHead label="workbench"`, footer comment, the `N routes` meta), maps the tree.
+**`tree-card.tsx`** — `"use client"`. Owns the open/closed set, renders the card
+chrome (`CardHead label="tree"`, footer comment, the `N routes` meta), maps the tree.
 
-**`workbench-node.tsx`** — one row, recursive. A folder renders a `<button>`, a file
+**`tree-node.tsx`** — one row, recursive. A folder renders a `<button>`, a file
 renders a `<Link>`, a locked node renders a `<span>`.
 
 Open state is a `Set<string>` of node paths (`"blog/"`, `"projects/"`), seeded from
@@ -150,7 +150,7 @@ So this is a nested list of real controls:
 <ul>
   <li>
     <button aria-expanded="false" aria-controls="wb-blog">blog/ <span>12</span></button>
-    <ul id="wb-blog" hidden>
+    <ul id="tree-blog" hidden>
       …
     </ul>
   </li>
@@ -248,15 +248,15 @@ that carries `inert` and an inline `height: 0`.
 `inert` rather than `hidden`, which is what this section originally said. `hidden` would
 have fought the height animation for control of the same box, and it isn't needed: `inert`
 already takes the collapsed rows out of the tab order and away from a screen reader, and
-the clipping is `overflow: hidden` on `.wb-children`. Both attributes keep the children in
+the clipping is `overflow: hidden` on `.tree-children`. Both attributes keep the children in
 the DOM, which is the part that matters — unmounting them would take the hrefs out of the
 markup and leave the animation nothing to measure.
 
 Verified against the built output rather than assumed:
 
 ```
-<ul id="wb-…-blog-" class="wb-children" inert="" style="height:0px;opacity:0">
-  <a class="wb-row" href="/blog/spreadsheets-arent-the-problem">…
+<ul id="tree-…-blog-" class="tree-children" inert="" style="height:0px;opacity:0">
+  <a class="tree-row" href="/blog/spreadsheets-arent-the-problem">…
 ```
 
 Every link in the tree already exists in `sitemap.xml`. Nothing to add there.
@@ -265,7 +265,7 @@ Every link in the tree already exists in `sitemap.xml`. Nothing to add there.
 
 ## Phases
 
-**1. Data.** `lib/workbench.ts` with the type and the tree. No component yet. This is
+**1. Data.** `lib/site-tree.ts` with the type and the tree. No component yet. This is
 the file to get opinions about, since it's where the editorial calls live.
 
 **2. Static render.** Both components, everything expanded, no animation, no state.
@@ -297,6 +297,17 @@ pass at 375px and across all six themes.
   is exactly how the roadmap's contributions page announces itself before it exists.
 - **`/admin` is not in the tree.** It's noindexed and 404s for everyone else. Listing it
   tells people it's there and buys nothing.
+- **It's called `tree`, not `workbench` or `worktree`.** On a dev portfolio "worktree"
+  reads as the git concept, which this isn't, and "workbench" says nothing about what's
+  in the card. `tree` is the unix command, which is exactly what this shows.
+- **The card is absolutely positioned inside a stretched wrapper on `md+`.** The plan
+  assumed a `max-height` would be enough. It isn't: a grid row is sized by its tallest
+  item's content, so expanding every folder made the tree the tallest thing in the row,
+  the hero card stretched to match, and the result was a column of dead space under the
+  hero's buttons. `max-height` on the card doesn't help, because the row is already the
+  wrong height by the time the card clips. Taking the card out of the row's height
+  calculation is the only fix that keeps the hero in charge of the row. Below `md` there
+  is no row to fight over, so it's a normal block with a cap.
 - **The log count is `number | null`, not `number`.** With the database unreachable
   `logEntries` is `[]`, and rendering `0` there would state something false — "no entries"
   and "couldn't ask" are different claims. `null` means the row renders as a plain link

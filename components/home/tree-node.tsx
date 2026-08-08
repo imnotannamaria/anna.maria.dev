@@ -10,10 +10,10 @@ import {
   LockSimpleIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import type { WorkbenchItem } from "@/lib/workbench"
+import type { SiteTreeItem } from "@/lib/site-tree"
 
 type NodeProps = {
-  item: WorkbenchItem
+  item: SiteTreeItem
   isOpen: (path: string) => boolean
   onToggle: (path: string) => void
   listVariants: Variants
@@ -29,9 +29,9 @@ type NodeProps = {
  * reader than none at all — it announces "tree, 7 items" and then the arrows do
  * nothing. This is a nested list of real buttons and links instead.
  */
-export function WorkbenchNode({ item, isOpen, onToggle, listVariants, rowVariants }: NodeProps) {
+export function TreeNode({ item, isOpen, onToggle, listVariants, rowVariants }: NodeProps) {
   const open = item.kind === "folder" && isOpen(item.path)
-  const panelId = `wb-${item.path.replace(/[^a-z0-9]+/gi, "-")}`
+  const panelId = `tree-${item.path.replace(/[^a-z0-9]+/gi, "-")}`
   const hasChildren = Boolean(item.children && item.children.length > 0)
 
   const count =
@@ -52,14 +52,14 @@ export function WorkbenchNode({ item, isOpen, onToggle, listVariants, rowVariant
   )
 
   /** Keeps every row's text on the same left edge, folder or not. */
-  const caretSlot = <span aria-hidden className="wb-caret" style={{ width: 10, height: 10 }} />
+  const caretSlot = <span aria-hidden className="tree-caret" style={{ width: 10, height: 10 }} />
 
   return (
     <>
       {item.kind === "folder" && hasChildren ? (
         <button
           type="button"
-          className="wb-row"
+          className="tree-row"
           aria-expanded={open}
           aria-controls={panelId}
           onClick={() => onToggle(item.path)}
@@ -68,21 +68,21 @@ export function WorkbenchNode({ item, isOpen, onToggle, listVariants, rowVariant
             aria-hidden
             size={10}
             weight="bold"
-            className={cn("wb-caret", open && "wb-caret-open")}
+            className={cn("tree-caret", open && "tree-caret-open")}
             style={{ color: open ? "var(--fg-brand)" : "var(--fg-muted)" }}
           />
           {open ? (
             <FolderOpenIcon
               aria-hidden
               size={14}
-              className="wb-glyph"
+              className="tree-glyph"
               style={{ color: "var(--fg-brand)" }}
             />
           ) : (
             <FolderIcon
               aria-hidden
               size={14}
-              className="wb-glyph wb-glyph-shift"
+              className="tree-glyph tree-glyph-shift"
               style={{ color: "var(--fg-brand)" }}
             />
           )}
@@ -90,20 +90,20 @@ export function WorkbenchNode({ item, isOpen, onToggle, listVariants, rowVariant
           {count}
         </button>
       ) : item.locked || !item.href ? (
-        <span className="wb-row wb-row-locked">
+        <span className="tree-row tree-row-locked">
           {caretSlot}
-          <FileTextIcon aria-hidden size={14} className="wb-glyph" />
+          <FileTextIcon aria-hidden size={14} className="tree-glyph" />
           {label}
           <span className="sr-only">not published yet</span>
           <LockSimpleIcon aria-hidden size={12} className="ml-auto flex-shrink-0" />
         </span>
       ) : (
-        <Link href={item.href} className="wb-row" title={item.hint ?? item.name}>
+        <Link href={item.href} className="tree-row" title={item.hint ?? item.name}>
           {caretSlot}
           {item.kind === "more" ? (
-            <span aria-hidden className="wb-glyph" style={{ width: 14 }} />
+            <span aria-hidden className="tree-glyph" style={{ width: 14 }} />
           ) : (
-            <FileTextIcon aria-hidden size={14} className="wb-glyph wb-glyph-shift" />
+            <FileTextIcon aria-hidden size={14} className="tree-glyph tree-glyph-shift" />
           )}
           {label}
           {count}
@@ -119,7 +119,7 @@ export function WorkbenchNode({ item, isOpen, onToggle, listVariants, rowVariant
          */
         <motion.ul
           id={panelId}
-          className="wb-children"
+          className="tree-children"
           initial={false}
           animate={open ? "open" : "closed"}
           variants={listVariants}
@@ -128,7 +128,7 @@ export function WorkbenchNode({ item, isOpen, onToggle, listVariants, rowVariant
         >
           {item.children!.map((child) => (
             <motion.li key={child.path} variants={rowVariants}>
-              <WorkbenchNode
+              <TreeNode
                 item={child}
                 isOpen={isOpen}
                 onToggle={onToggle}

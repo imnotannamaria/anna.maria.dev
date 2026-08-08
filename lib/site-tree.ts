@@ -1,4 +1,4 @@
-// ─── The workbench — the site's own routes, as a file tree ───────────────────
+// ─── The tree — the site's own routes, as a file tree ────────────────────────
 //
 // Hand-written on purpose. Walking the App Router would produce a tree that can't
 // answer the editorial questions: whether /admin belongs here (it doesn't), what
@@ -6,7 +6,7 @@
 // choice, so they live here as data instead of being inferred and then overridden.
 //
 // This file stays free of velite and database imports. The shape is static, the
-// numbers arrive at render — see `buildWorkbench`, which the home page calls with
+// numbers arrive at render — see `buildSiteTree`, which the home page calls with
 // data it has already fetched for other cards.
 
 /** How many real entries a content folder shows before the "more" row. */
@@ -17,7 +17,7 @@ type CountKey = "posts" | "projects" | "log"
 /** Which content list fills a folder's children, if any. */
 type ChildSource = "posts" | "projects"
 
-type WorkbenchNode = {
+type TreeNode = {
   /** Rendered label. Folders end in "/", files carry an extension. */
   name: string
   kind: "folder" | "file"
@@ -28,12 +28,12 @@ type WorkbenchNode = {
   /** Dimmed, with a lock. Not a link, not focusable. Nothing uses this yet — the
    *  contributions page in the roadmap is what it's here for. */
   locked?: boolean
-  children?: WorkbenchNode[]
+  children?: TreeNode[]
   childSource?: ChildSource
   defaultOpen?: boolean
 }
 
-const WORKBENCH: WorkbenchNode[] = [
+const SITE_TREE: TreeNode[] = [
   {
     name: "anna.maria.dev/",
     kind: "folder",
@@ -65,7 +65,7 @@ const WORKBENCH: WorkbenchNode[] = [
 
 // ─── Resolved tree — what the component actually renders ─────────────────────
 
-export type WorkbenchItem = {
+export type SiteTreeItem = {
   /** Stable identity for the open/closed set. Built from the ancestors' names. */
   path: string
   name: string
@@ -78,12 +78,12 @@ export type WorkbenchItem = {
   hint?: string
   locked?: boolean
   defaultOpen?: boolean
-  children?: WorkbenchItem[]
+  children?: SiteTreeItem[]
 }
 
 type Doc = { slug: string; title: string }
 
-export type WorkbenchData = {
+export type SiteTreeData = {
   posts: Doc[]
   projects: Doc[]
   /** Published log entries, or null when there is no number to show — the
@@ -97,8 +97,8 @@ function join(parent: string, name: string) {
   return parent ? `${parent}/${name}` : name
 }
 
-function docChildren(docs: Doc[], parent: string, ext: string, href: string): WorkbenchItem[] {
-  const shown: WorkbenchItem[] = docs.slice(0, CHILDREN_SHOWN).map((doc) => ({
+function docChildren(docs: Doc[], parent: string, ext: string, href: string): SiteTreeItem[] {
+  const shown: SiteTreeItem[] = docs.slice(0, CHILDREN_SHOWN).map((doc) => ({
     path: join(parent, doc.slug),
     name: `${doc.slug}${ext}`,
     kind: "file",
@@ -119,7 +119,7 @@ function docChildren(docs: Doc[], parent: string, ext: string, href: string): Wo
   return shown
 }
 
-function resolve(node: WorkbenchNode, parent: string, data: WorkbenchData): WorkbenchItem {
+function resolve(node: TreeNode, parent: string, data: SiteTreeData): SiteTreeItem {
   const path = join(parent, node.name)
   const counts: Record<CountKey, number | null> = {
     posts: data.posts.length,
@@ -127,7 +127,7 @@ function resolve(node: WorkbenchNode, parent: string, data: WorkbenchData): Work
     log: data.logCount,
   }
 
-  let children: WorkbenchItem[] | undefined
+  let children: SiteTreeItem[] | undefined
   if (node.childSource === "posts") {
     children = docChildren(data.posts, path, ".mdx", "/blog")
   } else if (node.childSource === "projects") {
@@ -149,29 +149,29 @@ function resolve(node: WorkbenchNode, parent: string, data: WorkbenchData): Work
   }
 }
 
-export function buildWorkbench(data: WorkbenchData): WorkbenchItem[] {
-  return WORKBENCH.map((node) => resolve(node, "", data))
+export function buildSiteTree(data: SiteTreeData): SiteTreeItem[] {
+  return SITE_TREE.map((node) => resolve(node, "", data))
 }
 
 /** Distinct routes the tree links to, for the card's header meta. Static only —
  *  it shouldn't tick up every time a blog post is published. */
-export function workbenchRouteCount(): number {
+export function siteTreeRouteCount(): number {
   const routes = new Set<string>()
-  const walk = (nodes: WorkbenchNode[]) => {
+  const walk = (nodes: TreeNode[]) => {
     for (const node of nodes) {
       if (node.href && !node.locked) routes.add(node.href)
       if (node.children) walk(node.children)
     }
   }
-  walk(WORKBENCH)
+  walk(SITE_TREE)
   return routes.size
 }
 
 /** Paths that start expanded. Seeds the component's state on the server, so the
  *  first paint matches the markup. */
-export function defaultOpenPaths(items: WorkbenchItem[]): string[] {
+export function defaultOpenPaths(items: SiteTreeItem[]): string[] {
   const open: string[] = []
-  const walk = (nodes: WorkbenchItem[]) => {
+  const walk = (nodes: SiteTreeItem[]) => {
     for (const node of nodes) {
       if (node.defaultOpen) open.push(node.path)
       if (node.children) walk(node.children)

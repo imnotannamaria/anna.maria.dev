@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { useReducedMotion, type Variants } from "motion/react"
-import { defaultOpenPaths, type WorkbenchItem } from "@/lib/workbench"
-import { WorkbenchNode } from "./workbench-node"
+import { cn } from "@/lib/utils"
+import { defaultOpenPaths, type SiteTreeItem } from "@/lib/site-tree"
+import { TreeNode } from "./tree-node"
 
 /** The project's own easing token, as a Motion cubic-bezier array. */
 const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
@@ -58,12 +59,14 @@ function buildVariants(reduce: boolean): { list: Variants; row: Variants } {
  * velite and the database client stay out of this bundle — the home page builds
  * it from data it has fetched for other cards anyway.
  */
-export function WorkbenchCard({
+export function TreeCard({
   items,
   routeCount,
+  className,
 }: {
-  items: WorkbenchItem[]
+  items: SiteTreeItem[]
   routeCount: number
+  className?: string
 }) {
   const reduce = useReducedMotion() ?? false
   const [open, setOpen] = useState<Set<string>>(() => new Set(defaultOpenPaths(items)))
@@ -79,7 +82,7 @@ export function WorkbenchCard({
     })
 
   return (
-    <div className="bento-card relative flex flex-col overflow-hidden">
+    <div className={cn("bento-card relative flex flex-col overflow-hidden", className)}>
       {/* Dot pattern, same treatment the experience card had */}
       <div
         aria-hidden
@@ -103,28 +106,28 @@ export function WorkbenchCard({
         style={{ color: "var(--fg-secondary)" }}
       >
         <h2
-          id="card-workbench"
+          id="card-tree"
           className="inline-flex items-center gap-1.5"
           style={{ margin: 0, fontSize: "inherit", fontWeight: "inherit" }}
         >
           <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
             ◆
           </span>
-          workbench
+          tree
         </h2>
         <span style={{ color: "var(--fg-muted)" }}>{routeCount} routes</span>
       </div>
 
-      {/* min-h-0 is what lets this scroll instead of stretching the grid row and
-          dragging the hero card taller with it. */}
+      {/* min-h-0 is what makes this the part that scrolls: without it a flex child
+          refuses to shrink below its content and the overflow never engages. */}
       <nav
-        aria-labelledby="card-workbench"
-        className="relative -mx-2 min-h-0 flex-1 overflow-y-auto"
+        aria-labelledby="card-tree"
+        className="relative -mx-2 min-h-0 flex-1 overflow-y-auto pb-1"
       >
-        <ul className="wb-tree">
+        <ul className="tree-root">
           {items.map((item) => (
             <li key={item.path}>
-              <WorkbenchNode
+              <TreeNode
                 item={item}
                 isOpen={isOpen}
                 onToggle={toggle}

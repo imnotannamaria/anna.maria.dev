@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
 import { LatestLogCard } from "@/components/home/latest-log-card"
-import { WorkbenchCard } from "@/components/home/workbench-card"
-import { buildWorkbench, workbenchRouteCount } from "@/lib/workbench"
+import { TreeCard } from "@/components/home/tree-card"
+import { buildSiteTree, siteTreeRouteCount } from "@/lib/site-tree"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { createMetadata } from "@/lib/metadata"
 import { calcYearsOfExp, yearsWord } from "@/lib/experience"
@@ -222,7 +222,7 @@ export default async function Home() {
   // Counts come off lists this page already has in memory, so the tree costs no
   // extra query. `logEntries` is [] when the database is down, and null there
   // means the row renders without a number rather than asserting zero.
-  const workbench = buildWorkbench({
+  const siteTree = buildSiteTree({
     posts,
     projects,
     logCount: logEntries.length || null,
@@ -347,11 +347,25 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* The workbench — replaces the experience card. That one restated the hero
+          {/* The tree — replaces the experience card. That one restated the hero
               paragraph's "N years shipping" beside a row of dots that did nothing; this
               gives the same slot to something you can actually browse. The years are
-              still in the hero and in the $ whoami header. */}
-          <WorkbenchCard items={workbench} routeCount={workbenchRouteCount()} />
+              still in the hero and in the $ whoami header.
+
+              The wrapper exists because this is the one card whose height the visitor
+              controls. Expanding every folder made it the tallest thing in the row, which
+              stretched the hero card to match and left a column of dead space under the
+              buttons. Absolute inside a stretched wrapper takes the card out of the row's
+              height calculation entirely: the hero sets the height, the tree scrolls
+              inside whatever it gets. On mobile there is no row to fight over, so it goes
+              back to being a normal block with a cap. */}
+          <div className="relative md:min-h-0">
+            <TreeCard
+              items={siteTree}
+              routeCount={siteTreeRouteCount()}
+              className="max-h-130 md:absolute md:inset-0 md:max-h-none"
+            />
+          </div>
         </div>
 
         {/* Row 2: Stack — full width */}
