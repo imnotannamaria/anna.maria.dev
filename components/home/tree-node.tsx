@@ -4,13 +4,47 @@ import Link from "next/link"
 import { motion, type Variants } from "motion/react"
 import {
   CaretRightIcon,
+  FileCodeIcon,
+  FileJsxIcon,
+  FileMdIcon,
   FileTextIcon,
+  FileTsIcon,
+  FileTsxIcon,
   FolderIcon,
   FolderOpenIcon,
   LockSimpleIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import type { SiteTreeItem } from "@/lib/site-tree"
+
+/**
+ * The glyph follows the extension, the way it would in a real editor sidebar.
+ * A tree where every file gets the same sheet of paper is a list with
+ * decoration; this one tells you `about.md` is prose and `log.tsx` is a page
+ * before you read either name.
+ */
+const FILE_ICONS: Record<string, typeof FileTextIcon> = {
+  md: FileMdIcon,
+  mdx: FileMdIcon,
+  tsx: FileTsxIcon,
+  ts: FileTsIcon,
+  jsx: FileJsxIcon,
+  js: FileCodeIcon,
+  css: FileCodeIcon,
+  json: FileCodeIcon,
+}
+
+/**
+ * Returns the element rather than the component on purpose. Assigning the
+ * looked-up component to a capitalized local inside the render trips
+ * `react-hooks/static-components`, which can't see that the reference comes
+ * from a frozen module-level map and is therefore stable.
+ */
+function fileGlyph(name: string, className: string) {
+  const ext = name.includes(".") ? name.split(".").pop()!.toLowerCase() : ""
+  const Icon = FILE_ICONS[ext] ?? FileTextIcon
+  return <Icon aria-hidden size={14} className={className} />
+}
 
 type NodeProps = {
   item: SiteTreeItem
@@ -36,7 +70,7 @@ export function TreeNode({ item, isOpen, onToggle, listVariants, rowVariants }: 
 
   const count =
     item.count !== undefined ? (
-      <span className="ml-auto flex-shrink-0 tabular-nums" style={{ color: "var(--fg-muted)" }}>
+      <span className="ml-auto shrink-0 tabular-nums" style={{ color: "var(--fg-muted)" }}>
         {item.count}
         {item.countNoun && <span className="sr-only"> {item.countNoun}</span>}
       </span>
@@ -92,10 +126,10 @@ export function TreeNode({ item, isOpen, onToggle, listVariants, rowVariants }: 
       ) : item.locked || !item.href ? (
         <span className="tree-row tree-row-locked">
           {caretSlot}
-          <FileTextIcon aria-hidden size={14} className="tree-glyph" />
+          {fileGlyph(item.name, "tree-glyph")}
           {label}
           <span className="sr-only">not published yet</span>
-          <LockSimpleIcon aria-hidden size={12} className="ml-auto flex-shrink-0" />
+          <LockSimpleIcon aria-hidden size={12} className="ml-auto shrink-0" />
         </span>
       ) : (
         <Link href={item.href} className="tree-row" title={item.hint ?? item.name}>
@@ -103,7 +137,7 @@ export function TreeNode({ item, isOpen, onToggle, listVariants, rowVariants }: 
           {item.kind === "more" ? (
             <span aria-hidden className="tree-glyph" style={{ width: 14 }} />
           ) : (
-            <FileTextIcon aria-hidden size={14} className="tree-glyph tree-glyph-shift" />
+            fileGlyph(item.name, "tree-glyph tree-glyph-shift")
           )}
           {label}
           {count}

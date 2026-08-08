@@ -9,11 +9,10 @@ import { formatDate, estimateReadingTime } from "@/lib/utils"
 import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
 import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
-import { buttonVariants } from "@/app/components/entrepta/button-variants"
-import { cn } from "@/lib/utils"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
 import { LatestLogCard } from "@/components/home/latest-log-card"
+import { ProfileCard } from "@/components/home/profile-card"
 import { TreeCard } from "@/components/home/tree-card"
 import { buildSiteTree, siteTreeRouteCount } from "@/lib/site-tree"
 import { getPublishedEntries } from "@/lib/log/queries"
@@ -241,130 +240,45 @@ export default async function Home() {
           cmd="whoami"
           meta={`uptime · ${yearsWord(yearsOfExp)} years`}
         />
-        {/* Row 1: hero + experience */}
+        {/* Row 1: profile + tree */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
-          {/* Hero card */}
-          <div
-            className="bento-card bento-card-xl relative overflow-hidden"
-            style={{ minHeight: 420, borderRadius: "var(--radius-xl)" }}
-          >
-            {/* Radial glow */}
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                right: -120,
-                bottom: -120,
-                width: 360,
-                height: 360,
-                borderRadius: "50%",
-                background: "radial-gradient(circle, var(--bg-surface-brand), transparent 65%)",
-                pointerEvents: "none",
-              }}
-            />
-
-            <p
-              className="mb-2 inline-flex items-center gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
-              style={{ color: "var(--fg-muted)" }}
-            >
-              <span>{"// "}hello, i&apos;m</span>
-              <span
-                className="rounded-[3px] px-1.5 py-0.5 font-mono tracking-normal normal-case"
-                style={{ border: "1px solid var(--border-subtle)", color: "var(--fg-brand)" }}
-              >
-                v1.0
-              </span>
-              <span>· Pernambuco, Brasil</span>
-            </p>
-
-            <h1
-              className="relative z-10"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontWeight: 400,
-                fontSize: "clamp(44px, 9vw, 88px)",
-                lineHeight: 1,
-                letterSpacing: "-0.02em",
-                color: "var(--fg-primary)",
-                margin: "24px 0",
-              }}
-            >
-              Anna <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>Maria</em>
-              <span
-                aria-hidden
-                style={{
-                  display: "inline-block",
-                  width: "0.55ch",
-                  color: "var(--fg-brand)",
-                  animation: "cursor-blink 1.1s steps(2) infinite",
-                  marginLeft: 2,
-                }}
-              >
-                _
-              </span>
-            </h1>
-
-            <p
-              className="relative z-10 mb-8 max-w-[52ch] text-base leading-relaxed"
-              style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
-            >
-              Full-stack Software Engineer with {yearsOfExp} years shipping web products. Currently
-              at{" "}
-              <Link
-                href="https://cesar.org.br"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors hover:[border-bottom-color:var(--fg-brand)] hover:[color:var(--fg-brand)]"
-                style={{
-                  color: "var(--fg-primary)",
-                  borderBottom: "1px solid var(--border-strong)",
-                }}
-              >
-                CESAR
-              </Link>{" "}
-              and always working on something open source on the side.
-            </p>
-
-            <div className="relative z-10 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-3">
-              <Link
-                href="/projects"
-                className={cn(
-                  buttonVariants({ variant: "primary", size: "lg" }),
-                  "w-full sm:w-auto",
-                )}
-              >
-                browse projects →
-              </Link>
-              <Link
-                href="/contact"
-                className={cn(
-                  buttonVariants({ variant: "command", size: "lg" }),
-                  "w-full sm:w-auto",
-                )}
-              >
-                cat contact.txt
-              </Link>
-            </div>
-          </div>
+          {/* The profile card. It carries the page h1, so the name stays the
+              one top-level heading on the home page. */}
+          <ProfileCard
+            stats={{
+              years: yearsOfExp,
+              projects: projects.length,
+              posts: posts.length,
+              logged: logEntries.length || null,
+            }}
+          />
 
           {/* The tree — replaces the experience card. That one restated the hero
               paragraph's "N years shipping" beside a row of dots that did nothing; this
-              gives the same slot to something you can actually browse. The years are
-              still in the hero and in the $ whoami header.
+              gives the same slot to something you can actually browse.
 
-              The wrapper exists because this is the one card whose height the visitor
-              controls. Expanding every folder made it the tallest thing in the row, which
-              stretched the hero card to match and left a column of dead space under the
-              buttons. Absolute inside a stretched wrapper takes the card out of the row's
-              height calculation entirely: the hero sets the height, the tree scrolls
-              inside whatever it gets. On mobile there is no row to fight over, so it goes
-              back to being a normal block with a cap. */}
+              Two nested wrappers, both earning their place. This is the one card whose
+              height the visitor controls, and a grid row is sized by its tallest item's
+              content — so left alone, opening every folder made the tree the tallest
+              thing in the row and stretched the profile card to match, while a collapsed
+              tree left it short. The outer div is the grid item and takes the row height
+              from the profile card. The inner div is what goes absolute, so the card is
+              pulled out of the row's height calculation and simply fills what it's given.
+
+              The inner div exists because `.bento-card` sets `position: relative` outside
+              any @layer, and unlayered CSS beats Tailwind's layered utilities — putting
+              `md:absolute` on the card itself silently lost that fight. A plain div has no
+              such rule to argue with.
+
+              Below md there is no row to share, so it's a normal block with a cap. */}
           <div className="relative md:min-h-0">
-            <TreeCard
-              items={siteTree}
-              routeCount={siteTreeRouteCount()}
-              className="max-h-130 md:absolute md:inset-0 md:max-h-none"
-            />
+            <div className="md:absolute md:inset-0">
+              <TreeCard
+                items={siteTree}
+                routeCount={siteTreeRouteCount()}
+                className="h-full max-h-130 md:max-h-none"
+              />
+            </div>
           </div>
         </div>
 

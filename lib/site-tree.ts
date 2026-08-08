@@ -35,18 +35,22 @@ type TreeNode = {
 
 const SITE_TREE: TreeNode[] = [
   {
-    name: "anna.maria.dev/",
+    name: "annamaria.app/",
     kind: "folder",
     defaultOpen: true,
     children: [
       { name: "about.md", kind: "file", href: "/about" },
       {
+        // Opens with the card. A tree that arrives fully collapsed is a list of
+        // six words — you have to work before it shows you anything. One branch
+        // open demonstrates what the thing does without being asked.
         name: "blog/",
         kind: "folder",
         href: "/blog",
         countKey: "posts",
         countNoun: "posts",
         childSource: "posts",
+        defaultOpen: true,
       },
       {
         name: "projects/",

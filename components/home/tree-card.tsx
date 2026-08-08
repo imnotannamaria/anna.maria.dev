@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useReducedMotion, type Variants } from "motion/react"
+import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 import { defaultOpenPaths, type SiteTreeItem } from "@/lib/site-tree"
 import { TreeNode } from "./tree-node"
@@ -70,6 +71,7 @@ export function TreeCard({
 }) {
   const reduce = useReducedMotion() ?? false
   const [open, setOpen] = useState<Set<string>>(() => new Set(defaultOpenPaths(items)))
+  const spotlight = useSpotlight()
 
   const variants = buildVariants(reduce)
 
@@ -82,7 +84,11 @@ export function TreeCard({
     })
 
   return (
-    <div className={cn("bento-card relative flex flex-col overflow-hidden", className)}>
+    <div
+      className={cn("bento-card relative flex flex-col overflow-hidden", className)}
+      onMouseMove={spotlight.onMouseMove}
+    >
+      <Spotlight background={spotlight.background} />
       {/* Dot pattern, same treatment the experience card had */}
       <div
         aria-hidden

@@ -77,6 +77,12 @@
   --shadow-brand: color-mix(in srgb, var(--fg-brand) 20%, transparent);
   --fg-brand-glow: color-mix(in srgb, var(--fg-brand) 50%, transparent);
 
+  /* Mouse-follow glow on the profile card. Not --bg-surface-brand: that one is
+     tuned for badge fills and each theme drops it to ~8% in light mode, which
+     vanishes on a white surface. Same idea, mixed per mode so it survives both
+     — and still derived from --fg-brand, so it follows every theme. */
+  --bg-spotlight: color-mix(in srgb, var(--fg-brand) 15%, transparent);
+
   /* hover overlays (flip white→black in light mode) */
   --bg-hover-soft: rgba(255, 255, 255, 0.04);
   --bg-hover-strong: rgba(255, 255, 255, 0.08);
@@ -805,6 +811,9 @@ button:focus-visible,
   --bg-hover-soft: rgba(0, 0, 0, 0.04);
   --bg-hover-strong: rgba(0, 0, 0, 0.08);
   --bg-chrome: rgba(0, 0, 0, 0.03);
+
+  /* A wash that reads on #18181b disappears on #ffffff. Same glow, more of it. */
+  --bg-spotlight: color-mix(in srgb, var(--fg-brand) 26%, transparent);
 
   /* black drop-shadows read as heavy smudges on a light canvas — soften them */
   --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
