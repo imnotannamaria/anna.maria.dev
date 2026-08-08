@@ -1,50 +1,56 @@
 import Link from "next/link"
 import { StarRating } from "@/components/log/star-rating"
-import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
+import { LOG_TYPES, TYPE_LABEL, TYPE_PLURAL, type LogEntry } from "@/lib/log/validation"
 
-/** Current month as "YYYY-MM", in my timezone rather than the server's. */
-function currentMonth(): string {
-  const parts = new Intl.DateTimeFormat("en-CA", {
+/** Today in my timezone, as "YYYY-MM-DD". */
+function today(): string {
+  return new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Sao_Paulo",
     year: "numeric",
     month: "2-digit",
-  }).formatToParts(new Date())
-  const y = parts.find((p) => p.type === "year")?.value
-  const m = parts.find((p) => p.type === "month")?.value
-  return `${y}-${m}`
+    day: "2-digit",
+  }).format(new Date())
 }
 
-/** How many posters the shelf holds at its widest. */
-const SHELF_SIZE = 6
-
-const RADIUS = 15
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS
+/** Few enough to stay a highlight rather than a second copy of /log. */
+const SHELF_SIZE = 5
 
 /**
- * The log on the home page: a full-width shelf under the other widgets.
+ * The log on the home page: a full-width strip under the other widgets.
  *
- * It was a tall column first, which meant that row could only line up by stretching one of
- * its neighbours. On its own row it has no neighbours to match, so the height problem
- * disappears — and the width buys room for six posters instead of one.
+ * Posters on the left, numbers on the right. It was six stretched posters and nothing
+ * else, which left the right half of a wide card empty — the shelf is capped at five now
+ * and the space it gives back carries the counts instead.
  *
- * The poster grid is the "1a gallery wall" from docs/log-design.html, the layout that lost
- * to `1b` on the /log page because it had to survive entries with no artwork. Here it only
- * ever shows the leading few, so it gets to win.
+ * The five are favourites, in the same order /log uses (albums first), so the home page
+ * leads with the same thing the page does rather than inventing its own ranking.
  *
  * Takes the whole published list as a prop rather than querying, so the home page makes one
- * trip to the database. Everything shown comes from real columns — there is no goal or
+ * trip to the database. Everything here comes from real columns — there is no goal or
  * streak, because there is no such thing in `log_entries`.
  */
 export function LatestLogCard({ entries }: { entries: LogEntry[] }) {
   if (entries.length === 0) return null
 
-  const month = currentMonth()
-  const thisMonth = entries.filter((e) => e.loggedAt.startsWith(month))
-  const scope = thisMonth.length > 0 ? thisMonth : entries
-  const favourites = scope.filter((e) => e.favorite).length
-  const pct = scope.length > 0 ? Math.round((favourites / scope.length) * 100) : 0
+  const day = today()
+  const month = day.slice(0, 7)
+  const year = day.slice(0, 4)
 
-  const shelf = entries.slice(0, SHELF_SIZE)
+  const favourites = entries.filter((e) => e.favorite)
+  // `entries` already arrives albums-first, so filtering keeps that order.
+  const shelf = (favourites.length > 0 ? favourites : entries).slice(0, SHELF_SIZE)
+
+  const stats = [
+    { label: "this month", value: entries.filter((e) => e.loggedAt.startsWith(month)).length },
+    { label: "this year", value: entries.filter((e) => e.loggedAt.startsWith(year)).length },
+    { label: "favourites", value: favourites.length },
+    { label: "all time", value: entries.length },
+  ]
+
+  const byType = LOG_TYPES.map((type) => ({
+    type,
+    count: entries.filter((e) => e.type === type).length,
+  })).filter((t) => t.count > 0)
 
   return (
     <Link
@@ -58,51 +64,62 @@ export function LatestLogCard({ entries }: { entries: LogEntry[] }) {
         style={{ background: "var(--bg-surface)", borderColor: "var(--border-strong)" }}
       >
         <div
-          className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 border-b px-4 py-3"
+          className="flex items-baseline gap-3 border-b px-4 py-3"
           style={{ borderColor: "var(--border-subtle)", background: "var(--bg-chrome)" }}
         >
-          <div className="flex items-baseline gap-3">
-            <h3
-              className="font-mono text-[11px] font-normal tracking-[0.08em] uppercase"
-              style={{ color: "var(--fg-secondary)", margin: 0 }}
-            >
-              <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-                ◆
-              </span>{" "}
-              log
-            </h3>
-            <p
-              className="font-serif text-xl leading-none"
-              style={{ color: "var(--fg-primary)", margin: 0 }}
-            >
-              This{" "}
-              <em className="italic" style={{ color: "var(--fg-brand)" }}>
-                {thisMonth.length > 0 ? "month" : "year"}
-              </em>
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2.5">
-            <Ring pct={pct} />
-            <p
-              className="font-sans text-[13px]"
-              style={{ color: "var(--fg-secondary)", margin: 0 }}
-            >
-              {scope.length} logged
-              {favourites > 0 && (
-                <>
-                  {" — "}
-                  <span style={{ color: "var(--fg-primary)" }}>{favourites} favourites</span>
-                </>
-              )}
-            </p>
-          </div>
+          <h3
+            className="font-mono text-[11px] font-normal tracking-[0.08em] uppercase"
+            style={{ color: "var(--fg-secondary)", margin: 0 }}
+          >
+            <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 10 }}>
+              ◆
+            </span>{" "}
+            log
+          </h3>
+          <p
+            className="font-serif text-xl leading-none"
+            style={{ color: "var(--fg-primary)", margin: 0 }}
+          >
+            A few{" "}
+            <em className="italic" style={{ color: "var(--fg-brand)" }}>
+              favourites
+            </em>
+          </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 p-4 sm:grid-cols-4 lg:grid-cols-6">
-          {shelf.map((entry) => (
-            <ShelfItem key={entry.id} entry={entry} />
-          ))}
+        <div className="flex flex-col gap-5 p-4 lg:flex-row lg:items-stretch lg:gap-8">
+          <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
+            {shelf.map((entry) => (
+              <ShelfItem key={entry.id} entry={entry} />
+            ))}
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col justify-between gap-5">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {stats.map((s) => (
+                <div
+                  key={s.label}
+                  className="rounded-lg border px-3 py-2"
+                  style={{ borderColor: "var(--border-subtle)" }}
+                >
+                  <div
+                    className="mb-1 font-mono text-[10px] tracking-[0.08em] uppercase"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    {s.label}
+                  </div>
+                  <div
+                    className="font-serif text-2xl leading-none tracking-[-0.02em] italic"
+                    style={{ color: "var(--fg-brand)" }}
+                  >
+                    {s.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <TypeBreakdown byType={byType} total={entries.length} />
+          </div>
         </div>
 
         <div
@@ -125,35 +142,59 @@ export function LatestLogCard({ entries }: { entries: LogEntry[] }) {
   )
 }
 
-function Ring({ pct }: { pct: number }) {
+/**
+ * A stacked bar of the type split, with the legend under it.
+ *
+ * Each segment is the brand colour mixed further into the canvas, so the ramp follows
+ * whichever of the six themes is active instead of pinning six literal colours.
+ */
+function TypeBreakdown({
+  byType,
+  total,
+}: {
+  byType: { type: (typeof LOG_TYPES)[number]; count: number }[]
+  total: number
+}) {
+  if (byType.length === 0) return null
+
+  const shade = (i: number) =>
+    `color-mix(in srgb, var(--fg-brand) ${100 - i * 13}%, var(--bg-canvas))`
+
   return (
-    <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden className="shrink-0">
-      <circle
-        cx="19"
-        cy="19"
-        r={RADIUS}
-        fill="none"
-        strokeWidth="4"
-        style={{ stroke: "var(--border-strong)" }}
-      />
-      <circle
-        cx="19"
-        cy="19"
-        r={RADIUS}
-        fill="none"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeDasharray={`${(pct / 100) * CIRCUMFERENCE} ${CIRCUMFERENCE}`}
-        transform="rotate(-90 19 19)"
-        style={{ stroke: "var(--fg-brand)" }}
-      />
-    </svg>
+    <div className="flex flex-col gap-2">
+      <div
+        className="flex h-2 w-full overflow-hidden rounded-full"
+        style={{ background: "var(--border-subtle)" }}
+        aria-hidden
+      >
+        {byType.map((t, i) => (
+          <span
+            key={t.type}
+            style={{ width: `${(t.count / total) * 100}%`, background: shade(i) }}
+          />
+        ))}
+      </div>
+
+      <ul className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px]">
+        {byType.map((t, i) => (
+          <li key={t.type} className="inline-flex items-center gap-1.5">
+            <span
+              aria-hidden
+              className="inline-block h-2 w-2 shrink-0 rounded-full"
+              style={{ background: shade(i) }}
+            />
+            <span style={{ color: "var(--fg-secondary)" }}>{TYPE_PLURAL[t.type]}</span>
+            <span style={{ color: "var(--fg-muted)" }}>{t.count}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
 function ShelfItem({ entry }: { entry: LogEntry }) {
   return (
-    <div className="flex min-w-0 flex-col gap-2">
+    <div className="flex w-22 flex-col gap-1.5 sm:w-24 lg:w-26">
       <div
         className="relative aspect-2/3 overflow-hidden rounded-lg border"
         style={{ borderColor: "var(--border-subtle)", background: "var(--bg-canvas)" }}
