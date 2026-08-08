@@ -8,10 +8,18 @@ import { buttonVariants } from "@/app/components/entrepta/button-variants"
 import { cn } from "@/lib/utils"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
+import { LatestLogCard } from "@/components/home/latest-log-card"
+import { getPublishedEntries } from "@/lib/log/queries"
 import { createMetadata } from "@/lib/metadata"
 import { CAREER_START_YEAR, calcYearsOfExp, yearsWord } from "@/lib/experience"
 
-export const revalidate = 3600
+/**
+ * Rendered per request. Two cards here read live data — wristkit's activity rings and the
+ * log shelf — and both are the kind of thing that is wrong the moment it is an hour old.
+ * An Apple Watch ring frozen at this morning's numbers is worse than a slightly slower
+ * page, and the rest of the home page comes from MDX that is already in the bundle.
+ */
+export const dynamic = "force-dynamic"
 
 export const metadata = createMetadata({
   title: "Anna Maria — Full-stack Software Engineer",
@@ -193,7 +201,12 @@ const TIMELINE_WINDOW = 5 // intervals shown (= points - 1)
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Home() {
-  const activityState = await loadTodayActivity({ tz: "America/Sao_Paulo" })
+  const [activityState, logEntries] = await Promise.all([
+    loadTodayActivity({ tz: "America/Sao_Paulo" }),
+    // A database blip should cost the home page one card, not the whole page. /log has an
+    // error boundary instead, because there the log IS the page.
+    getPublishedEntries().catch(() => []),
+  ])
   const featuredProject = getFeaturedProjects()[0]
   const featuredPost = getFeaturedPosts()[0]
   const currentYear = new Date().getFullYear()
@@ -759,7 +772,11 @@ export default async function Home() {
 
       {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
       <section aria-labelledby="sec-offclock">
-        <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym" />
+        <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym · log" />
+        {/* Back to the arrangement that worked: now-playing and the piano stacked beside a
+            full-height wristkit. Those three balance because the stack of two roughly
+            matches the tall one — putting them in three equal columns instead would leave
+            a ~450px hole under now-playing, since wristkit is about 2.5x its height. */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <NowPlayingWidget />
           <Link
@@ -772,6 +789,11 @@ export default async function Home() {
             <TodayActivityCard state={activityState} className="h-full" />
           </Link>
           <MiniPianoCard />
+        </div>
+
+        {/* The log gets the full width underneath, laid out as a shelf. */}
+        <div className="mt-6">
+          <LatestLogCard entries={logEntries} />
         </div>
       </section>
 

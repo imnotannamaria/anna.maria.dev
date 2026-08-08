@@ -26,7 +26,10 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 | Analytics        | Vercel Analytics                                                   |
 | SEO              | next-sitemap                                                       |
 | Icons            | Phosphor Icons, simple-icons                                       |
-| wristkit storage | Postgres via Drizzle ORM                                           |
+| Database         | Postgres (Supabase) via Drizzle ORM — wristkit + /log              |
+| API layer        | Hono, mounted at /api/v1                                           |
+| Admin auth       | WorkOS AuthKit + an email allowlist                                |
+| Forms            | react-hook-form + zod                                              |
 | Deploy           | Vercel                                                             |
 | Fonts            | Newsreader, JetBrains Mono, Inter, self hosted via next/font       |
 
@@ -124,14 +127,20 @@ app/
   projects/                 list + [slug]
   piano/
   contact/page.tsx
+  log/                      public feed of everything I finish
+  admin/                    log CRUD, behind AuthKit + the allowlist
   components/entrepta/     entrepta design system components (button, card, dialog, etc)
   api/
     contact/route.ts        email via Resend
     og/route.tsx             dynamic OG images
     now-playing/route.ts    Spotify Now Playing
-    wristkit-sync/route.ts  wristkit ingest endpoint
+    auth/callback/route.ts  WorkOS AuthKit callback
+    v1/[[...route]]/        the Hono app — wristkit ingest + admin CRUD
+    wristkit-sync/route.ts  legacy path, forwards into Hono (delete once the Shortcut moves)
   layout.tsx                root layout, editor chrome + fonts + theme setup
   globals.css                tokens, typography scale, theme overrides
+
+proxy.ts                    AuthKit proxy (Next 16's name for middleware), /admin only
 
 content/
   blog/*.mdx
@@ -139,7 +148,9 @@ content/
 
 components/
   chrome/                   titlebar, sidebar, command palette
-  home/                     bento grid cards (stack, mini piano, GitHub)
+  home/                     bento grid cards (stack, mini piano, GitHub, log)
+  log/                      feed card, star rating, filter feed
+  admin/                    entry form, table, rating input, delete dialog
   spotify/                  Now Playing widget
   wristkit/                 Apple Watch activity card
   blog/                     MDX renderer, reading progress
@@ -153,6 +164,10 @@ emails/
   contact-email.tsx         React Email template
 
 lib/
+  api/                      Hono app, routes, middleware (rate limit, api key, admin)
+  auth/require-admin.ts     the email allowlist — AuthKit says who, this says whether
+  db/client.ts              shared Postgres client, one pool for wristkit and /log
+  log/                      schema, validation, queries, mutations, slug, stars, date
   velite.ts                 content query helpers
   site-config.ts             name, email, socials, single source of identity
   experience.ts              career start date, years of experience
@@ -197,6 +212,22 @@ Small interactive piano, entrepta tokens.
 ### `/contact`
 
 Two columns: text + social links | form. entrepta `Input` + `Button` with loading state. Inline feedback, no redirect, no modal. Honeypot on the backend.
+
+### `/log`
+
+One feed for everything I finish: films, series, books, albums, podcasts, games. Catalog cards with poster, type badge, serif title, `creator · year` and a drawn star rating. Favourites carry a `♥`; entries with a note get an inline expand; entries with an external link make the whole card clickable.
+
+Ordered albums first, then favourites, then newest — `TYPE_ORDER` in `lib/log/queries.ts` decides. Filter pills are client-side and mirror into `?type=`, read through `useSyncExternalStore` rather than `useSearchParams` so every card lands in the server HTML.
+
+Posters are plain `<img>`, not `next/image`, so no host allowlist has to be kept in sync. A URL that doesn't load falls back to the type label.
+
+Every entry has a slug, but there is no `/log/[slug]` page and there shouldn't be. An entry is a title, a creator, a year and maybe two sentences — a page per entry would be a hundred thin pages diluting a small site, competing for queries Letterboxd and Goodreads already own. The slug is there to be a stable anchor and to keep the option open, not as a route waiting to be built.
+
+### `/admin`
+
+Guarded by WorkOS AuthKit **and** an `ADMIN_EMAILS` allowlist checked at the route level, not just in `proxy.ts`. Anyone else gets a 404, never a 403. `/admin/log` lists everything including drafts; create, edit and delete go through Hono at `/api/v1/admin/log`.
+
+Full docs, including the phase-by-phase decisions and their reasoning: [docs/log-plan.md](docs/log-plan.md).
 
 ---
 
@@ -249,12 +280,28 @@ SPOTIFY_CLIENT_ID=
 SPOTIFY_CLIENT_SECRET=
 SPOTIFY_PLAYLIST_ID=
 
-# wristkit Apple Watch activity card, optional
+# Postgres, shared by the wristkit card and /log, optional
+# On Supabase use the transaction pooler string (port 6543), not the direct one
+DATABASE_URL=
+
+# Old name for DATABASE_URL, still read as a fallback
 WRISTKIT_DATABASE_URL=
+
+# wristkit ingest endpoint, optional
 WRISTKIT_API_KEY=
+
+# WorkOS AuthKit — guards /admin, optional (without it /admin is unreachable)
+WORKOS_API_KEY=sk_test_xxxxxxxxxxxx
+WORKOS_CLIENT_ID=client_xxxxxxxxxxxx
+WORKOS_COOKIE_PASSWORD=              # 32+ chars: openssl rand -base64 32
+NEXT_PUBLIC_WORKOS_REDIRECT_URI=https://annamaria.app/api/auth/callback
+
+# Comma-separated emails allowed into /admin. AuthKit signs people in;
+# this is what decides who is actually let through.
+ADMIN_EMAILS=
 ```
 
-Spotify and wristkit are optional. Without them the widgets just show an empty or error state, the rest of the site still builds and runs.
+Everything except Resend and the base URL is optional. Without a database the wristkit card shows an error state and `/log` renders empty; without WorkOS `/admin` is unreachable. The rest of the site still builds and runs either way.
 
 ---
 
@@ -267,7 +314,8 @@ Spotify and wristkit are optional. Without them the widgets just show an empty o
   "postbuild": "next-sitemap",
   "lint": "eslint . && prettier --check .",
   "format": "prettier --write .",
-  "email:dev": "email dev --dir emails"
+  "email:dev": "email dev --dir emails",
+  "seed:log": "tsx scripts/seed-log.ts"
 }
 ```
 
@@ -279,3 +327,27 @@ Spotify and wristkit are optional. Without them the widgets just show an empty o
 - Mono is the default UI font. Reach for Inter only in long prose blocks.
 - entrepta components in `app/components/entrepta/` are owned code, edit them directly rather than wrapping or overriding from outside.
 - Chrome mobile won't resize below about 550px in DevTools. For real narrow viewports (375px), use the device toolbar, not window resize.
+- New API routes go in the Hono app under `lib/api/routes/`, mounted at `/api/v1`. The older handlers (`/api/contact`, `/api/og`, `/api/now-playing`) stay where they are — they work, and moving them buys nothing.
+- Anything under `/admin` calls `requireAdmin()` (pages) or `requireAdminApi` (routes). The `proxy.ts` matcher is not the gate; a matcher can be edited wrong.
+- **Pages that read Postgres are `force-dynamic`, not ISR.** That covers `/`, `/log` and everything under `/admin`. The log and the wristkit rings are supposed to read as live — an activity ring frozen at this morning's numbers, or an entry I published ten minutes ago still missing from the feed, is a worse experience than the handful of milliseconds two indexed queries cost against a pooled connection. Caching them was buying convenience, not speed, and it bought it at the price of a `revalidatePath` call I'd have to remember every time a new page started reading the same table. Content that comes from MDX stays static — this is about the database, not about the site.
+- Because of the above, mutations do **not** call `revalidatePath`. If you ever put log or wristkit data on a cached page, that decision changes and the trade-off above is the one to re-argue.
+
+---
+
+## Code review
+
+When asked to review a branch or PR, review the full diff against `main` and check, at minimum:
+
+- **Security** — auth on every admin surface (layout AND route, never just the proxy matcher), input validation on the server, URL fields restricted to `https://` before they become an `href`, no secrets or stack traces in responses, middleware ordered so unauthenticated requests never reach a body parse.
+- **Backend (Hono)** — new routes live under `lib/api/routes/` behind the right middleware; errors return JSON through `onError`, not leaked stacks; any page added that reads Postgres is `force-dynamic` (see Conventions), so no mutation should be reintroducing `revalidatePath`.
+- **Loading and error states** — every `force-dynamic` page that hits the database needs a `loading.tsx`; pages where the data IS the page need an `error.tsx` (an empty state when the DB is down is a lie); forms need a submitting state and distinct network-vs-API error feedback.
+- **Accessibility** — real semantics over roles on divs, `aria-pressed`/`aria-expanded` on toggles, screen-reader text for glyph-only info (stars, ♥), `useReducedMotion` on animations, and contrast wherever text sits _on top of_ `--fg-brand` — that combination changes per theme and orange (marmalade) is where white text fails first.
+- **Theme reactivity** — grep the diff for hardcoded brand hexes; every accent must derive from `--fg-brand` (see Conventions). Fixed colors are only acceptable as overlays on images, where no theme token can guarantee legibility.
+- **SEO** — metadata on new pages, content in the server HTML (prefer `useSyncExternalStore` over `useSearchParams` on static routes — the latter makes prerender emit the Suspense fallback), sitemap/robots updated, private pages noindexed in layers.
+- **Performance** — watch for queries whose result is derivable from data already fetched in the same render (a `GROUP BY` beside the query that returns the same rows is the usual shape); plain `<img>` needs `loading="lazy"` and a fixed-aspect container so there is no CLS; database reads stay off the critical path of static content.
+- **Responsive** — reason about 375px minus the 56px sidebar; wide tables scroll rather than reflow; grid tracks use `min(Npx, 100%)`. Code-level checks only: hand the actual visual pass to Anna, never drive a browser.
+- **Bugs** — timezone traps around `new Date("YYYY-MM-DD")`, hydration mismatches between server and client formatting, and pages that would fail `next build` if the database were unreachable.
+
+Also run `npm run lint` and `npx tsc --noEmit` and report the result.
+
+Deliver the findings as a Markdown doc at the repo root (e.g. `CODE-REVIEW-<branch>.md`), uncommitted. Open with a clear production-readiness verdict, cite findings as `file:line` links, close with a prioritized action table (fix before merge / follow-up / future), and note explicitly which checks are left for visual pass.

@@ -1,3 +1,4 @@
+import { dbUrl } from "@/lib/db/client"
 import { getTodayActivity } from "@/lib/wristkit/queries"
 
 export type Goals = {
@@ -48,8 +49,8 @@ function formatHourMinute(d: Date, tz: string): string {
 }
 
 export async function loadTodayActivity(options: LoadOptions = {}): Promise<TodayState> {
-  const url = process.env.WRISTKIT_DATABASE_URL
-  if (!url) return { kind: "error", message: "WRISTKIT_DATABASE_URL not set" }
+  const url = dbUrl()
+  if (!url) return { kind: "error", message: "DATABASE_URL not set" }
 
   const tz = options.tz ?? "UTC"
   const goals: Goals = { ...DEFAULT_GOALS, ...options.goals }

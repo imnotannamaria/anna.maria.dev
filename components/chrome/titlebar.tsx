@@ -11,6 +11,7 @@ import {
   TerminalWindowIcon,
   ChatsCircleIcon,
   PianoKeysIcon,
+  SquaresFourIcon,
   FileIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
@@ -38,6 +39,7 @@ const NAV_TABS: Tab[] = [
   { href: "/blog", name: "posts/", icon: FileMdIcon },
   { href: "/projects", name: "projects/", icon: TerminalWindowIcon },
   { href: "/contact", name: "contact.tsx", icon: ChatsCircleIcon },
+  { href: "/log", name: "log.tsx", icon: SquaresFourIcon },
   { href: "/piano", name: "piano.tsx", icon: PianoKeysIcon },
 ]
 
