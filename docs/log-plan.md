@@ -1126,9 +1126,13 @@ Ideas for later, none of them blocking:
 
 ### Checklist — Phase 6
 
-- [ ] `/log` renders an empty state with `DATABASE_URL` unset, and `npm run build` still passes
-- [ ] `CLAUDE.md` and `README.md` updated
-- [ ] `npm run lint` clean
+- [x] `/log` renders an empty state with `DATABASE_URL` unset, and `npm run build` still passes
+- [x] Empty counts as unset in `dbUrl()` — `.env.example` ships `DATABASE_URL=` with no
+      value, and `??` alone would hand `""` straight to the driver
+- [x] `/log` has an error boundary, so a database outage says so instead of showing an
+      empty feed; the home page catches instead, losing one card rather than the page
+- [x] `CLAUDE.md` and `README.md` updated
+- [x] `npm run lint` clean
 - [ ] Full pass on the deployed preview, phone and desktop
 - [ ] `docs/log-design.html` deleted, and nothing in the codebase still references it
 - [ ] `/api/v1/wristkit/sync` verified in production with the real key

@@ -32,8 +32,14 @@ export function createDb(url: string): AppDb {
  * The one place that resolves the connection string. Returns null rather than throwing so
  * callers can degrade to an empty state — a missing database should not take down a page.
  *
+ * Empty counts as unset. `??` alone would not do that, and `.env.example` ships
+ * `DATABASE_URL=` with no value, so anyone copying it would get "" here: truthy enough to
+ * build a client, useless enough to fail on the first query. That turns "the log renders
+ * empty" into "the page throws", which is the opposite of the intent.
+ *
  * WRISTKIT_DATABASE_URL is the old name, kept until DATABASE_URL is set in Vercel.
  */
 export function dbUrl(): string | null {
-  return process.env.DATABASE_URL ?? process.env.WRISTKIT_DATABASE_URL ?? null
+  const candidates = [process.env.DATABASE_URL, process.env.WRISTKIT_DATABASE_URL]
+  return candidates.find((v) => v?.trim())?.trim() ?? null
 }

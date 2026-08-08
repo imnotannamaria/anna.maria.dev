@@ -197,7 +197,9 @@ const TIMELINE_WINDOW = 5 // intervals shown (= points - 1)
 export default async function Home() {
   const [activityState, logEntries] = await Promise.all([
     loadTodayActivity({ tz: "America/Sao_Paulo" }),
-    getPublishedEntries(),
+    // A database blip should cost the home page one card, not the whole page. /log has an
+    // error boundary instead, because there the log IS the page.
+    getPublishedEntries().catch(() => []),
   ])
   const featuredProject = getFeaturedProjects()[0]
   const featuredPost = getFeaturedPosts()[0]

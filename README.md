@@ -15,13 +15,14 @@ Personal portfolio and open source template for full-stack engineers. Built as a
 - **Blog**: MDX posts with syntax highlighting (Shiki), reading progress bar, and tag filtering
 - **Projects**: case studies with sidebar metadata and rich MDX content
 - **Piano**: a small interactive piano
+- **Log**: one feed for everything you finish — films, series, books, albums, podcasts, games — with ratings, favourites and notes, plus an admin behind WorkOS AuthKit to manage it
 - **Contact**: email form powered by Resend and React Email, with a honeypot
 - **Command palette**: ⌘K navigation across the whole site
 - **Editor chrome**: titlebar, sidebar, and status bar shared across every page
 - **Themes**: dark by default, light toggle, 6 brand color presets, no flash
 - **SEO**: dynamic OG images, sitemap, robots.txt, canonical URLs
 
-The Spotify and wristkit widgets are optional. Without their environment variables the site still builds and runs, the widgets just show an empty or error state.
+Spotify, wristkit and the log are all optional. Without their environment variables the site still builds and runs: the widgets show an empty or error state, `/log` renders empty, and `/admin` is unreachable.
 
 ## Stack
 
@@ -75,12 +76,24 @@ SPOTIFY_CLIENT_ID=xxx
 SPOTIFY_CLIENT_SECRET=xxx
 SPOTIFY_PLAYLIST_ID=xxx
 
-# Optional: wristkit Apple Watch activity card
-WRISTKIT_DATABASE_URL=postgresql://user:pass@host:5432/db
+# Optional: Postgres, shared by the wristkit card and /log
+# On Supabase use the transaction pooler string (port 6543), not the direct one
+DATABASE_URL=postgresql://user:pass@host:6543/postgres
+
+# Optional: wristkit ingest endpoint
 WRISTKIT_API_KEY=replace-with-32-random-bytes
+
+# Optional: WorkOS AuthKit, guards /admin
+WORKOS_API_KEY=sk_test_xxx
+WORKOS_CLIENT_ID=client_xxx
+WORKOS_COOKIE_PASSWORD=            # 32+ chars: openssl rand -base64 32
+NEXT_PUBLIC_WORKOS_REDIRECT_URI=https://yourdomain.com/api/auth/callback
+
+# Optional: comma-separated emails allowed into /admin
+ADMIN_EMAILS=you@example.com
 ```
 
-Leave the Spotify and wristkit variables out if you don't need those widgets.
+Leave out whatever you don't need. Only `RESEND_API_KEY` and `NEXT_PUBLIC_BASE_URL` are required.
 
 ### 3. Update your personal info
 
@@ -171,7 +184,24 @@ The widget uses the Client Credentials flow, server to server, so the secret nev
 
 ## Configuring wristkit (optional)
 
-The Apple Watch activity card reads from your own Postgres database. See [wristkit](https://wristkit-web.vercel.app/) for the full setup: the SQL migration, the iOS Shortcut, and the sync endpoint at `app/api/wristkit-sync/route.ts`.
+The Apple Watch activity card reads from your own Postgres database. See [wristkit](https://wristkit-web.vercel.app/) for the full setup: the SQL migration, the iOS Shortcut, and the sync endpoint at `/api/v1/wristkit/sync`.
+
+---
+
+## Configuring the log (optional)
+
+`/log` is a single feed for everything you finish, with an admin at `/admin/log` to manage it. It shares the same Postgres database as wristkit.
+
+1. Set `DATABASE_URL` and run [`docs/sql/001-log-entries.sql`](docs/sql/001-log-entries.sql) against it.
+2. Optionally seed it with sample entries: `npm run seed:log`.
+3. For the admin, create an application at [workos.com](https://workos.com), register `<your-domain>/api/auth/callback` as a redirect URI, and fill in the four `WORKOS_*` variables.
+4. Put your own email in `ADMIN_EMAILS`.
+
+**That last step is not optional if you want the admin.** AuthKit decides who is signed in, not who is allowed — without an allowlist, anyone who creates an account in your WorkOS organisation reaches your admin. `lib/auth/require-admin.ts` is what actually guards it.
+
+Without `DATABASE_URL` the page renders empty and the build still passes. Without the WorkOS variables `/admin` is simply unreachable.
+
+The design decisions behind all of it, phase by phase, are in [docs/log-plan.md](docs/log-plan.md).
 
 ---
 
@@ -194,13 +224,18 @@ app/
   projects/                # Projects list + [slug]
   piano/                   # Piano
   contact/page.tsx         # Contact form
+  log/                     # Public log feed
+  admin/                   # Log CRUD, behind AuthKit
   components/entrepta/     # entrepta design system components
   api/
     contact/route.ts       # Email via Resend
     og/route.tsx           # Dynamic OG images
     now-playing/route.ts   # Spotify Now Playing
-    wristkit-sync/route.ts # wristkit ingest endpoint
+    auth/callback/route.ts # WorkOS AuthKit callback
+    v1/[[...route]]/       # Hono app: wristkit ingest + admin CRUD
   layout.tsx               # Root layout (editor chrome)
+
+proxy.ts                   # AuthKit proxy, scoped to /admin
 
 content/
   blog/*.mdx               # Blog posts
@@ -208,7 +243,9 @@ content/
 
 components/
   chrome/                  # Titlebar, sidebar, command palette
-  home/                    # Bento grid cards (stack, mini piano, GitHub)
+  home/                    # Bento grid cards (stack, mini piano, GitHub, log)
+  log/                     # Log feed card, star rating
+  admin/                   # Log entry form, table, dialogs
   spotify/                 # Now Playing widget
   wristkit/                # Apple Watch activity card
   blog/                    # MDX renderer, reading progress
@@ -221,13 +258,21 @@ emails/
   contact-email.tsx        # React Email template
 
 lib/
+  api/                     # Hono app, routes, middleware
+  auth/                    # Admin email allowlist
+  db/client.ts             # Shared Postgres client
+  log/                     # Schema, validation, queries, mutations
   velite.ts                # Content query helpers
   site-config.ts           # Name, email, socials
   experience.ts            # Career start date, years of experience
   spotify.ts               # Spotify token + playlist fetch
-  wristkit/                # DB client, schema, validation
+  wristkit/                # wristkit schema + queries
   utils.ts                 # cn(), formatDate(), estimateReadingTime()
   metadata.ts              # createMetadata() helper
+
+docs/
+  log-plan.md              # /log design decisions, phase by phase
+  sql/                     # Hand-run migrations
 ```
 
 ---
