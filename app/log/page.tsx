@@ -1,5 +1,6 @@
 import { createMetadata } from "@/lib/metadata"
-import { getPublishedEntries, getTypeCounts } from "@/lib/log/queries"
+import { countByType } from "@/lib/log/counts"
+import { getPublishedEntries } from "@/lib/log/queries"
 import { LogFeed } from "@/components/log/log-feed"
 import { LogStats } from "@/components/log/log-stats"
 
@@ -11,13 +12,19 @@ export const metadata = createMetadata({
 })
 
 /**
- * Static with ISR. The admin calls revalidatePath("/log") after a write, so publishing is
- * immediate and this is only the fallback.
+ * Rendered per request, not cached. The log is meant to read as live: publishing an entry
+ * should show up on the next load, not after an ISR window or a revalidate call I have to
+ * remember to wire up. Two indexed queries against a pooled connection cost little enough
+ * that the caching was buying convenience, not speed.
+ *
+ * It also means a database that is down during `next build` no longer fails the build —
+ * error.tsx handles it at request time instead.
  */
-export const revalidate = 300
+export const dynamic = "force-dynamic"
 
 export default async function LogPage() {
-  const [entries, counts] = await Promise.all([getPublishedEntries(), getTypeCounts()])
+  const entries = await getPublishedEntries()
+  const counts = countByType(entries)
 
   return (
     <div className="mx-auto w-full max-w-[1020px] px-5 py-12 sm:px-8 lg:px-11">

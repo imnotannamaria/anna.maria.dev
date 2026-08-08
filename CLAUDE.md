@@ -221,9 +221,11 @@ Ordered albums first, then favourites, then newest — `TYPE_ORDER` in `lib/log/
 
 Posters are plain `<img>`, not `next/image`, so no host allowlist has to be kept in sync. A URL that doesn't load falls back to the type label.
 
+Every entry has a slug, but there is no `/log/[slug]` page and there shouldn't be. An entry is a title, a creator, a year and maybe two sentences — a page per entry would be a hundred thin pages diluting a small site, competing for queries Letterboxd and Goodreads already own. The slug is there to be a stable anchor and to keep the option open, not as a route waiting to be built.
+
 ### `/admin`
 
-Guarded by WorkOS AuthKit **and** an `ADMIN_EMAILS` allowlist checked at the route level, not just in `proxy.ts`. Anyone else gets a 404, never a 403. `/admin/log` lists everything including drafts; create, edit and delete go through Hono at `/api/v1/admin/log` and call `revalidatePath("/log")`.
+Guarded by WorkOS AuthKit **and** an `ADMIN_EMAILS` allowlist checked at the route level, not just in `proxy.ts`. Anyone else gets a 404, never a 403. `/admin/log` lists everything including drafts; create, edit and delete go through Hono at `/api/v1/admin/log`.
 
 Full docs, including the phase-by-phase decisions and their reasoning: [docs/log-plan.md](docs/log-plan.md).
 
@@ -327,3 +329,25 @@ Everything except Resend and the base URL is optional. Without a database the wr
 - Chrome mobile won't resize below about 550px in DevTools. For real narrow viewports (375px), use the device toolbar, not window resize.
 - New API routes go in the Hono app under `lib/api/routes/`, mounted at `/api/v1`. The older handlers (`/api/contact`, `/api/og`, `/api/now-playing`) stay where they are — they work, and moving them buys nothing.
 - Anything under `/admin` calls `requireAdmin()` (pages) or `requireAdminApi` (routes). The `proxy.ts` matcher is not the gate; a matcher can be edited wrong.
+- **Pages that read Postgres are `force-dynamic`, not ISR.** That covers `/`, `/log` and everything under `/admin`. The log and the wristkit rings are supposed to read as live — an activity ring frozen at this morning's numbers, or an entry I published ten minutes ago still missing from the feed, is a worse experience than the handful of milliseconds two indexed queries cost against a pooled connection. Caching them was buying convenience, not speed, and it bought it at the price of a `revalidatePath` call I'd have to remember every time a new page started reading the same table. Content that comes from MDX stays static — this is about the database, not about the site.
+- Because of the above, mutations do **not** call `revalidatePath`. If you ever put log or wristkit data on a cached page, that decision changes and the trade-off above is the one to re-argue.
+
+---
+
+## Code review
+
+When asked to review a branch or PR, review the full diff against `main` and check, at minimum:
+
+- **Security** — auth on every admin surface (layout AND route, never just the proxy matcher), input validation on the server, URL fields restricted to `https://` before they become an `href`, no secrets or stack traces in responses, middleware ordered so unauthenticated requests never reach a body parse.
+- **Backend (Hono)** — new routes live under `lib/api/routes/` behind the right middleware; errors return JSON through `onError`, not leaked stacks; any page added that reads Postgres is `force-dynamic` (see Conventions), so no mutation should be reintroducing `revalidatePath`.
+- **Loading and error states** — every `force-dynamic` page that hits the database needs a `loading.tsx`; pages where the data IS the page need an `error.tsx` (an empty state when the DB is down is a lie); forms need a submitting state and distinct network-vs-API error feedback.
+- **Accessibility** — real semantics over roles on divs, `aria-pressed`/`aria-expanded` on toggles, screen-reader text for glyph-only info (stars, ♥), `useReducedMotion` on animations, and contrast wherever text sits _on top of_ `--fg-brand` — that combination changes per theme and orange (marmalade) is where white text fails first.
+- **Theme reactivity** — grep the diff for hardcoded brand hexes; every accent must derive from `--fg-brand` (see Conventions). Fixed colors are only acceptable as overlays on images, where no theme token can guarantee legibility.
+- **SEO** — metadata on new pages, content in the server HTML (prefer `useSyncExternalStore` over `useSearchParams` on static routes — the latter makes prerender emit the Suspense fallback), sitemap/robots updated, private pages noindexed in layers.
+- **Performance** — watch for queries whose result is derivable from data already fetched in the same render (a `GROUP BY` beside the query that returns the same rows is the usual shape); plain `<img>` needs `loading="lazy"` and a fixed-aspect container so there is no CLS; database reads stay off the critical path of static content.
+- **Responsive** — reason about 375px minus the 56px sidebar; wide tables scroll rather than reflow; grid tracks use `min(Npx, 100%)`. Code-level checks only: hand the actual visual pass to Anna, never drive a browser.
+- **Bugs** — timezone traps around `new Date("YYYY-MM-DD")`, hydration mismatches between server and client formatting, and pages that would fail `next build` if the database were unreachable.
+
+Also run `npm run lint` and `npx tsc --noEmit` and report the result.
+
+Deliver the findings as a Markdown doc at the repo root (e.g. `CODE-REVIEW-<branch>.md`), uncommitted. Open with a clear production-readiness verdict, cite findings as `file:line` links, close with a prioritized action table (fix before merge / follow-up / future), and note explicitly which checks are left for visual pass.

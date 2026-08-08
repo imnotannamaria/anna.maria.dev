@@ -107,7 +107,13 @@ export function RatingInput({
         })}
       </div>
 
-      <span className="font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+      {/* aria-live because the stars are the only other feedback, and they are aria-hidden.
+          Arrowing through values would otherwise change the rating silently. */}
+      <span
+        aria-live="polite"
+        className="font-mono text-[11px]"
+        style={{ color: "var(--fg-muted)" }}
+      >
         {starLabel(value)}
       </span>
 

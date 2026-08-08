@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { StarRating } from "@/components/log/star-rating"
-import { LOG_TYPES, TYPE_LABEL, TYPE_PLURAL, type LogEntry } from "@/lib/log/validation"
+import { typeBreakdown } from "@/lib/log/counts"
+import { TYPE_LABEL, TYPE_PLURAL, type LogEntry, type LogType } from "@/lib/log/validation"
 
 /** Today in my timezone, as "YYYY-MM-DD". */
 function today(): string {
@@ -47,10 +48,7 @@ export function LatestLogCard({ entries }: { entries: LogEntry[] }) {
     { label: "all time", value: entries.length },
   ]
 
-  const byType = LOG_TYPES.map((type) => ({
-    type,
-    count: entries.filter((e) => e.type === type).length,
-  })).filter((t) => t.count > 0)
+  const byType = typeBreakdown(entries)
 
   return (
     <Link
@@ -122,9 +120,18 @@ export function LatestLogCard({ entries }: { entries: LogEntry[] }) {
           </div>
         </div>
 
+        {/* The one place on the site where text sits ON the brand rather than being it,
+            which makes it the one place the theme can break contrast. White on raw
+            --fg-brand is 2.5:1 on marmalade and 3.2:1 on ivy — both below AA at 11px.
+            Mixing 30% black in costs little of the brand's character and clears 4.5:1 on
+            all six themes in both modes. Pure white for the same reason: at 70% brand,
+            even 0.95 alpha lands just under on marmalade. */}
         <div
           className="flex items-center justify-between gap-3 px-4 py-2.5 font-mono text-[11px]"
-          style={{ background: "var(--fg-brand)", color: "rgba(255,255,255,0.95)" }}
+          style={{
+            background: "color-mix(in srgb, var(--fg-brand) 70%, #000)",
+            color: "#fff",
+          }}
         >
           <span className="inline-flex items-center gap-1.5">
             <span aria-hidden>◆</span> open log
@@ -135,7 +142,7 @@ export function LatestLogCard({ entries }: { entries: LogEntry[] }) {
               →
             </span>
           </span>
-          <span style={{ opacity: 0.8 }}>{entries.length} logged</span>
+          <span>{entries.length} logged</span>
         </div>
       </div>
     </Link>
@@ -152,7 +159,7 @@ function TypeBreakdown({
   byType,
   total,
 }: {
-  byType: { type: (typeof LOG_TYPES)[number]; count: number }[]
+  byType: { type: LogType; count: number }[]
   total: number
 }) {
   if (byType.length === 0) return null

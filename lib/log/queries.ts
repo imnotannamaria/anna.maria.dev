@@ -1,4 +1,4 @@
-import { count, desc, eq, sql } from "drizzle-orm"
+import { desc, eq, sql } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
 import { logEntries } from "./schema"
 import type { LogEntry, LogType } from "./validation"
@@ -70,20 +70,6 @@ export async function getPublishedEntries(): Promise<LogEntry[]> {
     )
 
   return rows.map(toEntry)
-}
-
-/** Counts per type for the stat boxes and the filter pills. Published only. */
-export async function getTypeCounts(): Promise<Record<string, number>> {
-  const conn = db()
-  if (!conn) return {}
-
-  const rows = await conn
-    .select({ type: logEntries.type, total: count() })
-    .from(logEntries)
-    .where(eq(logEntries.published, true))
-    .groupBy(logEntries.type)
-
-  return Object.fromEntries(rows.map((r) => [r.type, Number(r.total)]))
 }
 
 /** The admin list. Includes drafts — that is the whole point of it. */

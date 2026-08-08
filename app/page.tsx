@@ -13,7 +13,13 @@ import { getPublishedEntries } from "@/lib/log/queries"
 import { createMetadata } from "@/lib/metadata"
 import { CAREER_START_YEAR, calcYearsOfExp, yearsWord } from "@/lib/experience"
 
-export const revalidate = 3600
+/**
+ * Rendered per request. Two cards here read live data — wristkit's activity rings and the
+ * log shelf — and both are the kind of thing that is wrong the moment it is an hour old.
+ * An Apple Watch ring frozen at this morning's numbers is worse than a slightly slower
+ * page, and the rest of the home page comes from MDX that is already in the bundle.
+ */
+export const dynamic = "force-dynamic"
 
 export const metadata = createMetadata({
   title: "Anna Maria — Full-stack Software Engineer",

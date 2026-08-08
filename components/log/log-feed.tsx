@@ -69,11 +69,7 @@ export function LogFeed({ entries, counts }: { entries: LogEntry[]; counts: Coun
 
   return (
     <>
-      <div
-        role="group"
-        aria-label="Filter by type"
-        className="mb-6 flex flex-wrap gap-2 overflow-x-auto"
-      >
+      <div role="group" aria-label="Filter by type" className="mb-6 flex flex-wrap gap-2">
         <Pill label="all" count={entries.length} active={!active} onClick={() => select(null)} />
         {visible.map((type) => (
           <Pill

@@ -69,11 +69,15 @@ export const logEntryInputSchema = z.object({
   favorite: z.boolean().optional(),
   note: optionalText(2000),
   posterUrl: posterUrlSchema.optional().or(z.literal("")),
+  // Same https check as the poster, and for a sharper reason: this one becomes the `href`
+  // of the card's stretched link. `.url()` alone accepts `javascript:…`, which would be
+  // stored XSS the moment it rendered — only reachable by an admin, but the fix is a line.
   externalUrl: z
     .string()
     .trim()
     .url("that doesn't look like a URL")
     .max(500)
+    .refine((v) => v.startsWith("https://"), "must be an https URL")
     .optional()
     .or(z.literal("")),
   loggedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "use YYYY-MM-DD"),
