@@ -34,24 +34,24 @@ export function LatestLogCard({ entries }: { entries: LogEntry[] }) {
   // The feed leads with albums; "recent" should mean recent.
   const byDate = [...entries].sort((a, b) => b.loggedAt.localeCompare(a.loggedAt))
   const hero = entries[0]
-  const recent = byDate.filter((e) => e.id !== hero.id).slice(0, 4)
+  const recent = byDate.filter((e) => e.id !== hero.id).slice(0, 3)
 
   return (
     <Link
       href="/log"
       aria-label="Open the log"
       style={{ textDecoration: "none" }}
-      className="group/log block h-full"
+      className="group/log block"
     >
       <div
-        className="flex h-full flex-col overflow-hidden rounded-2xl border hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover)"
+        className="flex flex-col overflow-hidden rounded-2xl border hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover)"
         style={{
           background: "var(--bg-surface)",
           borderColor: "var(--border-strong)",
           transition: "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out)",
         }}
       >
-        <div className="flex flex-1 flex-col gap-4 p-5">
+        <div className="flex flex-1 flex-col gap-3.5 p-4">
           <div>
             <h3
               className="font-mono text-[11px] font-normal tracking-[0.08em] uppercase"
@@ -93,7 +93,7 @@ export function LatestLogCard({ entries }: { entries: LogEntry[] }) {
         </div>
 
         <div
-          className="flex items-center justify-between gap-3 px-5 py-2.5 font-mono text-[11px]"
+          className="flex items-center justify-between gap-3 px-4 py-2.5 font-mono text-[11px]"
           style={{ background: "var(--fg-brand)", color: "rgba(255,255,255,0.95)" }}
         >
           <span className="inline-flex items-center gap-1.5">
@@ -119,7 +119,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 function Summary({ count, favourites, pct }: { count: number; favourites: number; pct: number }) {
   return (
     <div
-      className="flex items-center gap-4 rounded-xl border p-3.5"
+      className="flex items-center gap-3.5 rounded-xl border p-3"
       style={{ borderColor: "var(--border-subtle)", background: "var(--bg-surface-elevated)" }}
     >
       <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden className="shrink-0">

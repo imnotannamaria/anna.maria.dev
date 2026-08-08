@@ -767,23 +767,32 @@ export default async function Home() {
       {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
       <section aria-labelledby="sec-offclock">
         <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym · log" />
-        {/* Three columns at lg: the log and wristkit panels each take a full-height
-            column, with now-playing and the piano stacked between them. */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <div className="lg:row-span-2 lg:h-full">
+        {/* Masonry via CSS columns, not grid.
+            These four cards have genuinely different natural heights, and grid can only
+            reconcile that by stretching something — which left a hole under the shortest
+            column and thinned out the wristkit rings. Columns let every card keep the
+            height its content asks for and balances them itself. */}
+        <div className="columns-1 gap-6 md:columns-2 lg:columns-3">
+          <div className="mb-6 break-inside-avoid">
             <LatestLogCard entries={logEntries} />
           </div>
-          <NowPlayingWidget />
-          <Link
-            href="https://wristkit-web.vercel.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="View wristkit"
-            className="md:row-span-2 md:h-full"
-          >
-            <TodayActivityCard state={activityState} className="h-full" />
-          </Link>
-          <MiniPianoCard />
+          <div className="mb-6 break-inside-avoid">
+            <NowPlayingWidget />
+          </div>
+          <div className="mb-6 break-inside-avoid">
+            <Link
+              href="https://wristkit-web.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View wristkit"
+              className="block"
+            >
+              <TodayActivityCard state={activityState} />
+            </Link>
+          </div>
+          <div className="mb-6 break-inside-avoid">
+            <MiniPianoCard />
+          </div>
         </div>
       </section>
 
