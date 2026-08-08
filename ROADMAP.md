@@ -10,7 +10,8 @@ I want to add animations to the home page widgets so the site feels more alive. 
 
 ## Home components
 
-Some of the components are dull. I want to make them better.
+Some of the components are dull. I want to make them better. First one up: the experience
+card becomes a browsable file tree of the site — [docs/workbench-plan.md](docs/workbench-plan.md).
 
 ## Contributions page
 

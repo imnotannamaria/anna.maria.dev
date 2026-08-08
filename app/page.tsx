@@ -1,5 +1,10 @@
 import Link from "next/link"
-import { getFeaturedPosts, getFeaturedProjects, getPublishedProjects } from "@/lib/velite"
+import {
+  getFeaturedPosts,
+  getFeaturedProjects,
+  getPublishedPosts,
+  getPublishedProjects,
+} from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/utils"
 import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
@@ -9,9 +14,11 @@ import { cn } from "@/lib/utils"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
 import { LatestLogCard } from "@/components/home/latest-log-card"
+import { WorkbenchCard } from "@/components/home/workbench-card"
+import { buildWorkbench, workbenchRouteCount } from "@/lib/workbench"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { createMetadata } from "@/lib/metadata"
-import { CAREER_START_YEAR, calcYearsOfExp, yearsWord } from "@/lib/experience"
+import { calcYearsOfExp, yearsWord } from "@/lib/experience"
 
 /**
  * Rendered per request. Two cards here read live data — wristkit's activity rings and the
@@ -193,11 +200,6 @@ function ProgressBar({ filled, total }: { filled: number; total: number }) {
   )
 }
 
-// ─── Experience timeline constants ─────────────────────────────────────────────
-
-const CAREER_START = CAREER_START_YEAR
-const TIMELINE_WINDOW = 5 // intervals shown (= points - 1)
-
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Home() {
@@ -207,23 +209,24 @@ export default async function Home() {
     // error boundary instead, because there the log IS the page.
     getPublishedEntries().catch(() => []),
   ])
+  const posts = getPublishedPosts()
+  const projects = getPublishedProjects()
   const featuredProject = getFeaturedProjects()[0]
   const featuredPost = getFeaturedPosts()[0]
   const currentYear = new Date().getFullYear()
-  const ossCount = getPublishedProjects().filter(
-    (p) => new Date(p.date).getFullYear() === currentYear,
-  ).length
+  const ossCount = projects.filter((p) => new Date(p.date).getFullYear() === currentYear).length
   const ossGoal = 6
   const yrShort = currentYear.toString().slice(2)
-
-  // Experience timeline — counts from exact date (March 15 2021), not just year
   const yearsOfExp = calcYearsOfExp()
-  const windowStart = Math.max(CAREER_START, currentYear - TIMELINE_WINDOW)
-  const showBeforeHint = windowStart > CAREER_START
-  const timelineYears = Array.from(
-    { length: currentYear - windowStart + 1 },
-    (_, i) => windowStart + i,
-  )
+
+  // Counts come off lists this page already has in memory, so the tree costs no
+  // extra query. `logEntries` is [] when the database is down, and null there
+  // means the row renders without a number rather than asserting zero.
+  const workbench = buildWorkbench({
+    posts,
+    projects,
+    logCount: logEntries.length || null,
+  })
 
   return (
     <div
@@ -344,167 +347,11 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* Experience card — directly in grid, stretches to hero height */}
-          <div className="bento-card relative flex flex-col overflow-hidden">
-            {/* Dot pattern decoration */}
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: "28%",
-                width: "80%",
-                aspectRatio: "1",
-                opacity: 0.18,
-                pointerEvents: "none",
-                backgroundImage: "radial-gradient(var(--fg-brand) 1px, transparent 1.4px)",
-                backgroundSize: "18px 18px",
-                maskImage: "radial-gradient(circle, #000 0%, transparent 65%)",
-                WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 65%)",
-              }}
-            />
-            {/* Radial glow */}
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                left: "30%",
-                top: "10%",
-                width: 260,
-                height: 260,
-                borderRadius: "50%",
-                background: "radial-gradient(circle, var(--bg-surface-brand), transparent 70%)",
-                pointerEvents: "none",
-                opacity: 0.7,
-              }}
-            />
-            {/* Header */}
-            <div className="relative flex items-center justify-between">
-              <CardHead label="experience" as="h2" id="card-experience" />
-              <span
-                className="font-mono text-[11px] tracking-[0.04em]"
-                style={{ color: "var(--fg-brand)" }}
-              >
-                {CAREER_START} → NOW
-              </span>
-            </div>
-
-            {/* Display number */}
-            <div className="relative mt-3 flex items-baseline gap-3">
-              <em
-                style={{
-                  fontFamily: "var(--font-serif)",
-                  fontSize: 72,
-                  fontStyle: "italic",
-                  fontWeight: 400,
-                  lineHeight: 0.9,
-                  color: "var(--fg-brand)",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {yearsWord(yearsOfExp)}
-              </em>
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                <em
-                  style={{
-                    fontFamily: "var(--font-serif)",
-                    fontSize: 24,
-                    fontStyle: "italic",
-                    fontWeight: 400,
-                    color: "var(--fg-secondary)",
-                    lineHeight: 1,
-                  }}
-                >
-                  years
-                </em>
-                <span
-                  className="font-mono tracking-[0.12em] uppercase"
-                  style={{ fontSize: 11, color: "var(--fg-secondary)" }}
-                >
-                  shipping
-                </span>
-              </div>
-            </div>
-
-            {/* Timeline */}
-            <div className="relative mt-auto flex justify-between" style={{ paddingTop: 28 }}>
-              {/* Line */}
-              <div
-                className="absolute right-0 left-0"
-                style={{ height: 1, background: "var(--fg-brand)", top: 33 }}
-              />
-              {timelineYears.map((year, i) => {
-                const isCurrent = year === currentYear
-                const isFirst = i === 0
-                const label =
-                  isFirst && showBeforeHint
-                    ? `-'${year.toString().slice(2)}`
-                    : `'${year.toString().slice(2)}`
-                return (
-                  <div
-                    key={year}
-                    className="group/dot flex flex-col items-center gap-2"
-                    style={{ cursor: "default", position: "relative", zIndex: 1 }}
-                  >
-                    <div
-                      style={{
-                        width: isCurrent ? 12 : 10,
-                        height: isCurrent ? 12 : 10,
-                        borderRadius: "50%",
-                        background: isCurrent ? "var(--fg-brand)" : "var(--fg-primary)",
-                        border: `2px solid ${isCurrent ? "var(--fg-brand)" : "var(--fg-secondary)"}`,
-                        transition: "transform 200ms ease, border-color 200ms ease",
-                        animation: isCurrent ? "dot-glow 2s ease-in-out infinite" : undefined,
-                      }}
-                      className={
-                        isCurrent
-                          ? ""
-                          : "group-hover/dot:scale-125 group-hover/dot:[border-color:var(--fg-brand)]"
-                      }
-                    />
-                    <span
-                      className="font-mono transition-colors duration-200 group-hover/dot:[color:var(--fg-brand)]"
-                      style={{
-                        fontSize: 10,
-                        color: isCurrent ? "var(--fg-brand)" : "var(--fg-muted)",
-                        fontWeight: isCurrent ? 600 : 400,
-                      }}
-                    >
-                      {label}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Footer */}
-            <div
-              className="relative mt-4 flex items-center justify-between font-mono text-[11px]"
-              style={{
-                color: "var(--fg-muted)",
-                borderTop: "1px dashed var(--border-subtle)",
-                paddingTop: 12,
-              }}
-            >
-              <span>
-                <span style={{ opacity: 0.6 }}>{"// "}</span>
-                full-stack · web products
-              </span>
-              <span
-                className="inline-flex items-center gap-1.5"
-                style={{ color: "var(--fg-brand)" }}
-              >
-                <span
-                  className="inline-block h-1.5 w-1.5 rounded-full"
-                  style={{
-                    background: "var(--fg-brand)",
-                    animation: "live-pulse 2s ease-in-out infinite",
-                  }}
-                />
-                live
-              </span>
-            </div>
-          </div>
+          {/* The workbench — replaces the experience card. That one restated the hero
+              paragraph's "N years shipping" beside a row of dots that did nothing; this
+              gives the same slot to something you can actually browse. The years are
+              still in the hero and in the $ whoami header. */}
+          <WorkbenchCard items={workbench} routeCount={workbenchRouteCount()} />
         </div>
 
         {/* Row 2: Stack — full width */}

@@ -520,6 +520,92 @@ button:focus-visible,
   box-shadow: 0 12px 32px var(--shadow-brand);
 }
 
+/* ============================================================
+   WORKBENCH  — the file tree card on the home page
+   ============================================================ */
+
+.wb-tree {
+  /* One indent step = guide + gap. Tighter on phones, where the sidebar
+     already took 56px off the card. */
+  --wb-guide: 7px;
+  --wb-gap: 11px;
+}
+
+@media (max-width: 640px) {
+  .wb-tree {
+    --wb-guide: 5px;
+    --wb-gap: 7px;
+  }
+}
+
+/* Nested list. `overflow: hidden` is what lets the height animation clip. */
+.wb-children {
+  margin-left: var(--wb-guide);
+  padding-left: var(--wb-gap);
+  border-left: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.wb-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 32px;
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1;
+  color: var(--fg-secondary);
+  text-align: left;
+  text-decoration: none;
+  transition:
+    background 150ms var(--ease-out),
+    color 150ms var(--ease-out);
+}
+
+/* Not --bg-surface-elevated: .bento-card:hover already paints the whole card
+   that color, so a row using it would vanish exactly when you hover it. */
+.wb-row:hover {
+  background: var(--bg-surface-brand);
+  color: var(--fg-brand);
+}
+
+.wb-row:focus-visible {
+  outline: 2px solid var(--fg-brand);
+  outline-offset: -2px;
+}
+
+.wb-row-locked {
+  color: var(--fg-muted);
+  opacity: 0.55;
+  cursor: default;
+}
+
+.wb-row-locked:hover {
+  background: transparent;
+  color: var(--fg-muted);
+}
+
+.wb-glyph {
+  flex-shrink: 0;
+  transition: transform 200ms var(--ease-out);
+}
+
+.wb-row:hover .wb-glyph-shift {
+  transform: translateX(1px);
+}
+
+.wb-caret {
+  flex-shrink: 0;
+  transition: transform 200ms var(--ease-out);
+}
+
+.wb-caret-open {
+  transform: rotate(90deg);
+}
+
 @keyframes cursor-blink {
   50% {
     opacity: 0;
