@@ -90,9 +90,10 @@ type Doc = { slug: string; title: string }
 export type SiteTreeData = {
   posts: Doc[]
   projects: Doc[]
-  /** Published log entries, or null when there is no number to show — the
-   *  database being unreachable is not the same claim as "zero entries", and a
-   *  confident 0 would be a lie. Either way the row still links to /log. */
+  /** Published log entries, or null when the database didn't answer. Those are
+   *  different facts: zero entries is a real count and gets shown, while a
+   *  failed query has no number to report and the row renders without one.
+   *  Either way the row still links to /log. */
   logCount: number | null
 }
 

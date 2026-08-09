@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion, useReducedMotion, type Variants } from "motion/react"
@@ -11,45 +10,24 @@ import {
   XLogoIcon,
 } from "@phosphor-icons/react"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
-import { revealViewport } from "@/components/ui/reveal"
-import { RollingNumber } from "@/components/ui/rolling-number"
+import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
+import { RollingNumber, useRollOnHover } from "@/components/ui/rolling-number"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 import { siteConfig } from "@/lib/site-config"
 
-/** The project's --ease-out token, as a Motion cubic-bezier array. */
-const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
-
 function Stat({ value, label, delay }: { value: number; label: string; delay: number }) {
-  const [cycle, setCycle] = useState(0)
-
-  /*
-   * The stagger delay belongs to the entrance and nothing else.
-   *
-   * Left on the transition unconditionally, every hover re-applied it: the
-   * in-flight spring got interrupted, and its replacement then sat waiting out
-   * the delay before moving. On the last stat that delay is ~0.7s, so hovering
-   * it mid-roll parked the strip between two digits and it looked frozen.
-   *
-   * This lives here rather than in Digit because the decision is "has the user
-   * touched this yet", which is a fact about the stat, and it's set from an
-   * event — no ref read during render, no setState inside an effect.
-   */
-  const [touched, setTouched] = useState(false)
+  const roll = useRollOnHover(delay)
 
   return (
     <div
       className="group/stat relative flex cursor-default flex-col items-center gap-1.5 py-1"
-      onMouseEnter={() => {
-        setTouched(true)
-        setCycle(1)
-      }}
-      onMouseLeave={() => setCycle(0)}
+      {...roll.handlers}
     >
       <RollingNumber
         value={value}
-        cycle={cycle}
-        delay={touched ? 0 : delay}
+        cycle={roll.cycle}
+        delay={roll.delay}
         height={34}
         style={{
           fontFamily: "var(--font-serif)",
@@ -207,7 +185,8 @@ export type ProfileStats = {
   years: number
   projects: number
   posts: number
-  /** null when the database is unreachable — the stat is dropped, not zeroed. */
+  /** null when the database didn't answer — the stat is dropped rather than
+   *  guessed at. A real 0 is a count and still gets its cell. */
   logged: number | null
 }
 
@@ -247,7 +226,8 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
     { value: stats.years, label: "years" },
     { value: stats.projects, label: "projects" },
     { value: stats.posts, label: "posts" },
-    // A database blip costs this one cell. Showing 0 would be a claim, not a gap.
+    // A database blip costs this one cell — there is no number to show, and
+    // inventing a 0 would turn a gap into a claim.
     ...(stats.logged !== null ? [{ value: stats.logged, label: "logged" }] : []),
   ]
 

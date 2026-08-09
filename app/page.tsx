@@ -90,8 +90,13 @@ export default async function Home() {
     loadTodayActivity({ tz: "America/Sao_Paulo" }),
     // A database blip should cost the home page one card, not the whole page. /log has an
     // error boundary instead, because there the log IS the page.
-    getPublishedEntries().catch(() => []),
+    //
+    // null, not []: an unreachable database and an empty log are different facts, and
+    // collapsing them means the counters can't tell "I don't know" from "none yet". A
+    // genuine 0 is true and gets shown; a failed query shows nothing at all.
+    getPublishedEntries().catch(() => null),
   ])
+  const logList = logEntries ?? []
   const posts = getPublishedPosts()
   const projects = getPublishedProjects()
   const featuredProject = getFeaturedProjects()[0]
@@ -103,12 +108,12 @@ export default async function Home() {
   const yearsOfExp = calcYearsOfExp()
 
   // Counts come off lists this page already has in memory, so the tree costs no
-  // extra query. `logEntries` is [] when the database is down, and null there
-  // means the row renders without a number rather than asserting zero.
+  // extra query. A null count renders the row without a number, which is what
+  // an unreachable database deserves — asserting zero would be a claim.
   const siteTree = buildSiteTree({
     posts,
     projects,
-    logCount: logEntries.length || null,
+    logCount: logEntries?.length ?? null,
   })
 
   return (
@@ -133,7 +138,7 @@ export default async function Home() {
               years: yearsOfExp,
               projects: projects.length,
               posts: posts.length,
-              logged: logEntries.length || null,
+              logged: logEntries?.length ?? null,
             }}
           />
 
@@ -248,7 +253,7 @@ export default async function Home() {
 
         {/* The log gets the full width underneath, laid out as a shelf. */}
         <div className="mt-6">
-          <LatestLogCard entries={logEntries} />
+          <LatestLogCard entries={logList} />
         </div>
       </section>
 
