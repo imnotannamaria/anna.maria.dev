@@ -1,5 +1,7 @@
 import { Hono } from "hono"
 import { adminLog } from "./routes/admin-log"
+import { adminRoadmap } from "./routes/admin-roadmap"
+import { roadmap } from "./routes/roadmap"
 import { wristkit } from "./routes/wristkit"
 
 /**
@@ -11,7 +13,9 @@ import { wristkit } from "./routes/wristkit"
 export const app = new Hono().basePath("/api/v1")
 
 app.route("/wristkit", wristkit)
+app.route("/roadmap", roadmap)
 app.route("/admin/log", adminLog)
+app.route("/admin/roadmap", adminRoadmap)
 
 app.onError((err, c) => {
   console.error("[api]", err)
