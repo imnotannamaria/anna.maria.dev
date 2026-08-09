@@ -4,10 +4,9 @@ import Link from "next/link"
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react"
 import type { Variants } from "motion/react"
 import { ArrowLink } from "@/components/ui/arrow-link"
-import { Badge, CardFoot } from "@/components/ui/card-parts"
+import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
+import { EASE_OUT } from "@/components/ui/reveal"
 import { TypeIn } from "@/components/ui/type-in"
-
-const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
 
 export type FeaturedProject = {
   slug: string
@@ -113,18 +112,7 @@ export function FeaturedProjectCard({
         }}
       />
 
-      <div className="relative flex items-center justify-between">
-        <span
-          className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.08em] uppercase"
-          style={{ color: "var(--fg-secondary)" }}
-        >
-          <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-            ◆
-          </span>
-          featured
-        </span>
-        <Badge variant="brand-soft">SHIPPED</Badge>
-      </div>
+      <CardHead label="featured" meta={<Badge variant="brand-soft">SHIPPED</Badge>} />
 
       <p
         className="relative font-mono text-xs tracking-[0.04em]"
@@ -182,7 +170,11 @@ export function FeaturedProjectCard({
       <CardFoot>
         <div className="flex gap-6" style={{ position: "relative", zIndex: 2 }}>
           {project.github && (
-            <ArrowLink href={project.github} external>
+            /* Named for the project, not just "github": the contributions card
+               further down this page has a "github" link of its own pointing at
+               the profile, and two links with one name and two destinations is
+               what makes a screen reader's link list useless. */
+            <ArrowLink href={project.github} external aria-label={`${project.title} on GitHub`}>
               github
             </ArrowLink>
           )}

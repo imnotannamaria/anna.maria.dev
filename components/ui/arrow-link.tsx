@@ -50,15 +50,20 @@ export function ArrowLink({
   external,
   children,
   className,
+  /** For when the visible label is too generic to stand on its own — two
+   *  "github" links on one page need to name what each one points at. */
+  "aria-label": ariaLabel,
 }: {
   href: string
   external?: boolean
   children: React.ReactNode
   className?: string
+  "aria-label"?: string
 }) {
   return (
     <Link
       href={href}
+      aria-label={ariaLabel}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
         "group/arrow inline-flex font-mono text-xs",
