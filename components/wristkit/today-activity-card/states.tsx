@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import type * as React from "react"
+import { motion, useReducedMotion } from "motion/react"
+import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import type { TodayData } from "./load"
 
 const colors = {
@@ -17,6 +19,16 @@ function clamp01(x: number): number {
   return Math.min(1, Math.max(0, x))
 }
 
+/**
+ * The rings are unchanged in shape; what's new is that they arrive instead of
+ * appearing. Each one sweeps from empty to its value, outer first.
+ *
+ * The draw runs through Motion on `strokeDashoffset`. The hover response is CSS
+ * on `stroke-width` — a presentation attribute, so a stylesheet can take it over
+ * — because mixing the two on one element means every hover restarts the sweep.
+ * Splitting them also means the hover inherits the global reduced-motion reset
+ * for free, while the sweep asks `useReducedMotion` itself.
+ */
 function Ring({
   r,
   value,
@@ -24,6 +36,7 @@ function Ring({
   color,
   cx,
   cy,
+  index = 0,
 }: {
   r: number
   value: number
@@ -31,9 +44,12 @@ function Ring({
   color: string
   cx: number
   cy: number
+  index?: number
 }) {
+  const reduce = useReducedMotion() ?? false
   const circ = 2 * Math.PI * r
   const p = clamp01(max > 0 ? value / max : 0)
+
   return (
     <>
       <circle
@@ -45,7 +61,9 @@ function Ring({
         strokeWidth={9}
         strokeOpacity={0.18}
       />
-      <circle
+      <motion.circle
+        className="wk-ring"
+        style={{ transitionDelay: `${index * 70}ms` }}
         cx={cx}
         cy={cy}
         r={r}
@@ -53,8 +71,20 @@ function Ring({
         stroke={color}
         strokeWidth={9}
         strokeLinecap="round"
-        strokeDasharray={`${circ * p} ${circ}`}
+        strokeDasharray={circ}
         transform={`rotate(-90 ${cx} ${cy})`}
+        initial={{ strokeDashoffset: circ }}
+        // whileInView and not animate. This card lives well below the fold, so
+        // `animate` fired at page load — the rings finished sweeping while the
+        // visitor was still reading the hero, and by the time they scrolled down
+        // there was nothing left to see. Now it waits for the card to be looked at.
+        whileInView={{ strokeDashoffset: circ * (1 - p) }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={
+          reduce
+            ? { duration: 0 }
+            : { duration: 1.2, ease: [0.2, 0.8, 0.2, 1], delay: 0.15 + index * 0.12 }
+        }
       />
     </>
   )
@@ -62,10 +92,15 @@ function Ring({
 
 function Panel({ className, children }: { className?: string; children: React.ReactNode }) {
   const [hovered, setHovered] = useState(false)
+  const { onMouseMove, spotlight } = useSpotlight(380)
+
   return (
     <section
-      className={className}
+      className={`wk-panel ${className ?? ""}`}
+      onMouseMove={onMouseMove}
       style={{
+        position: "relative",
+        overflow: "hidden",
         background: hovered ? "var(--bg-card-hover)" : "var(--bg-card)",
         border: "1px solid var(--border-strong)",
         borderRadius: "var(--radius-xl)",
@@ -83,6 +118,7 @@ function Panel({ className, children }: { className?: string; children: React.Re
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      <Spotlight {...spotlight} />
       {children}
     </section>
   )
@@ -100,16 +136,20 @@ function Header({
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
       <h3
+        className="inline-flex items-center gap-1.5"
         style={{
           margin: 0,
           fontWeight: 400,
           color: "var(--fg-secondary)",
           fontSize: 11,
-          letterSpacing: "0.12em",
+          letterSpacing: "0.08em",
           textTransform: "uppercase",
         }}
       >
-        Today / Activity
+        <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
+          ◆
+        </span>
+        today / activity
       </h3>
       <span
         style={{
@@ -250,9 +290,9 @@ export function TodayActivityCardLoading({ className }: { className?: string }) 
             aria-label="Activity rings"
           >
             <title>Activity rings</title>
-            <Ring r={52} value={1} max={1} color={colors.move} cx={cx} cy={cy} />
-            <Ring r={38} value={1} max={1} color={colors.exercise} cx={cx} cy={cy} />
-            <Ring r={24} value={1} max={1} color={colors.steps} cx={cx} cy={cy} />
+            <Ring index={0} r={52} value={1} max={1} color={colors.move} cx={cx} cy={cy} />
+            <Ring index={1} r={38} value={1} max={1} color={colors.exercise} cx={cx} cy={cy} />
+            <Ring index={2} r={24} value={1} max={1} color={colors.steps} cx={cx} cy={cy} />
           </svg>
         </div>
         <div style={{ opacity: 0.75 }}>
@@ -299,9 +339,9 @@ export function TodayActivityCardEmpty({ className }: { className?: string }) {
             aria-label="No activity yet"
           >
             <title>No activity yet</title>
-            <Ring r={52} value={0} max={1} color={colors.move} cx={cx} cy={cy} />
-            <Ring r={38} value={0} max={1} color={colors.exercise} cx={cx} cy={cy} />
-            <Ring r={24} value={0} max={1} color={colors.steps} cx={cx} cy={cy} />
+            <Ring index={0} r={52} value={0} max={1} color={colors.move} cx={cx} cy={cy} />
+            <Ring index={1} r={38} value={0} max={1} color={colors.exercise} cx={cx} cy={cy} />
+            <Ring index={2} r={24} value={0} max={1} color={colors.steps} cx={cx} cy={cy} />
           </svg>
         </div>
         <div>
@@ -374,6 +414,7 @@ export function TodayActivityCardStale({
           >
             <title>Activity rings</title>
             <Ring
+              index={0}
               r={52}
               value={data.kcal}
               max={data.kcalGoal}
@@ -382,6 +423,7 @@ export function TodayActivityCardStale({
               cy={cy}
             />
             <Ring
+              index={1}
               r={38}
               value={data.exerciseMinutes}
               max={data.exerciseGoal}
@@ -390,6 +432,7 @@ export function TodayActivityCardStale({
               cy={cy}
             />
             <Ring
+              index={2}
               r={24}
               value={data.steps}
               max={data.stepsGoal}
@@ -449,6 +492,7 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
           >
             <title>Activity rings</title>
             <Ring
+              index={0}
               r={52}
               value={data.kcal}
               max={data.kcalGoal}
@@ -457,6 +501,7 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
               cy={cy}
             />
             <Ring
+              index={1}
               r={38}
               value={data.exerciseMinutes}
               max={data.exerciseGoal}
@@ -465,6 +510,7 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
               cy={cy}
             />
             <Ring
+              index={2}
               r={24}
               value={data.steps}
               max={data.stepsGoal}

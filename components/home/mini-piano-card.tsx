@@ -2,39 +2,55 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { CardHead } from "@/components/ui/card-parts"
+import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 
-// ─── Key dimensions ──────────────────────────────────────────────────────────
-const WW = 28 // white key width
-const WH = 62 // white key height (compact)
-const GK = 2 // gap between white keys
-const ST = WW + GK // stride = 30px
-const BW = 18 // black key width
+// ─── Key geometry ────────────────────────────────────────────────────────────
+//
+// Two octaves, and the keyboard fills whatever width it is given instead of
+// sitting at a fixed 238px with air on both sides. Everything horizontal is a
+// fraction of the container, so the same markup works at 500px in the home grid
+// and at ~240px once a phone's sidebar has taken its cut.
+
+const WH = 62 // white key height
 const BH = 38 // black key height
 
-const TOTAL_W = 8 * ST - GK // 238px
+/** C–B twice, plus the C that closes the second octave. */
+const WHITE_NOTES = ["C", "D", "E", "F", "G", "A", "B", "C", "D", "E", "F", "G", "A", "B", "C"]
+const N = WHITE_NOTES.length
 
-// White key labels (one octave C–B + C above)
-const WHITE_NOTES = ["C", "D", "E", "F", "G", "A", "B", "C"]
+const KEY_W = `calc(100% / ${N})`
+/** A black key is a shade under two thirds of a white one, as on a real board. */
+const BLACK_W = `calc(100% / ${N} * 0.62)`
 
-// center between white[i] and white[i+1] = i*ST + (WW+ST)/2
-function blackKeyLeft(i: number): number {
-  return i * ST + (WW + ST) / 2 - BW / 2
+/** Straddles the seam between white key `i` and the next one. */
+function blackLeft(i: number): string {
+  return `calc(${i + 1} * 100% / ${N} - (100% / ${N} * 0.31))`
 }
 
-const BLACK_KEY_DATA: [number, string][] = [
-  [blackKeyLeft(0), "C#"],
-  [blackKeyLeft(1), "D#"],
-  [blackKeyLeft(3), "F#"],
-  [blackKeyLeft(4), "G#"],
-  [blackKeyLeft(5), "A#"],
+/** The two-black / three-black grouping, repeated an octave up. */
+const BLACK_KEY_DATA: [string, string][] = [
+  [blackLeft(0), "C#"],
+  [blackLeft(1), "D#"],
+  [blackLeft(3), "F#"],
+  [blackLeft(4), "G#"],
+  [blackLeft(5), "A#"],
+  [blackLeft(7), "C#"],
+  [blackLeft(8), "D#"],
+  [blackLeft(10), "F#"],
+  [blackLeft(11), "G#"],
+  [blackLeft(12), "A#"],
 ]
 
 const SOL = 4 // G
 const LA = 5 // A
-const SEQ = [SOL, LA, SOL, LA]
+/** The same two notes, second time an octave up, so the idle loop travels the
+ *  whole keyboard instead of twitching in the left third of it. */
+const SEQ = [SOL, LA, SOL + 7, LA + 7]
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export function MiniPianoCard() {
+  const { onMouseMove, spotlight } = useSpotlight(340)
   const [pressed, setPressed] = useState<number | null>(null)
   const [step, setStep] = useState(0)
 
@@ -59,60 +75,19 @@ export function MiniPianoCard() {
 
   return (
     <Link href="/piano" style={{ textDecoration: "none", display: "block" }}>
-      <div
-        className="group/piano relative overflow-hidden rounded-2xl border hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] hover:[background:var(--bg-surface-elevated)]"
-        style={{
-          background: "var(--bg-card)",
-          borderColor: "var(--border-strong)",
-          transition:
-            "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out)",
-        }}
-      >
-        {/* Toolbar */}
-        <div
-          className="flex items-center gap-3 border-b px-4 py-2.5"
-          style={{
-            borderColor: "var(--border-subtle)",
-            background: "var(--bg-chrome)",
-          }}
-        >
-          {/* Traffic lights */}
-          <div className="flex items-center gap-1.5">
-            <span
-              className="block h-2.5 w-2.5 rounded-full opacity-60"
-              style={{ background: "#f43f5e" }}
-            />
-            <span
-              className="block h-2.5 w-2.5 rounded-full opacity-60"
-              style={{ background: "#f59e0b" }}
-            />
-            <span
-              className="block h-2.5 w-2.5 rounded-full opacity-60"
-              style={{ background: "#10b981" }}
-            />
-          </div>
-          {/* Label */}
-          <h3
-            className="font-mono text-[11px] font-normal tracking-[0.08em] uppercase"
-            style={{ color: "var(--fg-secondary)", margin: 0 }}
-          >
-            <span
-              aria-hidden="true"
-              style={{ color: "var(--fg-brand)", marginRight: 5, fontSize: 9 }}
-            >
-              ◆
-            </span>
-            piano
-          </h3>
-          <div className="flex-1" />
-          {/* Hint */}
-          <span className="font-mono text-[10px]" style={{ color: "var(--fg-muted)" }}>
-            {"// tap to play"}
-          </span>
-        </div>
+      <div className="bento-card group/piano h-full" onMouseMove={onMouseMove}>
+        <Spotlight {...spotlight} />
+
+        {/* This was a mac title bar — traffic lights over a chrome-tinted strip
+            with its own border — which made the piano the one widget in the
+            section wearing a costume. Same head as every other card now. */}
+        <CardHead label="piano" meta="// tap to play" />
 
         {/* Stage */}
-        <div className="px-5 pt-4 pb-3" style={{ background: "var(--piano-stage)" }}>
+        <div
+          className="relative rounded-[var(--radius-md)] px-5 pt-4 pb-3"
+          style={{ background: "var(--piano-stage)" }}
+        >
           {/* Frame */}
           <div
             style={{
@@ -127,9 +102,8 @@ export function MiniPianoCard() {
             <div
               style={{
                 position: "relative",
-                width: TOTAL_W,
+                width: "100%",
                 height: WH,
-                margin: "0 auto",
                 overflow: "hidden",
                 borderRadius: "0 0 4px 4px",
                 isolation: "isolate",
@@ -143,11 +117,11 @@ export function MiniPianoCard() {
                     key={i}
                     style={{
                       position: "absolute",
-                      left: i * ST,
+                      left: `calc(${i} * 100% / ${N})`,
                       top: 0,
-                      width: WW,
+                      width: KEY_W,
                       height: WH,
-                      borderRight: i < 7 ? "1px solid var(--piano-key-sep)" : "none",
+                      borderRight: i < N - 1 ? "1px solid var(--piano-key-sep)" : "none",
                       borderRadius: "0 0 3px 3px",
                       background: isPressed
                         ? "linear-gradient(180deg, var(--fg-brand-hover) 0%, var(--fg-brand) 100%)"
@@ -184,14 +158,14 @@ export function MiniPianoCard() {
               })}
 
               {/* Black keys */}
-              {BLACK_KEY_DATA.map(([leftPx, label]) => (
+              {BLACK_KEY_DATA.map(([left, label], i) => (
                 <div
-                  key={label}
+                  key={`${label}-${i}`}
                   style={{
                     position: "absolute",
-                    left: leftPx,
+                    left,
                     top: 0,
-                    width: BW,
+                    width: BLACK_W,
                     height: BH,
                     borderRadius: "0 0 3px 3px",
                     border: "1px solid #000",
@@ -207,6 +181,7 @@ export function MiniPianoCard() {
                   }}
                 >
                   <span
+                    className="hidden sm:block"
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontSize: 7,
@@ -223,9 +198,8 @@ export function MiniPianoCard() {
           </div>
         </div>
 
-        {/* Bottom hint */}
         <div
-          className="flex items-center justify-between px-4 py-2.5 font-mono text-[10px]"
+          className="relative mt-auto flex items-center justify-between font-mono text-[11px]"
           style={{ color: "var(--fg-muted)" }}
         >
           <span>

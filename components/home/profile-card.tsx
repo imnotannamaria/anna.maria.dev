@@ -11,6 +11,7 @@ import {
   XLogoIcon,
 } from "@phosphor-icons/react"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
+import { RollingNumber } from "@/components/ui/rolling-number"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 import { siteConfig } from "@/lib/site-config"
@@ -18,68 +19,8 @@ import { siteConfig } from "@/lib/site-config"
 /** The project's --ease-out token, as a Motion cubic-bezier array. */
 const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
 
-// ─── Rolling number ──────────────────────────────────────────────────────────
-
-/** One digit slot. Matches the number's font size to a whole line box. */
-const DIGIT_H = 34
-
-/**
- * A single decimal place as a vertical strip of 0–9, printed twice.
- *
- * The repeat is the whole trick: the resting position for digit `d` exists in
- * two places on the strip (`d` and `d + 10`), so you can travel between them
- * and land on the same number having turned a full revolution. That's what
- * lets hover roll up and un-hover roll back down without ever cutting.
- */
-function Digit({ digit, cycle, delay }: { digit: number; cycle: number; delay: number }) {
-  const reduce = useReducedMotion() ?? false
-
-  return (
-    <span
-      aria-hidden
-      style={{ display: "block", height: DIGIT_H, overflow: "hidden", width: "0.62em" }}
-    >
-      <motion.span
-        style={{ display: "block" }}
-        // Starts at 0 and climbs to the value. The delay lives here rather than
-        // in a `mounted` flag on the parent on purpose: gating the mount on a
-        // timeout would keep the numbers out of the server HTML, where they are
-        // what a crawler and a screen reader actually read.
-        initial={{ y: 0 }}
-        animate={{ y: -(digit + cycle * 10) * DIGIT_H }}
-        transition={
-          reduce
-            ? { duration: 0 }
-            : {
-                type: "spring",
-                stiffness: 90,
-                damping: 16,
-                mass: 0.9,
-                delay,
-              }
-        }
-      >
-        {Array.from({ length: 20 }, (_, i) => (
-          <span
-            key={i}
-            style={{
-              display: "block",
-              height: DIGIT_H,
-              lineHeight: `${DIGIT_H}px`,
-              textAlign: "center",
-            }}
-          >
-            {i % 10}
-          </span>
-        ))}
-      </motion.span>
-    </span>
-  )
-}
-
 function Stat({ value, label, delay }: { value: number; label: string; delay: number }) {
   const [cycle, setCycle] = useState(0)
-  const digits = String(value).split("").map(Number)
 
   /*
    * The stagger delay belongs to the entrance and nothing else.
@@ -104,21 +45,18 @@ function Stat({ value, label, delay }: { value: number; label: string; delay: nu
       }}
       onMouseLeave={() => setCycle(0)}
     >
-      <span
-        className="flex"
+      <RollingNumber
+        value={value}
+        cycle={cycle}
+        delay={touched ? 0 : delay}
+        height={34}
         style={{
           fontFamily: "var(--font-serif)",
           fontSize: 30,
           color: "var(--fg-primary)",
           fontVariantNumeric: "tabular-nums",
         }}
-      >
-        {/* The strip is aria-hidden, so the real number lives here. */}
-        <span className="sr-only">{value}</span>
-        {digits.map((d, i) => (
-          <Digit key={i} digit={d} cycle={cycle} delay={touched ? 0 : delay + i * 0.06} />
-        ))}
-      </span>
+      />
       <span
         className="font-mono text-[10px] tracking-[0.1em] uppercase transition-colors duration-200 group-hover/stat:text-(--fg-brand)"
         style={{ color: "var(--fg-muted)" }}

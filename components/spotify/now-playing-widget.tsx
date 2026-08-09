@@ -4,6 +4,10 @@ import { useEffect, useState } from "react"
 import Image from "next/image"
 import { useNowPlayingStore } from "@/store/nowPlayingStore"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
+import { motion, useReducedMotion } from "motion/react"
+import { ArrowLink } from "@/components/ui/arrow-link"
+import { CardHead } from "@/components/ui/card-parts"
+import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 
 function formatMs(ms: number): string {
@@ -59,10 +63,8 @@ function CoverFallback() {
 
 function LoadingSkeleton() {
   return (
-    <div
-      className="flex flex-col justify-center rounded-2xl border p-5"
-      style={{ background: "var(--bg-card)", borderColor: "var(--border-subtle)" }}
-    >
+    <div className="bento-card">
+      <CardHead label="me, as a playlist" />
       <div className="flex items-center gap-4">
         <Skeleton className="h-[72px] w-[72px] shrink-0 rounded-lg" />
         <div className="flex min-w-0 flex-1 flex-col gap-2.5">
@@ -80,41 +82,41 @@ function LoadingSkeleton() {
 
 function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
-    <div
-      className="flex items-center gap-4 rounded-2xl border p-5"
-      style={{ background: "var(--bg-card)", borderColor: "var(--border-subtle)" }}
-    >
-      <div
-        className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-lg border border-dashed text-2xl"
-        style={{
-          background: "var(--bg-surface-elevated)",
-          borderColor: "var(--border-strong)",
-          color: "var(--zinc-600)",
-        }}
-      >
-        ✕
-      </div>
-      <div className="min-w-0 flex-1">
+    <div className="bento-card">
+      <CardHead label="me, as a playlist" />
+      <div className="flex items-center gap-4">
         <div
-          className="mb-1 font-mono text-sm font-medium"
-          style={{ color: "var(--fg-secondary)" }}
+          className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-lg border border-dashed text-2xl"
+          style={{
+            background: "var(--bg-surface-elevated)",
+            borderColor: "var(--border-strong)",
+            color: "var(--zinc-600)",
+          }}
         >
-          music unavailable
+          ✕
         </div>
-        <div className="mb-3 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
-          spotify api didn&apos;t respond
-        </div>
-        <div className="flex items-center gap-2.5">
-          <span className="font-mono text-xs" style={{ color: "var(--zinc-600)" }}>
-            $
-          </span>
-          <button
-            onClick={onRetry}
-            className="font-mono text-xs transition-colors"
-            style={{ color: "var(--fg-brand)" }}
+        <div className="min-w-0 flex-1">
+          <div
+            className="mb-1 font-mono text-sm font-medium"
+            style={{ color: "var(--fg-secondary)" }}
           >
-            retry →
-          </button>
+            playlist unavailable
+          </div>
+          <div className="mb-3 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+            spotify api didn&apos;t respond
+          </div>
+          <div className="flex items-center gap-2.5">
+            <span className="font-mono text-xs" style={{ color: "var(--zinc-600)" }}>
+              $
+            </span>
+            <button
+              onClick={onRetry}
+              className="font-mono text-xs transition-colors"
+              style={{ color: "var(--fg-brand)" }}
+            >
+              retry →
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -126,6 +128,8 @@ export function NowPlayingWidget({ className }: { className?: string }) {
   const [coverError, setCoverError] = useState(false)
   const [fading, setFading] = useState(false)
   const [prevIndex, setPrevIndex] = useState(0)
+  const reduce = useReducedMotion() ?? false
+  const { onMouseMove, spotlight } = useSpotlight(360)
 
   useEffect(() => {
     load()
@@ -163,48 +167,43 @@ export function NowPlayingWidget({ className }: { className?: string }) {
   const remaining = track.durationMs - elapsedMs
 
   return (
-    <div
-      className={cn(
-        "group/card relative flex flex-col justify-center overflow-hidden rounded-2xl border p-5",
-        "hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] hover:[background:var(--bg-surface-elevated)]",
-        className,
-      )}
-      style={{
-        background: "var(--bg-card)",
-        borderColor: "var(--border-strong)",
-        transition:
-          "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out)",
-      }}
-    >
-      <h3 className="sr-only">Now playing on Spotify</h3>
+    <div className={cn("bento-card", className)} onMouseMove={onMouseMove}>
+      <Spotlight {...spotlight} />
+      <h3 className="sr-only">Songs that sound like me</h3>
 
-      {/* spotify ↗ — absolute, respects card padding */}
-      <a
-        href={track.spotifyUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute top-5 right-5 font-mono text-[10px] tracking-[0.06em] transition-all duration-150 hover:tracking-[0.1em]"
-        style={{ color: "var(--fg-muted)" }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--fg-brand)")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--fg-muted)")}
-        aria-label="Open on Spotify"
+      {/* Not "now playing" — nothing is playing, and this was never a live feed.
+          It's a playlist of songs that sound like me, some of them answers to
+          asking friends which song they think of when they think of me. The
+          label should say that, because "now playing" was quietly a lie. */}
+      <CardHead
+        label="me, as a playlist"
+        meta={
+          <ArrowLink href={track.spotifyUrl} external className="text-[10px]">
+            spotify
+          </ArrowLink>
+        }
+      />
+
+      {/* The track name leads. It used to be 14px mono under a 72px cover, which
+          made the cover the loudest thing in a widget whose whole point is what
+          is playing — the art shrinks, the title takes the serif. */}
+      <div
+        className={cn(
+          "relative flex items-center gap-4 transition-opacity duration-[240ms]",
+          fading ? "opacity-0" : "opacity-100",
+        )}
       >
-        spotify ↗
-      </a>
-
-      <div className="flex items-center gap-4">
-        {/* Cover */}
-        <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-lg">
+        <div
+          className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg"
+          style={{ border: "1px solid var(--border-subtle)" }}
+        >
           {track.coverUrl && !coverError ? (
             <Image
               src={track.coverUrl}
-              alt={`${track.name} cover`}
+              alt=""
               fill
-              sizes="72px"
-              className={cn(
-                "object-cover transition-opacity duration-[240ms]",
-                fading ? "opacity-0" : "opacity-100",
-              )}
+              sizes="56px"
+              className="object-cover"
               unoptimized
               onError={() => setCoverError(true)}
             />
@@ -213,58 +212,55 @@ export function NowPlayingWidget({ className }: { className?: string }) {
           )}
         </div>
 
-        {/* Track info + progress */}
-        <div
-          className={cn(
-            "min-w-0 flex-1 transition-opacity duration-[240ms]",
-            fading ? "opacity-0" : "opacity-100",
-          )}
-        >
-          {/* Equalizer + track name */}
-          <div className="mb-1 flex items-center gap-2 pr-16">
-            <Equalizer />
-            <span
-              className="truncate font-mono text-sm font-medium"
-              style={{ color: "var(--fg-primary)" }}
-            >
-              {track.name}
-            </span>
-          </div>
-
-          {/* Artist */}
-          <div
-            className="mb-3 truncate pr-16 font-mono text-xs"
-            style={{ color: "var(--fg-muted)" }}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <span
+            className="truncate"
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: 24,
+              lineHeight: 1.15,
+              letterSpacing: "-0.01em",
+              color: "var(--fg-primary)",
+            }}
           >
+            {track.name}
+          </span>
+          <span className="truncate font-mono text-xs" style={{ color: "var(--fg-secondary)" }}>
             {track.artist}
-          </div>
-
-          {/* Progress bar */}
-          <div
-            className="relative h-px overflow-hidden rounded-full"
-            style={{ background: "var(--bg-surface-elevated)" }}
-            role="progressbar"
-            aria-label={`Playback progress: ${track.name} by ${track.artist}`}
-            aria-valuenow={Math.round(progress * 100)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          >
-            <div
-              className="absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-linear"
-              style={{ width: `${progress * 100}%`, background: "var(--fg-brand)" }}
-            />
-          </div>
-
-          {/* Time */}
-          <div className="mt-1.5 flex justify-between">
-            <span className="font-mono text-[10px]" style={{ color: "var(--fg-secondary)" }}>
-              {formatMs(elapsedMs)}
-            </span>
-            <span className="font-mono text-[10px]" style={{ color: "var(--fg-secondary)" }}>
-              -{formatMs(remaining)}
-            </span>
-          </div>
+          </span>
         </div>
+
+        <Equalizer />
+      </div>
+
+      <div className="relative mt-auto flex items-center justify-between gap-3 font-mono text-[10px]">
+        <span style={{ color: "var(--fg-muted)" }}>
+          <span style={{ opacity: 0.6 }}>{"// "}</span>some of these my friends picked for me
+        </span>
+        <span className="shrink-0" style={{ color: "var(--fg-secondary)" }}>
+          {formatMs(elapsedMs)}{" "}
+          <span style={{ color: "var(--fg-muted)" }}>/ -{formatMs(remaining)}</span>
+        </span>
+      </div>
+
+      {/* Progress rides the card's bottom edge, clipped by its radius, instead of
+          being one more line competing with the text above it. */}
+      <div
+        className="absolute inset-x-0 bottom-0"
+        style={{ height: 2, background: "var(--border-subtle)" }}
+        role="progressbar"
+        aria-label={`Playback progress: ${track.name} by ${track.artist}`}
+        aria-valuenow={Math.round(progress * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <motion.span
+          className="absolute inset-y-0 left-0 block w-full"
+          style={{ background: "var(--fg-brand)", originX: 0 }}
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: progress }}
+          transition={reduce ? { duration: 0 } : { duration: 1, ease: "linear" }}
+        />
       </div>
     </div>
   )

@@ -85,7 +85,10 @@ export function OssCard({
       className="bento-card"
       onMouseMove={onMouseMove}
       initial="hidden"
-      animate="show"
+      // Same reason as the wristkit rings: this section sits below the fold, so
+      // an entrance tied to mount plays to an empty room.
+      whileInView="show"
+      viewport={{ once: true, amount: 0.5 }}
       whileHover="hover"
     >
       <Spotlight {...spotlight} />

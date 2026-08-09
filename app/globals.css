@@ -535,6 +535,23 @@ button:focus-visible,
 }
 
 /* ============================================================
+   WRISTKIT RINGS  — hover response
+   ============================================================ */
+
+/* Deliberately CSS and not Motion. The sweep that draws each ring on arrival
+   already owns `strokeDashoffset` through Motion, and driving a second property
+   on the same element from the same library means every hover restarts the
+   sweep. `stroke-width` is a presentation attribute, so a stylesheet can take it
+   over — and doing it here means the reduced-motion reset covers it for free. */
+.wk-ring {
+  transition: stroke-width 280ms var(--ease-out);
+}
+
+.wk-panel:hover .wk-ring {
+  stroke-width: 12;
+}
+
+/* ============================================================
    SITE_TREE  — the file tree card on the home page
    ============================================================ */
 
