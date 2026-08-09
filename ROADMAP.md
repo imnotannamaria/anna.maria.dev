@@ -19,6 +19,10 @@ Replace the system arrow with something that belongs to the site — a small mar
 Some of the components are dull. I want to make them better. First one up: the experience
 card becomes a browsable file tree of the site — [docs/tree-plan.md](docs/tree-plan.md).
 
+## A state for every card
+
+Some of the cards read the database, so the page can be fine while one card has nothing. Each of those wants its own skeleton while it loads and its own error state when the query fails — a card that broke should say it broke, not sit there looking empty. Right now the home page has neither.
+
 ## Posts and (or) projects as a feed
 
 List them the way a social feed does, instead of as a list of links. One item per card, in one column, newest first. Maybe both in the same feed.
