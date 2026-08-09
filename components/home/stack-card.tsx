@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
+import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 import { CaretRightIcon } from "@phosphor-icons/react"
@@ -172,6 +173,7 @@ export function StackCard() {
   const reduce = useReducedMotion() ?? false
   const [open, setOpen] = useState<Set<string>>(() => new Set(["front", "back"]))
   const { onMouseMove, spotlight } = useSpotlight(700)
+  const reveal = useReveal(0.12)
 
   const toggle = (id: string) =>
     setOpen((prev) => {
@@ -226,7 +228,7 @@ export function StackCard() {
   }
 
   return (
-    <div className="bento-card" onMouseMove={onMouseMove}>
+    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
 
       {/* Header — same shape as the tree card: mark + name left, count right. */}
@@ -325,7 +327,10 @@ export function StackCard() {
                     padding-top + padding-bottom, so a closed branch would leave
                     a 16px ghost. This one is a motion.div with no `animate` of
                     its own, which keeps the stagger propagating to the badges. */}
-                <motion.div className="flex flex-wrap gap-1.5 px-4 pb-4">
+                {/* pt-1 is not spacing, it is clearance. The badges lift on hover inside a
+                    panel that has to clip for the height animation, so without a little
+                    room above them the top of the border gets cut off. */}
+                <motion.div className="flex flex-wrap gap-1.5 px-4 pt-1 pb-4">
                   {branch.tools.map((tool) => (
                     <motion.span key={tool.name} variants={badge} className="inline-flex">
                       <StackBadge tool={tool} />
@@ -353,6 +358,6 @@ export function StackCard() {
         </span>
         <span style={{ color: "var(--fg-brand)" }}>{TOTAL_TOOLS} tools</span>
       </div>
-    </div>
+    </motion.div>
   )
 }

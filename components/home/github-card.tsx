@@ -1,9 +1,11 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import { motion } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { ArrowLink } from "@/components/ui/arrow-link"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 
 const GithubCalendarInner = dynamic(
@@ -27,9 +29,10 @@ const GithubCalendarInner = dynamic(
  */
 export function GithubCard({ username }: { username: string }) {
   const { onMouseMove, spotlight } = useSpotlight(700)
+  const reveal = useReveal()
 
   return (
-    <div className="bento-card" onMouseMove={onMouseMove}>
+    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
 
       <CardHead label="contributions" as="h3" meta={username} />
@@ -54,6 +57,6 @@ export function GithubCard({ username }: { username: string }) {
           </ArrowLink>
         </span>
       </CardFoot>
-    </div>
+    </motion.div>
   )
 }

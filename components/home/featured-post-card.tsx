@@ -1,10 +1,13 @@
 "use client"
 
 import Link from "next/link"
+import { motion } from "motion/react"
 import { BookOpenIcon } from "@phosphor-icons/react"
 import { ArrowAffordance } from "@/components/ui/arrow-link"
 import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
+import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { TypeIn } from "@/components/ui/type-in"
 
 export type FeaturedPost = {
   slug: string
@@ -23,6 +26,7 @@ export type FeaturedPost = {
  */
 export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
   const { onMouseMove, spotlight } = useSpotlight(340)
+  const reveal = useReveal(0.08)
 
   return (
     <Link
@@ -31,7 +35,7 @@ export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
       style={{ textDecoration: "none" }}
       onMouseMove={onMouseMove}
     >
-      <div className="bento-card flex flex-1 flex-col">
+      <motion.div className="bento-card flex flex-1 flex-col" {...reveal}>
         <Spotlight {...spotlight} />
 
         <CardHead
@@ -44,7 +48,13 @@ export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
           }
         />
 
-        <h3
+        {/* By word, not by character. This is a sentence that wraps, and
+            inline-block characters can't break a line where a word ends. */}
+        <TypeIn
+          as="h3"
+          by="word"
+          text={post.title}
+          delay={0.18}
           className="relative"
           style={{
             fontFamily: "var(--font-serif)",
@@ -53,9 +63,7 @@ export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
             color: "var(--fg-primary)",
             margin: 0,
           }}
-        >
-          {post.title}
-        </h3>
+        />
 
         {post.description && (
           <p
@@ -81,7 +89,7 @@ export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
             <ArrowAffordance>read post</ArrowAffordance>
           </span>
         </CardFoot>
-      </div>
+      </motion.div>
     </Link>
   )
 }

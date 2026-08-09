@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { useReducedMotion, type Variants } from "motion/react"
+import { motion, useReducedMotion, type Variants } from "motion/react"
+import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 import { defaultOpenPaths, type SiteTreeItem } from "@/lib/site-tree"
@@ -72,6 +73,14 @@ export function TreeCard({
   const reduce = useReducedMotion() ?? false
   const [open, setOpen] = useState<Set<string>>(() => new Set(defaultOpenPaths(items)))
   const { onMouseMove, spotlight } = useSpotlight()
+  const reveal = useReveal(0.08)
+
+  /* Header, list and footer arrive in sequence after the card does, so this
+     matches the profile card beside it instead of revealing as one slab. */
+  const piece: Variants = {
+    hidden: { opacity: 0, y: reduce ? 0 : 8 },
+    show: { opacity: 1, y: 0, transition: { duration: reduce ? 0 : 0.4, ease: EASE_OUT } },
+  }
 
   const variants = buildVariants(reduce)
 
@@ -84,9 +93,11 @@ export function TreeCard({
     })
 
   return (
-    <div
+    <motion.div
       className={cn("bento-card relative flex flex-col overflow-hidden", className)}
       onMouseMove={onMouseMove}
+      {...reveal}
+      transition={{ ...reveal.transition, staggerChildren: reduce ? 0 : 0.09, delayChildren: 0.1 }}
     >
       <Spotlight {...spotlight} />
       {/* Dot pattern, same treatment the experience card had */}
@@ -107,9 +118,10 @@ export function TreeCard({
         }}
       />
 
-      <div
+      <motion.div
         className="relative flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-secondary)" }}
+        variants={piece}
       >
         <h2
           id="card-tree"
@@ -122,13 +134,14 @@ export function TreeCard({
           tree
         </h2>
         <span style={{ color: "var(--fg-muted)" }}>{routeCount} routes</span>
-      </div>
+      </motion.div>
 
       {/* min-h-0 is what makes this the part that scrolls: without it a flex child
           refuses to shrink below its content and the overflow never engages. */}
-      <nav
+      <motion.nav
         aria-labelledby="card-tree"
         className="relative -mx-2 min-h-0 flex-1 overflow-y-auto pb-1"
+        variants={piece}
       >
         <ul className="tree-root">
           {items.map((item) => (
@@ -143,15 +156,16 @@ export function TreeCard({
             </li>
           ))}
         </ul>
-      </nav>
+      </motion.nav>
 
-      <div
+      <motion.div
         className="relative flex items-center justify-between font-mono text-[11px]"
         style={{
           color: "var(--fg-muted)",
           borderTop: "1px dashed var(--border-subtle)",
           paddingTop: 12,
         }}
+        variants={piece}
       >
         <span>
           <span style={{ opacity: 0.6 }}>{"// "}</span>
@@ -167,7 +181,7 @@ export function TreeCard({
           />
           live
         </span>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

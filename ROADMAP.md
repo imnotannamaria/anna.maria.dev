@@ -29,6 +29,10 @@ It's `react-github-calendar` today. I want to drop the library and build it from
 
 A page for my open source work, built after I start contributing to projects that aren't mine. An empty page would be worse than no page at all.
 
+## Give the sidebar a job
+
+Right now it repeats the titlebar tabs, so it's two navigations for one set of pages. I'd rather it held the things that don't belong in a page: comments, the roadmap. Something like tabs sticking out of the edge — hover one and a panel slides out with what's inside.
+
 ## Comments
 
 Let anyone leave a comment about the site without signing in, and show them somewhere. Every new one emails me. Same open-form problem as tipfy, so it needs the same protection.

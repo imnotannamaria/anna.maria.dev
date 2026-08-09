@@ -7,6 +7,7 @@ import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { motion, useReducedMotion } from "motion/react"
 import { ArrowLink } from "@/components/ui/arrow-link"
 import { CardHead } from "@/components/ui/card-parts"
+import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 
@@ -130,6 +131,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
   const [prevIndex, setPrevIndex] = useState(0)
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(360)
+  const reveal = useReveal()
 
   useEffect(() => {
     load()
@@ -167,7 +169,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
   const remaining = track.durationMs - elapsedMs
 
   return (
-    <div className={cn("bento-card", className)} onMouseMove={onMouseMove}>
+    <motion.div className={cn("bento-card", className)} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
       <h3 className="sr-only">Songs that sound like me</h3>
 
@@ -262,6 +264,6 @@ export function NowPlayingWidget({ className }: { className?: string }) {
           transition={reduce ? { duration: 0 } : { duration: 1, ease: "linear" }}
         />
       </div>
-    </div>
+    </motion.div>
   )
 }

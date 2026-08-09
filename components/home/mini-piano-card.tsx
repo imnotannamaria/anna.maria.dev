@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { motion } from "motion/react"
+import { useReveal } from "@/components/ui/reveal"
 import { CardHead } from "@/components/ui/card-parts"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 
@@ -51,6 +53,7 @@ const SEQ = [SOL, LA, SOL + 7, LA + 7]
 // ─── Component ───────────────────────────────────────────────────────────────
 export function MiniPianoCard() {
   const { onMouseMove, spotlight } = useSpotlight(340)
+  const reveal = useReveal()
   const [pressed, setPressed] = useState<number | null>(null)
   const [step, setStep] = useState(0)
 
@@ -75,7 +78,7 @@ export function MiniPianoCard() {
 
   return (
     <Link href="/piano" style={{ textDecoration: "none", display: "block" }}>
-      <div className="bento-card group/piano h-full" onMouseMove={onMouseMove}>
+      <motion.div className="bento-card group/piano h-full" onMouseMove={onMouseMove} {...reveal}>
         <Spotlight {...spotlight} />
 
         {/* This was a mac title bar — traffic lights over a chrome-tinted strip
@@ -213,7 +216,7 @@ export function MiniPianoCard() {
             /piano →
           </span>
         </div>
-      </div>
+      </motion.div>
     </Link>
   )
 }

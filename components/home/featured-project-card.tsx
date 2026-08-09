@@ -5,6 +5,7 @@ import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } fro
 import type { Variants } from "motion/react"
 import { ArrowLink } from "@/components/ui/arrow-link"
 import { Badge, CardFoot } from "@/components/ui/card-parts"
+import { TypeIn } from "@/components/ui/type-in"
 
 const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
 
@@ -146,12 +147,20 @@ export function FeaturedProjectCard({
       >
         {hasDash ? (
           <>
-            <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>{head}-</em>
+            <TypeIn
+              text={`${head}-`}
+              style={{ fontStyle: "italic", color: "var(--fg-brand)" }}
+              delay={0.15}
+            />
             <br />
-            {rest.join("-")}
+            <TypeIn text={rest.join("-")} delay={0.15 + (head.length + 1) * 0.03} />
           </>
         ) : (
-          <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>{project.title}</em>
+          <TypeIn
+            text={project.title}
+            style={{ fontStyle: "italic", color: "var(--fg-brand)" }}
+            delay={0.15}
+          />
         )}
       </h3>
 

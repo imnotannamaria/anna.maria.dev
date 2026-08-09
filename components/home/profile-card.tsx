@@ -11,6 +11,7 @@ import {
   XLogoIcon,
 } from "@phosphor-icons/react"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
+import { revealViewport } from "@/components/ui/reveal"
 import { RollingNumber } from "@/components/ui/rolling-number"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
@@ -218,9 +219,24 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
 
   const { onMouseMove, spotlight } = useSpotlight()
 
+  /*
+   * The card rises as one piece and its contents follow, which is the same two
+   * beats every other card on the page does. It used to animate only its
+   * contents while the container sat still, and the tree beside it did the
+   * opposite — two cards in the same row disagreeing about what an entrance is.
+   */
   const container: Variants = {
-    hidden: {},
-    show: { transition: { staggerChildren: reduce ? 0 : 0.08, delayChildren: 0.05 } },
+    hidden: { opacity: 0, y: reduce ? 0 : 14 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: reduce ? 0 : 0.5,
+        ease: EASE_OUT,
+        staggerChildren: reduce ? 0 : 0.08,
+        delayChildren: reduce ? 0 : 0.12,
+      },
+    },
   }
   const item: Variants = {
     hidden: { opacity: 0, y: reduce ? 0 : 12 },
@@ -246,7 +262,8 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
       }}
       variants={container}
       initial="hidden"
-      animate="show"
+      whileInView="show"
+      viewport={revealViewport}
       onMouseMove={onMouseMove}
     >
       <Spotlight {...spotlight} />

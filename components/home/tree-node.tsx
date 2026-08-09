@@ -52,6 +52,8 @@ type NodeProps = {
   onToggle: (path: string) => void
   listVariants: Variants
   rowVariants: Variants
+  /** Position within its own list, used only to stagger the entrance. */
+  index?: number
 }
 
 /**
@@ -63,7 +65,14 @@ type NodeProps = {
  * reader than none at all — it announces "tree, 7 items" and then the arrows do
  * nothing. This is a nested list of real buttons and links instead.
  */
-export function TreeNode({ item, isOpen, onToggle, listVariants, rowVariants }: NodeProps) {
+export function TreeNode({
+  item,
+  isOpen,
+  onToggle,
+  listVariants,
+  rowVariants,
+  index = 0,
+}: NodeProps) {
   const open = item.kind === "folder" && isOpen(item.path)
   const panelId = `tree-${item.path.replace(/[^a-z0-9]+/gi, "-")}`
   const hasChildren = Boolean(item.children && item.children.length > 0)
@@ -90,59 +99,74 @@ export function TreeNode({ item, isOpen, onToggle, listVariants, rowVariants }: 
 
   return (
     <>
-      {item.kind === "folder" && hasChildren ? (
-        <button
-          type="button"
-          className="tree-row"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={() => onToggle(item.path)}
-        >
-          <CaretRightIcon
-            aria-hidden
-            size={10}
-            weight="bold"
-            className={cn("tree-caret", open && "tree-caret-open")}
-            style={{ color: open ? "var(--fg-brand)" : "var(--fg-muted)" }}
-          />
-          {open ? (
-            <FolderOpenIcon
+      {/*
+       * The entrance is its own element rather than another state on the row.
+       *
+       * The rows already answer to open/closed, and Motion resolves one variant
+       * label per element — a second axis for "arriving" has nowhere to live. A
+       * plain wrapper with its own initial/whileInView doesn't declare variants,
+       * so no label reaches it and the two never argue.
+       */}
+      <motion.div
+        initial={{ opacity: 0, x: -8 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.34, ease: [0.2, 0.8, 0.2, 1], delay: 0.12 + index * 0.05 }}
+      >
+        {item.kind === "folder" && hasChildren ? (
+          <button
+            type="button"
+            className="tree-row"
+            aria-expanded={open}
+            aria-controls={panelId}
+            onClick={() => onToggle(item.path)}
+          >
+            <CaretRightIcon
               aria-hidden
-              size={14}
-              className="tree-glyph"
-              style={{ color: "var(--fg-brand)" }}
+              size={10}
+              weight="bold"
+              className={cn("tree-caret", open && "tree-caret-open")}
+              style={{ color: open ? "var(--fg-brand)" : "var(--fg-muted)" }}
             />
-          ) : (
-            <FolderIcon
-              aria-hidden
-              size={14}
-              className="tree-glyph tree-glyph-shift"
-              style={{ color: "var(--fg-brand)" }}
-            />
-          )}
-          {label}
-          {count}
-        </button>
-      ) : item.locked || !item.href ? (
-        <span className="tree-row tree-row-locked">
-          {caretSlot}
-          {fileGlyph(item.name, "tree-glyph")}
-          {label}
-          <span className="sr-only">not published yet</span>
-          <LockSimpleIcon aria-hidden size={12} className="ml-auto shrink-0" />
-        </span>
-      ) : (
-        <Link href={item.href} className="tree-row" title={item.hint ?? item.name}>
-          {caretSlot}
-          {item.kind === "more" ? (
-            <span aria-hidden className="tree-glyph" style={{ width: 14 }} />
-          ) : (
-            fileGlyph(item.name, "tree-glyph tree-glyph-shift")
-          )}
-          {label}
-          {count}
-        </Link>
-      )}
+            {open ? (
+              <FolderOpenIcon
+                aria-hidden
+                size={14}
+                className="tree-glyph"
+                style={{ color: "var(--fg-brand)" }}
+              />
+            ) : (
+              <FolderIcon
+                aria-hidden
+                size={14}
+                className="tree-glyph tree-glyph-shift"
+                style={{ color: "var(--fg-brand)" }}
+              />
+            )}
+            {label}
+            {count}
+          </button>
+        ) : item.locked || !item.href ? (
+          <span className="tree-row tree-row-locked">
+            {caretSlot}
+            {fileGlyph(item.name, "tree-glyph")}
+            {label}
+            <span className="sr-only">not published yet</span>
+            <LockSimpleIcon aria-hidden size={12} className="ml-auto shrink-0" />
+          </span>
+        ) : (
+          <Link href={item.href} className="tree-row" title={item.hint ?? item.name}>
+            {caretSlot}
+            {item.kind === "more" ? (
+              <span aria-hidden className="tree-glyph" style={{ width: 14 }} />
+            ) : (
+              fileGlyph(item.name, "tree-glyph tree-glyph-shift")
+            )}
+            {label}
+            {count}
+          </Link>
+        )}
+      </motion.div>
 
       {hasChildren && (
         /*
@@ -160,7 +184,7 @@ export function TreeNode({ item, isOpen, onToggle, listVariants, rowVariants }: 
           custom={item.children!.length}
           inert={!open}
         >
-          {item.children!.map((child) => (
+          {item.children!.map((child, i) => (
             <motion.li key={child.path} variants={rowVariants}>
               <TreeNode
                 item={child}
@@ -168,6 +192,7 @@ export function TreeNode({ item, isOpen, onToggle, listVariants, rowVariants }: 
                 onToggle={onToggle}
                 listVariants={listVariants}
                 rowVariants={rowVariants}
+                index={i}
               />
             </motion.li>
           ))}

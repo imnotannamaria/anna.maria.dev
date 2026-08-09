@@ -3,6 +3,7 @@
 import { useState } from "react"
 import type * as React from "react"
 import { motion, useReducedMotion } from "motion/react"
+import { revealViewport } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import type { TodayData } from "./load"
 
@@ -28,6 +29,12 @@ function clamp01(x: number): number {
  * — because mixing the two on one element means every hover restarts the sweep.
  * Splitting them also means the hover inherits the global reduced-motion reset
  * for free, while the sweep asks `useReducedMotion` itself.
+ *
+ * The sweep is a variant driven from `Panel`, not a `whileInView` on the circle.
+ * An IntersectionObserver aimed at an SVG child is unreliable — in practice only
+ * the outer ring ever fired and the inner two snapped into place. The panel is an
+ * HTML element with an honest box, so watching that works, and the label reaches
+ * all three from one place.
  */
 function Ring({
   r,
@@ -51,7 +58,28 @@ function Ring({
   const p = clamp01(max > 0 ? value / max : 0)
 
   return (
-    <>
+    /*
+     * The group scales and fades in; the arc draws inside it.
+     *
+     * The draw alone was not enough and it was never a bug: all three rings run
+     * the same animation, but "the same animation" covers 80% of a circle for
+     * move and about 10% for exercise on a 3-of-30-minute day. Identical motion,
+     * an eighth of the distance — the inner rings read as popping into place.
+     * The arrival is what makes each ring legible whatever its value is.
+     */
+    <motion.g
+      style={{ transformBox: "fill-box", transformOrigin: "center" }}
+      variants={{
+        hidden: { opacity: 0, scale: reduce ? 1 : 0.84 },
+        show: {
+          opacity: 1,
+          scale: 1,
+          transition: reduce
+            ? { duration: 0 }
+            : { duration: 0.5, ease: [0.2, 0.8, 0.2, 1], delay: index * 0.12 },
+        },
+      }}
+    >
       <circle
         cx={cx}
         cy={cy}
@@ -73,20 +101,17 @@ function Ring({
         strokeLinecap="round"
         strokeDasharray={circ}
         transform={`rotate(-90 ${cx} ${cy})`}
-        initial={{ strokeDashoffset: circ }}
-        // whileInView and not animate. This card lives well below the fold, so
-        // `animate` fired at page load — the rings finished sweeping while the
-        // visitor was still reading the hero, and by the time they scrolled down
-        // there was nothing left to see. Now it waits for the card to be looked at.
-        whileInView={{ strokeDashoffset: circ * (1 - p) }}
-        viewport={{ once: true, amount: 0.4 }}
-        transition={
-          reduce
-            ? { duration: 0 }
-            : { duration: 1.2, ease: [0.2, 0.8, 0.2, 1], delay: 0.15 + index * 0.12 }
-        }
+        variants={{
+          hidden: { strokeDashoffset: circ },
+          show: {
+            strokeDashoffset: circ * (1 - p),
+            transition: reduce
+              ? { duration: 0 }
+              : { duration: 1.1, ease: [0.2, 0.8, 0.2, 1], delay: 0.2 + index * 0.12 },
+          },
+        }}
       />
-    </>
+    </motion.g>
   )
 }
 
@@ -95,9 +120,12 @@ function Panel({ className, children }: { className?: string; children: React.Re
   const { onMouseMove, spotlight } = useSpotlight(380)
 
   return (
-    <section
+    <motion.section
       className={`wk-panel ${className ?? ""}`}
       onMouseMove={onMouseMove}
+      initial="hidden"
+      whileInView="show"
+      viewport={revealViewport}
       style={{
         position: "relative",
         overflow: "hidden",
@@ -120,7 +148,7 @@ function Panel({ className, children }: { className?: string; children: React.Re
     >
       <Spotlight {...spotlight} />
       {children}
-    </section>
+    </motion.section>
   )
 }
 
@@ -180,19 +208,34 @@ function Header({
   )
 }
 
+/** `index` only orders the entrance; the rows are otherwise identical. */
 function MetricRow({
   dot,
   label,
   value,
   suffix,
+  index = 0,
 }: {
   dot: string
   label: string
   value: React.ReactNode
   suffix?: string
+  index?: number
 }) {
   return (
-    <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+    <motion.div
+      style={{ display: "flex", alignItems: "baseline", gap: 10 }}
+      // The rings sweep for over a second; rows that snap in at frame one beside
+      // them is what made the card read as half-animated.
+      variants={{
+        hidden: { opacity: 0, y: 8 },
+        show: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.4, ease: [0.2, 0.8, 0.2, 1], delay: 0.3 + index * 0.1 },
+        },
+      }}
+    >
       <span
         aria-hidden
         style={{
@@ -231,7 +274,7 @@ function MetricRow({
           <span style={{ color: "var(--fg-muted)", marginLeft: 6, fontSize: 11 }}>{suffix}</span>
         ) : null}
       </span>
-    </div>
+    </motion.div>
   )
 }
 
@@ -296,11 +339,11 @@ export function TodayActivityCardLoading({ className }: { className?: string }) 
           </svg>
         </div>
         <div style={{ opacity: 0.75 }}>
-          <MetricRow dot={colors.move} label="Move" value="—" suffix="kcal" />
+          <MetricRow index={0} dot={colors.move} label="Move" value="—" suffix="kcal" />
           <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow dot={colors.exercise} label="Exercise" value="—" suffix="min" />
+          <MetricRow index={1} dot={colors.exercise} label="Exercise" value="—" suffix="min" />
           <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow dot={colors.steps} label="Steps" value="—" />
+          <MetricRow index={2} dot={colors.steps} label="Steps" value="—" />
         </div>
       </div>
       <Footer
@@ -345,11 +388,11 @@ export function TodayActivityCardEmpty({ className }: { className?: string }) {
           </svg>
         </div>
         <div>
-          <MetricRow dot={colors.move} label="Move" value="—" suffix="kcal" />
+          <MetricRow index={0} dot={colors.move} label="Move" value="—" suffix="kcal" />
           <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow dot={colors.exercise} label="Exercise" value="—" suffix="min" />
+          <MetricRow index={1} dot={colors.exercise} label="Exercise" value="—" suffix="min" />
           <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow dot={colors.steps} label="Steps" value="—" />
+          <MetricRow index={2} dot={colors.steps} label="Steps" value="—" />
         </div>
       </div>
       <Footer
@@ -443,16 +486,23 @@ export function TodayActivityCardStale({
           </svg>
         </div>
         <div>
-          <MetricRow dot={colors.move} label="Move" value={Math.round(data.kcal)} suffix="kcal" />
+          <MetricRow
+            index={0}
+            dot={colors.move}
+            label="Move"
+            value={Math.round(data.kcal)}
+            suffix="kcal"
+          />
           <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow
+            index={1}
             dot={colors.exercise}
             label="Exercise"
             value={Math.round(data.exerciseMinutes)}
             suffix="min"
           />
           <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow dot={colors.steps} label="Steps" value={Math.round(data.steps)} />
+          <MetricRow index={2} dot={colors.steps} label="Steps" value={Math.round(data.steps)} />
         </div>
       </div>
       <Footer
@@ -521,16 +571,23 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
           </svg>
         </div>
         <div>
-          <MetricRow dot={colors.move} label="Move" value={Math.round(data.kcal)} suffix="kcal" />
+          <MetricRow
+            index={0}
+            dot={colors.move}
+            label="Move"
+            value={Math.round(data.kcal)}
+            suffix="kcal"
+          />
           <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
           <MetricRow
+            index={1}
             dot={colors.exercise}
             label="Exercise"
             value={Math.round(data.exerciseMinutes)}
             suffix="min"
           />
           <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow dot={colors.steps} label="Steps" value={Math.round(data.steps)} />
+          <MetricRow index={2} dot={colors.steps} label="Steps" value={Math.round(data.steps)} />
         </div>
       </div>
       <Footer
