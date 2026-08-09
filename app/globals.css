@@ -1001,3 +1001,255 @@ button:focus-visible,
   --bg-surface-brand: rgba(29, 78, 216, 0.08);
   --ring: rgba(29, 78, 216, 0.4);
 }
+
+/* ============================================================
+   ROADMAP — PROTÓTIPO / DISCOVERY
+   Tudo aqui é temporário. Se a ideia vingar, isso vira peça em
+   components/ui e o CSS entra junto das outras superfícies.
+   ============================================================ */
+
+:root {
+  /* Tinta do check por cima do preenchimento brand. Sempre escura: branco
+     falha o contraste em marmalade (laranja), que é onde ele falha primeiro. */
+  --rm-check-ink: #09090b;
+}
+
+/* ---------- checkbox ---------- */
+
+.rm-checkbox {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 160ms var(--ease-out),
+    transform 120ms var(--ease-out);
+}
+.rm-checkbox:hover {
+  border-color: var(--fg-brand);
+}
+.rm-checkbox:active {
+  transform: scale(0.92);
+}
+.rm-checkbox:focus-visible {
+  outline: 2px solid var(--fg-brand);
+  outline-offset: 3px;
+}
+.rm-checkbox[aria-checked="true"] {
+  border-color: var(--fg-brand);
+}
+
+.rm-checkbox-fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 4.5px;
+  background: var(--fg-brand);
+}
+
+.rm-checkbox-burst {
+  position: absolute;
+  inset: -2px;
+  border-radius: 8px;
+  border: 1.5px solid var(--fg-brand);
+  pointer-events: none;
+}
+
+.rm-checkbox-svg {
+  position: relative;
+}
+
+/* Fantasma do check no hover: mostra o que o clique vai fazer. */
+.rm-checkbox:hover .rm-checkbox-svg path {
+  opacity: 0.28;
+}
+.rm-checkbox[aria-checked="true"]:hover .rm-checkbox-svg path {
+  opacity: 1;
+}
+
+/* ---------- item: é um .bento-card, só com os estados do roadmap ---------- */
+
+/* Nada de superfície nova aqui. O card, o hover e a sombra vêm de
+   .bento-card + .featured-card; isto só acrescenta o que é do roadmap:
+   a barra de accent na borda e o que muda quando o item é marcado. */
+.rm-item {
+  padding: 18px;
+  gap: 12px;
+}
+
+.rm-item::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--fg-brand);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 280ms var(--ease-out);
+  z-index: 1;
+}
+.rm-item:hover::before,
+.rm-item:focus-within::before,
+.rm-item[data-status="doing"]::before {
+  transform: scaleY(1);
+}
+
+.rm-item[data-status="doing"] {
+  border-color: var(--border-brand);
+}
+.rm-item[data-checked="true"] {
+  background: transparent;
+}
+.rm-item[data-checked="true"] .rm-title {
+  color: var(--fg-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--border-brand-strong);
+  text-decoration-thickness: 1px;
+}
+.rm-item[data-checked="true"] .rm-blurb {
+  opacity: 0.55;
+}
+.rm-item[data-checked="true"]:hover .rm-blurb {
+  opacity: 1;
+}
+
+.rm-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--fg-primary);
+  transition: color 200ms var(--ease-out);
+}
+.rm-blurb {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--fg-secondary);
+  transition: opacity 200ms var(--ease-out);
+}
+
+/* ---------- stepper do card de progresso ---------- */
+
+.rm-step {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.rm-step-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+.rm-step[data-state="done"] .rm-step-mark {
+  border-color: var(--fg-brand);
+  background: var(--fg-brand);
+  color: var(--rm-check-ink);
+}
+.rm-step[data-state="live"] .rm-step-mark {
+  border-color: var(--fg-brand);
+  color: var(--fg-brand);
+  animation: dot-glow 2.4s ease-in-out infinite;
+}
+.rm-step-rule {
+  flex: 1;
+  height: 1px;
+  min-width: 16px;
+  background: var(--border-subtle);
+}
+
+/* ---------- tab vertical do sidebar ---------- */
+
+.rm-tab {
+  position: relative;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 5px;
+  margin-right: -1px;
+  border: 1px solid var(--border-subtle);
+  border-right: 0;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  background: var(--bg-card);
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 180ms var(--ease-out),
+    border-color 180ms var(--ease-out),
+    background 180ms var(--ease-out),
+    letter-spacing 220ms var(--ease-out),
+    padding 220ms var(--ease-out);
+}
+.rm-tab:hover,
+.rm-tab[aria-expanded="true"] {
+  color: var(--fg-primary);
+  border-color: var(--border-brand);
+  background: var(--bg-surface-brand);
+  letter-spacing: 0.3em;
+  padding-block: 20px;
+}
+.rm-tab:focus-visible {
+  outline: 2px solid var(--fg-brand);
+  outline-offset: 2px;
+}
+.rm-tab-diamond {
+  color: var(--fg-brand);
+  font-size: 9px;
+  line-height: 1;
+}
+.rm-tab:hover .rm-tab-diamond {
+  animation: live-pulse 1.6s ease-in-out infinite;
+}
+
+/* ---------- barra de progresso ---------- */
+
+.rm-progress {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+.rm-progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--fg-brand), var(--fg-brand-hover));
+  box-shadow: 0 0 12px var(--fg-brand-glow);
+}
+
+/* ---------- ponto de status da coluna ---------- */
+
+.rm-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fg-brand);
+}
+.rm-dot[data-live="true"] {
+  animation: dot-glow 2.4s ease-in-out infinite;
+}
+.rm-dot[data-muted="true"] {
+  background: var(--border-strong);
+}
