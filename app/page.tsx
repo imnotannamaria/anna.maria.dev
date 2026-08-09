@@ -6,6 +6,10 @@ import {
   getPublishedProjects,
 } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/utils"
+import { CardHead } from "@/components/ui/card-parts"
+import { FeaturedProjectCard } from "@/components/home/featured-project-card"
+import { FeaturedPostCard } from "@/components/home/featured-post-card"
+import { OssCard } from "@/components/home/oss-card"
 import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
 import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
@@ -75,126 +79,6 @@ function SectHead({
           {meta}
         </span>
       )}
-    </div>
-  )
-}
-
-function CardHead({
-  label,
-  meta,
-  as = "span",
-  id,
-}: {
-  label: string
-  meta?: React.ReactNode
-  as?: "span" | "h2" | "h3"
-  id?: string
-}) {
-  const Label = as
-  const isHeading = as !== "span"
-  return (
-    <div
-      className="flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
-      style={{ color: "var(--fg-secondary)" }}
-    >
-      <Label
-        id={id}
-        className="inline-flex items-center gap-1.5"
-        style={isHeading ? { margin: 0, fontSize: "inherit", fontWeight: "inherit" } : undefined}
-      >
-        <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-          ◆
-        </span>
-        {label}
-      </Label>
-      {meta && <span style={{ color: "var(--fg-muted)" }}>{meta}</span>}
-    </div>
-  )
-}
-
-function CardFoot({ comment, children }: { comment?: string; children?: React.ReactNode }) {
-  return (
-    <div
-      className="mt-auto flex items-center justify-between gap-3 font-mono text-[11px]"
-      style={{ color: "var(--fg-muted)" }}
-    >
-      {comment && (
-        <span>
-          <span style={{ opacity: 0.6 }}>{"// "}</span>
-          {comment}
-        </span>
-      )}
-      {children}
-    </div>
-  )
-}
-
-function Badge({
-  children,
-  variant = "default",
-}: {
-  children: React.ReactNode
-  variant?: "default" | "brand-soft" | "success-soft"
-}) {
-  const styles: Record<string, { bg: string; fg: string }> = {
-    default: { bg: "rgba(255,255,255,0.06)", fg: "var(--fg-secondary)" },
-    "brand-soft": { bg: "var(--bg-surface-brand)", fg: "var(--fg-brand-hover)" },
-    "success-soft": { bg: "var(--status-success-soft)", fg: "var(--status-success-fg)" },
-  }
-  const { bg, fg } = styles[variant]
-  return (
-    <span
-      className="inline-flex h-[22px] items-center rounded-[var(--radius-sm)] px-2 font-mono text-[11px] font-medium"
-      style={{ background: bg, color: fg }}
-    >
-      {children}
-    </span>
-  )
-}
-
-function StatNum({ serif, sub }: { serif: React.ReactNode; sub: string }) {
-  return (
-    <div
-      style={{
-        fontFamily: "var(--font-serif)",
-        fontSize: 48,
-        lineHeight: 1,
-        color: "var(--fg-primary)",
-        letterSpacing: "-0.02em",
-        fontWeight: 400,
-      }}
-    >
-      <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>{serif}</em>
-      <sub
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: 12,
-          color: "var(--fg-muted)",
-          fontWeight: 400,
-          marginLeft: 4,
-          letterSpacing: 0,
-          verticalAlign: "baseline",
-        }}
-      >
-        {sub}
-      </sub>
-    </div>
-  )
-}
-
-function ProgressBar({ filled, total }: { filled: number; total: number }) {
-  return (
-    <div style={{ display: "flex", gap: 3, height: 6, marginTop: "auto" }}>
-      {Array.from({ length: total }, (_, i) => (
-        <span
-          key={i}
-          style={{
-            flex: 1,
-            background: i < filled ? "var(--fg-brand)" : "var(--border-subtle)",
-            borderRadius: 2,
-          }}
-        />
-      ))}
     </div>
   )
 }
@@ -304,141 +188,12 @@ export default async function Home() {
           }
         />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.35fr_1fr]">
-          {/* Featured project */}
           {featuredProject ? (
-            <div
-              className="featured-card group/featured relative flex flex-col gap-4 overflow-hidden p-6 sm:p-8"
-              style={{
-                background: "var(--bg-surface-brand)",
-                border: "1px solid var(--border-brand)",
-                borderRadius: "var(--radius-xl)",
-                minHeight: 380,
-              }}
-            >
-              {/* Stretch link — covers whole card, inner links sit above it via z-index */}
-              <Link
-                href={`/projects/${featuredProject.slug}`}
-                className="absolute inset-0"
-                style={{ zIndex: 1 }}
-                aria-label={`View ${featuredProject.title}`}
-              />
-
-              <div
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  right: "-10%",
-                  bottom: "-30%",
-                  width: "60%",
-                  aspectRatio: "1",
-                  opacity: 0.35,
-                  pointerEvents: "none",
-                  backgroundImage: "radial-gradient(var(--fg-brand) 1px, transparent 1.4px)",
-                  backgroundSize: "22px 22px",
-                  maskImage: "radial-gradient(circle, #000 0%, transparent 60%)",
-                  WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 60%)",
-                }}
-              />
-
-              <div className="flex items-center justify-between">
-                <span
-                  className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.08em] uppercase"
-                  style={{ color: "var(--fg-secondary)" }}
-                >
-                  <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-                    ◆
-                  </span>
-                  featured
-                </span>
-                <Badge variant="brand-soft">SHIPPED</Badge>
-              </div>
-
-              <p
-                className="font-mono text-xs tracking-[0.04em]"
-                style={{ color: "var(--fg-brand)" }}
-              >
-                01 / {getFeaturedProjects().length.toString().padStart(2, "0")}
-              </p>
-
-              <h3
-                style={{
-                  fontFamily: "var(--font-serif)",
-                  fontWeight: 400,
-                  fontSize: 48,
-                  lineHeight: 1,
-                  letterSpacing: "-0.02em",
-                  color: "var(--fg-primary)",
-                  margin: 0,
-                }}
-              >
-                {featuredProject.title.includes("-") ? (
-                  <>
-                    <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>
-                      {featuredProject.title.split("-")[0]}-
-                    </em>
-                    <br />
-                    {featuredProject.title.split("-").slice(1).join("-")}
-                  </>
-                ) : (
-                  <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>
-                    {featuredProject.title}
-                  </em>
-                )}
-              </h3>
-
-              <p
-                className="max-w-[44ch] text-sm leading-relaxed"
-                style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
-              >
-                {featuredProject.description}
-              </p>
-
-              <div className="flex flex-wrap gap-1.5">
-                {featuredProject.tags.slice(0, 4).map((tag) => (
-                  <Badge key={tag} variant="brand-soft">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-
-              <CardFoot>
-                <div className="flex gap-6" style={{ position: "relative", zIndex: 2 }}>
-                  {featuredProject.github && (
-                    <Link
-                      href={featuredProject.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex min-h-6 items-center py-0.5 transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
-                      style={{
-                        color: "var(--fg-primary)",
-                        fontFamily: "var(--font-mono)",
-                        fontSize: 12,
-                      }}
-                    >
-                      github ↗
-                    </Link>
-                  )}
-                  {featuredProject.live && (
-                    <Link
-                      href={featuredProject.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex min-h-6 items-center py-0.5 transition-all duration-150 hover:tracking-[0.08em] hover:[color:var(--fg-brand)]"
-                      style={{
-                        color: "var(--fg-primary)",
-                        fontFamily: "var(--font-mono)",
-                        fontSize: 12,
-                      }}
-                    >
-                      live demo ↗
-                    </Link>
-                  )}
-                </div>
-                <span style={{ color: "var(--fg-muted)", marginLeft: "auto" }}>
-                  {"// "}mit · open source
-                </span>
-              </CardFoot>
-            </div>
+            <FeaturedProjectCard
+              project={featuredProject}
+              index={1}
+              total={getFeaturedProjects().length}
+            />
           ) : (
             <div className="bento-card">
               <CardHead label="featured" />
@@ -451,95 +206,20 @@ export default async function Home() {
             </div>
           )}
 
-          {/* Stats column */}
           <div className="flex flex-col gap-3">
-            {/* OSS card — full width */}
-            <div className="bento-card">
-              <CardHead
-                label={`oss '${yrShort}`}
-                as="h3"
-                id="card-oss"
-                meta={
-                  <Badge variant="success-soft">
-                    <span
-                      className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
-                      style={{ background: "currentColor" }}
-                    />
-                    {ossGoal - ossCount} to go
-                  </Badge>
-                }
-              />
-
-              <div className="flex items-end gap-4">
-                <StatNum serif={ossCount} sub={`/ ${ossGoal}`} />
-                <span
-                  className="mb-1 font-mono text-[11px] tracking-[0.06em]"
-                  style={{ color: "var(--fg-muted)" }}
-                >
-                  shipped this year
-                </span>
-              </div>
-
-              <ProgressBar filled={ossCount} total={ossGoal} />
-            </div>
+            <OssCard count={ossCount} goal={ossGoal} yearShort={yrShort} />
 
             {featuredPost && (
-              <Link
-                href={`/blog/${featuredPost.slug}`}
-                className="group/post flex flex-1 flex-col"
-                style={{ textDecoration: "none" }}
-              >
-                <div className="bento-card flex flex-1 flex-col">
-                  <CardHead
-                    label="featured post"
-                    meta={`${formatDate(featuredPost.date)} · ${estimateReadingTime(featuredPost.body)} min`}
-                  />
-
-                  <h3
-                    style={{
-                      fontFamily: "var(--font-serif)",
-                      fontSize: 22,
-                      lineHeight: 1.2,
-                      color: "var(--fg-primary)",
-                      margin: 0,
-                    }}
-                  >
-                    {featuredPost.title}
-                  </h3>
-
-                  {featuredPost.description && (
-                    <p
-                      className="line-clamp-3 text-sm leading-relaxed"
-                      style={{
-                        fontFamily: "var(--font-sans)",
-                        color: "var(--fg-secondary)",
-                        margin: 0,
-                      }}
-                    >
-                      {featuredPost.description}
-                    </p>
-                  )}
-
-                  {featuredPost.tags && featuredPost.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {featuredPost.tags.slice(0, 4).map((tag) => (
-                        <Badge key={tag} variant="brand-soft">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-
-                  <CardFoot comment="notes · public">
-                    <span
-                      className="transition-all duration-150 group-hover/post:tracking-[0.06em]"
-                      style={{ color: "var(--fg-brand)" }}
-                    >
-                      read post →
-                    </span>
-                  </CardFoot>
-                </div>
-              </Link>
+              <FeaturedPostCard
+                post={{
+                  slug: featuredPost.slug,
+                  title: featuredPost.title,
+                  description: featuredPost.description,
+                  tags: featuredPost.tags,
+                  date: formatDate(featuredPost.date),
+                  minutes: estimateReadingTime(featuredPost.body),
+                }}
+              />
             )}
           </div>
         </div>
