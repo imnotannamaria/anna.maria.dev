@@ -61,7 +61,7 @@ function LoadingSkeleton() {
   return (
     <div
       className="flex flex-col justify-center rounded-2xl border p-5"
-      style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
+      style={{ background: "var(--bg-card)", borderColor: "var(--border-subtle)" }}
     >
       <div className="flex items-center gap-4">
         <Skeleton className="h-[72px] w-[72px] shrink-0 rounded-lg" />
@@ -82,7 +82,7 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div
       className="flex items-center gap-4 rounded-2xl border p-5"
-      style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
+      style={{ background: "var(--bg-card)", borderColor: "var(--border-subtle)" }}
     >
       <div
         className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-lg border border-dashed text-2xl"
@@ -170,7 +170,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
         className,
       )}
       style={{
-        background: "var(--bg-surface)",
+        background: "var(--bg-card)",
         borderColor: "var(--border-strong)",
         transition:
           "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out)",

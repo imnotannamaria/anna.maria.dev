@@ -59,7 +59,7 @@ export function LatestLogCard({ entries }: { entries: LogEntry[] }) {
     >
       <div
         className="overflow-hidden rounded-2xl border transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-(--shadow-card-hover)"
-        style={{ background: "var(--bg-surface)", borderColor: "var(--border-strong)" }}
+        style={{ background: "var(--bg-card)", borderColor: "var(--border-strong)" }}
       >
         <div
           className="flex items-baseline gap-3 border-b px-4 py-3"

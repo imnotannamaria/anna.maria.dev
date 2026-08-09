@@ -54,6 +54,14 @@
   --bg-surface-elevated: rgba(39, 39, 42, 0.6);
   --bg-surface-brand: rgba(124, 107, 255, 0.15); /* overridden by theme */
 
+  /* Cards specifically, which is a narrower role than "any raised surface".
+     zinc-900 across a whole bento grid reads as a field of grey; a card sitting
+     a hair above the canvas and defined by its border reads as dark. Dropdowns,
+     dialogs, code blocks and tooltips keep --bg-surface, because those genuinely
+     do need to sit above whatever they cover. */
+  --bg-card: #0b0b0e;
+  --bg-card-hover: #121216;
+
   /* foreground */
   --fg-primary: var(--zinc-50);
   --fg-secondary: var(--zinc-400);
@@ -483,7 +491,7 @@ button:focus-visible,
 /* ─── Bento card hover ─────────────────────────────────────────────────────── */
 .bento-card {
   position: relative;
-  background: var(--bg-surface);
+  background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 24px;
@@ -497,7 +505,7 @@ button:focus-visible,
 }
 .bento-card:hover {
   border-color: var(--border-strong);
-  background: var(--bg-surface-elevated);
+  background: var(--bg-card-hover);
 }
 .bento-card-xl {
   border-radius: var(--radius-xl);
@@ -800,6 +808,11 @@ button:focus-visible,
   --bg-canvas: #fafafa;
   --bg-surface: #ffffff;
   --bg-surface-elevated: #f4f4f5;
+
+  /* Light mode was already right — white cards on a near-white canvas, told
+     apart by the border. This is the same relationship the dark values now have. */
+  --bg-card: #ffffff;
+  --bg-card-hover: #f7f7f8;
 
   --fg-primary: #09090b;
   --fg-secondary: #52525b;

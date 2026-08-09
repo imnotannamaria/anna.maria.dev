@@ -50,7 +50,13 @@ function Digit({ digit, cycle, delay }: { digit: number; cycle: number; delay: n
         transition={
           reduce
             ? { duration: 0 }
-            : { type: "spring", stiffness: 90, damping: 16, mass: 0.9, delay }
+            : {
+                type: "spring",
+                stiffness: 90,
+                damping: 16,
+                mass: 0.9,
+                delay,
+              }
         }
       >
         {Array.from({ length: 20 }, (_, i) => (
@@ -75,10 +81,27 @@ function Stat({ value, label, delay }: { value: number; label: string; delay: nu
   const [cycle, setCycle] = useState(0)
   const digits = String(value).split("").map(Number)
 
+  /*
+   * The stagger delay belongs to the entrance and nothing else.
+   *
+   * Left on the transition unconditionally, every hover re-applied it: the
+   * in-flight spring got interrupted, and its replacement then sat waiting out
+   * the delay before moving. On the last stat that delay is ~0.7s, so hovering
+   * it mid-roll parked the strip between two digits and it looked frozen.
+   *
+   * This lives here rather than in Digit because the decision is "has the user
+   * touched this yet", which is a fact about the stat, and it's set from an
+   * event — no ref read during render, no setState inside an effect.
+   */
+  const [touched, setTouched] = useState(false)
+
   return (
     <div
       className="group/stat relative flex cursor-default flex-col items-center gap-1.5 py-1"
-      onMouseEnter={() => setCycle(1)}
+      onMouseEnter={() => {
+        setTouched(true)
+        setCycle(1)
+      }}
       onMouseLeave={() => setCycle(0)}
     >
       <span
@@ -93,7 +116,7 @@ function Stat({ value, label, delay }: { value: number; label: string; delay: nu
         {/* The strip is aria-hidden, so the real number lives here. */}
         <span className="sr-only">{value}</span>
         {digits.map((d, i) => (
-          <Digit key={i} digit={d} cycle={cycle} delay={delay + i * 0.06} />
+          <Digit key={i} digit={d} cycle={cycle} delay={touched ? 0 : delay + i * 0.06} />
         ))}
       </span>
       <span
@@ -156,7 +179,7 @@ function Avatar() {
         style={{
           borderRadius: 14,
           border: "1px solid var(--border-strong)",
-          background: "var(--bg-surface)",
+          background: "var(--bg-card)",
         }}
       >
         <Image
@@ -255,7 +278,7 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
   /** The numbers only roll once the card has finished arriving. */
   const ROLL_DELAY = reduce ? 0 : 0.45
 
-  const spotlight = useSpotlight()
+  const { onMouseMove, spotlight } = useSpotlight()
 
   const container: Variants = {
     hidden: {},
@@ -278,7 +301,7 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
     <motion.div
       className="relative flex flex-col items-center gap-6 overflow-hidden p-6 text-center sm:p-8"
       style={{
-        background: "var(--bg-surface)",
+        background: "var(--bg-card)",
         border: "1px solid var(--border-subtle)",
         borderRadius: "var(--radius-xl)",
         minHeight: 420,
@@ -286,9 +309,9 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
       variants={container}
       initial="hidden"
       animate="show"
-      onMouseMove={spotlight.onMouseMove}
+      onMouseMove={onMouseMove}
     >
-      <Spotlight background={spotlight.background} />
+      <Spotlight {...spotlight} />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"

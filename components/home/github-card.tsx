@@ -19,7 +19,7 @@ export function GithubCard({ username }: { username: string }) {
     <div
       style={{
         position: "relative",
-        background: hovered ? "var(--bg-surface-elevated)" : "var(--bg-surface)",
+        background: hovered ? "var(--bg-card-hover)" : "var(--bg-card)",
         border: `1px solid ${hovered ? "var(--border-strong)" : "var(--border-subtle)"}`,
         borderRadius: "var(--radius-lg)",
         padding: 24,

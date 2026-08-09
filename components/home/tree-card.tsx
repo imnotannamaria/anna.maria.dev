@@ -71,7 +71,7 @@ export function TreeCard({
 }) {
   const reduce = useReducedMotion() ?? false
   const [open, setOpen] = useState<Set<string>>(() => new Set(defaultOpenPaths(items)))
-  const spotlight = useSpotlight()
+  const { onMouseMove, spotlight } = useSpotlight()
 
   const variants = buildVariants(reduce)
 
@@ -86,9 +86,9 @@ export function TreeCard({
   return (
     <div
       className={cn("bento-card relative flex flex-col overflow-hidden", className)}
-      onMouseMove={spotlight.onMouseMove}
+      onMouseMove={onMouseMove}
     >
-      <Spotlight background={spotlight.background} />
+      <Spotlight {...spotlight} />
       {/* Dot pattern, same treatment the experience card had */}
       <div
         aria-hidden

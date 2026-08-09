@@ -62,7 +62,7 @@ export function MiniPianoCard() {
       <div
         className="group/piano relative overflow-hidden rounded-2xl border hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)] hover:[background:var(--bg-surface-elevated)]"
         style={{
-          background: "var(--bg-surface)",
+          background: "var(--bg-card)",
           borderColor: "var(--border-strong)",
           transition:
             "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out)",

@@ -66,7 +66,7 @@ function Panel({ className, children }: { className?: string; children: React.Re
     <section
       className={className}
       style={{
-        background: hovered ? "var(--bg-surface-elevated)" : "var(--bg-surface)",
+        background: hovered ? "var(--bg-card-hover)" : "var(--bg-card)",
         border: "1px solid var(--border-strong)",
         borderRadius: "var(--radius-xl)",
         containerType: "inline-size",

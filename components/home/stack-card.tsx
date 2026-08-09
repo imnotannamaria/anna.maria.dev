@@ -171,7 +171,7 @@ function StackBadge({ tool }: { tool: Tool }) {
 export function StackCard() {
   const reduce = useReducedMotion() ?? false
   const [open, setOpen] = useState<Set<string>>(() => new Set(["front", "back"]))
-  const spotlight = useSpotlight(520)
+  const { onMouseMove, spotlight } = useSpotlight(700)
 
   const toggle = (id: string) =>
     setOpen((prev) => {
@@ -189,7 +189,6 @@ export function StackCard() {
   const panel: Variants = {
     open: {
       height: "auto",
-      opacity: 1,
       transition: {
         duration: reduce ? 0 : 0.24,
         ease: EASE_OUT,
@@ -197,17 +196,38 @@ export function StackCard() {
         delayChildren: reduce ? 0 : 0.06,
       },
     },
-    // Shorter on the way out. A branch you just closed shouldn't make you wait.
-    closed: { height: 0, opacity: 0, transition: { duration: reduce ? 0 : 0.16, ease: EASE_OUT } },
+    closed: {
+      height: 0,
+      /*
+       * Closing had no animation to watch. Two things were hiding it: the panel
+       * faded its own opacity, which covered whatever the badges were doing, and
+       * the height hit 0 while they were still fully opaque, so the whole thing
+       * read as a cut. Now the panel only animates height, the badges carry the
+       * fade, and the collapse waits 80ms for them to go first. Still shorter
+       * end to end than opening — a branch you just closed shouldn't make you
+       * wait for it.
+       */
+      transition: { duration: reduce ? 0 : 0.16, ease: EASE_OUT, delay: reduce ? 0 : 0.08 },
+    },
   }
   const badge: Variants = {
-    open: { opacity: 1, y: 0, scale: 1 },
-    closed: { opacity: 0, y: reduce ? 0 : 6, scale: reduce ? 1 : 0.94 },
+    open: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: reduce ? 0 : 0.3, ease: EASE_OUT },
+    },
+    closed: {
+      opacity: 0,
+      y: reduce ? 0 : 6,
+      scale: reduce ? 1 : 0.94,
+      transition: { duration: reduce ? 0 : 0.12, ease: EASE_OUT },
+    },
   }
 
   return (
-    <div className="bento-card" onMouseMove={spotlight.onMouseMove}>
-      <Spotlight background={spotlight.background} />
+    <div className="bento-card" onMouseMove={onMouseMove}>
+      <Spotlight {...spotlight} />
 
       {/* Header — same shape as the tree card: mark + name left, count right. */}
       <div
