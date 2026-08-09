@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
-import { useReveal } from "@/components/ui/reveal"
+import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import { EASE_OUT, useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 import { CaretRightIcon } from "@phosphor-icons/react"
@@ -100,9 +101,6 @@ const BRANCHES: { id: string; label: string; comment: string; tools: Tool[] }[] 
 
 const TOTAL_TOOLS = BRANCHES.reduce((sum, b) => sum + b.tools.length, 0)
 
-/** The project's --ease-out token, as a Motion cubic-bezier array. */
-const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
-
 // Divider borders per cell, adapting to the column count at each breakpoint:
 // 1 col (mobile) → bottom between rows · 2 col (sm) → right on col 0, bottom on row 0
 // 4 col (lg) → right between columns, no bottom
@@ -146,7 +144,10 @@ function StackBadge({ tool }: { tool: Tool }) {
         "inline-flex h-[26px] cursor-default items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5",
         "border border-transparent font-mono text-[11px] font-medium",
         "transition-[transform,border-color,background-color] duration-150 ease-out",
-        "hover:-translate-y-0.5 hover:border-(--border-brand-strong)",
+        // Driven from the wrapper, which doesn't move. On its own `:hover` the
+        // badge slid out from under the cursor at the bottom edge, ending the
+        // hover, dropping back, and starting it again — a flicker loop.
+        "group-hover/badge:-translate-y-0.5 group-hover/badge:border-(--border-brand-strong)",
       )}
       style={{ background: "var(--bg-surface-brand)", color: "var(--fg-brand-hover)" }}
     >
@@ -231,23 +232,7 @@ export function StackCard() {
     <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
 
-      {/* Header — same shape as the tree card: mark + name left, count right. */}
-      <div
-        className="relative flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
-        style={{ color: "var(--fg-secondary)" }}
-      >
-        <h2
-          id="card-stack"
-          className="inline-flex items-center gap-1.5"
-          style={{ margin: 0, fontSize: "inherit", fontWeight: "inherit" }}
-        >
-          <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-            ◆
-          </span>
-          stack
-        </h2>
-        <span style={{ color: "var(--fg-muted)" }}>{BRANCHES.length} branches</span>
-      </div>
+      <CardHead label="stack" as="h2" id="card-stack" meta={`${BRANCHES.length} branches`} />
 
       <div
         className="relative grid grid-cols-1 overflow-hidden sm:grid-cols-2 lg:grid-cols-4"
@@ -332,7 +317,11 @@ export function StackCard() {
                     room above them the top of the border gets cut off. */}
                 <motion.div className="flex flex-wrap gap-1.5 px-4 pt-1 pb-4">
                   {branch.tools.map((tool) => (
-                    <motion.span key={tool.name} variants={badge} className="inline-flex">
+                    <motion.span
+                      key={tool.name}
+                      variants={badge}
+                      className="group/badge inline-flex"
+                    >
                       <StackBadge tool={tool} />
                     </motion.span>
                   ))}
@@ -344,20 +333,12 @@ export function StackCard() {
       </div>
 
       {/* Footer — mirrors the tree card's. */}
-      <div
-        className="relative flex items-center justify-between font-mono text-[11px]"
-        style={{
-          color: "var(--fg-muted)",
-          borderTop: "1px dashed var(--border-subtle)",
-          paddingTop: 12,
-        }}
+      <CardFoot
+        comment="click a branch to fold it away"
+        className="border-t border-dashed border-(--border-subtle) pt-3"
       >
-        <span>
-          <span style={{ opacity: 0.6 }}>{"// "}</span>
-          click a branch to fold it away
-        </span>
         <span style={{ color: "var(--fg-brand)" }}>{TOTAL_TOOLS} tools</span>
-      </div>
+      </CardFoot>
     </motion.div>
   )
 }
