@@ -2,17 +2,12 @@
 
 import { useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
-import { useReveal } from "@/components/ui/reveal"
+import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 import { defaultOpenPaths, type SiteTreeItem } from "@/lib/site-tree"
 import { TreeNode } from "./tree-node"
-
-/** The project's own easing token, as a Motion cubic-bezier array. */
-const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
-
-/** Past this, a per-row stagger stops reading as flow and starts as lag. */
-const STAGGER_LIMIT = 6
 
 function buildVariants(reduce: boolean): { list: Variants; row: Variants } {
   if (reduce) {
@@ -73,10 +68,31 @@ export function TreeCard({
   const reduce = useReducedMotion() ?? false
   const [open, setOpen] = useState<Set<string>>(() => new Set(defaultOpenPaths(items)))
   const { onMouseMove, spotlight } = useSpotlight()
-  const reveal = useReveal(0.08)
 
-  /* Header, list and footer arrive in sequence after the card does, so this
-     matches the profile card beside it instead of revealing as one slab. */
+  /*
+   * Header, list and footer arrive in sequence after the card does, so this
+   * matches the profile card beside it instead of revealing as one slab.
+   *
+   * Spelled as labels, not as a spread `useReveal()`. That hook hands Motion
+   * value objects, and values reach the element they're on and stop — the
+   * `staggerChildren` sitting beside them was orchestrating nothing, and the
+   * three `piece` children below never heard a "show". Nothing looked broken,
+   * which is exactly how this kind of mistake survives.
+   */
+  const container: Variants = {
+    hidden: { opacity: 0, y: reduce ? 0 : 14 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: reduce ? 0 : 0.5,
+        ease: EASE_OUT,
+        delay: reduce ? 0 : 0.08,
+        staggerChildren: reduce ? 0 : 0.09,
+        delayChildren: reduce ? 0 : 0.1,
+      },
+    },
+  }
   const piece: Variants = {
     hidden: { opacity: 0, y: reduce ? 0 : 8 },
     show: { opacity: 1, y: 0, transition: { duration: reduce ? 0 : 0.4, ease: EASE_OUT } },
@@ -96,8 +112,10 @@ export function TreeCard({
     <motion.div
       className={cn("bento-card relative flex flex-col overflow-hidden", className)}
       onMouseMove={onMouseMove}
-      {...reveal}
-      transition={{ ...reveal.transition, staggerChildren: reduce ? 0 : 0.09, delayChildren: 0.1 }}
+      variants={container}
+      initial="hidden"
+      whileInView="show"
+      viewport={revealViewport}
     >
       <Spotlight {...spotlight} />
       {/* Dot pattern, same treatment the experience card had */}
@@ -118,22 +136,8 @@ export function TreeCard({
         }}
       />
 
-      <motion.div
-        className="relative flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
-        style={{ color: "var(--fg-secondary)" }}
-        variants={piece}
-      >
-        <h2
-          id="card-tree"
-          className="inline-flex items-center gap-1.5"
-          style={{ margin: 0, fontSize: "inherit", fontWeight: "inherit" }}
-        >
-          <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-            ◆
-          </span>
-          tree
-        </h2>
-        <span style={{ color: "var(--fg-muted)" }}>{routeCount} routes</span>
+      <motion.div variants={piece}>
+        <CardHead label="tree" as="h2" id="card-tree" meta={`${routeCount} routes`} />
       </motion.div>
 
       {/* min-h-0 is what makes this the part that scrolls: without it a flex child
@@ -158,29 +162,22 @@ export function TreeCard({
         </ul>
       </motion.nav>
 
-      <motion.div
-        className="relative flex items-center justify-between font-mono text-[11px]"
-        style={{
-          color: "var(--fg-muted)",
-          borderTop: "1px dashed var(--border-subtle)",
-          paddingTop: 12,
-        }}
-        variants={piece}
-      >
-        <span>
-          <span style={{ opacity: 0.6 }}>{"// "}</span>
-          click a file to open it
-        </span>
-        <span className="inline-flex items-center gap-1.5" style={{ color: "var(--fg-brand)" }}>
-          <span
-            className="inline-block h-1.5 w-1.5 rounded-full"
-            style={{
-              background: "var(--fg-brand)",
-              animation: "live-pulse 2s ease-in-out infinite",
-            }}
-          />
-          live
-        </span>
+      <motion.div variants={piece}>
+        <CardFoot
+          comment="click a file to open it"
+          className="border-t border-dashed border-(--border-subtle) pt-3"
+        >
+          <span className="inline-flex items-center gap-1.5" style={{ color: "var(--fg-brand)" }}>
+            <span
+              className="inline-block h-1.5 w-1.5 rounded-full"
+              style={{
+                background: "var(--fg-brand)",
+                animation: "live-pulse 2s ease-in-out infinite",
+              }}
+            />
+            live
+          </span>
+        </CardFoot>
       </motion.div>
     </motion.div>
   )

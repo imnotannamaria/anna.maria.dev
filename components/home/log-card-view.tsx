@@ -1,12 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowLink } from "@/components/ui/arrow-link"
 import { motion, useReducedMotion } from "motion/react"
-
-const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
+import { ArrowLink } from "@/components/ui/arrow-link"
 import { StarRating } from "@/components/log/star-rating"
-import { RollingNumber } from "@/components/ui/rolling-number"
+import { RollingNumber, useRollOnHover } from "@/components/ui/rolling-number"
+import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
 import { CardHead } from "@/components/ui/card-parts"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
@@ -67,7 +66,10 @@ export function LogCardView({
                 onFocus={() => setActive(i)}
                 onClick={() => setActive(i)}
                 aria-pressed={i === active}
-                className="rounded-[9px] p-0.5 transition-colors duration-200 outline-none"
+                // The button is the hit area and it holds still; the cover
+                // inside it is what lifts. Putting the lift here would move the
+                // target out from under the cursor and flicker.
+                className="group/thumb rounded-[9px] p-0.5 transition-colors duration-200 outline-none"
                 style={{
                   border: `1px solid ${i === active ? "var(--fg-brand)" : "transparent"}`,
                 }}
@@ -96,12 +98,17 @@ export function LogCardView({
 /** The entry currently in front: poster, who made it, how it landed. */
 function Hero({ entry, reduce }: { entry: LogEntry; reduce: boolean }) {
   return (
+    /* `whileInView`, not `animate`, like every other entrance here — the card
+       sits well below the fold, and `key` remounting this on every selection
+       satisfies the observer on the first frame, so the crossfade between
+       entries is unchanged. */
     <motion.div
       key={entry.id}
       className="flex gap-4"
       initial={{ opacity: 0, y: reduce ? 0 : 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reduce ? 0 : 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={revealViewport}
+      transition={{ duration: reduce ? 0 : 0.28, ease: EASE_OUT }}
     >
       <div
         className="relative aspect-2/3 w-24 shrink-0 overflow-hidden rounded-lg border sm:w-28"
@@ -189,7 +196,10 @@ function Thumb({ entry }: { entry: LogEntry }) {
     <span
       className={cn(
         "relative block aspect-2/3 w-12 overflow-hidden rounded-[7px] border",
-        "transition-transform duration-200 ease-out hover:-translate-y-0.5",
+        "transition-transform duration-200 ease-out",
+        // Focus as well as hover: tabbing the strip already swaps the hero, so
+        // the cover should answer a keyboard the same way it answers a pointer.
+        "group-hover/thumb:-translate-y-0.5 group-focus-visible/thumb:-translate-y-0.5",
       )}
       style={{ borderColor: "var(--border-subtle)", background: "var(--bg-canvas)" }}
     >
@@ -328,8 +338,7 @@ function StatTile({
   index: number
   reduce: boolean
 }) {
-  const [cycle, setCycle] = useState(0)
-  const [touched, setTouched] = useState(false)
+  const roll = useRollOnHover(reduce ? 0 : 0.35 + index * 0.07)
 
   return (
     <motion.div
@@ -339,11 +348,7 @@ function StatTile({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.6 }}
       transition={{ duration: reduce ? 0 : 0.4, ease: EASE_OUT, delay: reduce ? 0 : index * 0.07 }}
-      onMouseEnter={() => {
-        setTouched(true)
-        setCycle(1)
-      }}
-      onMouseLeave={() => setCycle(0)}
+      {...roll.handlers}
     >
       <div
         className="mb-1 font-mono text-[10px] tracking-[0.08em] uppercase transition-colors duration-200 group-hover/tile:text-(--fg-brand)"
@@ -353,8 +358,8 @@ function StatTile({
       </div>
       <RollingNumber
         value={value}
-        cycle={cycle}
-        delay={touched || reduce ? 0 : 0.35 + index * 0.07}
+        cycle={roll.cycle}
+        delay={roll.delay}
         height={30}
         className="font-serif italic"
         style={{

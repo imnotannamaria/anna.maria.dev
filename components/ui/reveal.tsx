@@ -2,10 +2,22 @@
 
 import { motion, useReducedMotion } from "motion/react"
 
-const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
+/** The project's --ease-out token, as a Motion cubic-bezier array. */
+export const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
 
 /** One rule for the whole page, so nothing has to remember which it is. */
 export const revealViewport = { once: true, amount: 0.25 } as const
+
+/**
+ * Past this many items a per-item stagger stops reading as flow and starts as
+ * lag. Everything after it arrives together.
+ *
+ * Lists here are short today — four posts, four projects — so an uncapped
+ * `index * step` is invisible. At twenty posts the last row waits a full second
+ * after being scrolled to, which is a bug that arrives with the content rather
+ * than with the code.
+ */
+export const STAGGER_LIMIT = 6
 
 /**
  * The entrance every card shares: rises and fades once it's on screen.
@@ -17,6 +29,12 @@ export const revealViewport = { once: true, amount: 0.25 } as const
  * exactly how the rings and the oss bar ended up animating to an empty room.
  *
  * Spread onto any motion element: `<motion.div {...useReveal(0.1)}>`.
+ *
+ * For a leaf, or a card that enters as one piece. What it hands Motion are
+ * value objects, and values don't propagate — a child with `variants` of its
+ * own never hears about them, so `staggerChildren` bolted onto this transition
+ * orchestrates nothing. A card that has to sequence its own contents spells the
+ * entrance as variant labels instead; see `ProfileCard` or `TreeCard`.
  */
 export function useReveal(delay = 0) {
   const reduce = useReducedMotion() ?? false
@@ -52,7 +70,7 @@ export function Reveal({
   step?: number
   className?: string
 }) {
-  const reveal = useReveal(delay + index * step)
+  const reveal = useReveal(delay + Math.min(index, STAGGER_LIMIT) * step)
   return (
     <motion.div className={className} {...reveal}>
       {children}
