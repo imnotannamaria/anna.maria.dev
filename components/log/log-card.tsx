@@ -26,7 +26,7 @@ export function LogCard({ entry }: { entry: LogEntry }) {
       )}
       style={{
         borderColor: "var(--border-subtle)",
-        background: "var(--bg-surface)",
+        background: "var(--bg-card)",
       }}
     >
       {/* Stretched link: it sits above the content so the whole card is clickable, and

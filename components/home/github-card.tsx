@@ -1,8 +1,12 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { useState } from "react"
+import { motion } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
+import { ArrowLink } from "@/components/ui/arrow-link"
+import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import { useReveal } from "@/components/ui/reveal"
+import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 
 const GithubCalendarInner = dynamic(
   () => import("@/components/about/github-calendar").then((m) => m.GithubCalendar),
@@ -12,72 +16,47 @@ const GithubCalendarInner = dynamic(
   },
 )
 
+/**
+ * The calendar itself is still `react-github-calendar` and still due a rewrite —
+ * see the roadmap. This is only the frame around it.
+ *
+ * That frame used to be `.bento-card` copied out by hand into inline styles,
+ * with a React state hook driving the hover so it could also lift and cast a
+ * shadow. Everything it was reimplementing already exists: the class does the
+ * surface, `CardHead` and `CardFoot` do the chrome, `ArrowLink` does the link.
+ * The lift went with the state — no other card on the page lifts, and keeping it
+ * meant keeping a re-render on every pointer enter to do what CSS does free.
+ */
 export function GithubCard({ username }: { username: string }) {
-  const [hovered, setHovered] = useState(false)
+  const { onMouseMove, spotlight } = useSpotlight(700)
+  const reveal = useReveal()
 
   return (
-    <div
-      style={{
-        position: "relative",
-        background: hovered ? "var(--bg-surface-elevated)" : "var(--bg-surface)",
-        border: `1px solid ${hovered ? "var(--border-strong)" : "var(--border-subtle)"}`,
-        borderRadius: "var(--radius-lg)",
-        padding: 24,
-        display: "flex",
-        flexDirection: "column",
-        gap: 16,
-        overflow: "hidden",
-        transform: hovered ? "translateY(-2px)" : "none",
-        boxShadow: hovered ? "var(--shadow-card-hover)" : "none",
-        transition:
-          "transform 200ms var(--ease-out), box-shadow 200ms var(--ease-out), background 200ms var(--ease-out), border-color 200ms var(--ease-out)",
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* Header */}
-      <div
-        className="flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
-        style={{ color: "var(--fg-secondary)" }}
-      >
-        <h3 className="inline-flex items-center gap-1.5 font-normal" style={{ margin: 0 }}>
-          <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-            ◆
-          </span>
-          contributions
-        </h3>
-        <span style={{ color: "var(--fg-muted)" }}>{username}</span>
-      </div>
+    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
+      <Spotlight {...spotlight} />
 
-      {/* Calendar */}
-      <div className="overflow-x-auto">
+      <CardHead label="contributions" as="h3" meta={username} />
+
+      <div className="relative overflow-x-auto">
         <GithubCalendarInner username={username} />
       </div>
 
-      {/* Footer */}
-      <div
-        className="mt-auto flex items-center justify-between gap-3 font-mono text-[11px]"
-        style={{
-          color: "var(--fg-muted)",
-          paddingTop: 12,
-          borderTop: "1px dashed var(--border-subtle)",
-        }}
+      {/* Same dashed rule the tree and oss footers use — spelled with the token,
+          not Tailwind's default border colour, which is a different grey. */}
+      <CardFoot
+        comment="public activity · last 12 months"
+        className="border-t border-dashed border-(--border-subtle) pt-3"
       >
-        <span>
-          <span style={{ opacity: 0.6 }}>{"// "}</span>
-          public activity · last 12 months
+        <span style={{ color: "var(--fg-brand)" }}>
+          <ArrowLink
+            href={`https://github.com/${username}`}
+            external
+            className="text-[11px] text-(--fg-brand)"
+          >
+            github
+          </ArrowLink>
         </span>
-        <a
-          href={`https://github.com/${username}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transition-all duration-150 hover:tracking-[0.08em]"
-          style={{ color: "var(--fg-brand)" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          github ↗
-        </a>
-      </div>
-    </div>
+      </CardFoot>
+    </motion.div>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
+import { Reveal } from "@/components/ui/reveal"
 import {
   FeaturedProjectCard,
   ProjectCard,
@@ -25,13 +26,15 @@ export function ProjectList({ projects }: { projects: ProjectCardData[] }) {
 
   return (
     <div className="flex flex-col gap-6">
-      {ordered.map((project) =>
-        project.featured ? (
-          <FeaturedProjectCard key={project.slug} project={project} />
-        ) : (
-          <ProjectCard key={project.slug} project={project} />
-        ),
-      )}
+      {ordered.map((project, i) => (
+        <Reveal key={project.slug} index={i}>
+          {project.featured ? (
+            <FeaturedProjectCard project={project} />
+          ) : (
+            <ProjectCard project={project} />
+          )}
+        </Reveal>
+      ))}
     </div>
   )
 }

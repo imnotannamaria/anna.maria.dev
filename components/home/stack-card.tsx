@@ -1,7 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown } from "lucide-react"
+import { motion, useReducedMotion, type Variants } from "motion/react"
+import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import { EASE_OUT, useReveal } from "@/components/ui/reveal"
+import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { cn } from "@/lib/utils"
+import { CaretRightIcon } from "@phosphor-icons/react"
 import {
   siTypescript,
   siJavascript,
@@ -106,57 +111,45 @@ const CELL_BORDERS = [
   "",
 ]
 
-const NUMBER_WORDS: Record<number, string> = {
-  14: "fourteen",
-  15: "fifteen",
-  16: "sixteen",
-  17: "seventeen",
-  18: "eighteen",
-  19: "nineteen",
-  20: "twenty",
-  21: "twenty-one",
-  22: "twenty-two",
-  23: "twenty-three",
-  24: "twenty-four",
-  25: "twenty-five",
-  26: "twenty-six",
-  27: "twenty-seven",
-  28: "twenty-eight",
-}
-
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
 function RadioDot({ active }: { active: boolean }) {
   return (
-    <div
-      className="flex flex-shrink-0 items-center justify-center rounded-full transition-all duration-200"
+    <span
+      aria-hidden
+      className="flex shrink-0 items-center justify-center rounded-full transition-all duration-200"
       style={{
         width: 16,
         height: 16,
-        border: `1.5px solid ${active ? "var(--fg-primary)" : "var(--border-strong)"}`,
+        border: `1.5px solid ${active ? "var(--fg-brand)" : "var(--border-strong)"}`,
       }}
     >
-      <div
-        className="rounded-full transition-all duration-200"
+      <span
+        className="rounded-full transition-transform duration-200"
         style={{
           width: 7,
           height: 7,
-          background: active ? "var(--fg-primary)" : "transparent",
+          background: active ? "var(--fg-brand)" : "transparent",
           transform: active ? "scale(1)" : "scale(0)",
         }}
       />
-    </div>
+    </span>
   )
 }
 
 function StackBadge({ tool }: { tool: Tool }) {
   return (
     <span
-      className="inline-flex h-[26px] items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5 font-mono text-[11px] font-medium"
-      style={{
-        background: "var(--bg-surface-brand)",
-        color: "var(--fg-brand-hover)",
-      }}
+      className={cn(
+        "inline-flex h-[26px] cursor-default items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5",
+        "border border-transparent font-mono text-[11px] font-medium",
+        "transition-[transform,border-color,background-color] duration-150 ease-out",
+        // Driven from the wrapper, which doesn't move. On its own `:hover` the
+        // badge slid out from under the cursor at the bottom edge, ending the
+        // hover, dropping back, and starting it again — a flicker loop.
+        "group-hover/badge:-translate-y-0.5 group-hover/badge:border-(--border-brand-strong)",
+      )}
+      style={{ background: "var(--bg-surface-brand)", color: "var(--fg-brand-hover)" }}
     >
       {tool.icon && (
         <svg
@@ -165,7 +158,7 @@ function StackBadge({ tool }: { tool: Tool }) {
           height={10}
           fill="currentColor"
           aria-hidden
-          style={{ opacity: 0.8, flexShrink: 0 }}
+          className="shrink-0 opacity-80"
         >
           <path d={tool.icon} />
         </svg>
@@ -178,82 +171,103 @@ function StackBadge({ tool }: { tool: Tool }) {
 // ─── Component ─────────────────────────────────────────────────────────────────
 
 export function StackCard() {
-  const [open, setOpen] = useState<Set<string>>(new Set(["front", "back"]))
+  const reduce = useReducedMotion() ?? false
+  const [open, setOpen] = useState<Set<string>>(() => new Set(["front", "back"]))
+  const { onMouseMove, spotlight } = useSpotlight(700)
+  const reveal = useReveal(0.12)
 
   const toggle = (id: string) =>
     setOpen((prev) => {
       const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
+      if (!next.delete(id)) next.add(id)
       return next
     })
 
+  /*
+   * The badges used to open on a `max-height: 200px` transition, which is a
+   * guess: too small and a branch clips, too large and the easing runs against
+   * empty space, so the panel appears to hesitate before anything moves. This
+   * is the same height + stagger the tree uses — measured, not guessed.
+   */
+  const panel: Variants = {
+    open: {
+      height: "auto",
+      transition: {
+        duration: reduce ? 0 : 0.24,
+        ease: EASE_OUT,
+        staggerChildren: reduce ? 0 : 0.025,
+        delayChildren: reduce ? 0 : 0.06,
+      },
+    },
+    closed: {
+      height: 0,
+      /*
+       * Closing had no animation to watch. Two things were hiding it: the panel
+       * faded its own opacity, which covered whatever the badges were doing, and
+       * the height hit 0 while they were still fully opaque, so the whole thing
+       * read as a cut. Now the panel only animates height, the badges carry the
+       * fade, and the collapse waits 80ms for them to go first. Still shorter
+       * end to end than opening — a branch you just closed shouldn't make you
+       * wait for it.
+       */
+      transition: { duration: reduce ? 0 : 0.16, ease: EASE_OUT, delay: reduce ? 0 : 0.08 },
+    },
+  }
+  const badge: Variants = {
+    open: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: reduce ? 0 : 0.3, ease: EASE_OUT },
+    },
+    closed: {
+      opacity: 0,
+      y: reduce ? 0 : 6,
+      scale: reduce ? 1 : 0.94,
+      transition: { duration: reduce ? 0 : 0.12, ease: EASE_OUT },
+    },
+  }
+
   return (
-    <div className="bento-card">
-      {/* Header */}
-      <div className="mb-5 flex items-center gap-3">
-        <h2
-          className="inline-flex items-center gap-1.5 font-mono text-[11px] font-normal tracking-[0.08em] uppercase"
-          style={{ color: "var(--fg-secondary)", margin: 0 }}
-        >
-          <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-            ◆
-          </span>
-          stack
-        </h2>
+    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
+      <Spotlight {...spotlight} />
 
-        <div
-          className="flex items-center gap-2 font-mono text-[11px]"
-          style={{ color: "var(--fg-muted)" }}
-        >
-          <div
-            className="rounded-full"
-            style={{ width: 6, height: 6, background: "var(--fg-secondary)", opacity: 0.4 }}
-          />
-          stack.json
-        </div>
+      <CardHead label="stack" as="h2" id="card-stack" meta={`${BRANCHES.length} branches`} />
 
-        <span
-          className="ml-auto font-mono text-[11px] tracking-[0.04em]"
-          style={{ color: "var(--fg-brand)" }}
-        >
-          {BRANCHES.length} · BRANCHES
-        </span>
-      </div>
-
-      {/* Branches — 4 columns, border-r dividers, entire column is the hover target */}
       <div
-        className="grid grid-cols-1 overflow-hidden sm:grid-cols-2 lg:grid-cols-4"
-        style={{
-          border: "1px solid var(--border-subtle)",
-          borderRadius: "var(--radius-md)",
-        }}
+        className="relative grid grid-cols-1 overflow-hidden sm:grid-cols-2 lg:grid-cols-4"
+        style={{ border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)" }}
       >
         {BRANCHES.map((branch, i) => {
           const isOpen = open.has(branch.id)
+          const panelId = `stack-panel-${branch.id}`
 
           return (
             <div
               key={branch.id}
-              role="button"
-              tabIndex={0}
-              aria-expanded={isOpen}
-              aria-controls={`stack-panel-${branch.id}`}
-              onClick={() => toggle(branch.id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault()
-                  toggle(branch.id)
-                }
-              }}
-              className={`group/branch flex cursor-pointer flex-col gap-3 border-[var(--border-subtle)] p-4 transition-colors duration-150 outline-none hover:[background:var(--bg-hover-soft)] focus-visible:[background:var(--bg-hover-soft)] ${CELL_BORDERS[i]}`}
+              className={cn(
+                "group/branch flex flex-col border-(--border-subtle) transition-colors duration-150",
+                "hover:bg-(--bg-hover-soft) has-[:focus-visible]:bg-(--bg-hover-soft)",
+                CELL_BORDERS[i],
+              )}
             >
-              {/* Branch header */}
-              <div className="flex w-full items-center gap-2">
+              {/*
+               * A real <button>, not a div with role="button" and a hand-rolled
+               * keydown handler. Enter and Space come free, and only the header
+               * toggles — clicking a badge no longer collapses the branch you
+               * opened to read it.
+               */}
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => toggle(branch.id)}
+                className="flex w-full items-center gap-2 p-4 text-left outline-none"
+              >
                 <RadioDot active={isOpen} />
 
                 <span
-                  className="font-mono text-sm font-semibold transition-colors duration-150 group-hover/branch:[color:var(--fg-brand)]"
+                  className="font-mono text-sm font-semibold transition-colors duration-150 group-hover/branch:text-(--fg-brand)"
                   style={{ color: "var(--fg-primary)" }}
                 >
                   {branch.label}
@@ -268,42 +282,63 @@ export function StackCard() {
                   style={{ color: "var(--fg-muted)" }}
                 >
                   {branch.tools.length}
+                  <span className="sr-only"> tools</span>
                 </span>
 
-                <ChevronDown
-                  size={12}
-                  className="flex-shrink-0 transition-transform duration-200"
+                <CaretRightIcon
+                  aria-hidden
+                  size={11}
+                  weight="bold"
+                  className="shrink-0 transition-transform duration-200"
                   style={{
-                    color: "var(--fg-secondary)",
-                    transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)",
+                    color: isOpen ? "var(--fg-brand)" : "var(--fg-secondary)",
+                    transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
                   }}
                 />
-              </div>
+              </button>
 
-              {/* Badges */}
-              <div
-                id={`stack-panel-${branch.id}`}
-                className="flex flex-wrap gap-1.5 overflow-hidden transition-all duration-200"
-                style={{
-                  maxHeight: isOpen ? 200 : 0,
-                  opacity: isOpen ? 1 : 0,
-                  marginTop: isOpen ? 0 : -8,
-                }}
+              {/* Kept mounted behind `inert` so the tool names stay in the server
+                  HTML and the height animation has something to measure. */}
+              <motion.div
+                id={panelId}
+                className="overflow-hidden"
+                initial={false}
+                animate={isOpen ? "open" : "closed"}
+                variants={panel}
+                inert={!isOpen}
               >
-                {branch.tools.map((tool) => (
-                  <StackBadge key={tool.name} tool={tool} />
-                ))}
-              </div>
+                {/* The padding lives on this inner div, not the animated one.
+                    With border-box, `height: 0` on a padded box still clamps to
+                    padding-top + padding-bottom, so a closed branch would leave
+                    a 16px ghost. This one is a motion.div with no `animate` of
+                    its own, which keeps the stagger propagating to the badges. */}
+                {/* pt-1 is not spacing, it is clearance. The badges lift on hover inside a
+                    panel that has to clip for the height animation, so without a little
+                    room above them the top of the border gets cut off. */}
+                <motion.div className="flex flex-wrap gap-1.5 px-4 pt-1 pb-4">
+                  {branch.tools.map((tool) => (
+                    <motion.span
+                      key={tool.name}
+                      variants={badge}
+                      className="group/badge inline-flex"
+                    >
+                      <StackBadge tool={tool} />
+                    </motion.span>
+                  ))}
+                </motion.div>
+              </motion.div>
             </div>
           )
         })}
       </div>
 
-      {/* Footer */}
-      <div className="mt-4 font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
-        <span style={{ opacity: 0.6 }}>{"// "}</span>
-        {NUMBER_WORDS[TOTAL_TOOLS] ?? TOTAL_TOOLS} tools · primary
-      </div>
-    </div>
+      {/* Footer — mirrors the tree card's. */}
+      <CardFoot
+        comment="click a branch to fold it away"
+        className="border-t border-dashed border-(--border-subtle) pt-3"
+      >
+        <span style={{ color: "var(--fg-brand)" }}>{TOTAL_TOOLS} tools</span>
+      </CardFoot>
+    </motion.div>
   )
 }
