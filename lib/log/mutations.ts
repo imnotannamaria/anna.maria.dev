@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
 import { getTakenSlugs } from "./queries"
 import { logEntries } from "./schema"
-import { slugify, uniqueSlug } from "./slug"
+import { slugify, uniqueSlug } from "@/lib/slug"
 import type { LogEntryInput } from "./validation"
 
 function db() {

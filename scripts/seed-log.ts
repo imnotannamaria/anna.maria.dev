@@ -10,7 +10,7 @@
 import { readFileSync } from "node:fs"
 import { createDb } from "../lib/db/client"
 import { logEntries } from "../lib/log/schema"
-import { slugify } from "../lib/log/slug"
+import { slugify } from "../lib/slug"
 import type { LogType } from "../lib/log/validation"
 
 type Seed = {
