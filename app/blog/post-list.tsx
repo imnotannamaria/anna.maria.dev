@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { formatDate } from "@/lib/utils"
 import { Badge } from "@/app/components/entrepta/badge"
+import { Reveal } from "@/components/ui/reveal"
 
 export type PostItem = {
   slug: string
@@ -31,8 +32,10 @@ export function PostList({ posts }: { posts: PostItem[] }) {
 
   return (
     <div className="flex flex-col">
-      {filtered.map((post) => (
-        <PostRow key={post.slug} post={post} />
+      {filtered.map((post, i) => (
+        <Reveal key={post.slug} index={i} step={0.05}>
+          <PostRow post={post} />
+        </Reveal>
       ))}
     </div>
   )

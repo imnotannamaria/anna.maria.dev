@@ -1,6 +1,7 @@
 import Image from "next/image"
 import { createMetadata } from "@/lib/metadata"
-import { GithubCalendar } from "@/components/about/github-calendar"
+import { GithubCard } from "@/components/home/github-card"
+import { Reveal } from "@/components/ui/reveal"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
 import { Badge } from "@/app/components/entrepta/badge"
 import {
@@ -685,55 +686,57 @@ export default function AboutPage() {
             </DisplayH2>
 
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {interests.map(({ Icon, title, desc, foot, glyph }) => (
-                <div key={title} className="bento-card">
-                  <span
-                    className="grid place-items-center"
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--bg-surface-brand)",
-                      color: "var(--fg-brand)",
-                    }}
-                  >
-                    <Icon size={18} />
-                  </span>
-                  <h3
-                    style={{
-                      fontFamily: "var(--font-serif)",
-                      fontStyle: "italic",
-                      fontSize: 22,
-                      lineHeight: 1.2,
-                      color: "var(--fg-brand)",
-                      margin: 0,
-                    }}
-                  >
-                    {title}
-                  </h3>
-                  <p
-                    className="text-[13px] leading-relaxed"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      color: "var(--fg-secondary)",
-                      margin: 0,
-                    }}
-                  >
-                    {desc}
-                  </p>
-                  <div
-                    className="mt-auto flex items-center justify-between pt-3 font-mono text-[11px]"
-                    style={{
-                      borderTop: "1px dashed var(--border-subtle)",
-                      color: "var(--fg-muted)",
-                    }}
-                  >
-                    <span>{foot}</span>
-                    <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-                      {glyph}
+              {interests.map(({ Icon, title, desc, foot, glyph }, i) => (
+                <Reveal key={title} index={i} className="flex">
+                  <div className="bento-card w-full">
+                    <span
+                      className="grid place-items-center"
+                      style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: "var(--radius-md)",
+                        background: "var(--bg-surface-brand)",
+                        color: "var(--fg-brand)",
+                      }}
+                    >
+                      <Icon size={18} />
                     </span>
+                    <h3
+                      style={{
+                        fontFamily: "var(--font-serif)",
+                        fontStyle: "italic",
+                        fontSize: 22,
+                        lineHeight: 1.2,
+                        color: "var(--fg-brand)",
+                        margin: 0,
+                      }}
+                    >
+                      {title}
+                    </h3>
+                    <p
+                      className="text-[13px] leading-relaxed"
+                      style={{
+                        fontFamily: "var(--font-sans)",
+                        color: "var(--fg-secondary)",
+                        margin: 0,
+                      }}
+                    >
+                      {desc}
+                    </p>
+                    <div
+                      className="mt-auto flex items-center justify-between pt-3 font-mono text-[11px]"
+                      style={{
+                        borderTop: "1px dashed var(--border-subtle)",
+                        color: "var(--fg-muted)",
+                      }}
+                    >
+                      <span>{foot}</span>
+                      <span aria-hidden style={{ color: "var(--fg-brand)" }}>
+                        {glyph}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </Reveal>
               ))}
             </div>
           </Section>
@@ -755,10 +758,11 @@ export default function AboutPage() {
               else.
             </p>
 
-            <div className="bento-card mt-8">
-              <div className="overflow-x-auto">
-                <GithubCalendar username="imnotannamaria" />
-              </div>
+            {/* The same card the home page uses, rather than a second bare frame
+                around the same calendar — head, footer, spotlight and entrance
+                all come with it. */}
+            <div className="mt-8">
+              <GithubCard username="imnotannamaria" />
             </div>
           </Section>
         </div>

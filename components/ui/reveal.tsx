@@ -1,6 +1,6 @@
 "use client"
 
-import { useReducedMotion } from "motion/react"
+import { motion, useReducedMotion } from "motion/react"
 
 const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
 
@@ -31,4 +31,31 @@ export function useReveal(delay = 0) {
       delay: reduce ? 0 : delay,
     },
   } as const
+}
+
+/**
+ * The same entrance as a wrapper, for lists and for server components that
+ * shouldn't become client components just to animate their children.
+ *
+ * `index` staggers a list without the parent needing to orchestrate anything.
+ */
+export function Reveal({
+  children,
+  index = 0,
+  delay = 0,
+  step = 0.06,
+  className,
+}: {
+  children: React.ReactNode
+  index?: number
+  delay?: number
+  step?: number
+  className?: string
+}) {
+  const reveal = useReveal(delay + index * step)
+  return (
+    <motion.div className={className} {...reveal}>
+      {children}
+    </motion.div>
+  )
 }
