@@ -535,8 +535,32 @@ button:focus-visible,
 }
 
 /* ============================================================
-   WRISTKIT RINGS  — hover response
+   WRISTKIT  — the activity card surface and its rings
    ============================================================ */
+
+/* Not `.bento-card`: this one is `--radius-xl` with a stronger border and it
+   lifts, which the shared card deliberately doesn't. It was a `useState`
+   re-rendering the card on every pointer enter until it moved here. */
+.wk-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  transition:
+    background 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    transform 200ms var(--ease-out);
+}
+
+.wk-panel:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
 
 /* Deliberately CSS and not Motion. The sweep that draws each ring on arrival
    already owns `strokeDashoffset` through Motion, and driving a second property
