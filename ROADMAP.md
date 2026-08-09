@@ -1,5 +1,10 @@
 # Roadmap
 
+> **Retired, pending migration.** These items now live in Postgres and are edited at
+> `/admin/roadmap`. This file is the source `npm run seed:roadmap` reads from and the
+> backup until that has run against production — then it gets deleted. Add new ideas in the
+> admin, not here. See [docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
+
 Raw ideas for this site, written down so I don't lose them. Nothing here has a date, nothing here has been validated, and not all of it will get built — some of these I'll sit with and decide I don't want. An item is a thought I had, not a promise.
 
 Once something is actually going to happen it leaves this file and becomes a plan in `docs/`.

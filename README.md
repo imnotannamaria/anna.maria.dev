@@ -205,6 +205,21 @@ The design decisions behind all of it, phase by phase, are in [docs/log-plan.md]
 
 ---
 
+## Configuring the roadmap (optional)
+
+`/roadmap` is a board of what the site is going to become — to do, in progress, shipped — with an admin at `/admin/roadmap`. It rides on the same database and the same allowlist as the log, so if you already did the steps above there are only two left:
+
+1. Run [`docs/sql/003-roadmap-items.sql`](docs/sql/003-roadmap-items.sql) against `DATABASE_URL`.
+2. Optionally seed it: `npm run seed:roadmap`.
+
+Items start with status `raw`, which never renders publicly — that is the holding pen for an idea you don't want to lose but haven't decided anything about. Promote one to `todo` when it becomes real.
+
+Without `DATABASE_URL` the board renders empty and the build still passes.
+
+The reasoning, phase by phase, is in [docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
+
+---
+
 ## Deploy to Vercel
 
 1. Push to GitHub

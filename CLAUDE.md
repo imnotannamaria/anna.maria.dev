@@ -26,7 +26,7 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 | Analytics        | Vercel Analytics                                                   |
 | SEO              | next-sitemap                                                       |
 | Icons            | Phosphor Icons, simple-icons                                       |
-| Database         | Postgres (Supabase) via Drizzle ORM — wristkit + /log              |
+| Database         | Postgres (Supabase) via Drizzle ORM — wristkit, /log, /roadmap     |
 | API layer        | Hono, mounted at /api/v1                                           |
 | Admin auth       | WorkOS AuthKit + an email allowlist                                |
 | Forms            | react-hook-form + zod                                              |
@@ -128,14 +128,15 @@ app/
   piano/
   contact/page.tsx
   log/                      public feed of everything I finish
-  admin/                    log CRUD, behind AuthKit + the allowlist
+  roadmap/                  the board: to do, in progress, shipped
+  admin/                    log + roadmap CRUD, behind AuthKit + the allowlist
   components/entrepta/     entrepta design system components (button, card, dialog, etc)
   api/
     contact/route.ts        email via Resend
     og/route.tsx             dynamic OG images
     now-playing/route.ts    Spotify Now Playing
     auth/callback/route.ts  WorkOS AuthKit callback
-    v1/[[...route]]/        the Hono app — wristkit ingest + admin CRUD
+    v1/[[...route]]/        the Hono app — wristkit ingest, the public roadmap read, admin CRUD
     wristkit-sync/route.ts  legacy path, forwards into Hono (delete once the Shortcut moves)
   layout.tsx                root layout, editor chrome + fonts + theme setup
   globals.css                tokens, typography scale, theme overrides
@@ -150,7 +151,8 @@ components/
   chrome/                   titlebar, sidebar, command palette
   home/                     bento grid cards (stack, mini piano, GitHub, log)
   log/                      feed card, star rating, filter feed
-  admin/                    entry form, table, rating input, delete dialog
+  roadmap/                  board, item card, progress card, status mark, sidebar tab
+  admin/                    entry + item forms, tables, rating input, quick add, delete dialogs
   spotify/                  Now Playing widget
   wristkit/                 Apple Watch activity card
   blog/                     MDX renderer, reading progress
@@ -167,7 +169,9 @@ lib/
   api/                      Hono app, routes, middleware (rate limit, api key, admin)
   auth/require-admin.ts     the email allowlist — AuthKit says who, this says whether
   db/client.ts              shared Postgres client, one pool for wristkit and /log
-  log/                      schema, validation, queries, mutations, slug, stars, date
+  log/                      schema, validation, queries, mutations, stars, date
+  roadmap/                  schema, validation, queries, counts, mutations
+  slug.ts                    slugify() + uniqueSlug(), shared by log and roadmap
   velite.ts                 content query helpers
   site-config.ts             name, email, socials, single source of identity
   experience.ts              career start date, years of experience
@@ -223,11 +227,30 @@ Posters are plain `<img>`, not `next/image`, so no host allowlist has to be kept
 
 Every entry has a slug, but there is no `/log/[slug]` page and there shouldn't be. An entry is a title, a creator, a year and maybe two sentences — a page per entry would be a hundred thin pages diluting a small site, competing for queries Letterboxd and Goodreads already own. The slug is there to be a stable anchor and to keep the option open, not as a route waiting to be built.
 
+### `/roadmap`
+
+Three columns — to do, in progress, shipped — of what this site is going to become, over a
+progress card whose stepper walks the same three stages. Every item is a `.bento-card` with
+the status mark, a serif title, the blurb and a `Badge`; shipped ones are struck through.
+
+Filter pills mirror into `?status=` and are read with `useSyncExternalStore`, like `/log`,
+so every card lands in the server HTML. They are also what keeps the cards' `layoutId`
+animation alive: the mark is **read-only** on the public site, so filtering is the only
+thing a visitor can do that makes a card travel.
+
+The same items open in a dialog from the sidebar tab, fetched from `/api/v1/roadmap` the
+first time it is opened — never on render, or the sidebar would drag every page on the site
+into `force-dynamic`.
+
 ### `/admin`
 
-Guarded by WorkOS AuthKit **and** an `ADMIN_EMAILS` allowlist checked at the route level, not just in `proxy.ts`. Anyone else gets a 404, never a 403. `/admin/log` lists everything including drafts; create, edit and delete go through Hono at `/api/v1/admin/log`.
+Guarded by WorkOS AuthKit **and** an `ADMIN_EMAILS` allowlist checked at the route level, not just in `proxy.ts`. Anyone else gets a 404, never a 403. `/admin/log` lists everything including drafts; `/admin/roadmap` lists everything including
+`raw`. Create, edit and delete go through Hono at `/api/v1/admin/log` and
+`/api/v1/admin/roadmap`.
 
-Full docs, including the phase-by-phase decisions and their reasoning: [docs/log-plan.md](docs/log-plan.md).
+Full docs, including the phase-by-phase decisions and their reasoning:
+[docs/log-plan.md](docs/log-plan.md) and
+[docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
 
 ---
 
@@ -315,7 +338,8 @@ Everything except Resend and the base URL is optional. Without a database the wr
   "lint": "eslint . && prettier --check .",
   "format": "prettier --write .",
   "email:dev": "email dev --dir emails",
-  "seed:log": "tsx scripts/seed-log.ts"
+  "seed:log": "tsx scripts/seed-log.ts",
+  "seed:roadmap": "tsx scripts/seed-roadmap.ts"
 }
 ```
 
@@ -329,18 +353,41 @@ Everything except Resend and the base URL is optional. Without a database the wr
 - Chrome mobile won't resize below about 550px in DevTools. For real narrow viewports (375px), use the device toolbar, not window resize.
 - New API routes go in the Hono app under `lib/api/routes/`, mounted at `/api/v1`. The older handlers (`/api/contact`, `/api/og`, `/api/now-playing`) stay where they are — they work, and moving them buys nothing.
 - Anything under `/admin` calls `requireAdmin()` (pages) or `requireAdminApi` (routes). The `proxy.ts` matcher is not the gate; a matcher can be edited wrong.
-- **Pages that read Postgres are `force-dynamic`, not ISR.** That covers `/`, `/log` and everything under `/admin`. The log and the wristkit rings are supposed to read as live — an activity ring frozen at this morning's numbers, or an entry I published ten minutes ago still missing from the feed, is a worse experience than the handful of milliseconds two indexed queries cost against a pooled connection. Caching them was buying convenience, not speed, and it bought it at the price of a `revalidatePath` call I'd have to remember every time a new page started reading the same table. Content that comes from MDX stays static — this is about the database, not about the site.
+- **Pages that read Postgres are `force-dynamic`, not ISR.** That covers `/`, `/log`, `/roadmap` and everything under `/admin`. The log and the wristkit rings are supposed to read as live — an activity ring frozen at this morning's numbers, or an entry I published ten minutes ago still missing from the feed, is a worse experience than the handful of milliseconds two indexed queries cost against a pooled connection. Caching them was buying convenience, not speed, and it bought it at the price of a `revalidatePath` call I'd have to remember every time a new page started reading the same table. Content that comes from MDX stays static — this is about the database, not about the site.
 - Because of the above, mutations do **not** call `revalidatePath`. If you ever put log or wristkit data on a cached page, that decision changes and the trade-off above is the one to re-argue.
 
 ---
 
-## ROADMAP.md
+## The roadmap
 
-A holding pen for raw ideas, nothing more. Two or three sentences an item: what the thing is, and at most one line on why I want it.
+Raw ideas for the site used to live in a `ROADMAP.md` at the repo root. They live in
+Postgres now, written and edited at `/admin/roadmap`, and shown at `/roadmap`.
 
-When I ask you to add something there, **write it down, don't evaluate it.** No feasibility, no architecture, no list of what makes it hard, no accessibility caveats — I know something might not work, and finding that out is what the plan doc is for, later, if the idea survives. Adding an item is me not wanting to lose a thought, not me asking for an opinion on it.
+The file is gone but its rules are not:
 
-An idea that grows into real work moves out of here and into `docs/<name>-plan.md`, the way the tree did. That is where the analysis belongs, and it's what keeps this file from turning into a pile of half-designs nobody rereads.
+- **An item is two or three sentences.** What the thing is, and at most one line on why I
+  want it.
+- **When I ask you to add one, write it down — don't evaluate it.** No feasibility, no
+  architecture, no list of what makes it hard, no accessibility caveats. I know something
+  might not work; finding that out is what the plan doc is for, later, if the idea
+  survives. Adding an item is me not wanting to lose a thought, not asking for an opinion
+  on it. The same sentence is the helper text under the blurb field, so the rule lives
+  where the writing happens.
+- **New items land as `raw`,** which never renders on the site. That status _is_ the old
+  file: somewhere to put a thought without deciding anything about it. Promote it to `todo`
+  when it becomes real.
+- **An idea that grows into real work becomes `docs/<name>-plan.md`,** the way the tree and
+  this roadmap did, and the item gets a `plan` pointing at it. That is where analysis
+  belongs, and it is what keeps the board from turning into a pile of half-designs nobody
+  rereads.
+
+If capture ever starts costing more than typing a line into an open editor did, that is the
+signal the move was wrong — the fix is an import script, not going back to the file. The
+reasoning is in [docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
+
+`ROADMAP.md` is still in the tree until `npm run seed:roadmap` has run against production.
+It is the migration's source and its backup, and deleting it is the last step of that
+migration, not part of building this.
 
 ---
 
