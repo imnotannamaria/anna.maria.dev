@@ -543,12 +543,18 @@ button:focus-visible,
    on the same element from the same library means every hover restarts the
    sweep. `stroke-width` is a presentation attribute, so a stylesheet can take it
    over — and doing it here means the reduced-motion reset covers it for free. */
-.wk-ring {
+.wk-ring,
+.wk-track {
   transition: stroke-width 280ms var(--ease-out);
 }
 
-.wk-panel:hover .wk-ring {
-  stroke-width: 12;
+/* Arc and track swell together, or the arc leaves its own track behind.
+   10.5 and not 12: the radii are 52 / 38 / 24, so the rings sit 14 apart. At 12
+   the gap between them closes to 2px and three rings read as one thick blob —
+   the swell has to stay smaller than the space it has to grow into. */
+.wk-panel:hover .wk-ring,
+.wk-panel:hover .wk-track {
+  stroke-width: 10.5;
 }
 
 /* ============================================================

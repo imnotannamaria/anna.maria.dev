@@ -80,7 +80,12 @@ function Ring({
         },
       }}
     >
+      {/* The track thickens with the arc. Left behind at 9 while the arc went to
+          12, the arc overflowed its own track by 1.5px a side and the ring read
+          as a rendering fault rather than a response. */}
       <circle
+        className="wk-track"
+        style={{ transitionDelay: `${index * 70}ms` }}
         cx={cx}
         cy={cy}
         r={r}
