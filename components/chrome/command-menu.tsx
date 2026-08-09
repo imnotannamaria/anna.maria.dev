@@ -11,6 +11,7 @@ import {
   PianoKeysIcon,
   SquaresFourIcon,
   LockSimpleIcon,
+  ListChecksIcon,
 } from "@phosphor-icons/react"
 import {
   CommandDialog,
@@ -33,6 +34,7 @@ const PAGES: Page[] = [
   { href: "/contact", name: "contact.tsx", hint: "~/contact", icon: ChatsCircleIcon },
   { href: "/log", name: "log.tsx", hint: "~/log", icon: SquaresFourIcon },
   { href: "/piano", name: "piano.tsx", hint: "~/piano", icon: PianoKeysIcon },
+  { href: "/roadmap", name: "roadmap.md", hint: "~/roadmap", icon: ListChecksIcon },
 ]
 
 /**
@@ -42,6 +44,7 @@ const PAGES: Page[] = [
  */
 const PRIVATE_PAGES: Page[] = [
   { href: "/admin/log", name: "admin/log.tsx", hint: "~/admin", icon: SquaresFourIcon },
+  { href: "/admin/roadmap", name: "admin/roadmap.tsx", hint: "~/admin", icon: ListChecksIcon },
 ]
 
 /**

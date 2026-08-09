@@ -1,10 +1,10 @@
 "use client"
 
 /**
- * PROTÓTIPO / DISCOVERY — o card de progresso.
+ * The progress card.
  *
- * Também um `.bento-card`: cabeça, corpo, pé. O corpo é um stepper — as três
- * colunas viram etapas, e a etapa que está viva pulsa.
+ * A `.bento-card` like the rest: head, body, foot. The body is a stepper — the three
+ * columns as stages, with the live one pulsing.
  */
 
 import { motion, useReducedMotion } from "motion/react"
@@ -12,27 +12,27 @@ import { CardFoot, CardHead } from "@/components/ui/card-parts"
 import { revealViewport, useReveal } from "@/components/ui/reveal"
 import { RollingNumber, useRollOnHover } from "@/components/ui/rolling-number"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
-import { ROADMAP_STATUS, type RoadmapStatus } from "@/lib/roadmap-data"
-
-const STEPS: RoadmapStatus[] = ["todo", "doing", "done"]
+import { countByStatus } from "@/lib/roadmap/counts"
+import { PUBLIC_STATUSES, STATUS_LABEL, type RoadmapItem } from "@/lib/roadmap/validation"
 
 export function RoadmapProgressCard({
-  counts,
-  doneCount,
-  total,
-  /** No dialog o card já entrou junto com o modal; lá a entrada é dispensável. */
+  items,
+  /** In the dialog the card arrives with the modal, so it has no entrance of its own. */
   animateIn = true,
 }: {
-  counts: Record<RoadmapStatus, number>
-  doneCount: number
-  total: number
+  items: RoadmapItem[]
   animateIn?: boolean
 }) {
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(420)
   const reveal = useReveal(0)
   const roll = useRollOnHover(0.3)
-  const pct = total === 0 ? 0 : doneCount / total
+
+  // Counted off the list this card was already handed. No second query for a number that
+  // is one pass over an array we have.
+  const counts = countByStatus(items)
+  const total = items.length
+  const pct = total === 0 ? 0 : counts.done / total
 
   return (
     <motion.div className="bento-card" onMouseMove={onMouseMove} {...(animateIn ? reveal : {})}>
@@ -46,13 +46,13 @@ export function RoadmapProgressCard({
           style={{ color: "var(--fg-primary)" }}
           {...roll.handlers}
         >
-          <RollingNumber value={doneCount} cycle={roll.cycle} delay={roll.delay} height={30} />
+          <RollingNumber value={counts.done} cycle={roll.cycle} delay={roll.delay} height={30} />
           <span className="text-lg" style={{ color: "var(--fg-muted)" }}>
             /{total}
           </span>
         </span>
 
-        {/* Escala, não redimensiona: largura reflui layout, transform não. */}
+        {/* Scales, never resizes: width reflows layout, a transform does not. */}
         <div className="rm-progress min-w-[160px] flex-1">
           <motion.div
             className="rm-progress-fill"
@@ -67,10 +67,9 @@ export function RoadmapProgressCard({
         </div>
       </div>
 
-      {/* O stepper. Cada etapa carrega sua contagem; a que está viva pulsa. */}
+      {/* The stepper. Each stage carries its count; the live one pulses. */}
       <div className="relative flex flex-wrap items-center gap-x-3 gap-y-2">
-        {STEPS.map((status, i) => {
-          const meta = ROADMAP_STATUS[status]
+        {PUBLIC_STATUSES.map((status, i) => {
           const state = status === "done" ? "done" : status === "doing" ? "live" : "idle"
 
           return (
@@ -82,17 +81,19 @@ export function RoadmapProgressCard({
                 className="font-mono text-[11px] tracking-[0.08em] whitespace-nowrap uppercase"
                 style={{ color: state === "idle" ? "var(--fg-muted)" : "var(--fg-secondary)" }}
               >
-                {meta.label}
+                {STATUS_LABEL[status]}
                 <span className="sr-only">: {counts[status]} items</span>
               </span>
-              {i < STEPS.length - 1 && <span className="rm-step-rule" aria-hidden />}
+              {i < PUBLIC_STATUSES.length - 1 && <span className="rm-step-rule" aria-hidden />}
             </div>
           )
         })}
       </div>
 
-      <CardFoot comment="ROADMAP.md">
-        <span style={{ color: "var(--fg-brand)" }}>◆</span>
+      <CardFoot comment="what I'm building next">
+        <span aria-hidden style={{ color: "var(--fg-brand)" }}>
+          ◆
+        </span>
       </CardFoot>
     </motion.div>
   )

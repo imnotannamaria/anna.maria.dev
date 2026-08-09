@@ -1,22 +1,27 @@
 "use client"
 
 /**
- * PROTÓTIPO / DISCOVERY — um item do roadmap.
+ * One roadmap item.
  *
- * É um `.bento-card` como qualquer outro card do site: `CardHead` em cima,
- * `CardFoot` embaixo, `Badge` pro status, spotlight seguindo o cursor e o lift
- * do `.featured-card`. O que é só do roadmap mora em `.rm-item`: a barra de
- * accent na borda esquerda e o estado de marcado.
+ * It is a `.bento-card` like every other card on the site: `CardHead` on top, `CardFoot`
+ * at the bottom, a `Badge` for the status, the spotlight that trails the cursor and the
+ * lift `.featured-card` gives. `.rm-item` adds only what is the roadmap's own — the accent
+ * bar on the left edge and the shipped treatment.
  */
 
 import { motion, useReducedMotion } from "motion/react"
 import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
 import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
-import { ROADMAP_STATUS, type RoadmapItem, type RoadmapStatus } from "@/lib/roadmap-data"
-import { RoadmapCheckbox } from "./roadmap-checkbox"
+import {
+  STATUS_LABEL,
+  STATUS_MARK,
+  type PublicStatus,
+  type RoadmapItem,
+} from "@/lib/roadmap/validation"
+import { RoadmapMark } from "./roadmap-mark"
 
-const BADGE_VARIANT: Record<RoadmapStatus, "default" | "brand-soft" | "success-soft"> = {
+const BADGE_VARIANT: Record<PublicStatus, "default" | "brand-soft" | "success-soft"> = {
   todo: "default",
   doing: "brand-soft",
   done: "success-soft",
@@ -24,42 +29,36 @@ const BADGE_VARIANT: Record<RoadmapStatus, "default" | "brand-soft" | "success-s
 
 export function RoadmapItemCard({
   item,
-  status,
-  checked,
-  onToggle,
   index,
   delay = 0,
-  /** Prefixo do layoutId — dialog e board são duas instâncias, não podem colidir. */
+  /** Prefix for the layoutId — the dialog and the board are two mounts of the same item. */
   surface,
 }: {
   item: RoadmapItem
-  status: RoadmapStatus
-  checked: boolean
-  onToggle: () => void
   index: number
   delay?: number
   surface: string
 }) {
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(320)
-  const meta = ROADMAP_STATUS[status]
+  const status = item.status as PublicStatus
 
   return (
-    /* `layoutId`: marcar um item o desmonta daqui e o monta na outra coluna, e a
-       Motion faz o card *voar* entre as duas posições em vez de piscar. */
+    /* `layoutId` is what makes a card travel when the filter changes instead of blinking
+       out of one place and into another. */
     <motion.li
       layout
       layoutId={`${surface}-${item.id}`}
       transition={reduce ? { duration: 0 } : { layout: { duration: 0.45, ease: EASE_OUT } }}
       className="bento-card featured-card rm-item"
       data-status={status}
-      data-checked={checked}
+      id={`item-${item.slug}`}
       onMouseMove={onMouseMove}
     >
       <Spotlight {...spotlight} />
 
-      {/* A entrada mora aqui dentro: o transform do <li> é da layout animation,
-          e dois donos no mesmo canal brigam. */}
+      {/* The entrance lives on an inner element: the <li>'s transform belongs to the
+          layout animation, and two owners on one channel fight. */}
       <motion.div
         className="relative flex flex-col gap-3"
         initial={{ opacity: 0, y: reduce ? 0 : 10 }}
@@ -67,26 +66,21 @@ export function RoadmapItemCard({
         viewport={revealViewport}
         transition={{ duration: reduce ? 0 : 0.45, ease: EASE_OUT, delay: reduce ? 0 : delay }}
       >
-        {/* O heading é o título do item, não o status — por isso CardHead fica
-            como span e o <h3> mora embaixo, junto do checkbox. */}
-        <CardHead label={meta.label} meta={String(index + 1).padStart(2, "0")} />
+        {/* The heading is the item's title, not its status — so CardHead stays a span and
+            the <h3> sits below it, next to the mark. */}
+        <CardHead label={STATUS_LABEL[status]} meta={String(index + 1).padStart(2, "0")} />
 
         <div className="flex items-start gap-3">
           <span className="mt-0.5">
-            <RoadmapCheckbox
-              checked={checked}
-              indeterminate={status === "doing"}
-              onChange={onToggle}
-              label={`${item.title} — ${meta.label}`}
-            />
+            <RoadmapMark status={status} />
           </span>
           <h3 className="rm-title">{item.title}</h3>
         </div>
 
-        <p className="rm-blurb">{item.blurb}</p>
+        {item.blurb && <p className="rm-blurb">{item.blurb}</p>}
 
-        <CardFoot comment={item.plan ?? `roadmap/${status}`}>
-          <Badge variant={BADGE_VARIANT[status]}>{meta.mark}</Badge>
+        <CardFoot comment={item.planUrl ?? `roadmap/${status}`}>
+          <Badge variant={BADGE_VARIANT[status]}>{STATUS_MARK[status]}</Badge>
         </CardFoot>
       </motion.div>
     </motion.li>

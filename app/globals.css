@@ -1003,84 +1003,53 @@ button:focus-visible,
 }
 
 /* ============================================================
-   ROADMAP — PROTÓTIPO / DISCOVERY
-   Tudo aqui é temporário. Se a ideia vingar, isso vira peça em
-   components/ui e o CSS entra junto das outras superfícies.
+   ROADMAP — the item card's own bits, the sidebar tab and the
+   progress stepper. The card surface itself is .bento-card.
    ============================================================ */
 
 :root {
-  /* Tinta do check por cima do preenchimento brand. Sempre escura: branco
-     falha o contraste em marmalade (laranja), que é onde ele falha primeiro. */
+  /* Ink of the check drawn on top of the brand fill. Always dark: white fails contrast
+     in marmalade (orange), which is where it fails first. */
   --rm-check-ink: #09090b;
 }
 
-/* ---------- checkbox ---------- */
+/* ---------- the status mark ---------- */
 
-.rm-checkbox {
+/* Not a control. It looks like a checkbox because a roadmap is a checklist, but nothing
+   on the public site can move an item — so no pointer cursor, no hover, no focus ring. */
+.rm-mark {
   position: relative;
   display: grid;
   place-items: center;
   flex: none;
-  padding: 0;
   border: 1.5px solid var(--border-strong);
   border-radius: 6px;
-  background: transparent;
-  cursor: pointer;
-  transition:
-    border-color 160ms var(--ease-out),
-    transform 120ms var(--ease-out);
 }
-.rm-checkbox:hover {
-  border-color: var(--fg-brand);
-}
-.rm-checkbox:active {
-  transform: scale(0.92);
-}
-.rm-checkbox:focus-visible {
-  outline: 2px solid var(--fg-brand);
-  outline-offset: 3px;
-}
-.rm-checkbox[aria-checked="true"] {
+.rm-mark[data-status="doing"],
+.rm-mark[data-status="done"] {
   border-color: var(--fg-brand);
 }
 
-.rm-checkbox-fill {
+.rm-mark-fill {
   position: absolute;
   inset: 0;
   border-radius: 4.5px;
   background: var(--fg-brand);
 }
 
-.rm-checkbox-burst {
-  position: absolute;
-  inset: -2px;
-  border-radius: 8px;
-  border: 1.5px solid var(--fg-brand);
-  pointer-events: none;
-}
-
-.rm-checkbox-svg {
+.rm-mark-svg {
   position: relative;
 }
 
-/* Fantasma do check no hover: mostra o que o clique vai fazer. */
-.rm-checkbox:hover .rm-checkbox-svg path {
-  opacity: 0.28;
-}
-.rm-checkbox[aria-checked="true"]:hover .rm-checkbox-svg path {
-  opacity: 1;
-}
+/* ---------- item: a .bento-card, plus what is the roadmap's own ---------- */
 
-/* ---------- item: é um .bento-card, só com os estados do roadmap ---------- */
-
-/* Nada de superfície nova aqui. O card, o hover e a sombra vêm de
-   .bento-card + .featured-card; isto só acrescenta o que é do roadmap:
-   a barra de accent na borda e o que muda quando o item é marcado. */
 .rm-item {
   padding: 18px;
   gap: 12px;
 }
 
+/* The accent bar on the left edge: lit for whatever is in progress, wiping up from the
+   bottom on hover for everything else. */
 .rm-item::before {
   content: "";
   position: absolute;
@@ -1101,19 +1070,19 @@ button:focus-visible,
 .rm-item[data-status="doing"] {
   border-color: var(--border-brand);
 }
-.rm-item[data-checked="true"] {
+.rm-item[data-status="done"] {
   background: transparent;
 }
-.rm-item[data-checked="true"] .rm-title {
+.rm-item[data-status="done"] .rm-title {
   color: var(--fg-muted);
   text-decoration: line-through;
   text-decoration-color: var(--border-brand-strong);
   text-decoration-thickness: 1px;
 }
-.rm-item[data-checked="true"] .rm-blurb {
+.rm-item[data-status="done"] .rm-blurb {
   opacity: 0.55;
 }
-.rm-item[data-checked="true"]:hover .rm-blurb {
+.rm-item[data-status="done"]:hover .rm-blurb {
   opacity: 1;
 }
 
@@ -1135,7 +1104,7 @@ button:focus-visible,
   transition: opacity 200ms var(--ease-out);
 }
 
-/* ---------- stepper do card de progresso ---------- */
+/* ---------- the progress card's stepper ---------- */
 
 .rm-step {
   flex: 1 1 auto;
@@ -1173,7 +1142,7 @@ button:focus-visible,
   background: var(--border-subtle);
 }
 
-/* ---------- tab vertical do sidebar ---------- */
+/* ---------- the sidebar tab ---------- */
 
 .rm-tab {
   position: relative;
@@ -1222,7 +1191,7 @@ button:focus-visible,
   animation: live-pulse 1.6s ease-in-out infinite;
 }
 
-/* ---------- barra de progresso ---------- */
+/* ---------- progress bar and column dot ---------- */
 
 .rm-progress {
   position: relative;
@@ -1238,8 +1207,6 @@ button:focus-visible,
   background: linear-gradient(90deg, var(--fg-brand), var(--fg-brand-hover));
   box-shadow: 0 0 12px var(--fg-brand-glow);
 }
-
-/* ---------- ponto de status da coluna ---------- */
 
 .rm-dot {
   width: 6px;
