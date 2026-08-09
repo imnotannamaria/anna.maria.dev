@@ -1,6 +1,37 @@
 "use client"
 
+import { useState } from "react"
 import { motion, useReducedMotion } from "motion/react"
+
+/**
+ * The pointer handlers for a counter that rolls a full turn on hover.
+ *
+ * `delay` is the catch, and it's the reason this is a hook rather than three
+ * lines copied twice. A stagger delay belongs to the entrance and nothing else:
+ * left on the transition, every hover re-applies it, so an interrupted spring
+ * sits out the delay before it moves again — on the last stat that is ~0.7s of
+ * a strip parked between two digits, which reads as frozen. `touched` is the
+ * fact that the user has reached this counter, so the delay is spent once.
+ *
+ * Spread the handlers onto the hit area, pass `cycle` and `delay` to
+ * `RollingNumber`.
+ */
+export function useRollOnHover(entranceDelay: number) {
+  const [cycle, setCycle] = useState(0)
+  const [touched, setTouched] = useState(false)
+
+  return {
+    cycle,
+    delay: touched ? 0 : entranceDelay,
+    handlers: {
+      onMouseEnter: () => {
+        setTouched(true)
+        setCycle(1)
+      },
+      onMouseLeave: () => setCycle(0),
+    },
+  }
+}
 
 /**
  * A number that rolls into place like an odometer.

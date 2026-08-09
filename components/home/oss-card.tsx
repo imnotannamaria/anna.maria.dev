@@ -1,10 +1,9 @@
 "use client"
 
 import { motion, useReducedMotion, type Variants } from "motion/react"
+import { EASE_OUT } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { Badge, CardHead } from "@/components/ui/card-parts"
-
-const EASE_OUT = [0.2, 0.8, 0.2, 1] as const
 
 /**
  * The same segmented bar the card has always had, given something to do.
