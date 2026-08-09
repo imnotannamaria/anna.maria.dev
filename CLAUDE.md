@@ -334,6 +334,16 @@ Everything except Resend and the base URL is optional. Without a database the wr
 
 ---
 
+## ROADMAP.md
+
+A holding pen for raw ideas, nothing more. Two or three sentences an item: what the thing is, and at most one line on why I want it.
+
+When I ask you to add something there, **write it down, don't evaluate it.** No feasibility, no architecture, no list of what makes it hard, no accessibility caveats — I know something might not work, and finding that out is what the plan doc is for, later, if the idea survives. Adding an item is me not wanting to lose a thought, not me asking for an opinion on it.
+
+An idea that grows into real work moves out of here and into `docs/<name>-plan.md`, the way the tree did. That is where the analysis belongs, and it's what keeps this file from turning into a pile of half-designs nobody rereads.
+
+---
+
 ## Cards and motion
 
 Every card on the site is built from the same pieces. Reaching for raw markup instead is how the home page ended up with eight cards that each invented their own header, and how the contributions card spent months re-implementing `.bento-card` in inline styles with a React state hook driving its hover.

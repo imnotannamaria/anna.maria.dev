@@ -1,12 +1,18 @@
 # Roadmap
 
-What's next for this site. Nothing here has a date.
+Raw ideas for this site, written down so I don't lose them. Nothing here has a date, nothing here has been validated, and not all of it will get built — some of these I'll sit with and decide I don't want. An item is a thought I had, not a promise.
+
+Once something is actually going to happen it leaves this file and becomes a plan in `docs/`.
 
 ---
 
 ## Animations
 
 I want to add animations to the home page widgets so the site feels more alive. Something with a wow effect.
+
+## A cursor of my own
+
+Replace the system arrow with something that belongs to the site — a small mark that reacts to what it's over, grows on a link, maybe leaves a short trail. I don't know how it's built yet.
 
 ## Home components
 
@@ -36,6 +42,8 @@ Right now it repeats the titlebar tabs, so it's two navigations for one set of p
 ## Comments
 
 Let anyone leave a comment about the site without signing in, and show them somewhere. Every new one emails me. Same open-form problem as tipfy, so it needs the same protection.
+
+What I want is the Figma version of it: point at a card or a section, drop a pin on it, write there. The comment belongs to that thing instead of to a form at the bottom of the page, and the pins stay on screen as a trace of what people stopped on.
 
 ## tipfy
 
