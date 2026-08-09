@@ -158,7 +158,7 @@ components/
   about/                    GitHub calendar
   contact/                  contact form
   brand/                    logo mark
-  ui/                       shared UI helpers (blur-fade, icons, inline-arrow)
+  ui/                       shared card + motion primitives (see below), icons, blur-fade
 
 emails/
   contact-email.tsx         React Email template
@@ -334,19 +334,61 @@ Everything except Resend and the base URL is optional. Without a database the wr
 
 ---
 
+## Cards and motion
+
+Every card on the site is built from the same pieces. Reaching for raw markup instead is how the home page ended up with eight cards that each invented their own header, and how the contributions card spent months re-implementing `.bento-card` in inline styles with a React state hook driving its hover.
+
+### The pieces
+
+| Piece                             | What it is                                              |
+| --------------------------------- | ------------------------------------------------------- |
+| `.bento-card` (globals.css)       | The card surface: padding, radius, border, hover        |
+| `CardHead` / `CardFoot` / `Badge` | `components/ui/card-parts` — the chrome inside a card   |
+| `ArrowLink` / `ArrowAffordance`   | A link with a travelling arrow and a rule that wipes in |
+| `useSpotlight` + `Spotlight`      | The glow that trails the cursor across a card           |
+| `useReveal` + `Reveal`            | The entrance every card shares                          |
+| `RollingNumber`                   | An odometer for any number worth watching land          |
+| `TypeIn`                          | Text that assembles itself a piece at a time            |
+
+Card shape is fixed: `◆ name` on the left of the head, muted meta on the right, no border and no fill on the head itself. The foot is a `//` comment on the left and an accent on the right. If a card needs something the pieces don't do, change the piece.
+
+`--bg-card` is for cards. `--bg-surface` is for things that sit _above_ a card — dropdowns, dialogs, code blocks, tooltips — which genuinely need to be lighter than what they cover.
+
+### Motion rules, each one paid for
+
+- **Entrances use `whileInView` with `once`, never `animate`** — including above the fold, where the observer is satisfied on the first frame anyway. One trigger everywhere means there is no "is this above the fold" judgement left to get wrong, and getting it wrong is silent: the animation runs perfectly, to an empty room.
+- **Never put `whileInView` on an element that starts at zero size.** `scaleX: 0` is no width, no width is no area, and an observer asked for a fraction of no area never fires. Put the trigger on an ancestor with an honest box and reach the children through variants.
+- **Drive SVG from an HTML ancestor.** An IntersectionObserver aimed at an SVG child is unreliable — in practice one ring of three fired and the other two snapped.
+- **One variant label per element.** If something already answers to a state axis (`open`/`closed`), its entrance needs its own wrapper. A second axis has nowhere to live.
+- **A stagger delay belongs to the entrance and nothing else.** Left on the transition, every later interaction re-applies it: the in-flight spring is interrupted and its replacement sits out the delay before moving, which looks exactly like a freeze.
+- **Motion can't interpolate a colour hiding inside a custom property.** `box-shadow: … var(--shadow-brand)` stays in CSS.
+- **Splitting Motion and CSS across two properties of one element is sometimes the point** — the rings draw through Motion and thicken through CSS, because driving both from Motion means every hover restarts the draw.
+- **Motion walks straight past the global `prefers-reduced-motion` reset.** That block only zeroes CSS. Anything animated through JS asks `useReducedMotion()` itself.
+- **Hover that moves an element must not move it out from under the cursor.** Keep the hit area still and move the skin, or you get a flicker loop: lift, un-hover, drop, hover, forever.
+- **Something that lifts inside a clipping container needs clearance**, not spacing. Clip plus lift equals a cut-off border.
+- **Animated text keeps all its text in the DOM.** Fade the pieces in; never grow `text.slice(0, n)`, which ships an empty heading to a crawler and to anyone whose JS hasn't run. Pieces are `aria-hidden` under one `aria-label`, and anything that wraps splits by word — inline-block characters can't break a line where a word ends.
+- **Don't rebuild a gradient string every frame.** Translate a fixed one; a card-sized repaint at 60fps starves whatever else is animating.
+- **Equal animations are not equal perception.** A sweep driven by a value covers 80% of a circle for one metric and 10% for another. If the small case has to read, give it an arrival of its own rather than assuming the shared animation is enough.
+
+---
+
 ## Code review
 
-When asked to review a branch or PR, review the full diff against `main` and check, at minimum:
+When asked to review a branch or PR, review the full diff against `main`.
+
+The checks below are the ones this codebase has actually been bitten by. Read them as prompts to look, not as a list to tick — a diff that touches none of these still deserves a read, and a rule that clearly doesn't apply to the diff in front of you isn't a finding.
 
 - **Security** — auth on every admin surface (layout AND route, never just the proxy matcher), input validation on the server, URL fields restricted to `https://` before they become an `href`, no secrets or stack traces in responses, middleware ordered so unauthenticated requests never reach a body parse.
-- **Backend (Hono)** — new routes live under `lib/api/routes/` behind the right middleware; errors return JSON through `onError`, not leaked stacks; any page added that reads Postgres is `force-dynamic` (see Conventions), so no mutation should be reintroducing `revalidatePath`.
-- **Loading and error states** — every `force-dynamic` page that hits the database needs a `loading.tsx`; pages where the data IS the page need an `error.tsx` (an empty state when the DB is down is a lie); forms need a submitting state and distinct network-vs-API error feedback.
-- **Accessibility** — real semantics over roles on divs, `aria-pressed`/`aria-expanded` on toggles, screen-reader text for glyph-only info (stars, ♥), `useReducedMotion` on animations, and contrast wherever text sits _on top of_ `--fg-brand` — that combination changes per theme and orange (marmalade) is where white text fails first.
-- **Theme reactivity** — grep the diff for hardcoded brand hexes; every accent must derive from `--fg-brand` (see Conventions). Fixed colors are only acceptable as overlays on images, where no theme token can guarantee legibility.
-- **SEO** — metadata on new pages, content in the server HTML (prefer `useSyncExternalStore` over `useSearchParams` on static routes — the latter makes prerender emit the Suspense fallback), sitemap/robots updated, private pages noindexed in layers.
-- **Performance** — watch for queries whose result is derivable from data already fetched in the same render (a `GROUP BY` beside the query that returns the same rows is the usual shape); plain `<img>` needs `loading="lazy"` and a fixed-aspect container so there is no CLS; database reads stay off the critical path of static content.
-- **Responsive** — reason about 375px minus the 56px sidebar; wide tables scroll rather than reflow; grid tracks use `min(Npx, 100%)`. Code-level checks only: hand the actual visual pass to Anna, never drive a browser.
-- **Bugs** — timezone traps around `new Date("YYYY-MM-DD")`, hydration mismatches between server and client formatting, and pages that would fail `next build` if the database were unreachable.
+- **Backend (Hono)** — new routes live under `lib/api/routes/` behind the right middleware, and errors return JSON through `onError` rather than a leaked stack. Where a route or page sits on the caching decisions in Conventions, check it agrees with them; if it has a reason not to, the reason belongs in the diff.
+- **Loading and error states** — a page that hits the database needs a `loading.tsx`; where the data IS the page it needs an `error.tsx`, because an empty state when the DB is down is a lie. Forms need a submitting state and need to tell a network failure apart from a rejection.
+- **Reuse before invention** — this is the one worth reading the diff twice for. A new card that hand-rolls a header, a hover, or a surface is re-implementing something in `components/ui`; see Cards and motion. The tell is inline styles that add up to `.bento-card`, or a `useState` doing what `:hover` does.
+- **Motion** — every rule in Cards and motion came out of a bug that shipped. The expensive ones to miss: an entrance on `animate` instead of `whileInView`, a trigger on an element with no area, and anything animated through JS that never asks `useReducedMotion`.
+- **Accessibility** — real semantics over roles on divs, `aria-pressed`/`aria-expanded` on toggles, screen-reader text for glyph-only info (stars, ♥), hover-only affordances mirrored on `focus-visible`, no two links sharing a name and pointing elsewhere, and contrast wherever text sits _on top of_ `--fg-brand` — that combination changes per theme and orange (marmalade) is where white text fails first.
+- **Theme reactivity** — grep the diff for hardcoded brand hexes; every accent derives from `--fg-brand`. Fixed colours are only acceptable as overlays on images, where no token can guarantee legibility.
+- **SEO** — metadata on new pages, and the content itself in the server HTML. Two ways it silently isn't: `useSearchParams` on a static route makes prerender emit the Suspense fallback (`useSyncExternalStore` reads the URL without that), and any animation that gates mount on a timer or grows a sliced string ships an empty element.
+- **Performance** — queries whose result is derivable from data already fetched in the same render (a `GROUP BY` beside the query returning the same rows is the usual shape); per-frame work that repaints rather than composites; plain `<img>` needs `loading="lazy"` and a fixed-aspect container so there is no CLS.
+- **Responsive** — reason about 375px minus the 56px sidebar; wide tables scroll rather than reflow; grid tracks use `min(Npx, 100%)`. Code-level checks only: hand the visual pass to Anna, never drive a browser.
+- **Bugs** — timezone traps around `new Date("YYYY-MM-DD")`; anything date-dependent computed on both sides of the server/client boundary, which is a hydration mismatch waiting for a render that straddles midnight; pages that would fail `next build` with the database unreachable.
 
 Also run `npm run lint` and `npx tsc --noEmit` and report the result.
 

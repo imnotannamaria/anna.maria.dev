@@ -45,6 +45,10 @@ Let anyone leave a comment about the site without signing in, and show them some
 
 One line in the `/log` header. Blocked on the refactor above.
 
+## Make the easter egg do something
+
+`showEasterEgg` in the titlebar fires a toast and that's it. Whatever it turns into, a toast isn't a reward. I don't know what the feature is yet.
+
 ## Better favicon
 
 The current one is too simple. I want to sit down, study a bit, and make a better one.
