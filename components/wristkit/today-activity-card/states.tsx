@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import type * as React from "react"
 import { motion, useReducedMotion } from "motion/react"
 import { revealViewport } from "@/components/ui/reveal"
@@ -120,8 +119,16 @@ function Ring({
   )
 }
 
+/**
+ * The card surface. Everything it does on hover — background, lift, shadow, and
+ * the rings swelling inside it — lives in `.wk-panel` in globals.css.
+ *
+ * It used to be a `useState` re-rendering the whole card on every pointer enter
+ * to do what `:hover` does for free, which is the pattern the contributions card
+ * was rebuilt to get rid of. As CSS it also inherits the global reduced-motion
+ * reset, which the JS version never did.
+ */
 function Panel({ className, children }: { className?: string; children: React.ReactNode }) {
-  const [hovered, setHovered] = useState(false)
   const { onMouseMove, spotlight } = useSpotlight(380)
 
   return (
@@ -132,24 +139,10 @@ function Panel({ className, children }: { className?: string; children: React.Re
       whileInView="show"
       viewport={revealViewport}
       style={{
-        position: "relative",
-        overflow: "hidden",
-        background: hovered ? "var(--bg-card-hover)" : "var(--bg-card)",
-        border: "1px solid var(--border-strong)",
-        borderRadius: "var(--radius-xl)",
         containerType: "inline-size",
-        padding: 18,
         color: "var(--fg-primary)",
         fontFamily: "var(--font-mono)",
-        display: "flex",
-        flexDirection: "column",
-        transform: hovered ? "translateY(-2px)" : "none",
-        boxShadow: hovered ? "var(--shadow-card-hover)" : "none",
-        transition:
-          "background 200ms var(--ease-out), box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out)",
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       <Spotlight {...spotlight} />
       {children}
@@ -227,17 +220,23 @@ function MetricRow({
   suffix?: string
   index?: number
 }) {
+  // Asked here, not inherited: the global prefers-reduced-motion block only
+  // zeroes CSS, and this row is animated through Motion like the rings above it.
+  const reduce = useReducedMotion() ?? false
+
   return (
     <motion.div
       style={{ display: "flex", alignItems: "baseline", gap: 10 }}
       // The rings sweep for over a second; rows that snap in at frame one beside
       // them is what made the card read as half-animated.
       variants={{
-        hidden: { opacity: 0, y: 8 },
+        hidden: { opacity: 0, y: reduce ? 0 : 8 },
         show: {
           opacity: 1,
           y: 0,
-          transition: { duration: 0.4, ease: [0.2, 0.8, 0.2, 1], delay: 0.3 + index * 0.1 },
+          transition: reduce
+            ? { duration: 0 }
+            : { duration: 0.4, ease: [0.2, 0.8, 0.2, 1], delay: 0.3 + index * 0.1 },
         },
       }}
     >
