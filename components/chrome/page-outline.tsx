@@ -21,7 +21,13 @@ import { useEffect, useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
 
-export type OutlineItem = { id: string; label: string; level: 1 | 2 | 3 }
+export type OutlineItem = {
+  id: string
+  label: string
+  level: 1 | 2 | 3
+  /** Right-aligned tally. /blog counts posts per year; the prose pages have nothing to count. */
+  count?: number
+}
 
 const PREFIX: Record<1 | 2 | 3, string> = { 1: "#", 2: "##", 3: "###" }
 
@@ -146,7 +152,10 @@ export function PageOutline({
                 >
                   {PREFIX[item.level]}
                 </span>
-                {item.label}
+                <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                {item.count != null && (
+                  <span style={{ color: "var(--fg-muted)", flexShrink: 0 }}>{item.count}</span>
+                )}
               </a>
             </motion.li>
           )

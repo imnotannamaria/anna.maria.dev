@@ -156,7 +156,7 @@ components/
   admin/                    entry + item forms, tables, rating input, quick add, delete dialogs
   spotify/                  Now Playing widget
   wristkit/                 Apple Watch activity card
-  blog/                     MDX renderer, reading progress
+  blog/                     feed, post card, generated cover, MDX renderer, reading progress
   projects/                 project card
   about/                    GitHub calendar, stack graph, timeline, interest card
   contact/                  contact form
@@ -205,7 +205,24 @@ Two columns: photo + long bio. Career timeline (vertical brand line, circular do
 
 ### `/blog`
 
-List with tag filter pills. Each item: mono date, title, tags, reading time. Post page: Newsreader title, brand progress bar, sticky TOC, Shiki dark theme, callouts with a brand left border.
+The shelf. One post per row: a cover on the left, serif title and blurb on the right, `.bento-card`
+like everything else. The cover is **drawn in code** — `components/blog/post-cover.tsx`, seeded from
+the slug so it never changes, coloured through `color-mix` against `--fg-brand` so it follows the
+theme. There is no `cover` field in the frontmatter and there shouldn't be: a file per post is
+recurring work, and every post written before the field existed would sit without one.
+
+Posts are grouped by year, and the outline in the left rail lists those years with a count. Grouping
+is what gives the outline somewhere to point, and unlike `/log` it costs nothing — years descend and
+posts descend inside them, which is the order the feed always had with headings added.
+
+The tag filter mirrors into `?tag=` through `useUrlFilter`, **not** `useSearchParams`: on a static
+route the latter makes prerender emit the Suspense fallback, so every post was missing from the HTML
+a crawler reads, on the one page whose whole job is listing posts. The outline and the cards share
+that filter, which is why `BlogFeed` owns both; the page header is server-rendered and passed in as
+children.
+
+Post page: Newsreader title, brand progress bar, sticky TOC, Shiki dark theme, callouts with a brand
+left border.
 
 ### `/projects`
 
