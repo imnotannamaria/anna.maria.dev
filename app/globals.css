@@ -1037,8 +1037,14 @@ button:focus-visible,
   background: var(--fg-brand);
 }
 
+/* Absolute, filling the padding box. As a grid child at its natural 20px the svg was
+   larger than the 17px the 1.5px border leaves, and an oversized grid item aligns to the
+   start instead of the centre — which is why the dash and the check sat off to one side. */
 .rm-mark-svg {
-  position: relative;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* ---------- item: a .bento-card, plus what is the roadmap's own ---------- */
@@ -1048,28 +1054,96 @@ button:focus-visible,
   gap: 12px;
 }
 
-/* The accent bar on the left edge: lit for whatever is in progress, wiping up from the
-   bottom on hover for everything else. */
+/* The LED. It traces the whole card, not one edge, and every card has one — pointing at a
+   card lights it. `in progress` rests dimly lit rather than getting its own mechanism, so
+   the live column reads as live while the page is still.
+
+   Its own layer instead of the card's border: a border cannot be lit without moving the
+   box, and opacity on an overlay composites rather than repainting the card. */
+/* The ring at rest. `in progress` keeps it dimly lit so the live column reads as live
+   while the page is still; everything else is dark until you point at it. */
+.rm-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--fg-brand);
+  border-radius: inherit;
+  opacity: 0;
+  /* Inset only. The card clips its own overflow, so an outward glow drawn on this layer
+     would never be seen — the halo around the card is .featured-card's box-shadow, which
+     is drawn by the card itself and so escapes the clip. */
+  box-shadow: inset 0 0 14px -6px var(--fg-brand-glow);
+  transition:
+    opacity 380ms var(--ease-out),
+    box-shadow 380ms var(--ease-out);
+  pointer-events: none;
+  z-index: 1;
+}
+.rm-item[data-status="doing"]::after {
+  opacity: 0.4;
+}
+.rm-item:hover::after,
+.rm-item:focus-within::after {
+  opacity: 0.55;
+  box-shadow: inset 0 0 26px -6px var(--fg-brand-glow);
+}
+
+/* The snake: a bright head with a fading tail, running the perimeter on hover.
+   
+   It is a conic gradient the size of the card, masked down to a 1px ring — mask-composite
+   punches the middle out, so what survives is the border and the gradient turns behind it.
+   Rotating the gradient is one compositor property; drawing four travelling segments with
+   width and height would relayout the card sixty times a second.
+   
+   The angle is a registered custom property because plain custom properties are not
+   interpolable: without @property the browser jumps 0deg to 360deg in one frame and the
+   snake never moves. Where @property is missing the ring simply sits still, which is the
+   card's resting state anyway. */
+@property --rm-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .rm-item::before {
   content: "";
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 2px;
-  background: var(--fg-brand);
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform 280ms var(--ease-out);
-  z-index: 1;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--rm-angle),
+    transparent 0deg 200deg,
+    color-mix(in srgb, var(--fg-brand) 25%, transparent) 280deg,
+    color-mix(in srgb, var(--fg-brand) 70%, transparent) 335deg,
+    var(--fg-brand-hover) 355deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 260ms var(--ease-out);
+  pointer-events: none;
+  z-index: 2;
 }
 .rm-item:hover::before,
-.rm-item:focus-within::before,
-.rm-item[data-status="doing"]::before {
-  transform: scaleY(1);
+.rm-item:focus-within::before {
+  opacity: 1;
+  animation: rm-snake 2.4s linear infinite;
 }
 
-.rm-item[data-status="doing"] {
-  border-color: var(--border-brand);
+@keyframes rm-snake {
+  to {
+    --rm-angle: 360deg;
+  }
 }
+
 .rm-item[data-status="done"] {
   background: transparent;
 }
@@ -1142,53 +1216,61 @@ button:focus-visible,
   background: var(--border-subtle);
 }
 
-/* ---------- the sidebar tab ---------- */
+/* ---------- the sidebar launcher ---------- */
 
-.rm-tab {
+/* Shaped like the nav buttons above it, because it sits in the same rail and anything else
+   reads as a foreign object glued to the edge. What sets it apart is the hairline over it
+   and the brand tint it takes while the panel is open. */
+.rm-launcher {
   position: relative;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 5px;
-  margin-right: -1px;
-  border: 1px solid var(--border-subtle);
-  border-right: 0;
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
-  background: var(--bg-card);
+  text-decoration: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
   color: var(--fg-muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
   cursor: pointer;
   transition:
-    color 180ms var(--ease-out),
-    border-color 180ms var(--ease-out),
-    background 180ms var(--ease-out),
-    letter-spacing 220ms var(--ease-out),
-    padding 220ms var(--ease-out);
+    color 120ms var(--ease-out),
+    background 120ms var(--ease-out);
 }
-.rm-tab:hover,
-.rm-tab[aria-expanded="true"] {
+.rm-launcher:hover {
+  background: var(--bg-hover-soft);
   color: var(--fg-primary);
-  border-color: var(--border-brand);
-  background: var(--bg-surface-brand);
-  letter-spacing: 0.3em;
-  padding-block: 20px;
 }
-.rm-tab:focus-visible {
+.rm-launcher[aria-current="page"] {
+  background: var(--bg-surface-brand);
+  color: var(--fg-brand);
+}
+.rm-launcher:focus-visible {
   outline: 2px solid var(--fg-brand);
   outline-offset: 2px;
 }
-.rm-tab-diamond {
-  color: var(--fg-brand);
+
+/* The same ◆ the nav uses for the page you are on. */
+.rm-launcher-dot {
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
   font-size: 9px;
   line-height: 1;
+  color: var(--fg-brand);
+  opacity: 0;
+  transition: opacity 150ms var(--ease-out);
 }
-.rm-tab:hover .rm-tab-diamond {
-  animation: live-pulse 1.6s ease-in-out infinite;
+.rm-launcher[aria-current="page"] .rm-launcher-dot {
+  opacity: 1;
+}
+
+.rm-launcher-rule {
+  width: 20px;
+  height: 1px;
+  margin: 6px 0;
+  background: var(--border-subtle);
 }
 
 /* ---------- progress bar and column dot ---------- */

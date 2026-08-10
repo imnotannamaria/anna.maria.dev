@@ -15,14 +15,7 @@ import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { countByStatus } from "@/lib/roadmap/counts"
 import { PUBLIC_STATUSES, STATUS_LABEL, type RoadmapItem } from "@/lib/roadmap/validation"
 
-export function RoadmapProgressCard({
-  items,
-  /** In the dialog the card arrives with the modal, so it has no entrance of its own. */
-  animateIn = true,
-}: {
-  items: RoadmapItem[]
-  animateIn?: boolean
-}) {
+export function RoadmapProgressCard({ items }: { items: RoadmapItem[] }) {
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(420)
   const reveal = useReveal(0)
@@ -35,7 +28,7 @@ export function RoadmapProgressCard({
   const pct = total === 0 ? 0 : counts.done / total
 
   return (
-    <motion.div className="bento-card" onMouseMove={onMouseMove} {...(animateIn ? reveal : {})}>
+    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
 
       <CardHead label="progress" meta={`${Math.round(pct * 100)}% shipped`} />
@@ -74,8 +67,11 @@ export function RoadmapProgressCard({
 
           return (
             <div key={status} className="rm-step" data-state={state}>
+              {/* Every stage shows its count, shipped included. A ✓ there was a different
+                  kind of information in the same slot — two stages answering "how many"
+                  and the third answering "is it done", which is not a scale. */}
               <span className="rm-step-mark" aria-hidden>
-                {status === "done" ? "✓" : counts[status]}
+                {counts[status]}
               </span>
               <span
                 className="font-mono text-[11px] tracking-[0.08em] whitespace-nowrap uppercase"

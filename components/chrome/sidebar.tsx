@@ -12,7 +12,7 @@ import {
   SquaresFourIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import { RoadmapTab } from "@/components/roadmap/roadmap-tab"
+import { RoadmapNavLink } from "@/components/roadmap/roadmap-nav-link"
 
 const NAV_ITEMS = [
   { href: "/", icon: HouseLineIcon, label: "Home" },
@@ -104,8 +104,9 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* PROTÓTIPO — tab vertical grudada na borda direita do sidebar */}
-      <RoadmapTab />
+      {/* Below a hairline, apart from the primary nav: the roadmap is a page, but not one
+          of the ones the titlebar keeps a tab for. */}
+      <RoadmapNavLink />
     </aside>
   )
 }

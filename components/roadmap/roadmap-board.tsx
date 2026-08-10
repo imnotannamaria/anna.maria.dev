@@ -136,7 +136,6 @@ export function RoadmapBoard({ items }: { items: RoadmapItem[] }) {
                 {list.map((item, i) => (
                   <RoadmapItemCard
                     key={item.id}
-                    surface="rm-board"
                     item={item}
                     index={i}
                     delay={col * 0.06 + i * 0.05}

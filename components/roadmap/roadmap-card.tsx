@@ -31,13 +31,10 @@ export function RoadmapItemCard({
   item,
   index,
   delay = 0,
-  /** Prefix for the layoutId — the dialog and the board are two mounts of the same item. */
-  surface,
 }: {
   item: RoadmapItem
   index: number
   delay?: number
-  surface: string
 }) {
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(320)
@@ -48,7 +45,7 @@ export function RoadmapItemCard({
        out of one place and into another. */
     <motion.li
       layout
-      layoutId={`${surface}-${item.id}`}
+      layoutId={`rm-${item.id}`}
       transition={reduce ? { duration: 0 } : { layout: { duration: 0.45, ease: EASE_OUT } }}
       className="bento-card featured-card rm-item"
       data-status={status}
