@@ -1,3 +1,6 @@
+import Link from "next/link"
+import { ChatsCircleIcon } from "@phosphor-icons/react/dist/ssr"
+import { Button } from "@/app/components/entrepta/button"
 import { TypeIn } from "@/components/ui/type-in"
 import { RoadmapBoard } from "@/components/roadmap/roadmap-board"
 import { createMetadata } from "@/lib/metadata"
@@ -6,7 +9,7 @@ import { getPublicItems } from "@/lib/roadmap/queries"
 export const metadata = createMetadata({
   title: "Roadmap",
   description:
-    "Everything I want to build on this site and what already shipped — to do, in progress, done.",
+    "Loose ideas for what comes next on this site, and what already shipped: to do, in progress, done.",
   path: "/roadmap",
 })
 
@@ -58,17 +61,34 @@ export default async function RoadmapPage() {
           className="mt-4 max-w-[58ch] font-sans text-base leading-relaxed"
           style={{ color: "var(--fg-secondary)" }}
         >
-          Everything I want to build on this site, and what already{" "}
+          Hi. You&apos;re probably wondering why a portfolio has a roadmap. The honest answer is
+          that I&apos;ve been having too much fun building things for this site. At some point it
+          stopped being a portfolio and turned into{" "}
           <em className="font-serif italic" style={{ color: "var(--fg-brand)" }}>
-            shipped
+            me, as a website
           </em>
-          . Nothing here has a date and not all of it will get built — an item is a thought I had,
-          not a promise.
+          . It is also the best proof I have of what I can build.
         </p>
 
-        <p className="mt-3 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
-          {"// an idea that grows up leaves here and becomes a plan in docs/."}
+        <p
+          className="mt-3 max-w-[58ch] font-sans text-base leading-relaxed"
+          style={{ color: "var(--fg-secondary)" }}
+        >
+          So this is what might come next. Loose ideas, nothing else. No dates, no promises.
         </p>
+
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          <Link href="/contact" style={{ textDecoration: "none" }}>
+            <Button variant="secondary">
+              <ChatsCircleIcon size={14} aria-hidden />
+              tell me what to build next
+            </Button>
+          </Link>
+
+          <p className="m-0 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+            {"// an idea that grows up leaves here and becomes a plan in docs/."}
+          </p>
+        </div>
       </header>
 
       {items.length === 0 ? (
