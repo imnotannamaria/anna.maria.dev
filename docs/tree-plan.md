@@ -6,7 +6,7 @@ the same sources the pages do, so the tree can't tell you there are twelve blog 
 when there are fourteen.
 
 This is the first piece of the **Home components** and **Animations** items in
-[ROADMAP.md](../ROADMAP.md).
+the roadmap (`/roadmap`, edited in `/admin/roadmap`).
 
 ---
 

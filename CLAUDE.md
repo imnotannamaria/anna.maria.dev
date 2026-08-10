@@ -136,7 +136,7 @@ app/
     og/route.tsx             dynamic OG images
     now-playing/route.ts    Spotify Now Playing
     auth/callback/route.ts  WorkOS AuthKit callback
-    v1/[[...route]]/        the Hono app — wristkit ingest, the public roadmap read, admin CRUD
+    v1/[[...route]]/        the Hono app — wristkit ingest + admin CRUD
     wristkit-sync/route.ts  legacy path, forwards into Hono (delete once the Shortcut moves)
   layout.tsx                root layout, editor chrome + fonts + theme setup
   globals.css                tokens, typography scale, theme overrides
@@ -151,7 +151,7 @@ components/
   chrome/                   titlebar, sidebar, command palette
   home/                     bento grid cards (stack, mini piano, GitHub, log)
   log/                      feed card, star rating, filter feed
-  roadmap/                  board, item card, progress card, status mark, sidebar tab
+  roadmap/                  board, item card, progress card, status mark, sidebar link
   admin/                    entry + item forms, tables, rating input, quick add, delete dialogs
   spotify/                  Now Playing widget
   wristkit/                 Apple Watch activity card
@@ -229,18 +229,21 @@ Every entry has a slug, but there is no `/log/[slug]` page and there shouldn't b
 
 ### `/roadmap`
 
-Three columns — to do, in progress, shipped — of what this site is going to become, over a
+Three columns, to do, in progress and shipped, of what this site is going to become, over a
 progress card whose stepper walks the same three stages. Every item is a `.bento-card` with
 the status mark, a serif title, the blurb and a `Badge`; shipped ones are struck through.
+Hovering a card runs a light around its border, and the in-progress ones rest dimly lit.
 
 Filter pills mirror into `?status=` and are read with `useSyncExternalStore`, like `/log`,
 so every card lands in the server HTML. They are also what keeps the cards' `layoutId`
 animation alive: the mark is **read-only** on the public site, so filtering is the only
 thing a visitor can do that makes a card travel.
 
-The same items open in a dialog from the sidebar tab, fetched from `/api/v1/roadmap` the
-first time it is opened — never on render, or the sidebar would drag every page on the site
-into `force-dynamic`.
+The sidebar holds a link to it under a hairline, apart from the primary nav, since the
+titlebar keeps no permanent tab for it. That link used to open a dialog containing a copy
+of the board; the page says the same thing with a URL people can send each other, so the
+dialog was a second implementation to keep in step and it went. The public
+`GET /api/v1/roadmap` went with it, because the dialog was its only consumer.
 
 ### `/admin`
 
@@ -385,9 +388,10 @@ If capture ever starts costing more than typing a line into an open editor did, 
 signal the move was wrong — the fix is an import script, not going back to the file. The
 reasoning is in [docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
 
-`ROADMAP.md` is still in the tree until `npm run seed:roadmap` has run against production.
-It is the migration's source and its backup, and deleting it is the last step of that
-migration, not part of building this.
+`ROADMAP.md` is gone. The seed carried every item it held into the table, and a file
+regenerated from the database was a second copy of the same list to keep in step, which is
+the problem the move was supposed to solve. `scripts/seed-roadmap.ts` still has the
+original text if it is ever needed.
 
 ---
 

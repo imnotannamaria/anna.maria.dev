@@ -374,3 +374,22 @@ app/roadmap/page.tsx                    keeps, gains metadata/loading/error
 app/globals.css                         the `ROADMAP — PROTÓTIPO` block moves up into the card CSS
 components/chrome/sidebar.tsx           one import and one line — keeps
 ```
+
+---
+
+## What changed after the plan
+
+Written down because a plan that quietly stops matching the code is worse than no plan.
+
+- **The dialog is gone.** The sidebar link goes straight to `/roadmap`. Two surfaces meant
+  two implementations of the same board to keep in step, and only one of them had a URL.
+- **`GET /api/v1/roadmap` went with it.** The dialog was its only consumer, and an
+  unauthenticated public route with nothing calling it is surface for free.
+- **The LED replaced the accent bar.** A light runs the card's whole border on hover
+  instead of a bar lighting one edge; in-progress cards rest dimly lit.
+- **The sidebar tab became a nav-shaped button.** The vertical tab was a shape used nowhere
+  else on the site and read as something glued to the edge rather than living in it.
+- **`ROADMAP.md` is deleted.** Phase 5 said it would go once the seed had run, and it has.
+  A version regenerated from the table was tried for about ten minutes and thrown away: a
+  mirror of a list is still a second copy of the list. `scripts/seed-roadmap.ts` keeps the
+  original text.
