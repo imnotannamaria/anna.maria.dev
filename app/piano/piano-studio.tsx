@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
-import { DisplayH2, DocLabel, Em, Kbd, Prose, Section } from "./parts"
+import { DisplayH2, DocLabel, Em, Kbd, Prose, Section } from "@/components/chrome/page-parts"
 
 /* ════════════════════════════════════════════════
    DATA — 2 octaves, C4 → B5
@@ -532,7 +532,7 @@ export function PianoStudio() {
       {/* ══════════ KEYBOARD ══════════ */}
       <Section id="keyboard">
         <DocLabel level="##">keyboard</DocLabel>
-        <DisplayH2>
+        <DisplayH2 size={36} margin="0 0 8px">
           <Em>Twenty-four</Em> keys.
         </DisplayH2>
         <Prose>
@@ -787,7 +787,7 @@ export function PianoStudio() {
       {/* ══════════ SONGS ══════════ */}
       <Section id="songs">
         <DocLabel level="##">songs</DocLabel>
-        <DisplayH2>
+        <DisplayH2 size={36} margin="0 0 8px">
           <Em>Six</Em> classics, one tap.
         </DisplayH2>
         <Prose>

@@ -1,8 +1,16 @@
 import Link from "next/link"
 import { createMetadata } from "@/lib/metadata"
 import { PianoStudio } from "./piano-studio"
-import { PianoOutline, type OutlineItem } from "./piano-outline"
-import { DisplayH2, DocLabel, Em, Kbd, Prose, Section, Strong } from "./parts"
+import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
+import {
+  DisplayH2,
+  DocLabel,
+  Em,
+  Kbd,
+  Prose,
+  Section,
+  Strong,
+} from "@/components/chrome/page-parts"
 
 export const metadata = createMetadata({
   title: "Piano",
@@ -97,7 +105,38 @@ function KeymapGroup({ title, lines }: { title: string; lines: KeyLine[] }) {
 export default function PianoPage() {
   return (
     <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
-      <PianoOutline items={outline} />
+      <PageOutline
+        items={outline}
+        file="piano.tsx"
+        footer={
+          <>
+            <div className="flex items-center justify-between">
+              <span>{"// keys"}</span>
+              <span style={{ color: "var(--fg-brand)", fontFamily: "var(--font-serif)" }}>
+                <em>24</em>
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>{"// range"}</span>
+              <span>C4 — B5</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>{"// audio"}</span>
+              <span
+                className="inline-flex items-center gap-1"
+                style={{ color: "var(--status-success-fg)" }}
+              >
+                <span
+                  aria-hidden
+                  className="inline-block size-1.5 rounded-full"
+                  style={{ background: "var(--status-success)" }}
+                />
+                web
+              </span>
+            </div>
+          </>
+        }
+      />
 
       <div className="min-w-0">
         <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
@@ -153,7 +192,7 @@ export default function PianoPage() {
           {/* ══════════ KEY MAPPING ══════════ */}
           <Section id="controls">
             <DocLabel level="##">key mapping</DocLabel>
-            <DisplayH2>
+            <DisplayH2 size={36} margin="0 0 8px">
               Where every <Em>note</Em> lives.
             </DisplayH2>
             <Prose>

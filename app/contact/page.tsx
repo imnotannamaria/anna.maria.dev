@@ -4,7 +4,8 @@ import { cn } from "@/lib/utils"
 import { createMetadata } from "@/lib/metadata"
 import { ContactForm } from "@/components/contact/contact-form"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
-import { ContactOutline, type OutlineItem } from "./contact-outline"
+import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
+import { DisplayH2, DocLabel, Em, Prose, Section, Strong } from "@/components/chrome/page-parts"
 import { siteConfig } from "@/lib/site-config"
 
 export const metadata = createMetadata({
@@ -61,87 +62,6 @@ const channels: Channel[] = [
     action: "open",
   },
 ]
-
-// ─── Inline text helpers ─────────────────────────────────────────────────────
-
-function Strong({ children }: { children: React.ReactNode }) {
-  return <strong style={{ color: "var(--fg-primary)", fontWeight: 500 }}>{children}</strong>
-}
-
-function Em({ children }: { children: React.ReactNode }) {
-  return (
-    <em style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", color: "var(--fg-brand)" }}>
-      {children}
-    </em>
-  )
-}
-
-function DocLabel({ level, children }: { level: "#" | "##"; children: React.ReactNode }) {
-  return (
-    <div
-      className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
-      style={{ color: "var(--fg-muted)" }}
-    >
-      <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-        {level}
-      </span>{" "}
-      {children}
-    </div>
-  )
-}
-
-function DisplayH2({ children }: { children: React.ReactNode }) {
-  return (
-    <h2
-      style={{
-        fontFamily: "var(--font-serif)",
-        fontWeight: 400,
-        fontSize: 40,
-        lineHeight: 1.1,
-        letterSpacing: "-0.02em",
-        color: "var(--fg-primary)",
-        margin: "0 0 16px",
-      }}
-    >
-      {children}
-    </h2>
-  )
-}
-
-function Prose({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      className="mb-8 text-[15px] leading-[1.7]"
-      style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)", maxWidth: "60ch" }}
-    >
-      {children}
-    </p>
-  )
-}
-
-function Section({
-  id,
-  first,
-  children,
-}: {
-  id: string
-  first?: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <section
-      id={id}
-      style={{
-        scrollMarginTop: 24,
-        paddingTop: first ? 0 : 64,
-        paddingBottom: 64,
-        borderTop: first ? "none" : "1px solid var(--border-subtle)",
-      }}
-    >
-      {children}
-    </section>
-  )
-}
 
 function ChannelCard({ Icon, label, value, href, action, primary }: Channel) {
   const external = !href.startsWith("mailto:")
@@ -203,7 +123,33 @@ function ChannelCard({ Icon, label, value, href, action, primary }: Channel) {
 export default function ContactPage() {
   return (
     <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
-      <ContactOutline items={outline} />
+      <PageOutline
+        items={outline}
+        file="contact.tsx"
+        footer={
+          <>
+            <div className="flex justify-between">
+              <span>{"// inbox"}</span>
+              <span
+                className="inline-flex items-center gap-1"
+                style={{ color: "var(--status-success-fg)" }}
+              >
+                <span
+                  aria-hidden
+                  className="inline-block size-1.5 animate-pulse rounded-full"
+                  style={{ background: "var(--status-success)" }}
+                />
+                open
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>{"// replies"}</span>
+              <span>~ 1 day</span>
+            </div>
+            <div>{"// utf-8"}</div>
+          </>
+        }
+      />
 
       <div className="min-w-0">
         <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
@@ -296,10 +242,10 @@ export default function ContactPage() {
           {/* ══════════ CHANNELS ══════════ */}
           <Section id="channels">
             <DocLabel level="##">channels</DocLabel>
-            <DisplayH2>
+            <DisplayH2 margin="0 0 16px">
               <Em>Four</Em> ways to reach me.
             </DisplayH2>
-            <Prose>
+            <Prose className="mb-8 text-[15px] leading-[1.7]">
               Email is best for anything that needs a real answer. GitHub is where I live for open
               source, and LinkedIn or X are perfect for a quick hello. I keep an eye on all of them.
             </Prose>
@@ -314,10 +260,10 @@ export default function ContactPage() {
           {/* ══════════ MESSAGE ══════════ */}
           <Section id="message">
             <DocLabel level="##">send a message</DocLabel>
-            <DisplayH2>
+            <DisplayH2 margin="0 0 16px">
               Or just type it <Em>here.</Em>
             </DisplayH2>
-            <Prose>
+            <Prose className="mb-8 text-[15px] leading-[1.7]">
               This drops straight into my inbox. If it&apos;s about work, a couple of lines on what
               you&apos;re building and where I&apos;d fit in is all I need to get back to you.
             </Prose>
