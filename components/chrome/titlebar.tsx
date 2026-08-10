@@ -13,6 +13,7 @@ import {
   PianoKeysIcon,
   SquaresFourIcon,
   FileIcon,
+  ListChecksIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { toast } from "@/app/components/entrepta/toast"
@@ -44,6 +45,10 @@ const NAV_TABS: Tab[] = [
 ]
 
 function getDynamicTab(pathname: string): Tab | null {
+  // The roadmap opens as a tab rather than living in NAV_TABS: it is reached from the
+  // sidebar panel, not from the primary nav, and an eighth permanent tab for something
+  // secondary would push the row into the meta on the right at 1280px.
+  if (pathname === "/roadmap") return { href: pathname, name: "roadmap.md", icon: ListChecksIcon }
   const blogMatch = pathname.match(/^\/blog\/(.+)/)
   if (blogMatch) return { href: pathname, name: `${blogMatch[1]}.mdx`, icon: FileIcon }
   const projectMatch = pathname.match(/^\/projects\/(.+)/)

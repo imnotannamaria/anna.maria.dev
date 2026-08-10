@@ -13,6 +13,7 @@
     "format": "prettier --write .",
     "email:dev": "email dev --dir emails",
     "seed:log": "tsx scripts/seed-log.ts",
+    "seed:roadmap": "tsx scripts/seed-roadmap.ts",
     "prepare": "husky"
   },
   "lint-staged": {

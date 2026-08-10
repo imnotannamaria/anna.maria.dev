@@ -36,6 +36,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
         </nav>
 
+        {/* Two things live here now, so the layout has to say so. */}
+        <nav aria-label="Admin sections" className="flex items-center gap-3 font-mono text-xs">
+          <Link href="/admin/log" style={{ color: "var(--fg-secondary)" }}>
+            log
+          </Link>
+          <span aria-hidden style={{ opacity: 0.4, color: "var(--fg-muted)" }}>
+            ·
+          </span>
+          <Link href="/admin/roadmap" style={{ color: "var(--fg-secondary)" }}>
+            roadmap
+          </Link>
+        </nav>
+
         <div className="flex items-center gap-3">
           <span className="font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
             {user?.email}

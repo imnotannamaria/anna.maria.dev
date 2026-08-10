@@ -12,6 +12,7 @@ import {
   SquaresFourIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
+import { RoadmapNavLink } from "@/components/roadmap/roadmap-nav-link"
 
 const NAV_ITEMS = [
   { href: "/", icon: HouseLineIcon, label: "Home" },
@@ -102,6 +103,10 @@ export function Sidebar() {
           )
         })}
       </nav>
+
+      {/* Below a hairline, apart from the primary nav: the roadmap is a page, but not one
+          of the ones the titlebar keeps a tab for. */}
+      <RoadmapNavLink />
     </aside>
   )
 }

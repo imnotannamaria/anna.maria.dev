@@ -5,6 +5,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/**
+ * Whether a string can be handed to a `uuid` column.
+ *
+ * Postgres does not return "no rows" for `where id = 'garbage'`, it raises — so an id that
+ * came out of a URL has to be checked before the query, or a wrong URL becomes a 500 where
+ * a 404 was the whole intent.
+ */
+export function isUuid(value: string): boolean {
+  return UUID.test(value)
+}
+
 export function formatDate(date: string) {
   return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
