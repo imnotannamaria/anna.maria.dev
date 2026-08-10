@@ -21,7 +21,9 @@ export function RoadmapNavLink() {
 
   return (
     <>
-      <span aria-hidden className="rm-launcher-rule mt-auto" />
+      {/* The rule pushes itself and the launcher to the bottom of the rail — margin-top:auto
+          lives in the CSS rule, because an `mt-auto` utility loses to it. */}
+      <span aria-hidden className="rm-launcher-rule" />
 
       <Link
         href="/roadmap"

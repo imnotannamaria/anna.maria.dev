@@ -14,11 +14,7 @@ export type RoadmapStatus = z.infer<typeof RoadmapStatusSchema>
 export const PUBLIC_STATUSES = ["todo", "doing", "done"] as const
 export type PublicStatus = (typeof PUBLIC_STATUSES)[number]
 
-export function isPublicStatus(status: RoadmapStatus): status is PublicStatus {
-  return status !== "raw"
-}
-
-/** Column heading, filter pill, and the label a screen reader gets for the check mark. */
+/** Column heading, filter pill, and the one place a card says its status in words. */
 export const STATUS_LABEL: Record<RoadmapStatus, string> = {
   raw: "raw",
   todo: "to do",
@@ -65,11 +61,10 @@ export const roadmapItemInputSchema = z.object({
 export type RoadmapItemInput = z.infer<typeof roadmapItemInputSchema>
 
 /**
- * The quick-add. One field, because the whole point of retiring ROADMAP.md is that
- * capturing an idea must not cost more than typing a line into an editor did.
+ * The quick-add sends `{ title, status: "raw" }` against this same schema. It has no schema
+ * of its own: one field and a fixed status is not a second contract, and a `.pick()` nobody
+ * imports is a second contract that only looks like one.
  */
-export const roadmapQuickAddSchema = roadmapItemInputSchema.pick({ title: true })
-export type RoadmapQuickAdd = z.infer<typeof roadmapQuickAddSchema>
 
 /** An item as the UI consumes it: empty strings are null, dates are "YYYY-MM-DD". */
 export type RoadmapItem = {

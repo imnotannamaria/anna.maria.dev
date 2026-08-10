@@ -1,7 +1,8 @@
-import { asc, desc, ne, eq, sql } from "drizzle-orm"
+import { asc, desc, ne, eq } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
+import { isUuid } from "@/lib/utils"
 import { roadmapItems } from "./schema"
-import { PUBLIC_STATUSES, type RoadmapItem, type RoadmapStatus } from "./validation"
+import type { RoadmapItem, RoadmapStatus } from "./validation"
 
 type Row = typeof roadmapItems.$inferSelect
 
@@ -30,46 +31,45 @@ function db() {
 /**
  * Everything the site shows: to do, in progress, shipped. `raw` never leaves the admin.
  *
- * Ordered so the board can slice this one array into three columns without a second query.
- * Within a column, `position` is the hand-set order and `created_at` breaks the tie, so a
- * column nobody has ordered still comes back oldest-first rather than at random.
+ * Ordered by `position`, the hand-set order, with `created_at` breaking the tie so a column
+ * nobody has ordered still comes back oldest-first rather than at random. No CASE ranking
+ * the statuses: the board groups these rows into columns itself, so nothing downstream can
+ * observe what order the statuses came back in.
  */
 export async function getPublicItems(): Promise<RoadmapItem[]> {
   const conn = db()
   if (!conn) return []
 
-  // A CASE giving each public status its board index, so one query returns the columns in
-  // the order they are rendered.
-  const statusRank = sql`case ${roadmapItems.status} ${sql.join(
-    PUBLIC_STATUSES.map((s, i) => sql`when ${s} then ${i}`),
-    sql` `,
-  )} else ${PUBLIC_STATUSES.length} end`
-
   const rows = await conn
     .select()
     .from(roadmapItems)
     .where(ne(roadmapItems.status, "raw"))
-    .orderBy(statusRank, asc(roadmapItems.position), asc(roadmapItems.createdAt))
+    .orderBy(asc(roadmapItems.position), asc(roadmapItems.createdAt))
 
   return rows.map(toItem)
 }
 
-/** The admin list. Includes `raw` — that is the whole point of it. Newest first. */
+/**
+ * The admin list. Includes `raw` — that is the whole point of it. Newest first.
+ *
+ * Not by `position`: that is the board's within-column order and it means nothing in a flat
+ * list across four statuses. This screen is the capture log, so what was written last is
+ * what wants to be at the top.
+ */
 export async function getAllItems(): Promise<RoadmapItem[]> {
   const conn = db()
   if (!conn) return []
 
-  const rows = await conn
-    .select()
-    .from(roadmapItems)
-    .orderBy(asc(roadmapItems.position), desc(roadmapItems.createdAt))
+  const rows = await conn.select().from(roadmapItems).orderBy(desc(roadmapItems.createdAt))
 
   return rows.map(toItem)
 }
 
 export async function getItemById(id: string): Promise<RoadmapItem | null> {
   const conn = db()
-  if (!conn) return null
+  // A URL can hold anything, and `where id = 'garbage'` against a uuid column raises rather
+  // than returning nothing — which would turn a wrong URL into an error page.
+  if (!conn || !isUuid(id)) return null
 
   const rows = await conn.select().from(roadmapItems).where(eq(roadmapItems.id, id)).limit(1)
   return rows[0] ? toItem(rows[0]) : null

@@ -12,19 +12,18 @@ import { CardFoot, CardHead } from "@/components/ui/card-parts"
 import { revealViewport, useReveal } from "@/components/ui/reveal"
 import { RollingNumber, useRollOnHover } from "@/components/ui/rolling-number"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
-import { countByStatus } from "@/lib/roadmap/counts"
-import { PUBLIC_STATUSES, STATUS_LABEL, type RoadmapItem } from "@/lib/roadmap/validation"
+import { PUBLIC_STATUSES, STATUS_LABEL, type PublicStatus } from "@/lib/roadmap/validation"
 
-export function RoadmapProgressCard({ items }: { items: RoadmapItem[] }) {
+export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, number> }) {
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(420)
   const reveal = useReveal(0)
   const roll = useRollOnHover(0.3)
 
-  // Counted off the list this card was already handed. No second query for a number that
-  // is one pass over an array we have.
-  const counts = countByStatus(items)
-  const total = items.length
+  // Counted by the board, off the grouping it already did. No second pass over the same
+  // array, and no second query for a number we are holding. `raw` is out of both the
+  // numerator and the denominator: it is not a promise, so it is not progress either.
+  const total = counts.todo + counts.doing + counts.done
   const pct = total === 0 ? 0 : counts.done / total
 
   return (
@@ -45,19 +44,26 @@ export function RoadmapProgressCard({ items }: { items: RoadmapItem[] }) {
           </span>
         </span>
 
-        {/* Scales, never resizes: width reflows layout, a transform does not. */}
-        <div className="rm-progress min-w-[160px] flex-1">
+        {/* The trigger is on the track, not on the fill. A `scaleX: 0` element has no width,
+            no width is no area, and an observer asked for a quarter of no area never fires —
+            the bar would sit at zero forever. The track has an honest box, so it watches and
+            the fill hears about it through a variant. */}
+        <motion.div
+          className="rm-progress min-w-[160px] flex-1"
+          initial="hidden"
+          whileInView="show"
+          viewport={revealViewport}
+        >
+          {/* Scales, never resizes: width reflows layout, a transform does not. */}
           <motion.div
             className="rm-progress-fill"
             style={{ width: "100%", transformOrigin: "left" }}
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: pct }}
-            viewport={revealViewport}
+            variants={{ hidden: { scaleX: 0 }, show: { scaleX: pct } }}
             transition={
               reduce ? { duration: 0 } : { type: "spring", stiffness: 110, damping: 20, mass: 0.9 }
             }
           />
-        </div>
+        </motion.div>
       </div>
 
       {/* The stepper. Each stage carries its count; the live one pulses. */}

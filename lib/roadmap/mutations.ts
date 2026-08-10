@@ -2,6 +2,7 @@ import "server-only"
 import { eq } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
 import { slugify, uniqueSlug } from "@/lib/slug"
+import { isUuid } from "@/lib/utils"
 import { getTakenSlugs } from "./queries"
 import { roadmapItems } from "./schema"
 import type { RoadmapItemInput } from "./validation"
@@ -36,7 +37,7 @@ function shippedAtFor(status: RoadmapItemInput["status"], current: string | null
   return current ?? today()
 }
 
-/** Shared shape for insert and update. Defaults live here, not in zod. */
+/** The insert shape. Defaults live here, not in zod — an omitted field takes the default. */
 function toRow(input: RoadmapItemInput) {
   return {
     title: input.title.trim(),
@@ -45,6 +46,28 @@ function toRow(input: RoadmapItemInput) {
     position: input.position ?? 0,
     planUrl: blankToNull(input.planUrl),
   }
+}
+
+/**
+ * The update shape, which is not the insert shape.
+ *
+ * Every optional field in the schema is optional, so a PATCH that only moves the status
+ * validates — and running it through `toRow` would write the defaults over the blurb, the
+ * plan link and the hand-set position of an item that never mentioned them. There is no
+ * undo for that. A key that is absent is left alone; an empty string is still a clear,
+ * which is what the form sends when you empty a field.
+ */
+function toUpdate(input: RoadmapItemInput): Partial<typeof roadmapItems.$inferInsert> {
+  const set: Partial<typeof roadmapItems.$inferInsert> = {
+    title: input.title.trim(),
+    status: input.status,
+  }
+
+  if (input.blurb !== undefined) set.blurb = blankToNull(input.blurb)
+  if (input.planUrl !== undefined) set.planUrl = blankToNull(input.planUrl)
+  if (input.position !== undefined) set.position = input.position
+
+  return set
 }
 
 export async function createItem(input: RoadmapItemInput) {
@@ -60,7 +83,9 @@ export async function createItem(input: RoadmapItemInput) {
 }
 
 export async function updateItem(id: string, input: RoadmapItemInput) {
-  const desired = blankToNull(input.slug) ?? slugify(input.title)
+  // `where id = 'garbage'` against a uuid column raises instead of matching nothing, and
+  // the caller reads null as a 404.
+  if (!isUuid(id)) return null
 
   const [current] = await db()
     .select({ slug: roadmapItems.slug, shippedAt: roadmapItems.shippedAt })
@@ -70,6 +95,12 @@ export async function updateItem(id: string, input: RoadmapItemInput) {
 
   if (!current) return null
 
+  // No slug in the payload means keep the one the item has: a slug is a stable anchor, and
+  // regenerating it from the title on an unrelated edit breaks every link to it. An empty
+  // string is the form's "generate one for me".
+  const desired =
+    input.slug === undefined ? current.slug : (blankToNull(input.slug) ?? slugify(input.title))
+
   // An item's own slug is not a collision with itself — without this filter, saving a form
   // without touching the title would rename it to "-2" every time.
   const taken = (await getTakenSlugs()).filter((s) => s !== current.slug)
@@ -77,7 +108,7 @@ export async function updateItem(id: string, input: RoadmapItemInput) {
   const [row] = await db()
     .update(roadmapItems)
     .set({
-      ...toRow(input),
+      ...toUpdate(input),
       slug: uniqueSlug(desired, taken),
       shippedAt: shippedAtFor(input.status, current.shippedAt),
       updatedAt: new Date(),
@@ -89,6 +120,8 @@ export async function updateItem(id: string, input: RoadmapItemInput) {
 }
 
 export async function deleteItem(id: string) {
+  if (!isUuid(id)) return null
+
   const [row] = await db()
     .delete(roadmapItems)
     .where(eq(roadmapItems.id, id))

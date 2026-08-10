@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { PlusIcon } from "@phosphor-icons/react/dist/ssr"
-import { Button } from "@/app/components/entrepta/button"
+import { buttonVariants } from "@/app/components/entrepta/button-variants"
 import { RoadmapItemTable } from "@/components/admin/roadmap-item-table"
 import { RoadmapQuickAdd } from "@/components/admin/roadmap-quick-add"
 import { requireAdmin } from "@/lib/auth/require-admin"
@@ -37,11 +37,11 @@ export default async function AdminRoadmapPage() {
           </p>
         </div>
 
-        <Link href="/admin/roadmap/new">
-          <Button>
-            <PlusIcon size={14} weight="bold" aria-hidden />
-            new item
-          </Button>
+        {/* buttonVariants, not <Button> inside <Link>: that renders a <button> nested in an
+            <a>, which is invalid and gives one destination two tab stops. */}
+        <Link href="/admin/roadmap/new" className={buttonVariants()}>
+          <PlusIcon size={14} weight="bold" aria-hidden />
+          new item
         </Link>
       </div>
 

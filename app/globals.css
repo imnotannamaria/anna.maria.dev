@@ -1049,9 +1049,22 @@ button:focus-visible,
 
 /* ---------- item: a .bento-card, plus what is the roadmap's own ---------- */
 
+/* Everything .featured-card gives, minus the lift. The card carries Motion's `layout`, so
+   Motion owns its transform and writes it inline the first time a filter moves it — a CSS
+   translateY on hover would stop applying from then on, silently. Border and shadow have
+   no second owner, and the light running the perimeter is this card's hover anyway. */
 .rm-item {
   padding: 18px;
   gap: 12px;
+  transition:
+    border-color 200ms var(--ease-out),
+    background 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out);
+}
+.rm-item:hover,
+.rm-item:focus-within {
+  border-color: var(--border-brand-strong);
+  box-shadow: 0 12px 32px var(--shadow-brand);
 }
 
 /* The LED. It traces the whole card, not one edge, and every card has one — pointing at a
@@ -1070,8 +1083,8 @@ button:focus-visible,
   border-radius: inherit;
   opacity: 0;
   /* Inset only. The card clips its own overflow, so an outward glow drawn on this layer
-     would never be seen — the halo around the card is .featured-card's box-shadow, which
-     is drawn by the card itself and so escapes the clip. */
+     would never be seen — the halo around the card is the box-shadow above, which is drawn
+     by the card itself and so escapes the clip. */
   box-shadow: inset 0 0 14px -6px var(--fg-brand-glow);
   transition:
     opacity 380ms var(--ease-out),
@@ -1144,7 +1157,10 @@ button:focus-visible,
   }
 }
 
-.rm-item[data-status="done"] {
+/* Shipped recedes: no surface of its own, so the two live columns carry the weight. At
+   rest only — this ties with .bento-card:hover on specificity and would win on source
+   order, and a card that answers nothing when you point at it reads as disabled. */
+.rm-item[data-status="done"]:not(:hover):not(:focus-within) {
   background: transparent;
 }
 .rm-item[data-status="done"] .rm-title {
@@ -1266,10 +1282,14 @@ button:focus-visible,
   opacity: 1;
 }
 
+/* margin-top: auto here, not an `mt-auto` utility on the element. Everything in this file
+   is unlayered and Tailwind's utilities sit in @layer utilities, so unlayered wins whatever
+   the specificity — the utility was being overridden and the launcher sat flush under the
+   nav instead of at the bottom of the rail. */
 .rm-launcher-rule {
   width: 20px;
   height: 1px;
-  margin: 6px 0;
+  margin: auto 0 6px;
   background: var(--border-subtle);
 }
 

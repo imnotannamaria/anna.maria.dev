@@ -1,10 +1,13 @@
-import { PUBLIC_STATUSES, type PublicStatus, type RoadmapItem } from "./validation"
+import type { PublicStatus, RoadmapItem } from "./validation"
 
 /**
  * The board's columns, sliced from a list already in memory.
  *
  * No `GROUP BY` beside the query that returns the same rows: every caller that wants the
  * columns already has the items. The log made the same call with countByType.
+ *
+ * This runs once per board render and the counts are read off the result — the progress
+ * card is handed those numbers rather than grouping the same array a second time.
  */
 export function groupByStatus(items: RoadmapItem[]): Record<PublicStatus, RoadmapItem[]> {
   const groups = { todo: [], doing: [], done: [] } as Record<PublicStatus, RoadmapItem[]>
@@ -19,20 +22,9 @@ export function groupByStatus(items: RoadmapItem[]): Record<PublicStatus, Roadma
   return groups
 }
 
-export function countByStatus(items: RoadmapItem[]): Record<PublicStatus, number> {
-  const groups = groupByStatus(items)
+/** How many in each column. `raw` is already gone: it is not a promise, so it is not a total. */
+export function countByStatus(
+  groups: Record<PublicStatus, RoadmapItem[]>,
+): Record<PublicStatus, number> {
   return { todo: groups.todo.length, doing: groups.doing.length, done: groups.done.length }
-}
-
-/** Shipped over total, 0–1. Total is public items only — `raw` is not a promise. */
-export function shippedFraction(items: RoadmapItem[]): number {
-  const publicItems = items.filter((i) => i.status !== "raw")
-  if (publicItems.length === 0) return 0
-  return publicItems.filter((i) => i.status === "done").length / publicItems.length
-}
-
-/** The same statuses as an ordered list, for the places that render one row per column. */
-export function statusBreakdown(items: RoadmapItem[]): { status: PublicStatus; count: number }[] {
-  const counts = countByStatus(items)
-  return PUBLIC_STATUSES.map((status) => ({ status, count: counts[status] }))
 }

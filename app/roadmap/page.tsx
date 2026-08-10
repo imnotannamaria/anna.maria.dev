@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { ChatsCircleIcon } from "@phosphor-icons/react/dist/ssr"
-import { Button } from "@/app/components/entrepta/button"
+import { buttonVariants } from "@/app/components/entrepta/button-variants"
 import { TypeIn } from "@/components/ui/type-in"
 import { RoadmapBoard } from "@/components/roadmap/roadmap-board"
 import { createMetadata } from "@/lib/metadata"
@@ -78,11 +78,12 @@ export default async function RoadmapPage() {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-4">
-          <Link href="/contact" style={{ textDecoration: "none" }}>
-            <Button variant="secondary">
-              <ChatsCircleIcon size={14} aria-hidden />
-              tell me what to build next
-            </Button>
+          {/* A link wearing the button's clothes, the way the home page CTA does. A <Button>
+              inside a <Link> is a <button> inside an <a>: invalid markup, and two tab stops
+              for one destination. */}
+          <Link href="/contact" className={buttonVariants({ variant: "secondary" })}>
+            <ChatsCircleIcon size={14} aria-hidden />
+            tell me what to build next
           </Link>
 
           <p className="m-0 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>

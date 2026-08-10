@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
-import { STATUS_LABEL, type PublicStatus } from "@/lib/roadmap/validation"
+import type { PublicStatus } from "@/lib/roadmap/validation"
 
 /**
  * The checkbox on a roadmap card — state, not a control.
@@ -11,6 +11,9 @@ import { STATUS_LABEL, type PublicStatus } from "@/lib/roadmap/validation"
  * the site can move an item, so this is deliberately not a `<button role="checkbox">`. An
  * affordance that does nothing when clicked is worse than a glyph: no cursor change, no
  * hover, no focus ring, nothing to press. Status changes live in /admin.
+ *
+ * Decoration for the eye only: the card's own head already says the status in words, and a
+ * second copy here made a screen reader announce "shipped" twice per card.
  *
  * The check is drawn rather than faded in — `pathLength` 0→1 on the card's entrance. That
  * is an entrance like any other, so it is `whileInView` with `once`, and it asks
@@ -21,13 +24,22 @@ export function RoadmapMark({ status, size = 20 }: { status: PublicStatus; size?
   const done = status === "done"
 
   return (
-    <span className="rm-mark" data-status={status} style={{ width: size, height: size }}>
-      {/* The label is on the card's status text; this is decoration for the eye only. */}
-      <span className="sr-only">{STATUS_LABEL[status]}</span>
+    // The observer sits on this span, not on the path inside the svg. An
+    // IntersectionObserver aimed at an SVG child is unreliable — the rings on the home page
+    // proved it, one of three firing — so the HTML ancestor watches and the path hears
+    // about it through a variant.
+    <motion.span
+      className="rm-mark"
+      data-status={status}
+      style={{ width: size, height: size }}
+      aria-hidden
+      initial="hidden"
+      whileInView="show"
+      viewport={revealViewport}
+    >
+      {done && <span className="rm-mark-fill" />}
 
-      {done && <span aria-hidden className="rm-mark-fill" />}
-
-      <svg viewBox="0 0 20 20" width={size} height={size} aria-hidden className="rm-mark-svg">
+      <svg viewBox="0 0 20 20" width={size} height={size} className="rm-mark-svg">
         {status === "doing" ? (
           // In progress: a dash that breathes, so the live column reads as live without a
           // second colour or a second glyph.
@@ -39,6 +51,7 @@ export function RoadmapMark({ status, size = 20 }: { status: PublicStatus; size?
             stroke="var(--fg-brand)"
             strokeWidth="2"
             strokeLinecap="round"
+            initial={false}
             animate={reduce ? undefined : { opacity: [0.45, 1, 0.45] }}
             transition={reduce ? undefined : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -50,13 +63,11 @@ export function RoadmapMark({ status, size = 20 }: { status: PublicStatus; size?
             strokeWidth="2.1"
             strokeLinecap="round"
             strokeLinejoin="round"
-            initial={{ pathLength: reduce ? 1 : 0 }}
-            whileInView={{ pathLength: 1 }}
-            viewport={revealViewport}
+            variants={{ hidden: { pathLength: reduce ? 1 : 0 }, show: { pathLength: 1 } }}
             transition={{ duration: reduce ? 0 : 0.34, ease: EASE_OUT, delay: reduce ? 0 : 0.12 }}
           />
         ) : null}
       </svg>
-    </span>
+    </motion.span>
   )
 }

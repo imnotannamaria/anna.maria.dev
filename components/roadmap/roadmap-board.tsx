@@ -1,7 +1,9 @@
 "use client"
 
-import { useMemo, useSyncExternalStore } from "react"
-import { groupByStatus } from "@/lib/roadmap/counts"
+import { useMemo } from "react"
+import { STAGGER_LIMIT } from "@/components/ui/reveal"
+import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
+import { countByStatus, groupByStatus } from "@/lib/roadmap/counts"
 import {
   PUBLIC_STATUSES,
   STATUS_LABEL,
@@ -11,71 +13,38 @@ import {
 import { RoadmapItemCard } from "./roadmap-card"
 import { RoadmapProgressCard } from "./roadmap-progress"
 
-const FILTER_EVENT = "roadmap:filter"
-
-function subscribe(onChange: () => void) {
-  window.addEventListener("popstate", onChange)
-  window.addEventListener(FILTER_EVENT, onChange)
-  return () => {
-    window.removeEventListener("popstate", onChange)
-    window.removeEventListener(FILTER_EVENT, onChange)
-  }
-}
-
-function readFilter(): PublicStatus | null {
-  const value = new URLSearchParams(window.location.search).get("status")
-  return value && (PUBLIC_STATUSES as readonly string[]).includes(value)
-    ? (value as PublicStatus)
-    : null
-}
-
-/** Nothing is filtered during the server render, which is what puts every card in the HTML. */
-function serverFilter(): PublicStatus | null {
-  return null
-}
-
-/**
- * The URL is the source of truth, read through useSyncExternalStore — the same call /log
- * made, for the same reason. `useSearchParams` makes a prerendered route emit its Suspense
- * fallback instead of the content, and the cards are the entire page for a crawler.
- */
-function useStatusFilter(): PublicStatus | null {
-  return useSyncExternalStore(subscribe, readFilter, serverFilter)
-}
-
-/** pushState rather than replaceState, so the back button undoes a filter. */
-function writeFilter(status: PublicStatus | null) {
-  window.history.pushState(null, "", status ? `/roadmap?status=${status}` : "/roadmap")
-  window.dispatchEvent(new Event(FILTER_EVENT))
-}
-
 /**
  * The board: progress card, filter pills, then either three columns or one filtered grid.
  *
+ * The filter lives in the URL, read the same way /log reads its own — see `useUrlFilter`.
  * The pills are also what keeps the card's layout animation alive. Nobody can move an item
  * from the public site — the checkbox is read-only — so without them the `layoutId` travel
  * would only ever fire for an audience of one, logged into /admin.
  */
 export function RoadmapBoard({ items }: { items: RoadmapItem[] }) {
-  const active = useStatusFilter()
+  const [active, setFilter] = useUrlFilter<PublicStatus>("status", PUBLIC_STATUSES, "/roadmap")
+
+  // Grouped once. The progress card is handed the counts rather than grouping again.
   const groups = useMemo(() => groupByStatus(items), [items])
+  const counts = useMemo(() => countByStatus(groups), [groups])
   const columns = active ? [active] : PUBLIC_STATUSES
+  const total = counts.todo + counts.doing + counts.done
 
   return (
     <>
       <div className="mb-6">
-        <RoadmapProgressCard items={items} />
+        <RoadmapProgressCard counts={counts} />
       </div>
 
       <div role="group" aria-label="Filter by status" className="mb-6 flex flex-wrap gap-2">
-        <Pill label="all" count={items.length} active={!active} onClick={() => writeFilter(null)} />
+        <FilterPill label="all" count={total} active={!active} onClick={() => setFilter(null)} />
         {PUBLIC_STATUSES.map((status) => (
-          <Pill
+          <FilterPill
             key={status}
             label={STATUS_LABEL[status]}
-            count={groups[status].length}
+            count={counts[status]}
             active={active === status}
-            onClick={() => writeFilter(active === status ? null : status)}
+            onClick={() => setFilter(active === status ? null : status)}
           />
         ))}
       </div>
@@ -122,8 +91,7 @@ export function RoadmapBoard({ items }: { items: RoadmapItem[] }) {
                 </p>
               )}
 
-              {/* py-1: the cards lift 2px and cast a shadow on hover. Without the
-                  clearance the list clips the top border of the first one.
+              {/* py-1 so the hover shadow has somewhere to fall.
                   min(320px, 100%) so a 375px viewport gets one column rather than a track
                   wider than the screen. */}
               <ul
@@ -133,12 +101,15 @@ export function RoadmapBoard({ items }: { items: RoadmapItem[] }) {
                     : "m-0 flex list-none flex-col gap-4 p-0 py-1"
                 }
               >
+                {/* The stagger is capped: past STAGGER_LIMIT the delay stops reading as flow
+                    and starts as a card that sat still after being scrolled to. The todo
+                    column is already long enough to hit it. */}
                 {list.map((item, i) => (
                   <RoadmapItemCard
                     key={item.id}
                     item={item}
                     index={i}
-                    delay={col * 0.06 + i * 0.05}
+                    delay={col * 0.06 + Math.min(i, STAGGER_LIMIT) * 0.05}
                   />
                 ))}
               </ul>
@@ -147,42 +118,5 @@ export function RoadmapBoard({ items }: { items: RoadmapItem[] }) {
         })}
       </div>
     </>
-  )
-}
-
-function Pill({
-  label,
-  count,
-  active,
-  onClick,
-}: {
-  label: string
-  count: number
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className="inline-flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-md border px-3 font-mono text-xs whitespace-nowrap transition-all duration-120 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
-      style={
-        active
-          ? {
-              borderColor: "var(--fg-brand)",
-              color: "var(--fg-brand)",
-              background: "var(--bg-surface-brand)",
-            }
-          : {
-              borderColor: "var(--border-subtle)",
-              color: "var(--fg-muted)",
-              background: "transparent",
-            }
-      }
-    >
-      {label}
-      <span style={{ opacity: 0.55 }}>{count}</span>
-    </button>
   )
 }
