@@ -1,5 +1,11 @@
 import Link from "next/link"
-import { ArrowRightIcon, ArrowUpRightIcon } from "@phosphor-icons/react"
+// The `/dist/ssr` entry, not the package root. The root is the client build: it calls
+// `createContext` at module scope, and this file has no "use client" — so a server
+// component importing `ArrowAffordance` used to fail `next build` during route config
+// collection with `createContext is not a function`, an error that names no file. Every
+// consumer happened to be a client component, so it stayed hidden until /about needed the
+// link. Neither export here uses a hook, so the ssr build serves both sides.
+import { ArrowRightIcon, ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr"
 import { cn } from "@/lib/utils"
 
 /**
