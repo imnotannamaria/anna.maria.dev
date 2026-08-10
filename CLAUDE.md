@@ -18,6 +18,7 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 | Content          | MDX via Velite                                                     |
 | State            | Zustand                                                            |
 | Animation        | Motion v12                                                         |
+| Graph / diagram  | @xyflow/react (React Flow) — the stack graph on /about, lazy       |
 | Email (send)     | Resend SDK                                                         |
 | Email (template) | React Email                                                        |
 | Syntax highlight | Shiki + rehype-pretty-code                                         |
@@ -148,7 +149,7 @@ content/
   projects/*.mdx
 
 components/
-  chrome/                   titlebar, sidebar, command palette
+  chrome/                   titlebar, sidebar, command palette, page outline
   home/                     bento grid cards (stack, mini piano, GitHub, log)
   log/                      feed card, star rating, filter feed
   roadmap/                  board, item card, progress card, status mark, sidebar link
@@ -157,7 +158,7 @@ components/
   wristkit/                 Apple Watch activity card
   blog/                     MDX renderer, reading progress
   projects/                 project card
-  about/                    GitHub calendar
+  about/                    GitHub calendar, stack graph, timeline, interest card
   contact/                  contact form
   brand/                    logo mark
   ui/                       shared card + motion primitives (see below), icons, blur-fade
@@ -172,6 +173,7 @@ lib/
   log/                      schema, validation, queries, mutations, stars, date
   roadmap/                  schema, validation, queries, counts, mutations
   slug.ts                    slugify() + uniqueSlug(), shared by log and roadmap
+  stack.ts                   the stack list + the simple-icons path per entry
   velite.ts                 content query helpers
   site-config.ts             name, email, socials, single source of identity
   experience.ts              career start date, years of experience
@@ -443,6 +445,14 @@ The checks below are the ones this codebase has actually been bitten by. Read th
 - **Backend (Hono)** — new routes live under `lib/api/routes/` behind the right middleware, and errors return JSON through `onError` rather than a leaked stack. Where a route or page sits on the caching decisions in Conventions, check it agrees with them; if it has a reason not to, the reason belongs in the diff.
 - **Loading and error states** — a page that hits the database needs a `loading.tsx`; where the data IS the page it needs an `error.tsx`, because an empty state when the DB is down is a lie. Forms need a submitting state and need to tell a network failure apart from a rejection.
 - **Reuse before invention** — this is the one worth reading the diff twice for. A new card that hand-rolls a header, a hover, or a surface is re-implementing something in `components/ui`; see Cards and motion. The tell is inline styles that add up to `.bento-card`, or a `useState` doing what `:hover` does.
+- **Standardization** — reuse asks "does this already exist?". This asks the harder question: **does this page look like it belongs to the same site as the home page?** Two failures, and the second is the one that gets missed.
+
+  _Divergence_ — a page that solves a solved problem its own way. Every page is the editor metaphor: outline panel, `$ command` or `## label` section heads, `.bento-card` for collections, prose for narrative, mono as the default and Inter only in long text. A section that invents its own header rhythm, its own footer rule, or its own surface is a page drifting, even when every line of it is fine on its own.
+
+  _Duplication_ — the same component living in more than one place. `about-outline` / `contact-outline` / `piano-outline` were three files whose diff was a comment, a function name, a string and a footer; they only got folded together when a change had to be applied to all three at once. The rule now: **the second copy is a warning, the third is a bug.** When a diff adds copy number two, say so in the review even if extracting is out of scope — that note is what makes the extraction obvious later instead of expensive.
+
+  Two questions that catch most of it: if this pattern had to change, how many files would you edit? And could a reader tell which page a screenshot came from, for the right reasons rather than because one of them is styled differently?
+
 - **Motion** — every rule in Cards and motion came out of a bug that shipped. The expensive ones to miss: an entrance on `animate` instead of `whileInView`, a trigger on an element with no area, and anything animated through JS that never asks `useReducedMotion`.
 - **Accessibility** — real semantics over roles on divs, `aria-pressed`/`aria-expanded` on toggles, screen-reader text for glyph-only info (stars, ♥), hover-only affordances mirrored on `focus-visible`, no two links sharing a name and pointing elsewhere, and contrast wherever text sits _on top of_ `--fg-brand` — that combination changes per theme and orange (marmalade) is where white text fails first.
 - **Theme reactivity** — grep the diff for hardcoded brand hexes; every accent derives from `--fg-brand`. Fixed colours are only acceptable as overlays on images, where no token can guarantee legibility.
