@@ -159,7 +159,7 @@ components/
   blog/                     feed, post card, MDX renderer, reading progress
   projects/                 feed + project card
   about/                    GitHub calendar, stack graph, timeline, interest card
-  contact/                  contact form
+  contact/                  contact form, channels card
   brand/                    logo mark
   ui/                       shared card + motion primitives (see below), generated cover, icons, blur-fade
 
@@ -247,7 +247,19 @@ Small interactive piano, entrepta tokens.
 
 ### `/contact`
 
-Two columns: text + social links | form. entrepta `Input` + `Button` with loading state. Inline feedback, no redirect, no modal. Honeypot on the backend.
+The form leads. It used to come last — hero, then four channel cards, then the only thing on the
+page that does anything, two scrolls down. Now it is the wide card beside a narrow column holding
+the four channels as **rows in one card**, and the hero shrank from 96px to ~62px to make room
+above the fold.
+
+The form owns its card in both states, rather than the page wrapping it — the success state replaces
+the form entirely, and a page-owned card would have nested a card inside a card the moment someone
+hit send. entrepta `Input` + `Button`, loading state, inline field errors, a network failure told
+apart from a rejection, honeypot on the backend.
+
+`app/components/entrepta/card.tsx` is gone. It was a second card vocabulary with exactly one
+consumer — this form's success state — while seventeen other files spoke `.bento-card` +
+`components/ui/card-parts`.
 
 ### `/log`
 
