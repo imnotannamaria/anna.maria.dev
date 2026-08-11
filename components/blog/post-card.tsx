@@ -3,10 +3,11 @@
 /**
  * One post on /blog — the "shelf" card the discovery settled on.
  *
- * Horizontal: cover on the left, title and blurb on the right, one per row. It is the shape
- * `LogCard` already uses, turned toward text instead of a poster. The cover drops away below
- * `sm`, which is what keeps it readable at 375px: the text column gets the whole width
- * instead of ~200px.
+ * One per row, the text taking the full width. It started with a generated cover on the left
+ * — the `LogCard` shape, turned toward text — and the cover came back out: a poster earns its
+ * place when it is the thing you are scanning for, and a post is scanned by its title. A
+ * rectangle of fake code beside every one of them was decoration competing with the sentence
+ * that does the work.
  *
  * Nothing here invents a surface. `.bento-card` is the card, `CardHead` names it, `CardFoot`
  * carries the `//` comment and the accent, `Spotlight` is the glow every card has, and the
@@ -20,7 +21,6 @@ import { ArrowAffordance } from "@/components/ui/arrow-link"
 import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
 import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
-import { GeneratedCover, type CoverVariant } from "@/components/ui/generated-cover"
 
 export type PostItem = {
   slug: string
@@ -38,15 +38,7 @@ export type PostItem = {
   minutes: number
 }
 
-export function PostCard({
-  post,
-  index = 0,
-  cover = "minimap",
-}: {
-  post: PostItem
-  index?: number
-  cover?: CoverVariant
-}) {
+export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }) {
   const { onMouseMove, spotlight } = useSpotlight(420)
   const reveal = useReveal(Math.min(index, 6) * 0.05)
 
@@ -60,63 +52,56 @@ export function PostCard({
       <motion.article className="bento-card w-full !gap-0" {...reveal}>
         <Spotlight {...spotlight} />
 
-        <div className="relative flex gap-4 sm:gap-5">
-          <GeneratedCover
-            slug={post.slug}
-            title={post.title}
-            variant={cover}
-            className="hidden aspect-[4/3] w-[118px] shrink-0 rounded-[8px] border border-(--border-subtle) sm:block"
-          />
-
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
-            <div className="flex items-baseline justify-between gap-3">
-              <CardHead label="post" />
-              <span
-                className="font-mono text-[11px] whitespace-nowrap"
-                style={{ color: "var(--fg-muted)" }}
-              >
-                <time dateTime={post.date}>{post.dateLabel}</time> · {post.minutes} min
-              </span>
-            </div>
-
-            <h3
-              className="m-0 transition-colors group-hover/arrow:text-(--fg-brand)"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontSize: "clamp(20px, 2.4vw, 26px)",
-                fontWeight: 400,
-                lineHeight: 1.15,
-                letterSpacing: "-0.01em",
-                color: "var(--fg-primary)",
-              }}
+        {/* `relative` because the spotlight is absolute, and a sibling in normal flow paints
+            before it — without this the glow would wash over the text. */}
+        <div className="relative flex min-w-0 flex-col gap-2">
+          <div className="flex items-baseline justify-between gap-3">
+            <CardHead label="post" />
+            <span
+              className="font-mono text-[11px] whitespace-nowrap"
+              style={{ color: "var(--fg-muted)" }}
             >
-              {post.title}
-            </h3>
-
-            <p
-              className="m-0 line-clamp-2 text-[13.5px] leading-relaxed"
-              style={{
-                fontFamily: "var(--font-sans)",
-                color: "var(--fg-secondary)",
-                maxWidth: "68ch",
-              }}
-            >
-              {post.description}
-            </p>
-
-            <CardFoot className="mt-2 flex-wrap gap-y-2">
-              <span className="flex flex-wrap gap-1.5">
-                {post.tags.slice(0, 4).map((tag) => (
-                  <Badge key={tag} variant="brand-soft">
-                    {tag}
-                  </Badge>
-                ))}
-              </span>
-              <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
-                <ArrowAffordance>open .mdx</ArrowAffordance>
-              </span>
-            </CardFoot>
+              <time dateTime={post.date}>{post.dateLabel}</time> · {post.minutes} min
+            </span>
           </div>
+
+          <h3
+            className="m-0 transition-colors group-hover/arrow:text-(--fg-brand)"
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "clamp(20px, 2.4vw, 26px)",
+              fontWeight: 400,
+              lineHeight: 1.15,
+              letterSpacing: "-0.01em",
+              color: "var(--fg-primary)",
+            }}
+          >
+            {post.title}
+          </h3>
+
+          <p
+            className="m-0 line-clamp-2 text-[13.5px] leading-relaxed"
+            style={{
+              fontFamily: "var(--font-sans)",
+              color: "var(--fg-secondary)",
+              maxWidth: "68ch",
+            }}
+          >
+            {post.description}
+          </p>
+
+          <CardFoot className="mt-2 flex-wrap gap-y-2">
+            <span className="flex flex-wrap gap-1.5">
+              {post.tags.slice(0, 4).map((tag) => (
+                <Badge key={tag} variant="brand-soft">
+                  {tag}
+                </Badge>
+              ))}
+            </span>
+            <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
+              <ArrowAffordance>open .mdx</ArrowAffordance>
+            </span>
+          </CardFoot>
         </div>
       </motion.article>
     </Link>

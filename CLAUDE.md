@@ -156,7 +156,7 @@ components/
   admin/                    entry + item forms, tables, rating input, quick add, delete dialogs
   spotify/                  Now Playing widget
   wristkit/                 Apple Watch activity card
-  blog/                     feed, post card, generated cover, MDX renderer, reading progress
+  blog/                     feed, post card, MDX renderer, reading progress
   projects/                 feed + project card
   about/                    GitHub calendar, stack graph, timeline, interest card
   contact/                  contact form
@@ -205,11 +205,11 @@ Two columns: photo + long bio. Career timeline (vertical brand line, circular do
 
 ### `/blog`
 
-The shelf. One post per row: a cover on the left, serif title and blurb on the right, `.bento-card`
-like everything else. The cover is **drawn in code** — `components/blog/post-cover.tsx`, seeded from
-the slug so it never changes, coloured through `color-mix` against `--fg-brand` so it follows the
-theme. There is no `cover` field in the frontmatter and there shouldn't be: a file per post is
-recurring work, and every post written before the field existed would sit without one.
+The shelf. One post per row, `.bento-card` like everything else, and the text taking the full
+width. It briefly had a generated cover on the left and lost it: a poster earns its place when it
+is the thing you scan for, and a post is scanned by its title — a rectangle beside every row was
+decoration competing with the sentence doing the work. `/projects` keeps covers, because a project
+_is_ a thing you recognise by sight.
 
 Posts are grouped by year, and the outline in the left rail lists those years with a count. Grouping
 is what gives the outline somewhere to point, and unlike `/log` it costs nothing — years descend and

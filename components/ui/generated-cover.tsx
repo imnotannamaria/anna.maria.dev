@@ -5,10 +5,9 @@
  * cover on the server and the client, and it never flickers on hydration — and `--fg-brand`
  * through `color-mix`, so every cover follows the theme with no hardcoded colour anywhere.
  *
- * `/blog` uses it for every post, and deliberately has no `cover` field: a file per post is
- * recurring work, and every post written before the field existed would sit without one.
- * `/projects` is the other way round — those get real images — and falls back here for the
- * ones that don't have one yet, so the grid never has a hole in it.
+ * `/projects` is the only caller: those cards take a real image, and this fills the ones that
+ * don't have one yet so the grid is never missing a tile. `/blog` tried it and took it back
+ * out — a post is scanned by its title, and a rectangle beside every row competed with it.
  *
  * Three variants, chosen per call. `minimap` is the default: it is the thing seen from far
  * away, which is the metaphor the rest of the site is built on.
