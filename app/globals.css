@@ -967,9 +967,44 @@ button:focus-visible,
    entrepta theme — violet/indigo (default)
    ============================================================ */
 
+/*
+ * `--fg-on-brand` is the ink for text that sits ON TOP of a --fg-brand fill: the number in
+ * a shipped stepper mark, the check in a roadmap mark, a primary button's label, a solid
+ * badge. It ships with every theme because it cannot be derived — the only two candidates
+ * are near-black and near-white, and which one clears WCAG AA depends on the brand hue.
+ *
+ * Two single answers were tried and both fail. `--bg-canvas` (dark ink in dark mode, light
+ * ink in light mode) fails on blossom-dark 3.80, bosco-dark 3.85, marmalade-light 3.27,
+ * ivy-light 4.17, entrepta-light 4.41. A fixed near-black — what the roadmap check used —
+ * fails on blossom-light at 2.92, which is the black `7` on dark red you can see with the
+ * naked eye.
+ *
+ * Measured contrast of #09090b / #fafafa against every brand, the pick, and its ratio:
+ *
+ *   entrepta   dark   #7c6bff   5.12 / 3.72  → dark   5.12
+ *   entrepta   light  #6b5bff   4.33 / 4.41  → light  4.41
+ *   blossom    dark   #cc2e36   3.80 / 5.02  → light  5.02
+ *   blossom    light  #b02028   2.92 / 6.53  → light  6.53
+ *   marmalade  dark   #ff8213   8.01 / 2.38  → dark   8.01
+ *   marmalade  light  #e06800   5.83 / 3.27  → dark   5.83
+ *   julia      dark   #e85a8a   5.93 / 3.21  → dark   5.93
+ *   julia      light  #cc3a6a   4.15 / 4.59  → light  4.59
+ *   ivy        dark   #35a365   6.23 / 3.06  → dark   6.23
+ *   ivy        light  #258a50   4.58 / 4.17  → dark   4.58
+ *   bosco      dark   #2563eb   3.85 / 4.95  → light  4.95
+ *   bosco      light  #1d4ed8   2.97 / 6.42  → light  6.42
+ *
+ * Every pick clears 4.5. entrepta-light and julia-light are the tight ones — if either
+ * brand is ever darkened, re-measure rather than assuming the ink still holds.
+ *
+ * A new theme needs this line next to its --fg-brand. That is why it lives here and not in
+ * a table of its own: the two values are one decision.
+ */
+
 :root {
   --fg-brand: #7c6bff;
   --fg-brand-hover: #9b8eff;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(124, 107, 255, 0.15);
   --ring: rgba(124, 107, 255, 0.5);
 }
@@ -977,6 +1012,7 @@ button:focus-visible,
 :root[data-mode="light"] {
   --fg-brand: #6b5bff;
   --fg-brand-hover: #5848e0;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(107, 91, 255, 0.08);
   --ring: rgba(107, 91, 255, 0.4);
 }
@@ -989,12 +1025,14 @@ button:focus-visible,
 [data-theme="blossom"] {
   --fg-brand: #cc2e36;
   --fg-brand-hover: #e04750;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(204, 46, 54, 0.14);
   --ring: rgba(204, 46, 54, 0.45);
 }
 [data-theme="blossom"][data-mode="light"] {
   --fg-brand: #b02028;
   --fg-brand-hover: #cc2e36;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(176, 32, 40, 0.08);
   --ring: rgba(176, 32, 40, 0.4);
 }
@@ -1002,12 +1040,14 @@ button:focus-visible,
 [data-theme="marmalade"] {
   --fg-brand: #ff8213;
   --fg-brand-hover: #ff9d45;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(255, 130, 19, 0.14);
   --ring: rgba(255, 130, 19, 0.45);
 }
 [data-theme="marmalade"][data-mode="light"] {
   --fg-brand: #e06800;
   --fg-brand-hover: #ff8213;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(224, 104, 0, 0.08);
   --ring: rgba(224, 104, 0, 0.4);
 }
@@ -1015,12 +1055,14 @@ button:focus-visible,
 [data-theme="julia"] {
   --fg-brand: #e85a8a;
   --fg-brand-hover: #f178a0;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(232, 90, 138, 0.14);
   --ring: rgba(232, 90, 138, 0.45);
 }
 [data-theme="julia"][data-mode="light"] {
   --fg-brand: #cc3a6a;
   --fg-brand-hover: #e85a8a;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(204, 58, 106, 0.08);
   --ring: rgba(204, 58, 106, 0.4);
 }
@@ -1028,12 +1070,14 @@ button:focus-visible,
 [data-theme="ivy"] {
   --fg-brand: #35a365;
   --fg-brand-hover: #4cba7c;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(53, 163, 101, 0.14);
   --ring: rgba(53, 163, 101, 0.45);
 }
 [data-theme="ivy"][data-mode="light"] {
   --fg-brand: #258a50;
   --fg-brand-hover: #35a365;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(37, 138, 80, 0.08);
   --ring: rgba(37, 138, 80, 0.4);
 }
@@ -1041,12 +1085,14 @@ button:focus-visible,
 [data-theme="bosco"] {
   --fg-brand: #2563eb;
   --fg-brand-hover: #4f86f3;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(37, 99, 235, 0.14);
   --ring: rgba(37, 99, 235, 0.45);
 }
 [data-theme="bosco"][data-mode="light"] {
   --fg-brand: #1d4ed8;
   --fg-brand-hover: #2563eb;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(29, 78, 216, 0.08);
   --ring: rgba(29, 78, 216, 0.4);
 }
@@ -1055,12 +1101,6 @@ button:focus-visible,
    ROADMAP — the item card's own bits, the sidebar tab and the
    progress stepper. The card surface itself is .bento-card.
    ============================================================ */
-
-:root {
-  /* Ink of the check drawn on top of the brand fill. Always dark: white fails contrast
-     in marmalade (orange), which is where it fails first. */
-  --rm-check-ink: #09090b;
-}
 
 /* ---------- the status mark ---------- */
 
@@ -1267,7 +1307,7 @@ button:focus-visible,
 .rm-step[data-state="done"] .rm-step-mark {
   border-color: var(--fg-brand);
   background: var(--fg-brand);
-  color: var(--rm-check-ink);
+  color: var(--fg-on-brand);
 }
 .rm-step[data-state="live"] .rm-step-mark {
   border-color: var(--fg-brand);
