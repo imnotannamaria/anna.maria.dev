@@ -111,8 +111,8 @@ Mono is the default, not sans. Sans only shows up in long running text.
 └─────────────────────────────────────────────────────────┘
 ```
 
-- Titlebar: decorative traffic lights + file tabs + meta on the right (`components/chrome/titlebar.tsx`)
-- Sidebar: logo `a` in serif italic + nav icons + `◆` active indicator (`components/chrome/sidebar.tsx`)
+- Titlebar: decorative traffic lights + file tabs + meta on the right, with a brand underline that travels to the active tab (`components/chrome/titlebar.tsx`)
+- Sidebar: logo `a` in serif italic + nav icons + a `◆` that travels to the active item (`components/chrome/sidebar.tsx`)
 - Status bar: entrepta `StatusBar`, brand color, page context on the right
 - Recurring glyphs: `◆` as the brand mark, `//` for comments, `$` for section prompts
 
@@ -152,7 +152,7 @@ components/
   chrome/                   titlebar, sidebar, command palette, page outline
   home/                     bento grid cards (stack, mini piano, GitHub, log)
   log/                      feed, catalog card, star rating
-  roadmap/                  board, item card, progress card, status mark, sidebar link
+  roadmap/                  board, item card, progress card, status mark
   admin/                    entry + item forms, tables, rating input, quick add, delete dialogs
   spotify/                  Now Playing widget
   wristkit/                 Apple Watch activity card
@@ -305,11 +305,16 @@ so every card lands in the server HTML. They are also what keeps the cards' `lay
 animation alive: the mark is **read-only** on the public site, so filtering is the only
 thing a visitor can do that makes a card travel.
 
-The sidebar holds a link to it under a hairline, apart from the primary nav, since the
-titlebar keeps no permanent tab for it. That link used to open a dialog containing a copy
-of the board; the page says the same thing with a URL people can send each other, so the
-dialog was a second implementation to keep in step and it went. The public
-`GET /api/v1/roadmap` went with it, because the dialog was its only consumer.
+It sits in the primary nav now — an eighth tab in the titlebar and an eighth icon in the
+sidebar, like every other page. It used to live under a hairline in the sidebar and open as a
+dynamic tab, on the grounds that a permanent eighth tab would crowd the row; the row is a
+scroller with fade edges and handles that on its own, and a page reachable from the sidebar
+and the palette but never from the tabs was the odd one out.
+
+That sidebar link used to open a dialog containing a copy of the board; the page says the same
+thing with a URL people can send each other, so the dialog was a second implementation to keep
+in step and it went. The public `GET /api/v1/roadmap` went with it, because the dialog was its
+only consumer.
 
 ### `/admin`
 
