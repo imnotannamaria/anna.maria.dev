@@ -2,9 +2,7 @@
 
 /**
  * /projects: the outline, the tag filter and the grid — one component, because the three
- * share one piece of state. Same shape as `components/blog/blog-feed.tsx`, deliberately: two
- * sibling index pages that solved the same problem differently is exactly the divergence the
- * Standardization check in CLAUDE.md is about.
+ * share one piece of state.
  *
  * `useUrlFilter`, not `useSearchParams`: on a statically rendered route the latter makes
  * prerender emit the Suspense fallback, so every project would be missing from the HTML a
@@ -12,25 +10,18 @@
  *
  * Grouped by year so the outline has somewhere to point, and it costs nothing — years descend
  * and projects descend inside them, which is the order the grid already had.
+ *
+ * The shell is `FeedShell`, the same one /blog and /log are drawn in. Two sibling index pages
+ * solving the same problem differently is the divergence the Standardization check in
+ * CLAUDE.md is about — and three copies of the *same* solution was the duplication half of it.
  */
 
 import { useMemo } from "react"
-import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
-import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
+import { FeedShell, groupInOrder, type FeedGroup } from "@/components/chrome/feed-shell"
+import { useUrlFilter } from "@/components/ui/url-filter"
 import { ProjectCard, type ProjectItem } from "./project-card"
 
 export type TagCount = { name: string; count: number }
-
-function groupByYear(projects: ProjectItem[]) {
-  const years = new Map<string, ProjectItem[]>()
-  for (const project of projects) {
-    const bucket = years.get(project.year)
-    if (bucket) bucket.push(project)
-    else years.set(project.year, [project])
-  }
-  // The list arrives newest first, so insertion order is already descending.
-  return Array.from(years, ([year, items]) => ({ year, items }))
-}
 
 export function ProjectFeed({
   projects,
@@ -50,108 +41,54 @@ export function ProjectFeed({
     [projects, active],
   )
 
-  const groups = useMemo(() => groupByYear(filtered), [filtered])
-
-  const outline: OutlineItem[] = [
-    { id: "projects", label: "projects", level: 1 },
-    ...groups.map((g) => ({
-      id: `year-${g.year}`,
-      label: g.year,
-      level: 2 as const,
-      count: g.items.length,
-    })),
-  ]
+  const groups: FeedGroup<ProjectItem>[] = useMemo(
+    () =>
+      groupInOrder(filtered, (project) => project.year).map(({ key, items }) => ({
+        id: `year-${key}`,
+        label: key,
+        items,
+      })),
+    [filtered],
+  )
 
   return (
-    <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
-      <PageOutline
-        items={outline}
-        file="projects/"
-        footer={
-          <>
-            <div className="flex justify-between">
-              <span>{"// projects"}</span>
-              <span style={{ color: "var(--fg-brand)" }}>{filtered.length}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>{"// tags"}</span>
-              <span>{tags.length}</span>
-            </div>
-            <div>{"// open source"}</div>
-          </>
-        }
-      />
-
-      <div className="min-w-0">
-        <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
-          {children}
-
-          <div role="group" aria-label="Filter by tag" className="mt-8 flex flex-wrap gap-2">
-            <FilterPill
-              label="all"
-              count={projects.length}
-              active={!active}
-              onClick={() => setFilter(null)}
-            />
-            {tags.map((tag) => (
-              <FilterPill
-                key={tag.name}
-                label={tag.name}
-                count={tag.count}
-                active={active === tag.name}
-                onClick={() => setFilter(active === tag.name ? null : tag.name)}
-              />
-            ))}
+    <FeedShell
+      file="projects/"
+      root={{ id: "projects", label: "projects" }}
+      footer={
+        <>
+          <div className="flex justify-between">
+            <span>{"// projects"}</span>
+            <span style={{ color: "var(--fg-brand)" }}>{filtered.length}</span>
           </div>
-
-          {groups.length === 0 ? (
-            <p className="mt-12 font-mono text-sm" style={{ color: "var(--fg-muted)" }}>
-              {projects.length === 0
-                ? "// nothing published yet."
-                : "// nothing tagged that way yet."}
-            </p>
-          ) : (
-            groups.map((group, gi) => (
-              <section
-                key={group.year}
-                id={`year-${group.year}`}
-                className="mt-10 border-t pt-8"
-                style={{ borderColor: "var(--border-subtle)", scrollMarginTop: 24 }}
-              >
-                <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <h2
-                    className="m-0"
-                    style={{
-                      fontFamily: "var(--font-serif)",
-                      fontWeight: 400,
-                      fontSize: "clamp(24px, 3vw, 32px)",
-                      lineHeight: 1.1,
-                      letterSpacing: "-0.02em",
-                      color: "var(--fg-primary)",
-                    }}
-                  >
-                    {group.year}
-                  </h2>
-                  <span
-                    className="font-mono text-[11px] tracking-[0.08em] uppercase"
-                    style={{ color: "var(--fg-muted)" }}
-                  >
-                    {group.items.length} {group.items.length === 1 ? "project" : "projects"}
-                  </span>
-                </div>
-
-                {/* min(280px, 100%) so a 375px viewport gets one column rather than a track
-                    wider than the screen — the same rule /log's grid uses. */}
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(min(280px,100%),1fr))] gap-4">
-                  {group.items.map((project, i) => (
-                    <ProjectCard key={project.slug} project={project} index={gi === 0 ? i : 0} />
-                  ))}
-                </div>
-              </section>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
+          <div className="flex justify-between">
+            <span>{"// tags"}</span>
+            <span>{tags.length}</span>
+          </div>
+          <div>{"// open source"}</div>
+        </>
+      }
+      filterLabel="Filter by tag"
+      pills={tags.map((tag) => ({ key: tag.name, label: tag.name, count: tag.count }))}
+      totalCount={projects.length}
+      active={active}
+      onFilter={setFilter}
+      groups={groups}
+      groupMeta={(group) =>
+        `${group.items.length} ${group.items.length === 1 ? "project" : "projects"}`
+      }
+      empty={{
+        all: "// nothing published yet.",
+        filtered: "// nothing tagged that way yet.",
+      }}
+      /* min(280px, 100%) so a 375px viewport gets one column rather than a track wider than
+         the screen — the same rule /log's grid uses. */
+      listClassName="grid grid-cols-[repeat(auto-fill,minmax(min(280px,100%),1fr))] gap-4"
+      renderItem={(project, index) => (
+        <ProjectCard key={project.slug} project={project} index={index} />
+      )}
+    >
+      {children}
+    </FeedShell>
   )
 }
