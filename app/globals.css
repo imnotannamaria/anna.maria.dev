@@ -101,6 +101,10 @@
   /* elevation shadow for lifted cards — softened in light mode (see below) */
   --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
 
+  /* what a modal casts. Bigger than a card's because it covers the page rather than
+     sitting on it, and black rather than brand — a drop shadow is depth, not accent. */
+  --shadow-overlay: 0 24px 48px rgba(0, 0, 0, 0.6);
+
   /* ── Piano cabinet (skeuomorphic) ─────────────────────────────
      Dark by default; the light-mode block swaps the wood tone to a
      warm greige so the instrument reads on a light page. Black keys

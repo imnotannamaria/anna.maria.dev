@@ -48,10 +48,26 @@ const Command = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
+    /**
+     * `data-surface="dark"` is the scope globals.css already defines for "terminal cards,
+     * code blocks, tooltips and any element that should feel like IDE chrome regardless of
+     * page mode" — and which nothing had ever applied. The command palette is that element.
+     *
+     * It matters because of what it does to `--bg-surface`: zinc-900 (#18181b) inside the
+     * scope becomes #0e0e10, a hair above `--bg-card`. The palette was tuned back when cards
+     * were zinc-900 too; once they moved to near-black it became the one large grey panel on
+     * a near-black site, and it read as a different product. A dialog does have to sit above
+     * what it covers — the border, the shadow and the backdrop do that — but not by 13 steps
+     * of grey.
+     *
+     * The scope also pins the panel dark in light mode. That is the stated intent of it, and
+     * it is what an editor's palette does.
+     */
+    data-surface="dark"
     className={cn(
       "flex max-h-[70vh] flex-col overflow-hidden",
       "border border-[var(--border-strong)] bg-[var(--bg-surface)]",
-      "rounded-[var(--radius-lg)] shadow-[0_24px_48px_rgba(0,0,0,0.6)]",
+      "rounded-[var(--radius-lg)] shadow-[var(--shadow-overlay)]",
       className,
     )}
     {...props}
@@ -138,6 +154,11 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
+      // `◆ ` before the label, the way CardHead and the sidebar open every other heading
+      // on the site. cmdk owns this element, so it is reached with a `before:` rather than
+      // by wrapping something it renders.
+      "[&_[cmdk-group-heading]]:before:mr-1.5 [&_[cmdk-group-heading]]:before:content-['◆']",
+      "[&_[cmdk-group-heading]]:before:text-[var(--fg-brand)]",
       "[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-2",
       "[&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-[10px]",
       "[&_[cmdk-group-heading]]:tracking-[0.08em] [&_[cmdk-group-heading]]:uppercase",
@@ -208,7 +229,12 @@ const CommandFoot = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     >
       {children ?? (
         <>
-          <span />
+          <span>
+            <span aria-hidden style={{ opacity: 0.6 }}>
+              {"// "}
+            </span>
+            palette
+          </span>
           <span>⌘K to close · ↑↓ to navigate · ↵ to go</span>
         </>
       )}
