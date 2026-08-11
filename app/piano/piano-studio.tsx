@@ -536,8 +536,8 @@ export function PianoStudio() {
           <Em>Twenty-four</Em> keys.
         </DisplayH2>
         <Prose>
-          Web Audio API, no samples — pure additive synthesis with a piano-shaped envelope. Volume
-          and sustain live in the toolbar.
+          Web Audio API, no samples. Pure additive synthesis with a piano-shaped envelope, and
+          volume and sustain live in the toolbar.
         </Prose>
 
         <div

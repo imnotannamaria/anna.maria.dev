@@ -9,7 +9,7 @@ import { TypeIn } from "@/components/ui/type-in"
 export const metadata = createMetadata({
   title: "Log",
   description:
-    "Everything I finish — films, series, books, albums, podcasts and games — rated when my heart demands.",
+    "Everything I finish: films, series, books, albums, podcasts and games. Rated when my heart demands.",
   path: "/log",
 })
 
@@ -71,12 +71,18 @@ export default async function LogPage() {
               maxWidth: "56ch",
             }}
           >
-            A single feed for <Em>everything</Em> I finish — films, series, books, albums, podcasts
+            A single feed for <Em>everything</Em> I finish: films, series, books, albums, podcasts
             and games. Rated when my heart demands, favorites marked{" "}
             <span aria-hidden style={{ color: "var(--fg-brand)" }}>
               ♥
             </span>
             <span className="sr-only">with a heart</span>.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.42}>
+          <p className="mt-3 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+            {"// still adding some favorite stuff."}
           </p>
         </Reveal>
       </div>

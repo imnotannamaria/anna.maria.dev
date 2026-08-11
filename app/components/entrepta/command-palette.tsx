@@ -49,24 +49,18 @@ const Command = React.forwardRef<
   <CommandPrimitive
     ref={ref}
     /**
-     * `data-surface="dark"` is the scope globals.css already defines for "terminal cards,
-     * code blocks, tooltips and any element that should feel like IDE chrome regardless of
-     * page mode" — and which nothing had ever applied. The command palette is that element.
+     * `--bg-overlay`, not `--bg-surface`. The latter is zinc-900, which was right when cards
+     * were zinc-900 too; once `--bg-card` moved to near-black this became the one large grey
+     * panel on the site and read as a different product.
      *
-     * It matters because of what it does to `--bg-surface`: zinc-900 (#18181b) inside the
-     * scope becomes #0e0e10, a hair above `--bg-card`. The palette was tuned back when cards
-     * were zinc-900 too; once they moved to near-black it became the one large grey panel on
-     * a near-black site, and it read as a different product. A dialog does have to sit above
-     * what it covers — the border, the shadow and the backdrop do that — but not by 13 steps
-     * of grey.
-     *
-     * The scope also pins the panel dark in light mode. That is the stated intent of it, and
-     * it is what an editor's palette does.
+     * This was briefly `data-surface="dark"` — the scope globals.css defines for IDE chrome
+     * "regardless of page mode" — and that is exactly what was wrong with it: it pinned the
+     * panel dark while the page was light. A token that resolves per mode does the same job
+     * in dark and stays reactive in light.
      */
-    data-surface="dark"
     className={cn(
       "flex max-h-[70vh] flex-col overflow-hidden",
-      "border border-[var(--border-strong)] bg-[var(--bg-surface)]",
+      "border border-[var(--border-strong)] bg-[var(--bg-overlay)]",
       "rounded-[var(--radius-lg)] shadow-[var(--shadow-overlay)]",
       className,
     )}

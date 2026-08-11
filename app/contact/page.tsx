@@ -9,7 +9,7 @@ import { siteConfig } from "@/lib/site-config"
 
 export const metadata = createMetadata({
   title: "Contact",
-  description: "Get in touch — open to OSS collaborations and tech conversations.",
+  description: "Get in touch. Open to OSS collaborations and tech conversations.",
   path: "/contact",
 })
 

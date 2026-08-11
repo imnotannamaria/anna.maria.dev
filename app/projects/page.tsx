@@ -85,7 +85,7 @@ export default function ProjectsPage() {
               maxWidth: "56ch",
             }}
           >
-            Open-source tools, libraries and side projects — the things I built because I{" "}
+            Open-source tools, libraries and side projects. The things I built because I{" "}
             <Em>wanted them to exist.</Em> For the full archive, there is always{" "}
             <a
               href="https://github.com/imnotannamaria"

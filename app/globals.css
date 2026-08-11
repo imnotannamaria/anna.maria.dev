@@ -62,6 +62,12 @@
   --bg-card: #0b0b0e;
   --bg-card-hover: #121216;
 
+  /* What a modal is filled with. `--bg-surface` is zinc-900, which was right when cards
+     were zinc-900 too; once they moved to near-black it made the command palette the one
+     large grey panel on the site. A hair above `--bg-card` is enough to read as raised
+     when a border, a shadow and a backdrop are already saying so. */
+  --bg-overlay: #0e0e10;
+
   /* foreground */
   --fg-primary: var(--zinc-50);
   --fg-secondary: var(--zinc-400);
@@ -876,6 +882,7 @@ button:focus-visible,
   /* Light mode was already right — white cards on a near-white canvas, told
      apart by the border. This is the same relationship the dark values now have. */
   --bg-card: #ffffff;
+  --bg-overlay: #ffffff;
   --bg-card-hover: #f7f7f8;
 
   --fg-primary: #09090b;

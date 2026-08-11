@@ -481,7 +481,7 @@ export default function AboutPage() {
                 <span aria-hidden style={{ opacity: 0.7 }}>
                   {"//"}
                 </span>
-                <span>everything I actually finish — films, series, books, albums — lands in</span>
+                <span>everything I actually finish, from films to books, lands in</span>
                 <ArrowLink href="/log" aria-label="See the log of everything I finish">
                   the log
                 </ArrowLink>

@@ -17,7 +17,7 @@ import {
 
 export const metadata = createMetadata({
   title: "Piano",
-  description: "An offline, two-octave piano built with the Web Audio API — play it or watch it.",
+  description: "An offline, two-octave piano built with the Web Audio API. Play it or watch it.",
   path: "/piano",
 })
 
@@ -88,7 +88,7 @@ export default function PianoPage() {
             </div>
             <div className="flex items-center justify-between">
               <span>{"// range"}</span>
-              <span>C4 — B5</span>
+              <span>C4–B5</span>
             </div>
             <div className="flex items-center justify-between">
               <span>{"// audio"}</span>

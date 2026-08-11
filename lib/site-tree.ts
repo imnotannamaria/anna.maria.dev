@@ -62,6 +62,10 @@ const SITE_TREE: TreeNode[] = [
       },
       { name: "log.tsx", kind: "file", href: "/log", countKey: "log", countNoun: "entries" },
       { name: "piano.tsx", kind: "file", href: "/piano" },
+      /* No count, unlike log.tsx. The counts here come off lists the home page already has
+         in memory, and it has no reason to fetch roadmap items — a number in this row would
+         cost a query for a row that is one word wide. */
+      { name: "roadmap.md", kind: "file", href: "/roadmap" },
       { name: "contact.tsx", kind: "file", href: "/contact" },
     ],
   },
