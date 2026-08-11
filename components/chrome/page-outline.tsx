@@ -31,6 +31,23 @@ export type OutlineItem = {
 
 const PREFIX: Record<1 | 2 | 3, string> = { 1: "#", 2: "##", 3: "###" }
 
+/**
+ * The rail's own box, shared with `OutlineSkeleton` below. Constants rather than two copies
+ * of the class string: a `loading.tsx` that traces these by hand is a rail that drifts from
+ * the real one the first time either is touched, and the drift shows up as the layout moving
+ * the moment the data lands — which is the one thing the skeleton exists to prevent.
+ */
+const RAIL = "sticky top-0 hidden self-start px-4 py-12 min-[1100px]:block"
+const RAIL_BORDER = { borderRight: "1px solid var(--border-subtle)" } as const
+const RAIL_HEADING = "font-mono text-[10px] font-medium tracking-[0.08em] uppercase"
+const RAIL_HEADING_STYLE = { color: "var(--fg-muted)", margin: "0 0 12px" } as const
+const FILE_CHIP =
+  "mb-4 flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1.5 font-mono text-xs"
+const FILE_CHIP_STYLE = {
+  background: "var(--bg-surface-brand)",
+  color: "var(--fg-primary)",
+} as const
+
 export function PageOutline({
   items,
   file,
@@ -45,19 +62,44 @@ export function PageOutline({
   const [active, setActive] = useState(items[0]?.id)
   const reduce = useReducedMotion() ?? false
 
+  /**
+   * The scrollspy. Two things it has to get right, and the old version got neither.
+   *
+   * **Deepest, then topmost.** Picking the topmost visible section outright means a nested id
+   * can never win: its ancestor starts higher and is on screen whenever it is. That silently
+   * killed five of /about's ten rows — `cesar`, `avanade`, `education`, `fiap` and
+   * `descomplica` all live inside `<Section id="career">` — and /contact's `channels`, which
+   * sits inside `#message`. Dropping every entry that contains another visible one leaves the
+   * innermost sections in view, and the topmost of *those* is the one the reader is actually in.
+   *
+   * **The whole set, not the callback's batch.** An IntersectionObserver reports what
+   * *changed*, so reducing over `entries` compares whichever sections happened to cross the
+   * band in that tick. Visibility is kept in a map and the answer is computed from all of it.
+   */
   useEffect(() => {
     const sections = items
       .map((i) => document.getElementById(i.id))
       .filter((el): el is HTMLElement => el !== null)
 
+    const onScreen = new Set<Element>()
+
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting)
+        for (const entry of entries) {
+          if (entry.isIntersecting) onScreen.add(entry.target)
+          else onScreen.delete(entry.target)
+        }
+
+        const visible = sections.filter((s) => onScreen.has(s))
         if (visible.length === 0) return
-        const topmost = visible.reduce((a, b) =>
-          a.boundingClientRect.top < b.boundingClientRect.top ? a : b,
+
+        const innermost = visible.filter(
+          (s) => !visible.some((other) => other !== s && s.contains(other)),
         )
-        setActive(topmost.target.id)
+        const topmost = innermost.reduce((a, b) =>
+          a.getBoundingClientRect().top < b.getBoundingClientRect().top ? a : b,
+        )
+        setActive(topmost.id)
       },
       { rootMargin: "-12% 0px -70% 0px", threshold: 0 },
     )
@@ -101,26 +143,18 @@ export function PageOutline({
   return (
     <motion.nav
       aria-label="Page outline"
-      className="sticky top-0 hidden self-start px-4 py-12 min-[1100px]:block"
-      style={{ borderRight: "1px solid var(--border-subtle)" }}
+      className={RAIL}
+      style={RAIL_BORDER}
       initial="hidden"
       whileInView="show"
       viewport={revealViewport}
       variants={panel}
     >
-      <motion.h2
-        className="font-mono text-[10px] font-medium tracking-[0.08em] uppercase"
-        style={{ color: "var(--fg-muted)", margin: "0 0 12px" }}
-        variants={piece}
-      >
+      <motion.h2 className={RAIL_HEADING} style={RAIL_HEADING_STYLE} variants={piece}>
         outline
       </motion.h2>
 
-      <motion.div
-        className="mb-4 flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1.5 font-mono text-xs"
-        style={{ background: "var(--bg-surface-brand)", color: "var(--fg-primary)" }}
-        variants={piece}
-      >
+      <motion.div className={FILE_CHIP} style={FILE_CHIP_STYLE} variants={piece}>
         <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9 }}>
           ◆
         </span>
@@ -137,6 +171,10 @@ export function PageOutline({
               <a
                 href={`#${item.id}`}
                 onClick={(e) => jump(e, item.id)}
+                /* Which row is current was colour and nothing else, so it existed for
+                   sighted readers only. `location` rather than `page`: every row points
+                   inside the page already open, not at a different one. */
+                aria-current={isActive ? "location" : undefined}
                 className="flex items-baseline gap-1.5 py-1 font-mono text-xs transition-colors"
                 style={{
                   color: isActive ? "var(--fg-primary)" : "var(--fg-secondary)",
@@ -172,5 +210,38 @@ export function PageOutline({
         </motion.div>
       )}
     </motion.nav>
+  )
+}
+
+/**
+ * The rail as it looks before the data arrives, for a `loading.tsx` beside a page that reads
+ * Postgres.
+ *
+ * It lives in this file, not in the route it serves, so it takes the box, the heading and the
+ * file chip from the same constants the real panel does. `app/log/loading.tsx` used to spell
+ * all of that out again, which meant a change to the rail was two edits with nothing to fail
+ * if only one of them happened.
+ *
+ * No rows to spy on and nothing to navigate, so it is `aria-hidden` and not a `<nav>` — the
+ * page's real status message does the announcing.
+ */
+export function OutlineSkeleton({ file, rows = 3 }: { file: string; rows?: number }) {
+  return (
+    <div aria-hidden className={RAIL} style={RAIL_BORDER}>
+      <div className={RAIL_HEADING} style={RAIL_HEADING_STYLE}>
+        outline
+      </div>
+
+      <div className={FILE_CHIP} style={FILE_CHIP_STYLE}>
+        <span style={{ color: "var(--fg-brand)", fontSize: 9 }}>◆</span>
+        {file}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        {Array.from({ length: rows }, (_, i) => (
+          <span key={i} className="h-3 w-24 rounded bg-(--bg-surface-elevated)" />
+        ))}
+      </div>
+    </div>
   )
 }

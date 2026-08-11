@@ -4,34 +4,17 @@
  * Shaped like the real page rather than a spinner: the outline rail, the header, the filter
  * pills and a grid of poster tiles at the same 300px track the feed uses. What it is for is
  * the layout not jumping when the rows land — a centred spinner guarantees it will.
+ *
+ * The rail comes from `OutlineSkeleton` rather than being traced here. It was traced here,
+ * and a hand copy of a sticky box is exactly the thing that drifts from the real one and
+ * makes the layout jump anyway.
  */
+import { OutlineSkeleton } from "@/components/chrome/page-outline"
+
 export default function LogLoading() {
   return (
     <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
-      <div
-        aria-hidden
-        className="sticky top-0 hidden self-start px-4 py-12 min-[1100px]:block"
-        style={{ borderRight: "1px solid var(--border-subtle)" }}
-      >
-        <div
-          className="font-mono text-[10px] font-medium tracking-[0.08em] uppercase"
-          style={{ color: "var(--fg-muted)", margin: "0 0 12px" }}
-        >
-          outline
-        </div>
-        <div
-          className="mb-4 flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1.5 font-mono text-xs"
-          style={{ background: "var(--bg-surface-brand)", color: "var(--fg-primary)" }}
-        >
-          <span style={{ color: "var(--fg-brand)", fontSize: 9 }}>◆</span>
-          log.tsx
-        </div>
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 3 }, (_, i) => (
-            <span key={i} className="h-3 w-24 rounded bg-(--bg-surface-elevated)" />
-          ))}
-        </div>
-      </div>
+      <OutlineSkeleton file="log.tsx" />
 
       <div className="min-w-0">
         <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
