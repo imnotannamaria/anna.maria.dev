@@ -9,7 +9,8 @@ import {
 } from "@/lib/velite"
 import { formatDate } from "@/lib/utils"
 import { MDXContent } from "@/components/blog/mdx-content"
-import { Outline } from "@/components/outline"
+import { PageOutline } from "@/components/chrome/page-outline"
+import { MetaCol, MetaGrid } from "@/components/chrome/page-parts"
 import { Badge } from "@/app/components/entrepta/badge"
 
 type Props = {
@@ -57,7 +58,24 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
-      <Outline filename={`${slug}.tsx`} items={toc} words={words} minutes={minutes} />
+      {/* Same shared panel as /blog/[slug] — see the note there. */}
+      <PageOutline
+        items={toc}
+        file={`${slug}.tsx`}
+        footer={
+          <>
+            <div className="flex justify-between">
+              <span>{"// words"}</span>
+              <span>{words.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>{"// read"}</span>
+              <span>{minutes} min</span>
+            </div>
+            <div>{"// markdown · utf-8"}</div>
+          </>
+        }
+      />
 
       <div className="min-w-0">
         <article className="mx-auto max-w-[760px] px-5 py-12 sm:px-8 lg:px-12">
@@ -134,15 +152,14 @@ export default async function ProjectPage({ params }: Props) {
               {project.description}
             </p>
 
-            <dl
-              className="mb-6 grid grid-cols-2 gap-3 rounded-[var(--radius-lg)] border p-4 sm:grid-cols-4"
-              style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
-            >
-              <MetaCol label="published" value={formatDate(project.date)} />
-              <MetaCol label="read" value={`${minutes} min`} />
-              <MetaCol label="words" value={words.toLocaleString()} />
-              <MetaCol label="stack" value={String(project.tags.length)} />
-            </dl>
+            <div className="mb-6">
+              <MetaGrid>
+                <MetaCol label="published" value={formatDate(project.date)} />
+                <MetaCol label="read" value={`${minutes} min`} />
+                <MetaCol label="words" value={words.toLocaleString()} />
+                <MetaCol label="stack" value={String(project.tags.length)} />
+              </MetaGrid>
+            </div>
 
             {(project.github || project.live) && (
               <div className="flex flex-wrap gap-6">
@@ -171,22 +188,6 @@ export default async function ProjectPage({ params }: Props) {
           </div>
         </article>
       </div>
-    </div>
-  )
-}
-
-function MetaCol({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <dt
-        className="font-mono text-[10px] tracking-[0.08em] uppercase"
-        style={{ color: "var(--fg-muted)" }}
-      >
-        {label}
-      </dt>
-      <dd className="font-mono text-[13px]" style={{ color: "var(--fg-primary)", margin: 0 }}>
-        {value}
-      </dd>
     </div>
   )
 }

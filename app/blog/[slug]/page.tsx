@@ -5,7 +5,8 @@ import { getPublishedPosts, getPostBySlug, getPostToc, getPostReadingStats } fro
 import { formatDate } from "@/lib/utils"
 import { MDXContent } from "@/components/blog/mdx-content"
 import { ReadingProgress } from "@/components/blog/reading-progress"
-import { Outline } from "@/components/outline"
+import { PageOutline } from "@/components/chrome/page-outline"
+import { MetaCol, MetaGrid } from "@/components/chrome/page-parts"
 import { Badge } from "@/app/components/entrepta/badge"
 
 type Props = {
@@ -56,7 +57,27 @@ export default async function BlogPostPage({ params }: Props) {
       <ReadingProgress />
 
       <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
-        <Outline filename={`${slug}.mdx`} items={toc} words={words} minutes={minutes} />
+        {/* The same panel the index pages use. This page had its own copy —
+            `components/outline.tsx`, the fourth — identical down to the observer's
+            rootMargin and the scroll offset, and the only one that never got the
+            staggered entrance when the other three were folded together. */}
+        <PageOutline
+          items={toc}
+          file={`${slug}.mdx`}
+          footer={
+            <>
+              <div className="flex justify-between">
+                <span>{"// words"}</span>
+                <span>{words.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>{"// read"}</span>
+                <span>{minutes} min</span>
+              </div>
+              <div>{"// markdown · utf-8"}</div>
+            </>
+          }
+        />
 
         <div className="min-w-0">
           <article className="mx-auto max-w-[760px] px-5 py-12 sm:px-8 lg:px-12">
@@ -117,15 +138,12 @@ export default async function BlogPostPage({ params }: Props) {
                 {post.description}
               </p>
 
-              <dl
-                className="grid grid-cols-2 gap-3 rounded-[var(--radius-lg)] border p-4 sm:grid-cols-4"
-                style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
-              >
+              <MetaGrid>
                 <MetaCol label="published" value={formatDate(post.date)} />
                 <MetaCol label="read" value={`${minutes} min`} />
                 <MetaCol label="words" value={words.toLocaleString()} />
                 <MetaCol label="topics" value={String(post.tags.length)} />
-              </dl>
+              </MetaGrid>
             </header>
 
             {/* Prose */}
@@ -149,21 +167,5 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </div>
     </>
-  )
-}
-
-function MetaCol({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <dt
-        className="font-mono text-[10px] tracking-[0.08em] uppercase"
-        style={{ color: "var(--fg-muted)" }}
-      >
-        {label}
-      </dt>
-      <dd className="font-mono text-[13px]" style={{ color: "var(--fg-primary)", margin: 0 }}>
-        {value}
-      </dd>
-    </div>
   )
 }

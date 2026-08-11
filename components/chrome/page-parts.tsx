@@ -127,6 +127,37 @@ export function Section({
   )
 }
 
+/**
+ * The published/read/words strip under a post or project title.
+ *
+ * It was written twice, identically, once in each `[slug]/page.tsx` — and both drew their own
+ * surface: `rounded-[var(--radius-lg)] border p-4` painted `--bg-surface`, which by convention
+ * is the token for what sits *above* a card, not for a card. The same box `/piano`'s key map
+ * used to be. It is `.bento-card` now, at the dense end, with `!grid` because the class sets
+ * flex-column and this is four columns — the modifier pattern the piano song rows use.
+ */
+export function MetaGrid({ children }: { children: React.ReactNode }) {
+  return (
+    <dl className="bento-card bento-card-sm !grid grid-cols-2 !gap-3 sm:grid-cols-4">{children}</dl>
+  )
+}
+
+export function MetaCol({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <dt
+        className="font-mono text-[10px] tracking-[0.08em] uppercase"
+        style={{ color: "var(--fg-muted)" }}
+      >
+        {label}
+      </dt>
+      <dd className="font-mono text-[13px]" style={{ color: "var(--fg-primary)", margin: 0 }}>
+        {value}
+      </dd>
+    </div>
+  )
+}
+
 /** Small keyboard-cap glyph used inline in prose (Z, Q, space, …). Only /piano uses it. */
 export function Kbd({ children }: { children: React.ReactNode }) {
   return (
