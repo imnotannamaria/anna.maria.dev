@@ -805,11 +805,18 @@ export function PianoStudio() {
                 key={song.id}
                 type="button"
                 onClick={() => toggleSong(song)}
+                /* `.bento-card` for the surface and `!grid` for the layout: the class sets
+                   flex-column, and this row is three columns. It used to hand-roll
+                   `rounded-[var(--radius-md)] border p-4` with its own hover, six times over,
+                   and painted itself `--bg-surface` — the token for what sits above a card.
+
+                   No spotlight here, unlike the content cards. These are controls with a
+                   playing state that already lights the whole surface brand; a glow following
+                   the cursor across six of them would compete with the one that means
+                   something. */
                 className={cn(
-                  "group grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-[var(--radius-md)] border p-4 text-left transition-all duration-200",
-                  playing
-                    ? "border-[var(--fg-brand)] bg-[var(--bg-surface-brand)]"
-                    : "border-[var(--border-subtle)] bg-[var(--bg-surface)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface-elevated)]",
+                  "bento-card bento-card-sm group !grid grid-cols-[auto_1fr_auto] items-center !gap-3 text-left",
+                  playing && "!border-(--fg-brand) !bg-(--bg-surface-brand)",
                 )}
               >
                 <span

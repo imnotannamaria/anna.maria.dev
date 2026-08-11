@@ -160,6 +160,7 @@ components/
   projects/                 feed + project card
   about/                    GitHub calendar, stack graph, timeline, interest card
   contact/                  contact form, channels card
+  piano/                    keymap card
   brand/                    logo mark
   ui/                       shared card + motion primitives (see below), generated cover, icons, blur-fade
 
@@ -243,7 +244,16 @@ Case study page: left sidebar with metadata (stack, links, period).
 
 ### `/piano`
 
-Small interactive piano, entrepta tokens.
+A two-octave Web Audio piano, and the one page where the instrument is deliberately **not** a card.
+The wooden cabinet is skeuomorphic on purpose; wrapping it would be a frame inside a frame.
+
+Everything around it is the shared surface, though. The key mapping was one hand-written box
+painted `--bg-surface` — the token for what sits _above_ a card — and is four `.bento-card` now, one
+per octave group. The six song buttons hand-rolled the same surface six times and are
+`.bento-card` + `.bento-card-sm` with `!grid`, since the class sets flex-column and those rows are
+three columns. They are the one card on the site with **no spotlight**: they are controls whose
+playing state already lights the whole surface brand, and a glow following the cursor across six of
+them would compete with the one that means something.
 
 ### `/contact`
 
