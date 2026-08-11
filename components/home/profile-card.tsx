@@ -337,17 +337,30 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
       </motion.div>
 
       {/* flex-wrap because at 375px the sidebar leaves ~239px of card interior,
-          and three buttons plus the CTA come to slightly more than that. */}
+          and three buttons plus the CTA come to slightly more than that.
+          `@container` so the rule below can ask how wide this row actually is —
+          it is narrow on a phone AND in the right-hand grid column, which a
+          viewport query can't tell apart.
+
+          `w-full` is not decoration: `container-type: inline-size` means the
+          contents no longer contribute to the inline size, and the card is
+          `items-center`, so this row was sized shrink-to-fit. Made a container
+          without a width of its own, it collapsed to nothing and wrapped every
+          button onto its own line. */}
       <motion.div
         variants={item}
-        className="relative mt-auto flex flex-wrap items-center justify-center gap-2.5 pb-1"
+        className="@container relative mt-auto flex w-full flex-wrap items-center justify-center gap-2.5 pb-1"
       >
         {SOCIALS.map((s) => (
           <SocialButton key={s.label} icon={s.icon} href={s.href} label={s.label} />
         ))}
+        {/* A divider separates two things on one line. Once the CTA wraps below,
+            it separates nothing and just trails off the end of the icons — so it
+            leaves at ~285px, which is where the row stops fitting: three 40px
+            buttons, the CTA at ~102px, and four 10px gaps. */}
         <span
           aria-hidden
-          className="mx-1 h-6 w-px"
+          className="mx-1 hidden h-6 w-px @min-[285px]:block"
           style={{ background: "var(--border-subtle)" }}
         />
         <Link href="/contact" className={cn(buttonVariants({ variant: "primary" }), "group/cta")}>

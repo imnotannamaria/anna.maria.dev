@@ -62,6 +62,12 @@
   --bg-card: #0b0b0e;
   --bg-card-hover: #121216;
 
+  /* What a modal is filled with. `--bg-surface` is zinc-900, which was right when cards
+     were zinc-900 too; once they moved to near-black it made the command palette the one
+     large grey panel on the site. A hair above `--bg-card` is enough to read as raised
+     when a border, a shadow and a backdrop are already saying so. */
+  --bg-overlay: #0e0e10;
+
   /* foreground */
   --fg-primary: var(--zinc-50);
   --fg-secondary: var(--zinc-400);
@@ -100,6 +106,10 @@
 
   /* elevation shadow for lifted cards — softened in light mode (see below) */
   --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  /* what a modal casts. Bigger than a card's because it covers the page rather than
+     sitting on it, and black rather than brand — a drop shadow is depth, not accent. */
+  --shadow-overlay: 0 24px 48px rgba(0, 0, 0, 0.6);
 
   /* ── Piano cabinet (skeuomorphic) ─────────────────────────────
      Dark by default; the light-mode block swaps the wood tone to a
@@ -391,6 +401,31 @@
   }
 }
 
+/* The home page's mini piano. Its fifteen keys have always divided up whatever
+   width the card had; only the height was fixed, so a narrow card turned them
+   into slats. This scales the height with the card and drops the black-key
+   labels, which can't be read in a 7px-wide key anyway.
+
+   A container query, not a media query: the card is narrow on a phone AND in
+   the two-up grid just past `md`, where the page is still ~760px wide. Keyed
+   off the viewport, one of those two always gets the wrong keys. */
+.mini-piano {
+  container-type: inline-size;
+}
+.mini-piano-keys {
+  --wk-h: 62px;
+  --bk-h: 38px;
+}
+@container (max-width: 380px) {
+  .mini-piano-keys {
+    --wk-h: 44px;
+    --bk-h: 27px;
+  }
+  .mini-piano-bk-label {
+    display: none;
+  }
+}
+
 /* Wrist-kit activity card: rings + metrics sit side by side, but on a narrow
    card (phones, tight bento cells) the metric values can't fit next to the
    rings — so stack them. Keyed off the card's own width via a container query,
@@ -512,10 +547,23 @@ button:focus-visible,
   padding: 56px 48px 48px;
 }
 
+/* The dense end of the same card. `/log` packs a poster grid where 24px of padding on a
+   320px tile is most of the tile — this keeps the surface, the border, the hover and the
+   tokens identical and only tightens the box. A modifier, not a second card: the log used
+   to draw its own `rounded-[14px] border p-3.5` and drifted from everything else. */
+.bento-card-sm {
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  gap: 10px;
+}
+
 /* Tighten card padding on small screens so content isn't cramped */
 @media (max-width: 640px) {
   .bento-card {
     padding: 20px;
+  }
+  .bento-card-sm {
+    padding: 14px;
   }
   .bento-card-xl {
     padding: 32px 20px 28px;
@@ -671,6 +719,41 @@ button:focus-visible,
   50% {
     opacity: 0;
   }
+}
+
+/* The ellipsis after `$ loading page`, on the home page's loading state.
+   CSS rather than Motion so the global prefers-reduced-motion reset stops it
+   without the component having to ask, the same deal as the equaliser bars.
+
+   The delays start after the line has finished typing — twelve characters at
+   `TypeIn`'s 0.022s stagger plus its 0.28s fade, so ~0.52s — and the dots are
+   what keeps moving after that. `backwards` holds them on the 0% frame,
+   invisible, through the wait.
+
+   Paced to a loading state, not to a hero: the whole line lands in about half a
+   second and the ellipsis cycles just under one. Slower reads as the page being
+   stuck, which is the one thing a loading state must not say. */
+@keyframes load-dot {
+  0%,
+  70%,
+  100% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+}
+.load-dot {
+  animation: load-dot 0.9s ease-in-out infinite backwards;
+}
+.load-dot-1 {
+  animation-delay: 0.52s;
+}
+.load-dot-2 {
+  animation-delay: 0.64s;
+}
+.load-dot-3 {
+  animation-delay: 0.76s;
 }
 
 @keyframes shimmer {
@@ -859,6 +942,7 @@ button:focus-visible,
   /* Light mode was already right — white cards on a near-white canvas, told
      apart by the border. This is the same relationship the dark values now have. */
   --bg-card: #ffffff;
+  --bg-overlay: #ffffff;
   --bg-card-hover: #f7f7f8;
 
   --fg-primary: #09090b;
@@ -918,9 +1002,44 @@ button:focus-visible,
    entrepta theme — violet/indigo (default)
    ============================================================ */
 
+/*
+ * `--fg-on-brand` is the ink for text that sits ON TOP of a --fg-brand fill: the number in
+ * a shipped stepper mark, the check in a roadmap mark, a primary button's label, a solid
+ * badge. It ships with every theme because it cannot be derived — the only two candidates
+ * are near-black and near-white, and which one clears WCAG AA depends on the brand hue.
+ *
+ * Two single answers were tried and both fail. `--bg-canvas` (dark ink in dark mode, light
+ * ink in light mode) fails on blossom-dark 3.80, bosco-dark 3.85, marmalade-light 3.27,
+ * ivy-light 4.17, entrepta-light 4.41. A fixed near-black — what the roadmap check used —
+ * fails on blossom-light at 2.92, which is the black `7` on dark red you can see with the
+ * naked eye.
+ *
+ * Measured contrast of #09090b / #fafafa against every brand, the pick, and its ratio:
+ *
+ *   entrepta   dark   #7c6bff   5.12 / 3.72  → dark   5.12
+ *   entrepta   light  #6b5bff   4.33 / 4.41  → light  4.41
+ *   blossom    dark   #cc2e36   3.80 / 5.02  → light  5.02
+ *   blossom    light  #b02028   2.92 / 6.53  → light  6.53
+ *   marmalade  dark   #ff8213   8.01 / 2.38  → dark   8.01
+ *   marmalade  light  #e06800   5.83 / 3.27  → dark   5.83
+ *   julia      dark   #e85a8a   5.93 / 3.21  → dark   5.93
+ *   julia      light  #cc3a6a   4.15 / 4.59  → light  4.59
+ *   ivy        dark   #35a365   6.23 / 3.06  → dark   6.23
+ *   ivy        light  #258a50   4.58 / 4.17  → dark   4.58
+ *   bosco      dark   #2563eb   3.85 / 4.95  → light  4.95
+ *   bosco      light  #1d4ed8   2.97 / 6.42  → light  6.42
+ *
+ * Every pick clears 4.5. entrepta-light and julia-light are the tight ones — if either
+ * brand is ever darkened, re-measure rather than assuming the ink still holds.
+ *
+ * A new theme needs this line next to its --fg-brand. That is why it lives here and not in
+ * a table of its own: the two values are one decision.
+ */
+
 :root {
   --fg-brand: #7c6bff;
   --fg-brand-hover: #9b8eff;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(124, 107, 255, 0.15);
   --ring: rgba(124, 107, 255, 0.5);
 }
@@ -928,6 +1047,7 @@ button:focus-visible,
 :root[data-mode="light"] {
   --fg-brand: #6b5bff;
   --fg-brand-hover: #5848e0;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(107, 91, 255, 0.08);
   --ring: rgba(107, 91, 255, 0.4);
 }
@@ -940,12 +1060,14 @@ button:focus-visible,
 [data-theme="blossom"] {
   --fg-brand: #cc2e36;
   --fg-brand-hover: #e04750;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(204, 46, 54, 0.14);
   --ring: rgba(204, 46, 54, 0.45);
 }
 [data-theme="blossom"][data-mode="light"] {
   --fg-brand: #b02028;
   --fg-brand-hover: #cc2e36;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(176, 32, 40, 0.08);
   --ring: rgba(176, 32, 40, 0.4);
 }
@@ -953,12 +1075,14 @@ button:focus-visible,
 [data-theme="marmalade"] {
   --fg-brand: #ff8213;
   --fg-brand-hover: #ff9d45;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(255, 130, 19, 0.14);
   --ring: rgba(255, 130, 19, 0.45);
 }
 [data-theme="marmalade"][data-mode="light"] {
   --fg-brand: #e06800;
   --fg-brand-hover: #ff8213;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(224, 104, 0, 0.08);
   --ring: rgba(224, 104, 0, 0.4);
 }
@@ -966,12 +1090,14 @@ button:focus-visible,
 [data-theme="julia"] {
   --fg-brand: #e85a8a;
   --fg-brand-hover: #f178a0;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(232, 90, 138, 0.14);
   --ring: rgba(232, 90, 138, 0.45);
 }
 [data-theme="julia"][data-mode="light"] {
   --fg-brand: #cc3a6a;
   --fg-brand-hover: #e85a8a;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(204, 58, 106, 0.08);
   --ring: rgba(204, 58, 106, 0.4);
 }
@@ -979,12 +1105,14 @@ button:focus-visible,
 [data-theme="ivy"] {
   --fg-brand: #35a365;
   --fg-brand-hover: #4cba7c;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(53, 163, 101, 0.14);
   --ring: rgba(53, 163, 101, 0.45);
 }
 [data-theme="ivy"][data-mode="light"] {
   --fg-brand: #258a50;
   --fg-brand-hover: #35a365;
+  --fg-on-brand: #09090b;
   --bg-surface-brand: rgba(37, 138, 80, 0.08);
   --ring: rgba(37, 138, 80, 0.4);
 }
@@ -992,12 +1120,14 @@ button:focus-visible,
 [data-theme="bosco"] {
   --fg-brand: #2563eb;
   --fg-brand-hover: #4f86f3;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(37, 99, 235, 0.14);
   --ring: rgba(37, 99, 235, 0.45);
 }
 [data-theme="bosco"][data-mode="light"] {
   --fg-brand: #1d4ed8;
   --fg-brand-hover: #2563eb;
+  --fg-on-brand: #fafafa;
   --bg-surface-brand: rgba(29, 78, 216, 0.08);
   --ring: rgba(29, 78, 216, 0.4);
 }
@@ -1006,12 +1136,6 @@ button:focus-visible,
    ROADMAP — the item card's own bits, the sidebar tab and the
    progress stepper. The card surface itself is .bento-card.
    ============================================================ */
-
-:root {
-  /* Ink of the check drawn on top of the brand fill. Always dark: white fails contrast
-     in marmalade (orange), which is where it fails first. */
-  --rm-check-ink: #09090b;
-}
 
 /* ---------- the status mark ---------- */
 
@@ -1218,7 +1342,7 @@ button:focus-visible,
 .rm-step[data-state="done"] .rm-step-mark {
   border-color: var(--fg-brand);
   background: var(--fg-brand);
-  color: var(--rm-check-ink);
+  color: var(--fg-on-brand);
 }
 .rm-step[data-state="live"] .rm-step-mark {
   border-color: var(--fg-brand);

@@ -18,8 +18,16 @@ import { revealViewport } from "./reveal"
  * inline-block characters can't break a line the way real text does, so a long
  * sentence split by character wraps in the wrong places.
  */
+/** Serif italic in the brand colour — the same treatment the pages give `<Em>`. */
+const EMPHASIS: React.CSSProperties = {
+  fontFamily: "var(--font-serif)",
+  fontStyle: "italic",
+  color: "var(--fg-brand)",
+}
+
 export function TypeIn({
   text,
+  emphasis,
   by = "char",
   delay = 0,
   speed,
@@ -28,6 +36,14 @@ export function TypeIn({
   as: Tag = "span",
 }: {
   text: string
+  /**
+   * A substring of `text` to render as `<Em>` does. It exists because the alternative was
+   * taking JSX instead of a string, and `text` is what the `aria-label` is made of — the
+   * moment children are arbitrary nodes, the one-sentence label has to be reconstructed by
+   * walking them, and a heading is the worst place to get that wrong. Only the first
+   * occurrence is matched; anything else is a sentence that wants two calls, not one prop.
+   */
+  emphasis?: string
   by?: "char" | "word"
   delay?: number
   speed?: number
@@ -38,8 +54,18 @@ export function TypeIn({
   const reduce = useReducedMotion() ?? false
   const step = speed ?? (by === "char" ? 0.03 : 0.05)
 
+  const at = emphasis ? text.indexOf(emphasis) : -1
+  const segments =
+    emphasis && at >= 0
+      ? [
+          { text: text.slice(0, at), em: false },
+          { text: emphasis, em: true },
+          { text: text.slice(at + emphasis.length), em: false },
+        ].filter((s) => s.text.length > 0)
+      : [{ text, em: false }]
+
   // Split on the separator but keep it, so spaces survive as their own piece.
-  const pieces = by === "char" ? Array.from(text) : text.split(/(\s+)/)
+  const split = (value: string) => (by === "char" ? Array.from(value) : value.split(/(\s+)/))
 
   return (
     <Tag className={className} style={style} aria-label={text}>
@@ -55,23 +81,26 @@ export function TypeIn({
           },
         }}
       >
-        {pieces.map((piece, i) => (
-          <motion.span
-            key={i}
-            variants={{
-              hidden: { opacity: 0, y: reduce ? 0 : "0.25em" },
-              show: { opacity: 1, y: 0, transition: { duration: reduce ? 0 : 0.28 } },
-            }}
-            style={{
-              display: "inline-block",
-              // A run of whitespace collapses to nothing once it's inline-block,
-              // which would weld the words together.
-              whiteSpace: "pre",
-            }}
-          >
-            {piece}
-          </motion.span>
-        ))}
+        {segments.map((segment, s) =>
+          split(segment.text).map((piece, i) => (
+            <motion.span
+              key={`${s}-${i}`}
+              variants={{
+                hidden: { opacity: 0, y: reduce ? 0 : "0.25em" },
+                show: { opacity: 1, y: 0, transition: { duration: reduce ? 0 : 0.28 } },
+              }}
+              style={{
+                display: "inline-block",
+                // A run of whitespace collapses to nothing once it's inline-block,
+                // which would weld the words together.
+                whiteSpace: "pre",
+                ...(segment.em ? EMPHASIS : null),
+              }}
+            >
+              {piece}
+            </motion.span>
+          )),
+        )}
       </motion.span>
     </Tag>
   )

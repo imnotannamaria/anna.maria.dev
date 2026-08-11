@@ -69,12 +69,23 @@ export function LogCardView({
                 // The button is the hit area and it holds still; the cover
                 // inside it is what lifts. Putting the lift here would move the
                 // target out from under the cursor and flicker.
-                className="group/thumb rounded-[9px] p-0.5 transition-colors duration-200 outline-none"
-                style={{
-                  border: `1px solid ${i === active ? "var(--fg-brand)" : "transparent"}`,
-                }}
+                className="group/thumb relative rounded-[9px] p-0.5 outline-none"
               >
                 <span className="sr-only">Show {entry.title}</span>
+                {/* The ring travels with the cover instead of staying on the
+                    button. Hovering a thumb both selects it and lifts it by 2px,
+                    so a ring drawn on the static hit area ended up with no gap
+                    above the poster and a double gap below — the selection
+                    looked mis-centred exactly while you were pointing at it. */}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "pointer-events-none absolute inset-0 rounded-[9px] border",
+                    "transition-[transform,border-color] duration-200 ease-out",
+                    "group-hover/thumb:-translate-y-0.5 group-focus-visible/thumb:-translate-y-0.5",
+                  )}
+                  style={{ borderColor: i === active ? "var(--fg-brand)" : "transparent" }}
+                />
                 <Thumb entry={entry} />
               </button>
             ))}

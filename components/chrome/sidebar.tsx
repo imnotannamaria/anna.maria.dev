@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { motion, useReducedMotion } from "motion/react"
 import {
   HouseLineIcon,
   UserSquareIcon,
@@ -10,9 +11,10 @@ import {
   ChatsCircleIcon,
   PianoKeysIcon,
   SquaresFourIcon,
+  ListChecksIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import { RoadmapNavLink } from "@/components/roadmap/roadmap-nav-link"
+import { EASE_OUT } from "@/components/ui/reveal"
 
 const NAV_ITEMS = [
   { href: "/", icon: HouseLineIcon, label: "Home" },
@@ -22,6 +24,7 @@ const NAV_ITEMS = [
   { href: "/contact", icon: ChatsCircleIcon, label: "Contact" },
   { href: "/log", icon: SquaresFourIcon, label: "Log" },
   { href: "/piano", icon: PianoKeysIcon, label: "Piano" },
+  { href: "/roadmap", icon: ListChecksIcon, label: "Roadmap" },
 ]
 
 function isNavActive(href: string, pathname: string): boolean {
@@ -31,6 +34,7 @@ function isNavActive(href: string, pathname: string): boolean {
 
 export function Sidebar() {
   const pathname = usePathname()
+  const reduce = useReducedMotion() ?? false
 
   return (
     <aside className="flex flex-col items-center gap-1 border-r border-[var(--border-subtle)] bg-[var(--bg-canvas)] py-3">
@@ -82,31 +86,39 @@ export function Sidebar() {
               aria-current={active ? "page" : undefined}
               title={label}
               className={cn(
-                "relative grid h-9 w-9 place-items-center rounded-[var(--radius-md)]",
+                "group relative grid h-9 w-9 place-items-center rounded-[var(--radius-md)]",
                 "transition-colors duration-[120ms]",
                 active
                   ? "text-[var(--fg-primary)]"
                   : "text-[var(--fg-muted)] hover:bg-[var(--bg-hover-soft)] hover:text-[var(--fg-primary)]",
               )}
             >
+              {/* The mark travels between items instead of blinking out of one and into the
+                  next. `layoutId` needs both positions in the same tree across the render,
+                  which holds because the sidebar lives in the root layout and survives
+                  navigation. */}
               {active && (
-                <span
+                <motion.span
+                  layoutId="sidebar-active-mark"
+                  transition={reduce ? { duration: 0 } : { duration: 0.32, ease: EASE_OUT }}
                   className="pointer-events-none absolute top-1/2 -left-2.5 -translate-y-1/2 text-[9px] leading-none"
                   style={{ color: "var(--fg-brand)" }}
                   aria-hidden
                 >
                   ◆
-                </span>
+                </motion.span>
               )}
-              <Icon size={18} weight={active ? "fill" : "regular"} />
+              {/* The icon grows, the 36px hit area doesn't. Moving the box would slide it out
+                  from under the cursor and start the lift/un-hover flicker loop. */}
+              <Icon
+                size={18}
+                weight={active ? "fill" : "regular"}
+                className="transition-transform duration-200 ease-out group-hover:scale-115"
+              />
             </Link>
           )
         })}
       </nav>
-
-      {/* Below a hairline, apart from the primary nav: the roadmap is a page, but not one
-          of the ones the titlebar keeps a tab for. */}
-      <RoadmapNavLink />
     </aside>
   )
 }

@@ -15,7 +15,9 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary: [
-          "bg-[var(--fg-brand)] text-[var(--bg-canvas)] border-transparent",
+          // --fg-on-brand, not --bg-canvas: the canvas flips with the mode, and the label
+          // sits on the brand, whose hue decides which ink is legible. See globals.css.
+          "bg-[var(--fg-brand)] text-[var(--fg-on-brand)] border-transparent",
           "hover:bg-[var(--fg-brand-hover)] hover:-translate-y-px",
           "active:translate-y-0",
         ],

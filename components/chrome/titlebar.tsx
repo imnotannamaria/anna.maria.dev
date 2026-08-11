@@ -15,6 +15,8 @@ import {
   FileIcon,
   ListChecksIcon,
 } from "@phosphor-icons/react"
+import { motion, useReducedMotion } from "motion/react"
+import { EASE_OUT } from "@/components/ui/reveal"
 import { cn } from "@/lib/utils"
 import { toast } from "@/app/components/entrepta/toast"
 import dynamic from "next/dynamic"
@@ -42,13 +44,16 @@ const NAV_TABS: Tab[] = [
   { href: "/contact", name: "contact.tsx", icon: ChatsCircleIcon },
   { href: "/log", name: "log.tsx", icon: SquaresFourIcon },
   { href: "/piano", name: "piano.tsx", icon: PianoKeysIcon },
+  { href: "/roadmap", name: "roadmap.md", icon: ListChecksIcon },
 ]
 
+/**
+ * Detail pages only. The roadmap used to open here rather than living in NAV_TABS, on the
+ * grounds that an eighth permanent tab would crowd the row — but the row is a scroller with
+ * fade edges, so it degrades on its own, and a page reachable from the sidebar and the
+ * palette but never from the tabs was the odd one out.
+ */
 function getDynamicTab(pathname: string): Tab | null {
-  // The roadmap opens as a tab rather than living in NAV_TABS: it is reached from the
-  // sidebar panel, not from the primary nav, and an eighth permanent tab for something
-  // secondary would push the row into the meta on the right at 1280px.
-  if (pathname === "/roadmap") return { href: pathname, name: "roadmap.md", icon: ListChecksIcon }
   const blogMatch = pathname.match(/^\/blog\/(.+)/)
   if (blogMatch) return { href: pathname, name: `${blogMatch[1]}.mdx`, icon: FileIcon }
   const projectMatch = pathname.match(/^\/projects\/(.+)/)
@@ -84,6 +89,7 @@ export function Titlebar() {
   // Guarded set-during-render — no effect needed, avoids the extra commit.
   const [paletteMounted, setPaletteMounted] = useState(false)
   if (open && !paletteMounted) setPaletteMounted(true)
+  const reduce = useReducedMotion() ?? false
   const dynamicTab = getDynamicTab(pathname)
   const tabs = dynamicTab ? [...NAV_TABS, dynamicTab] : NAV_TABS
 
@@ -149,10 +155,23 @@ export function Titlebar() {
             <div
               key={tab.href}
               className={cn(
-                "inline-flex h-full shrink-0 items-center border-r border-[var(--border-subtle)]",
-                active && "bg-[var(--bg-surface)]",
+                "group relative inline-flex h-full shrink-0 items-center border-r border-[var(--border-subtle)]",
+                "transition-colors duration-150",
+                active ? "bg-[var(--bg-surface)]" : "hover:bg-[var(--bg-hover-soft)]",
               )}
             >
+              {/* One underline for the whole row, moving to whichever tab is active. Same
+                  `layoutId` trick as the sidebar's diamond, and it works for the same reason:
+                  the titlebar is in the root layout, so it survives navigation. */}
+              {active && (
+                <motion.span
+                  layoutId="titlebar-active-tab"
+                  transition={reduce ? { duration: 0 } : { duration: 0.32, ease: EASE_OUT }}
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+                  style={{ background: "var(--fg-brand)" }}
+                />
+              )}
               <Link
                 href={tab.href}
                 title={tab.name}
@@ -171,7 +190,7 @@ export function Titlebar() {
                   size={15}
                   weight={active ? "fill" : "regular"}
                   style={{ color: active ? "var(--fg-brand)" : "currentColor" }}
-                  className="shrink-0"
+                  className="shrink-0 transition-transform duration-200 ease-out group-hover:scale-115"
                 />
                 {/* Filename: always for the active tab, only on sm+ for inactive ones */}
                 <span className={cn(active ? "inline" : "hidden sm:inline")}>{tab.name}</span>

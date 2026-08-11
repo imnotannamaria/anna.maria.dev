@@ -63,16 +63,21 @@ export function Reveal({
   delay = 0,
   step = 0.06,
   className,
+  style,
 }: {
   children: React.ReactNode
   index?: number
   delay?: number
   step?: number
   className?: string
+  /** For when the wrapper *is* the laid-out element — a grid row with its own
+   *  border and padding — rather than a transparent box around one. Motion merges
+   *  it with the opacity and transform it owns. */
+  style?: React.CSSProperties
 }) {
   const reveal = useReveal(delay + Math.min(index, STAGGER_LIMIT) * step)
   return (
-    <motion.div className={className} {...reveal}>
+    <motion.div className={className} style={style} {...reveal}>
       {children}
     </motion.div>
   )

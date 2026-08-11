@@ -59,7 +59,7 @@ export function RoadmapMark({ status, size = 20 }: { status: PublicStatus; size?
           <motion.path
             d="M5.5 10.5 L8.6 13.6 L14.6 6.6"
             fill="none"
-            stroke="var(--rm-check-ink)"
+            stroke="var(--fg-on-brand)"
             strokeWidth="2.1"
             strokeLinecap="round"
             strokeLinejoin="round"

@@ -48,10 +48,20 @@ const Command = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
+    /**
+     * `--bg-overlay`, not `--bg-surface`. The latter is zinc-900, which was right when cards
+     * were zinc-900 too; once `--bg-card` moved to near-black this became the one large grey
+     * panel on the site and read as a different product.
+     *
+     * This was briefly `data-surface="dark"` — the scope globals.css defines for IDE chrome
+     * "regardless of page mode" — and that is exactly what was wrong with it: it pinned the
+     * panel dark while the page was light. A token that resolves per mode does the same job
+     * in dark and stays reactive in light.
+     */
     className={cn(
       "flex max-h-[70vh] flex-col overflow-hidden",
-      "border border-[var(--border-strong)] bg-[var(--bg-surface)]",
-      "rounded-[var(--radius-lg)] shadow-[0_24px_48px_rgba(0,0,0,0.6)]",
+      "border border-[var(--border-strong)] bg-[var(--bg-overlay)]",
+      "rounded-[var(--radius-lg)] shadow-[var(--shadow-overlay)]",
       className,
     )}
     {...props}
@@ -138,6 +148,11 @@ const CommandGroup = React.forwardRef<
   <CommandPrimitive.Group
     ref={ref}
     className={cn(
+      // `◆ ` before the label, the way CardHead and the sidebar open every other heading
+      // on the site. cmdk owns this element, so it is reached with a `before:` rather than
+      // by wrapping something it renders.
+      "[&_[cmdk-group-heading]]:before:mr-1.5 [&_[cmdk-group-heading]]:before:content-['◆']",
+      "[&_[cmdk-group-heading]]:before:text-[var(--fg-brand)]",
       "[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-2",
       "[&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-[10px]",
       "[&_[cmdk-group-heading]]:tracking-[0.08em] [&_[cmdk-group-heading]]:uppercase",
@@ -208,7 +223,12 @@ const CommandFoot = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     >
       {children ?? (
         <>
-          <span />
+          <span>
+            <span aria-hidden style={{ opacity: 0.6 }}>
+              {"// "}
+            </span>
+            palette
+          </span>
           <span>⌘K to close · ↑↓ to navigate · ↵ to go</span>
         </>
       )}

@@ -1,12 +1,23 @@
 import Link from "next/link"
 import { createMetadata } from "@/lib/metadata"
 import { PianoStudio } from "./piano-studio"
-import { PianoOutline, type OutlineItem } from "./piano-outline"
-import { DisplayH2, DocLabel, Em, Kbd, Prose, Section, Strong } from "./parts"
+import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
+import { KeymapCard, type KeyLine } from "@/components/piano/keymap-card"
+import { Reveal } from "@/components/ui/reveal"
+import { TypeIn } from "@/components/ui/type-in"
+import {
+  DisplayH2,
+  DocLabel,
+  Em,
+  Kbd,
+  Prose,
+  Section,
+  Strong,
+} from "@/components/chrome/page-parts"
 
 export const metadata = createMetadata({
   title: "Piano",
-  description: "An offline, two-octave piano built with the Web Audio API — play it or watch it.",
+  description: "An offline, two-octave piano built with the Web Audio API. Play it or watch it.",
   path: "/piano",
 })
 
@@ -18,8 +29,6 @@ const outline: OutlineItem[] = [
 ]
 
 // ─── Key mapping reference data ───────────────────────────────────────────────
-
-type KeyLine = { kbd: string; note: string; hint?: string }
 
 const OCTAVE_4_WHITE: KeyLine[] = [
   { kbd: "Z", note: "C4", hint: "do" },
@@ -54,50 +63,50 @@ const OCTAVE_5_BLACK: KeyLine[] = [
   { kbd: "7", note: "A#5" },
 ]
 
-function KeymapGroup({ title, lines }: { title: string; lines: KeyLine[] }) {
-  return (
-    <>
-      <h3
-        className="mb-2 font-mono text-[11px] font-medium tracking-[0.08em] uppercase"
-        style={{ color: "var(--fg-brand)" }}
-      >
-        <span aria-hidden>◆ </span>
-        {title}
-      </h3>
-      <div className="flex flex-col">
-        {lines.map((line, i) => (
-          <div
-            key={line.kbd}
-            className="grid grid-cols-[40px_1fr] items-baseline gap-3 py-1"
-            style={{ borderTop: i === 0 ? "none" : "1px dashed var(--border-subtle)" }}
-          >
-            <span
-              className="rounded-[3px] border px-1.5 py-0.5 text-center font-mono text-[11px] uppercase"
-              style={{
-                color: "var(--fg-primary)",
-                background: "var(--bg-canvas)",
-                borderColor: "var(--border-strong)",
-              }}
-            >
-              {line.kbd}
-            </span>
-            <span className="font-mono text-[12px]" style={{ color: "var(--fg-secondary)" }}>
-              <Em>{line.note}</Em>
-              {line.hint ? ` · ${line.hint}` : ""}
-            </span>
-          </div>
-        ))}
-      </div>
-    </>
-  )
-}
+const KEYMAP_GROUPS = [
+  { title: "octave 4 · white", lines: OCTAVE_4_WHITE, foot: "bottom row · C4–B4" },
+  { title: "octave 4 · black", lines: OCTAVE_4_BLACK, foot: "sharps, above their neighbours" },
+  { title: "octave 5 · white", lines: OCTAVE_5_WHITE, foot: "top row · C5–B5" },
+  { title: "octave 5 · black", lines: OCTAVE_5_BLACK, foot: "sharps, above their neighbours" },
+]
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function PianoPage() {
   return (
     <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
-      <PianoOutline items={outline} />
+      <PageOutline
+        items={outline}
+        file="piano.tsx"
+        footer={
+          <>
+            <div className="flex items-center justify-between">
+              <span>{"// keys"}</span>
+              <span style={{ color: "var(--fg-brand)", fontFamily: "var(--font-serif)" }}>
+                <em>24</em>
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>{"// range"}</span>
+              <span>C4–B5</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>{"// audio"}</span>
+              <span
+                className="inline-flex items-center gap-1"
+                style={{ color: "var(--status-success-fg)" }}
+              >
+                <span
+                  aria-hidden
+                  className="inline-block size-1.5 rounded-full"
+                  style={{ background: "var(--status-success)" }}
+                />
+                web
+              </span>
+            </div>
+          </>
+        }
+      />
 
       <div className="min-w-0">
         <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
@@ -119,7 +128,11 @@ export default function PianoPage() {
           {/* ══════════ HERO ══════════ */}
           <Section id="piano" first>
             <DocLabel level="#">piano</DocLabel>
-            <h1
+            <TypeIn
+              as="h1"
+              text="Tap to play."
+              emphasis="play."
+              speed={0.045}
               style={{
                 fontFamily: "var(--font-serif)",
                 fontWeight: 400,
@@ -128,23 +141,24 @@ export default function PianoPage() {
                 letterSpacing: "-0.02em",
                 color: "var(--fg-primary)",
                 margin: "0 0 16px",
+                display: "block",
               }}
-            >
-              Tap to <Em>play.</Em>
-            </h1>
-            <p
-              className="text-[17px] leading-[1.65]"
-              style={{
-                fontFamily: "var(--font-sans)",
-                color: "var(--fg-secondary)",
-                maxWidth: "56ch",
-              }}
-            >
-              An offline piano across <Em>two</Em> octaves. Click the keys, use your physical
-              keyboard, or trigger one of the songs below. The bottom row <Kbd>Z</Kbd>–<Kbd>M</Kbd>{" "}
-              plays <Strong>C4–B4</Strong>, the top row <Kbd>Q</Kbd>–<Kbd>U</Kbd> plays{" "}
-              <Strong>C5–B5</Strong>.
-            </p>
+            />
+            <Reveal delay={0.5}>
+              <p
+                className="m-0 text-[17px] leading-[1.65]"
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  color: "var(--fg-secondary)",
+                  maxWidth: "56ch",
+                }}
+              >
+                An offline piano across <Em>two</Em> octaves. Click the keys, use your physical
+                keyboard, or trigger one of the songs below. The bottom row <Kbd>Z</Kbd>–
+                <Kbd>M</Kbd> plays <Strong>C4–B4</Strong>, the top row <Kbd>Q</Kbd>–<Kbd>U</Kbd>{" "}
+                plays <Strong>C5–B5</Strong>.
+              </p>
+            </Reveal>
           </Section>
 
           {/* ══════════ KEYBOARD + SONGS (interactive) ══════════ */}
@@ -153,7 +167,7 @@ export default function PianoPage() {
           {/* ══════════ KEY MAPPING ══════════ */}
           <Section id="controls">
             <DocLabel level="##">key mapping</DocLabel>
-            <DisplayH2>
+            <DisplayH2 size={36} margin="0 0 8px">
               Where every <Em>note</Em> lives.
             </DisplayH2>
             <Prose>
@@ -161,33 +175,30 @@ export default function PianoPage() {
               exactly like a real piano.
             </Prose>
 
-            <div
-              className="rounded-[var(--radius-lg)] border p-6"
-              style={{ background: "var(--bg-surface)", borderColor: "var(--border-subtle)" }}
-            >
-              <div className="grid grid-cols-1 gap-6 min-[821px]:grid-cols-2">
-                <div className="flex flex-col gap-2">
-                  <KeymapGroup title="octave 4 · white" lines={OCTAVE_4_WHITE} />
-                  <div className="mt-2">
-                    <KeymapGroup title="octave 4 · black" lines={OCTAVE_4_BLACK} />
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <KeymapGroup title="octave 5 · white" lines={OCTAVE_5_WHITE} />
-                  <div className="mt-2">
-                    <KeymapGroup title="octave 5 · black" lines={OCTAVE_5_BLACK} />
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className="mt-6 pt-3 font-mono text-[11px]"
-                style={{ borderTop: "1px dashed var(--border-subtle)", color: "var(--fg-muted)" }}
-              >
-                {"// "}triangle fundamental + additive harmonics · adsr envelope · sustain extends
-                release from 1.2s to 3.4s
-              </div>
+            {/* Four cards, not one box. The box was `rounded-[var(--radius-lg)] border p-6`
+                written by hand — and it painted itself `--bg-surface`, which by convention is
+                for what sits *above* a card (dropdowns, dialogs, code blocks), not for the
+                card. Four groups in four `.bento-card` also read better than four groups
+                sharing one frame. */}
+            <div className="grid grid-cols-1 gap-4 min-[821px]:grid-cols-2">
+              {KEYMAP_GROUPS.map((group, i) => (
+                <KeymapCard
+                  key={group.title}
+                  title={group.title}
+                  lines={group.lines}
+                  foot={group.foot}
+                  index={i}
+                />
+              ))}
             </div>
+
+            <p className="mt-6 font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+              <span aria-hidden style={{ opacity: 0.7 }}>
+                {"// "}
+              </span>
+              triangle fundamental + additive harmonics · adsr envelope · sustain extends release
+              from 1.2s to 3.4s
+            </p>
           </Section>
         </div>
       </div>

@@ -18,6 +18,7 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 | Content          | MDX via Velite                                                     |
 | State            | Zustand                                                            |
 | Animation        | Motion v12                                                         |
+| Graph / diagram  | @xyflow/react (React Flow) — the stack graph on /about, lazy       |
 | Email (send)     | Resend SDK                                                         |
 | Email (template) | React Email                                                        |
 | Syntax highlight | Shiki + rehype-pretty-code                                         |
@@ -110,8 +111,8 @@ Mono is the default, not sans. Sans only shows up in long running text.
 └─────────────────────────────────────────────────────────┘
 ```
 
-- Titlebar: decorative traffic lights + file tabs + meta on the right (`components/chrome/titlebar.tsx`)
-- Sidebar: logo `a` in serif italic + nav icons + `◆` active indicator (`components/chrome/sidebar.tsx`)
+- Titlebar: decorative traffic lights + file tabs + meta on the right, with a brand underline that travels to the active tab (`components/chrome/titlebar.tsx`)
+- Sidebar: logo `a` in serif italic + nav icons + a `◆` that travels to the active item (`components/chrome/sidebar.tsx`)
 - Status bar: entrepta `StatusBar`, brand color, page context on the right
 - Recurring glyphs: `◆` as the brand mark, `//` for comments, `$` for section prompts
 
@@ -148,19 +149,20 @@ content/
   projects/*.mdx
 
 components/
-  chrome/                   titlebar, sidebar, command palette
+  chrome/                   titlebar, sidebar, command palette, page outline
   home/                     bento grid cards (stack, mini piano, GitHub, log)
-  log/                      feed card, star rating, filter feed
-  roadmap/                  board, item card, progress card, status mark, sidebar link
+  log/                      feed, catalog card, star rating
+  roadmap/                  board, item card, progress card, status mark
   admin/                    entry + item forms, tables, rating input, quick add, delete dialogs
   spotify/                  Now Playing widget
   wristkit/                 Apple Watch activity card
-  blog/                     MDX renderer, reading progress
-  projects/                 project card
-  about/                    GitHub calendar
-  contact/                  contact form
+  blog/                     feed, post card, MDX renderer, reading progress
+  projects/                 feed + project card
+  about/                    GitHub calendar, stack graph, timeline, interest card
+  contact/                  contact form, channels card
+  piano/                    keymap card
   brand/                    logo mark
-  ui/                       shared card + motion primitives (see below), icons, blur-fade
+  ui/                       shared card + motion primitives (see below), generated cover, icons, blur-fade
 
 emails/
   contact-email.tsx         React Email template
@@ -172,6 +174,7 @@ lib/
   log/                      schema, validation, queries, mutations, stars, date
   roadmap/                  schema, validation, queries, counts, mutations
   slug.ts                    slugify() + uniqueSlug(), shared by log and roadmap
+  stack.ts                   the stack list + the simple-icons path per entry
   velite.ts                 content query helpers
   site-config.ts             name, email, socials, single source of identity
   experience.ts              career start date, years of experience
@@ -203,25 +206,96 @@ Two columns: photo + long bio. Career timeline (vertical brand line, circular do
 
 ### `/blog`
 
-List with tag filter pills. Each item: mono date, title, tags, reading time. Post page: Newsreader title, brand progress bar, sticky TOC, Shiki dark theme, callouts with a brand left border.
+The shelf. One post per row, `.bento-card` like everything else, and the text taking the full
+width. It briefly had a generated cover on the left and lost it: a poster earns its place when it
+is the thing you scan for, and a post is scanned by its title — a rectangle beside every row was
+decoration competing with the sentence doing the work. `/projects` keeps covers, because a project
+_is_ a thing you recognise by sight.
+
+Posts are grouped by year, and the outline in the left rail lists those years with a count. Grouping
+is what gives the outline somewhere to point, and unlike `/log` it costs nothing — years descend and
+posts descend inside them, which is the order the feed always had with headings added.
+
+The tag filter mirrors into `?tag=` through `useUrlFilter`, **not** `useSearchParams`: on a static
+route the latter makes prerender emit the Suspense fallback, so every post was missing from the HTML
+a crawler reads, on the one page whose whole job is listing posts. The outline and the cards share
+that filter, which is why `BlogFeed` owns both; the page header is server-rendered and passed in as
+children.
+
+Post page: Newsreader title, brand progress bar, sticky TOC, Shiki dark theme, callouts with a brand
+left border.
 
 ### `/projects`
 
-Two column card grid, thumbnail with brand-to-zinc gradient. Case study page: left sidebar with metadata (stack, links, period).
+The uniform feed: one card per project, cover on top, text below, two per row, newest first.
+Everything `/blog` does — the outline in the left rail listing years with a count, `useUrlFilter`
+for the tag pills, the header server-rendered and passed into the client feed as children — is the
+same here on purpose. Two sibling index pages solving the same problem differently is the
+divergence the Standardization check is about.
+
+Where they differ is the cover, and only there. Projects get **real images**, kept in
+`public/projects/` and named after the project: `cover: "/projects/name.png"` in the frontmatter.
+The card renders them with `fill`, so no intrinsic dimensions are needed, and a `public/` path is
+local — `next/image` still optimises it with no `remotePatterns` entry. The field is optional and
+stays optional: a project without one falls back to the generated cover, so the grid is never
+missing a tile and adding art later is a one-line frontmatter change.
+
+It was `s.image()` on a co-located file, which also returned a blur placeholder. What that gave up
+is the placeholder; what it must not give up is **proof the file exists**, so `velite.config.ts`
+checks the path with `existsSync` instead. That check is not theoretical. `wristkit.mdx` shipped
+`cover: "./wirstkit.png"` — two letters swapped — and because `output.clean` empties `.velite`
+before writing and a failed validation then writes nothing, **every project vanished from
+`/projects`** and the page said "nothing published yet". One typo in one file, and the symptom
+pointed nowhere near it.
+
+Case study page: left sidebar with metadata (stack, links, period).
 
 ### `/piano`
 
-Small interactive piano, entrepta tokens.
+A two-octave Web Audio piano, and the one page where the instrument is deliberately **not** a card.
+The wooden cabinet is skeuomorphic on purpose; wrapping it would be a frame inside a frame.
+
+Everything around it is the shared surface, though. The key mapping was one hand-written box
+painted `--bg-surface` — the token for what sits _above_ a card — and is four `.bento-card` now, one
+per octave group. The six song buttons hand-rolled the same surface six times and are
+`.bento-card` + `.bento-card-sm` with `!grid`, since the class sets flex-column and those rows are
+three columns. They are the one card on the site with **no spotlight**: they are controls whose
+playing state already lights the whole surface brand, and a glow following the cursor across six of
+them would compete with the one that means something.
 
 ### `/contact`
 
-Two columns: text + social links | form. entrepta `Input` + `Button` with loading state. Inline feedback, no redirect, no modal. Honeypot on the backend.
+The form leads. It used to come last — hero, then four channel cards, then the only thing on the
+page that does anything, two scrolls down. Now it is the wide card beside a narrow column holding
+the four channels as **rows in one card**, and the hero shrank from 96px to ~62px to make room
+above the fold.
+
+The form owns its card in both states, rather than the page wrapping it — the success state replaces
+the form entirely, and a page-owned card would have nested a card inside a card the moment someone
+hit send. entrepta `Input` + `Button`, loading state, inline field errors, a network failure told
+apart from a rejection, honeypot on the backend.
+
+`app/components/entrepta/card.tsx` is gone. It was a second card vocabulary with exactly one
+consumer — this form's success state — while seventeen other files spoke `.bento-card` +
+`components/ui/card-parts`.
 
 ### `/log`
 
 One feed for everything I finish: films, series, books, albums, podcasts, games. Catalog cards with poster, type badge, serif title, `creator · year` and a drawn star rating. Favourites carry a `♥`; entries with a note get an inline expand; entries with an external link make the whole card clickable.
 
-Ordered albums first, then favourites, then newest — `TYPE_ORDER` in `lib/log/queries.ts` decides. Filter pills are client-side and mirror into `?type=`, read through `useSyncExternalStore` rather than `useSearchParams` so every card lands in the server HTML.
+Grouped by type, with the outline in the left rail listing those types and their counts — the same
+arrangement `/blog` and `/projects` use. Grouping costs the ordering nothing here: `TYPE_ORDER` in
+`lib/log/queries.ts` is `["music"]`, and grouping in **arrival order** rather than by `LOG_TYPES`
+keeps it exactly — albums lead because the query already put them first, and favourites still lead
+inside each section.
+
+Filter pills mirror into `?type=` through `useUrlFilter`, read with `useSyncExternalStore` rather
+than `useSearchParams` so every card lands in the server HTML.
+
+The card is `.bento-card` + `.bento-card-sm`. It used to draw its own `rounded-[14px] border p-3.5`
+and was the one card on the site that didn't hover like the rest; `-sm` exists because 24px of
+padding on a 320px tile in a poster grid is most of the tile, and a density modifier is cheaper than
+a second card.
 
 Posters are plain `<img>`, not `next/image`, so no host allowlist has to be kept in sync. A URL that doesn't load falls back to the type label.
 
@@ -239,11 +313,16 @@ so every card lands in the server HTML. They are also what keeps the cards' `lay
 animation alive: the mark is **read-only** on the public site, so filtering is the only
 thing a visitor can do that makes a card travel.
 
-The sidebar holds a link to it under a hairline, apart from the primary nav, since the
-titlebar keeps no permanent tab for it. That link used to open a dialog containing a copy
-of the board; the page says the same thing with a URL people can send each other, so the
-dialog was a second implementation to keep in step and it went. The public
-`GET /api/v1/roadmap` went with it, because the dialog was its only consumer.
+It sits in the primary nav now — an eighth tab in the titlebar and an eighth icon in the
+sidebar, like every other page. It used to live under a hairline in the sidebar and open as a
+dynamic tab, on the grounds that a permanent eighth tab would crowd the row; the row is a
+scroller with fade edges and handles that on its own, and a page reachable from the sidebar
+and the palette but never from the tabs was the odd one out.
+
+That sidebar link used to open a dialog containing a copy of the board; the page says the same
+thing with a URL people can send each other, so the dialog was a second implementation to keep
+in step and it went. The public `GET /api/v1/roadmap` went with it, because the dialog was its
+only consumer.
 
 ### `/admin`
 
@@ -283,6 +362,7 @@ date: "2026-01-01"
 tags: ["next.js", "resend"]
 github: "https://github.com/imnotannamaria/name"
 live: "https://name.vercel.app"
+cover: "/projects/name.png" # optional, file lives in public/projects/
 featured: true
 published: true
 ---
@@ -401,15 +481,16 @@ Every card on the site is built from the same pieces. Reaching for raw markup in
 
 ### The pieces
 
-| Piece                             | What it is                                              |
-| --------------------------------- | ------------------------------------------------------- |
-| `.bento-card` (globals.css)       | The card surface: padding, radius, border, hover        |
-| `CardHead` / `CardFoot` / `Badge` | `components/ui/card-parts` — the chrome inside a card   |
-| `ArrowLink` / `ArrowAffordance`   | A link with a travelling arrow and a rule that wipes in |
-| `useSpotlight` + `Spotlight`      | The glow that trails the cursor across a card           |
-| `useReveal` + `Reveal`            | The entrance every card shares                          |
-| `RollingNumber`                   | An odometer for any number worth watching land          |
-| `TypeIn`                          | Text that assembles itself a piece at a time            |
+| Piece                             | What it is                                                   |
+| --------------------------------- | ------------------------------------------------------------ |
+| `.bento-card` (globals.css)       | The card surface: padding, radius, border, hover             |
+| `.bento-card-sm` / `-xl`          | The same card, denser or roomier. A modifier, not a new card |
+| `CardHead` / `CardFoot` / `Badge` | `components/ui/card-parts` — the chrome inside a card        |
+| `ArrowLink` / `ArrowAffordance`   | A link with a travelling arrow and a rule that wipes in      |
+| `useSpotlight` + `Spotlight`      | The glow that trails the cursor across a card                |
+| `useReveal` + `Reveal`            | The entrance every card shares                               |
+| `RollingNumber`                   | An odometer for any number worth watching land               |
+| `TypeIn`                          | Text that assembles itself a piece at a time                 |
 
 Card shape is fixed: `◆ name` on the left of the head, muted meta on the right, no border and no fill on the head itself. The foot is a `//` comment on the left and an accent on the right. If a card needs something the pieces don't do, change the piece.
 
@@ -443,6 +524,14 @@ The checks below are the ones this codebase has actually been bitten by. Read th
 - **Backend (Hono)** — new routes live under `lib/api/routes/` behind the right middleware, and errors return JSON through `onError` rather than a leaked stack. Where a route or page sits on the caching decisions in Conventions, check it agrees with them; if it has a reason not to, the reason belongs in the diff.
 - **Loading and error states** — a page that hits the database needs a `loading.tsx`; where the data IS the page it needs an `error.tsx`, because an empty state when the DB is down is a lie. Forms need a submitting state and need to tell a network failure apart from a rejection.
 - **Reuse before invention** — this is the one worth reading the diff twice for. A new card that hand-rolls a header, a hover, or a surface is re-implementing something in `components/ui`; see Cards and motion. The tell is inline styles that add up to `.bento-card`, or a `useState` doing what `:hover` does.
+- **Standardization** — reuse asks "does this already exist?". This asks the harder question: **does this page look like it belongs to the same site as the home page?** Two failures, and the second is the one that gets missed.
+
+  _Divergence_ — a page that solves a solved problem its own way. Every page is the editor metaphor: outline panel, `$ command` or `## label` section heads, `.bento-card` for collections, prose for narrative, mono as the default and Inter only in long text. A section that invents its own header rhythm, its own footer rule, or its own surface is a page drifting, even when every line of it is fine on its own.
+
+  _Duplication_ — the same component living in more than one place. `about-outline` / `contact-outline` / `piano-outline` were three files whose diff was a comment, a function name, a string and a footer; they only got folded together when a change had to be applied to all three at once. The rule now: **the second copy is a warning, the third is a bug.** When a diff adds copy number two, say so in the review even if extracting is out of scope — that note is what makes the extraction obvious later instead of expensive.
+
+  Two questions that catch most of it: if this pattern had to change, how many files would you edit? And could a reader tell which page a screenshot came from, for the right reasons rather than because one of them is styled differently?
+
 - **Motion** — every rule in Cards and motion came out of a bug that shipped. The expensive ones to miss: an entrance on `animate` instead of `whileInView`, a trigger on an element with no area, and anything animated through JS that never asks `useReducedMotion`.
 - **Accessibility** — real semantics over roles on divs, `aria-pressed`/`aria-expanded` on toggles, screen-reader text for glyph-only info (stars, ♥), hover-only affordances mirrored on `focus-visible`, no two links sharing a name and pointing elsewhere, and contrast wherever text sits _on top of_ `--fg-brand` — that combination changes per theme and orange (marmalade) is where white text fails first.
 - **Theme reactivity** — grep the diff for hardcoded brand hexes; every accent derives from `--fg-brand`. Fixed colours are only acceptable as overlays on images, where no token can guarantee legibility.

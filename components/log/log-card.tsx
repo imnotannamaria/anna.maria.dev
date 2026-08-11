@@ -3,32 +3,44 @@
 import { useId, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ArrowUpRightIcon, CaretDownIcon } from "@phosphor-icons/react"
+import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import { useReveal } from "@/components/ui/reveal"
+import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 import { formatLoggedAt } from "@/lib/log/date"
 import { starLabel } from "@/lib/log/stars"
 import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
 import { StarRating } from "./star-rating"
 
-/** The "1b" catalog card from docs/log-design.html. */
-export function LogCard({ entry }: { entry: LogEntry }) {
+/**
+ * The "1b" catalog card from docs/log-design.html, on the shared surface.
+ *
+ * It used to draw its own `rounded-[14px] border p-3.5` with its own hover, which is how it
+ * ended up the one card on the site that didn't react like the others. It is `.bento-card`
+ * now — plus `.bento-card-sm`, because 24px of padding on a 320px tile in a poster grid is
+ * most of the tile, and a density modifier is cheaper than a second card.
+ */
+export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number }) {
   const [open, setOpen] = useState(false)
   const reduceMotion = useReducedMotion()
   const panelId = useId()
+  const { onMouseMove, spotlight } = useSpotlight(280)
+  const reveal = useReveal(Math.min(index, 6) * 0.04)
 
   const hasNote = Boolean(entry.note)
   const link = entry.externalUrl
 
   return (
-    <article
+    <motion.article
       className={cn(
-        "group relative flex flex-col rounded-[14px] border p-3.5 transition-colors",
+        "bento-card bento-card-sm group",
         link && "hover:border-(--border-brand-strong)",
       )}
-      style={{
-        borderColor: "var(--border-subtle)",
-        background: "var(--bg-card)",
-      }}
+      onMouseMove={onMouseMove}
+      {...reveal}
     >
+      <Spotlight {...spotlight} />
+
       {/* Stretched link: it sits above the content so the whole card is clickable, and
           the note trigger is lifted above it again. Without an external URL there is no
           link at all, so no pointer cursor and nothing to tab to. */}
@@ -38,33 +50,24 @@ export function LogCard({ entry }: { entry: LogEntry }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`${entry.title} — opens in a new tab`}
-          className="absolute inset-0 z-10 rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--fg-brand)"
+          className="absolute inset-0 z-10 rounded-[var(--radius-lg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--fg-brand)"
         />
       )}
 
-      <div className="flex gap-3.5">
+      {/* `relative` so it paints above the spotlight — a sibling in normal flow is painted
+          before an absolutely positioned one, and the glow would wash over the text. */}
+      <div className="relative flex gap-3.5">
         <Poster entry={entry} />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="flex items-center justify-between gap-2">
-            <span
-              className="inline-flex h-5 items-center rounded-[5px] px-2 font-mono text-[10px] tracking-[0.04em] uppercase"
-              style={{
-                background: "var(--bg-surface-brand)",
-                color: "var(--fg-brand-hover)",
-              }}
-            >
-              {TYPE_LABEL[entry.type]}
-            </span>
-
-            <time
-              dateTime={entry.loggedAt}
-              className="font-mono text-[10px] whitespace-nowrap"
-              style={{ color: "var(--fg-muted)" }}
-            >
-              {formatLoggedAt(entry.loggedAt)}
-            </time>
-          </div>
+          <CardHead
+            label={TYPE_LABEL[entry.type]}
+            meta={
+              <time dateTime={entry.loggedAt} className="whitespace-nowrap">
+                {formatLoggedAt(entry.loggedAt)}
+              </time>
+            }
+          />
 
           <h3
             className="mt-[9px] font-serif text-xl leading-[1.15] font-normal tracking-[-0.01em]"
@@ -93,7 +96,7 @@ export function LogCard({ entry }: { entry: LogEntry }) {
 
           {/* Wraps rather than squeezing: at 375px the text column is only ~200px, and
               five 18px stars plus the trigger do not always share a line. */}
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-x-2 gap-y-1 pt-2.5">
+          <CardFoot className="flex-wrap gap-x-2 gap-y-1 pt-2.5">
             {entry.rating != null ? (
               <StarRating rating={entry.rating} size={18} />
             ) : (
@@ -123,7 +126,7 @@ export function LogCard({ entry }: { entry: LogEntry }) {
                 />
               </button>
             )}
-          </div>
+          </CardFoot>
         </div>
       </div>
 
@@ -149,7 +152,7 @@ export function LogCard({ entry }: { entry: LogEntry }) {
           </motion.div>
         )}
       </AnimatePresence>
-    </article>
+    </motion.article>
   )
 }
 

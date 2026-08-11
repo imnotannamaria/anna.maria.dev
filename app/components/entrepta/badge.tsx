@@ -39,7 +39,9 @@ const badgeVariants = cva(
       {
         variant: "solid",
         color: "brand",
-        className: "bg-[var(--fg-brand)] text-[var(--bg-canvas)]",
+        // The brand fill is the one that changes hue per theme, so its ink is a token
+        // rather than the canvas. The status fills below are fixed colours and keep it.
+        className: "bg-[var(--fg-brand)] text-[var(--fg-on-brand)]",
       },
       {
         variant: "solid",
