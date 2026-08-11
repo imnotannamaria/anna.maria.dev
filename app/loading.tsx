@@ -10,10 +10,17 @@
  * loading one.
  *
  * So it says what is happening, in the voice the rest of the site already uses: the real
- * section prompt, a `$` line, and the blinking block the wristkit card uses while it waits.
- * Type cannot look broken the way a bad mock can. `60vh` keeps the status bar from jumping
- * up to meet it and back down again.
+ * section prompt, then a `$` line that types itself in. Type cannot look broken the way a
+ * bad mock can. `60vh` keeps the status bar from jumping up to meet it and back down again.
+ *
+ * `TypeIn` is the site's typing animation, the one the page titles use — it fades every
+ * character in from a stagger rather than growing a sliced string, so the whole sentence is
+ * in the DOM from the first render. The dots are CSS, and they loop: once the line has
+ * landed, one thing should still be moving, and an ellipsis says "still working" where a
+ * caret only says "cursor".
  */
+import { TypeIn } from "@/components/ui/type-in"
+
 export default function HomeLoading() {
   return (
     <div
@@ -36,18 +43,12 @@ export default function HomeLoading() {
         <span aria-hidden style={{ color: "var(--fg-brand)" }}>
           $
         </span>{" "}
-        loading home.tsx
-        <span
-          aria-hidden
-          className="ml-1 inline-block align-middle"
-          style={{
-            width: 7,
-            height: 14,
-            background: "var(--fg-brand)",
-            // CSS, so the global prefers-reduced-motion reset stops it without asking.
-            animation: "cursor-blink 1.1s step-start infinite",
-          }}
-        />
+        <TypeIn text="loading page" speed={0.045} />
+        <span aria-hidden>
+          <span className="load-dot load-dot-1">.</span>
+          <span className="load-dot load-dot-2">.</span>
+          <span className="load-dot load-dot-3">.</span>
+        </span>
       </p>
 
       <span className="sr-only" role="status">
