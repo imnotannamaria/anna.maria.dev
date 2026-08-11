@@ -11,8 +11,15 @@
  *
  * Nothing here invents a surface. `.bento-card` is the card, `CardHead` names it, `CardFoot`
  * carries the `//` comment and the accent, `Spotlight` is the glow every card has, and the
- * whole thing is one `<Link>` — so the footer affordance is a span reacting to the card's
- * hover through `group/arrow`, not a second anchor pointing where the first one already goes.
+ * footer affordance is a span reacting to the card's hover through `group/arrow`, not a second
+ * anchor pointing where the first one already goes.
+ *
+ * A stretched overlay link with an `aria-label`, the same shape `ProjectCard` uses, and for a
+ * reason that only shows up in a screen reader: wrapping the whole card in the `<Link>` makes
+ * its accessible name everything inside it, so each row announced as "post, Aug 4 2026, 7 min,
+ * <title>, <the entire description>, next.js, typescript, …, open .mdx". One unusable entry per
+ * post in the links list, on the page whose job is listing posts. Two sibling feeds also had no
+ * business answering the same question two ways.
  */
 
 import Link from "next/link"
@@ -43,67 +50,73 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
   const reveal = useReveal(Math.min(index, 6) * 0.05)
 
   return (
-    <Link
-      href={`/blog/${post.slug}`}
-      className="group/arrow flex"
-      style={{ textDecoration: "none" }}
+    <motion.article
+      className="bento-card group/arrow w-full !gap-0"
       onMouseMove={onMouseMove}
+      {...reveal}
     >
-      <motion.article className="bento-card w-full !gap-0" {...reveal}>
-        <Spotlight {...spotlight} />
+      <Spotlight {...spotlight} />
 
-        {/* `relative` because the spotlight is absolute, and a sibling in normal flow paints
+      {/* Sits above the content at `z-1`, so the whole card is the hit area while the link
+          itself has one short name. There is nothing to lift above it here — unlike
+          `ProjectCard`, this card has no second destination. */}
+      <Link
+        href={`/blog/${post.slug}`}
+        className="absolute inset-0 z-[1] rounded-[var(--radius-lg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--fg-brand)"
+        aria-label={`${post.title} — read the post`}
+      />
+
+      {/* `relative` because the spotlight is absolute, and a sibling in normal flow paints
             before it — without this the glow would wash over the text. */}
-        <div className="relative flex min-w-0 flex-col gap-2">
-          <div className="flex items-baseline justify-between gap-3">
-            <CardHead label="post" />
-            <span
-              className="font-mono text-[11px] whitespace-nowrap"
-              style={{ color: "var(--fg-muted)" }}
-            >
-              <time dateTime={post.date}>{post.dateLabel}</time> · {post.minutes} min
-            </span>
-          </div>
-
-          <h3
-            className="m-0 transition-colors group-hover/arrow:text-(--fg-brand)"
-            style={{
-              fontFamily: "var(--font-serif)",
-              fontSize: "clamp(20px, 2.4vw, 26px)",
-              fontWeight: 400,
-              lineHeight: 1.15,
-              letterSpacing: "-0.01em",
-              color: "var(--fg-primary)",
-            }}
+      <div className="relative flex min-w-0 flex-col gap-2">
+        <div className="flex items-baseline justify-between gap-3">
+          <CardHead label="post" />
+          <span
+            className="font-mono text-[11px] whitespace-nowrap"
+            style={{ color: "var(--fg-muted)" }}
           >
-            {post.title}
-          </h3>
-
-          <p
-            className="m-0 line-clamp-2 text-[13.5px] leading-relaxed"
-            style={{
-              fontFamily: "var(--font-sans)",
-              color: "var(--fg-secondary)",
-              maxWidth: "68ch",
-            }}
-          >
-            {post.description}
-          </p>
-
-          <CardFoot className="mt-2 flex-wrap gap-y-2">
-            <span className="flex flex-wrap gap-1.5">
-              {post.tags.slice(0, 4).map((tag) => (
-                <Badge key={tag} variant="brand-soft">
-                  {tag}
-                </Badge>
-              ))}
-            </span>
-            <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
-              <ArrowAffordance>open .mdx</ArrowAffordance>
-            </span>
-          </CardFoot>
+            <time dateTime={post.date}>{post.dateLabel}</time> · {post.minutes} min
+          </span>
         </div>
-      </motion.article>
-    </Link>
+
+        <h3
+          className="m-0 transition-colors group-hover/arrow:text-(--fg-brand)"
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "clamp(20px, 2.4vw, 26px)",
+            fontWeight: 400,
+            lineHeight: 1.15,
+            letterSpacing: "-0.01em",
+            color: "var(--fg-primary)",
+          }}
+        >
+          {post.title}
+        </h3>
+
+        <p
+          className="m-0 line-clamp-2 text-[13.5px] leading-relaxed"
+          style={{
+            fontFamily: "var(--font-sans)",
+            color: "var(--fg-secondary)",
+            maxWidth: "68ch",
+          }}
+        >
+          {post.description}
+        </p>
+
+        <CardFoot className="mt-2 flex-wrap gap-y-2">
+          <span className="flex flex-wrap gap-1.5">
+            {post.tags.slice(0, 4).map((tag) => (
+              <Badge key={tag} variant="brand-soft">
+                {tag}
+              </Badge>
+            ))}
+          </span>
+          <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
+            <ArrowAffordance>open .mdx</ArrowAffordance>
+          </span>
+        </CardFoot>
+      </div>
+    </motion.article>
   )
 }

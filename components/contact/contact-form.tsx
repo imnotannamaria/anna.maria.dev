@@ -185,7 +185,13 @@ export function ContactForm({ email }: { email: string }) {
           </button>
         }
       >
-        <div className="flex flex-col gap-3">
+        {/* `role="status"`, because this state *replaces* the form: the button that was
+            focused is unmounted, focus falls to <body>, and without a live region a screen
+            reader gets silence where everyone else gets "Message sent." The error path has
+            said `role="alert"` all along — only the good news was going unannounced.
+
+            status rather than alert: it is polite, and nothing here needs to interrupt. */}
+        <div role="status" className="flex flex-col gap-3">
           <CheckCircleIcon size={28} weight="fill" style={{ color: "var(--fg-brand)" }} />
           <p
             className="m-0"
