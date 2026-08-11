@@ -30,8 +30,6 @@ import { GeneratedCover } from "@/components/ui/generated-cover"
 import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 
-export type ProjectCover = { src: string; width: number; height: number; blurDataURL?: string }
-
 export type ProjectItem = {
   slug: string
   title: string
@@ -43,7 +41,8 @@ export type ProjectItem = {
   /** Sliced off the ISO string — `new Date("2026-01-01")` is 2025 in São Paulo. */
   year: string
   featured?: boolean
-  cover?: ProjectCover
+  /** A path under `public/`, e.g. `/projects/wristkit.png`. Velite checks it exists. */
+  cover?: string
 }
 
 /** Sits above the stretched overlay, so it opens its own destination. */
@@ -81,13 +80,14 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
           padding, which is 20px below `sm` and 24px above it. */}
       <div className="relative -mx-5 -mt-5 aspect-[16/9] overflow-hidden sm:-mx-6 sm:-mt-6">
         {project.cover ? (
+          /* `fill`, so the path needs no intrinsic dimensions — which is what makes a plain
+             `public/` path enough. The optimiser still resizes and re-encodes it, since a
+             local path needs no `remotePatterns` entry. */
           <Image
-            src={project.cover.src}
+            src={project.cover}
             alt=""
             fill
             sizes="(min-width: 1100px) 420px, (min-width: 640px) 50vw, 100vw"
-            placeholder={project.cover.blurDataURL ? "blur" : "empty"}
-            blurDataURL={project.cover.blurDataURL}
             className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover/arrow:scale-[1.03]"
           />
         ) : (

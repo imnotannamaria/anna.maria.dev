@@ -233,12 +233,20 @@ for the tag pills, the header server-rendered and passed into the client feed as
 same here on purpose. Two sibling index pages solving the same problem differently is the
 divergence the Standardization check is about.
 
-Where they differ is the cover, and only there. Projects get **real images**: `cover: "./name.png"`
-in the frontmatter, co-located with the `.mdx` and passed through Velite's `s.image()`, which emits
-into `public/static` with a hash and returns width, height and a blur placeholder — so `next/image`
-works with no `remotePatterns` entry. The field is optional and stays optional: a project without
-one falls back to the generated cover, so the grid is never missing a tile and adding art later is
-a one-line frontmatter change.
+Where they differ is the cover, and only there. Projects get **real images**, kept in
+`public/projects/` and named after the project: `cover: "/projects/name.png"` in the frontmatter.
+The card renders them with `fill`, so no intrinsic dimensions are needed, and a `public/` path is
+local — `next/image` still optimises it with no `remotePatterns` entry. The field is optional and
+stays optional: a project without one falls back to the generated cover, so the grid is never
+missing a tile and adding art later is a one-line frontmatter change.
+
+It was `s.image()` on a co-located file, which also returned a blur placeholder. What that gave up
+is the placeholder; what it must not give up is **proof the file exists**, so `velite.config.ts`
+checks the path with `existsSync` instead. That check is not theoretical. `wristkit.mdx` shipped
+`cover: "./wirstkit.png"` — two letters swapped — and because `output.clean` empties `.velite`
+before writing and a failed validation then writes nothing, **every project vanished from
+`/projects`** and the page said "nothing published yet". One typo in one file, and the symptom
+pointed nowhere near it.
 
 Case study page: left sidebar with metadata (stack, links, period).
 
@@ -354,7 +362,7 @@ date: "2026-01-01"
 tags: ["next.js", "resend"]
 github: "https://github.com/imnotannamaria/name"
 live: "https://name.vercel.app"
-cover: "./name.png" # optional, co-located with the .mdx, goes through Velite
+cover: "/projects/name.png" # optional, file lives in public/projects/
 featured: true
 published: true
 ---
