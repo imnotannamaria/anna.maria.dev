@@ -1,7 +1,38 @@
-import Link from "next/link"
-import { GithubLogoIcon, ArrowSquareOutIcon } from "@phosphor-icons/react/dist/ssr"
+"use client"
 
-export type ProjectCardData = {
+/**
+ * One project on /projects — the "uniform feed" card the discovery settled on.
+ *
+ * Cover on top, text below, two per row, newest first. Every project gets the same card:
+ * `featured` decides what the home page shows, not what this grid emphasises.
+ *
+ * The cover is a real image when the project has one and the generated cover when it
+ * doesn't, so the grid looks finished before every project has art. `next/image` gets real
+ * dimensions and a blur placeholder from Velite, which is why the frontmatter takes a
+ * co-located file rather than a URL — no host to add to `remotePatterns`.
+ *
+ * This replaces a card that hand-rolled its own `CardBadge`, its own header row, its own
+ * footer rule and two decorative gradients. All of that already existed in
+ * `components/ui/card-parts` and `Spotlight`.
+ *
+ * A stretched overlay link rather than wrapping the card, because github and live are links
+ * of their own and an anchor inside an anchor is not markup. The overlay sits at `z-1` and
+ * they sit above it.
+ */
+
+import Image from "next/image"
+import Link from "next/link"
+import { motion } from "motion/react"
+import { GithubLogoIcon, ArrowSquareOutIcon } from "@phosphor-icons/react"
+import { ArrowAffordance } from "@/components/ui/arrow-link"
+import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
+import { GeneratedCover } from "@/components/ui/generated-cover"
+import { useReveal } from "@/components/ui/reveal"
+import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+
+export type ProjectCover = { src: string; width: number; height: number; blurDataURL?: string }
+
+export type ProjectItem = {
   slug: string
   title: string
   description: string
@@ -9,287 +40,110 @@ export type ProjectCardData = {
   github?: string
   live?: string
   date: string
+  /** Sliced off the ISO string — `new Date("2026-01-01")` is 2025 in São Paulo. */
+  year: string
   featured?: boolean
+  cover?: ProjectCover
 }
 
-// ─── Shared pieces ───────────────────────────────────────────────────────────
-
-function CardBadge({
-  children,
-  variant = "default",
-}: {
-  children: React.ReactNode
-  variant?: "default" | "brand-soft"
-}) {
-  const styles = {
-    default: { bg: "rgba(255,255,255,0.06)", fg: "var(--fg-secondary)" },
-    "brand-soft": { bg: "var(--bg-surface-brand)", fg: "var(--fg-brand-hover)" },
-  }[variant]
+/** Sits above the stretched overlay, so it opens its own destination. */
+function OutLink({ href, kind }: { href: string; kind: "github" | "live" }) {
   return (
-    <span
-      className="inline-flex h-[22px] items-center rounded-[var(--radius-sm)] px-2 font-mono text-[11px] font-medium"
-      style={{ background: styles.bg, color: styles.fg }}
-    >
-      {children}
-    </span>
-  )
-}
-
-/** External link that sits above a card's stretch overlay. */
-function ExternalLink({
-  href,
-  icon,
-  label,
-}: {
-  href: string
-  icon: "github" | "live"
-  label: string
-}) {
-  return (
-    <Link
+    <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative z-[2] inline-flex min-h-6 items-center gap-1.5 py-0.5 transition-all duration-150 hover:tracking-[0.06em] hover:[color:var(--fg-brand)]"
-      style={{ color: "var(--fg-primary)", fontFamily: "var(--font-mono)", fontSize: 12 }}
+      className="relative z-[2] inline-flex min-h-6 items-center gap-1.5 font-mono text-[12px] transition-colors hover:text-(--fg-brand) focus-visible:text-(--fg-brand)"
+      style={{ color: "var(--fg-primary)" }}
     >
-      {icon === "github" ? <GithubLogoIcon size={13} /> : <ArrowSquareOutIcon size={12} />}
-      {label}
+      {kind === "github" ? <GithubLogoIcon size={13} /> : <ArrowSquareOutIcon size={12} />}
+      {kind}
       <span className="sr-only"> (opens in a new tab)</span>
-    </Link>
+    </a>
   )
 }
 
-/** Serif title that splits a hyphenated name onto two lines with a brand accent. */
-function SplitTitle({ title, size }: { title: string; size: number }) {
-  const hyphen = title.indexOf("-")
-  return (
-    <h2
-      className="transition-colors group-hover:[color:var(--fg-brand)]"
-      style={{
-        fontFamily: "var(--font-serif)",
-        fontWeight: 400,
-        fontSize: size,
-        lineHeight: 1,
-        letterSpacing: "-0.02em",
-        color: "var(--fg-primary)",
-        margin: 0,
-      }}
-    >
-      {hyphen > -1 ? (
-        <>
-          <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>
-            {title.slice(0, hyphen + 1)}
-          </em>
-          <br />
-          {title.slice(hyphen + 1)}
-        </>
-      ) : (
-        <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>{title}</em>
-      )}
-    </h2>
-  )
-}
-
-// ─── Featured card — mirrors the home "entrepta" featured card ────────────────
-
-export function FeaturedProjectCard({ project }: { project: ProjectCardData }) {
-  const year = new Date(project.date).getFullYear()
+export function ProjectCard({ project, index = 0 }: { project: ProjectItem; index?: number }) {
+  const { onMouseMove, spotlight } = useSpotlight(400)
+  const reveal = useReveal(Math.min(index, 6) * 0.05)
 
   return (
-    <div
-      className="featured-card group relative flex flex-col gap-4 overflow-hidden p-6 sm:p-8"
-      style={{
-        background: "var(--bg-surface-brand)",
-        border: "1px solid var(--border-brand)",
-        borderRadius: "var(--radius-xl)",
-        minHeight: 300,
-      }}
-    >
-      {/* Stretch link — covers the card; inner links sit above via z-index */}
+    <motion.article className="bento-card group/arrow h-full" onMouseMove={onMouseMove} {...reveal}>
+      <Spotlight {...spotlight} />
+
       <Link
         href={`/projects/${project.slug}`}
-        className="absolute inset-0 z-[1]"
-        aria-label={`View ${project.title}`}
+        className="absolute inset-0 z-[1] rounded-[var(--radius-lg)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--fg-brand)"
+        aria-label={`${project.title} — read the case study`}
       />
 
-      {/* Dot pattern decoration */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          right: "-10%",
-          bottom: "-30%",
-          width: "55%",
-          aspectRatio: "1",
-          opacity: 0.3,
-          pointerEvents: "none",
-          backgroundImage: "radial-gradient(var(--fg-brand) 1px, transparent 1.4px)",
-          backgroundSize: "22px 22px",
-          maskImage: "radial-gradient(circle, #000 0%, transparent 60%)",
-          WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 60%)",
-        }}
-      />
-
-      <div className="flex items-center justify-between">
-        <span
-          className="inline-flex items-center gap-1.5 font-mono text-[11px] tracking-[0.08em] uppercase"
-          style={{ color: "var(--fg-secondary)" }}
-        >
-          <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-            ◆
-          </span>
-          featured
-        </span>
-        <CardBadge variant="brand-soft">{year}</CardBadge>
+      {/* Bleeds to the card edge. The negative margins have to match `.bento-card`'s
+          padding, which is 20px below `sm` and 24px above it. */}
+      <div className="relative -mx-5 -mt-5 aspect-[16/9] overflow-hidden sm:-mx-6 sm:-mt-6">
+        {project.cover ? (
+          <Image
+            src={project.cover.src}
+            alt=""
+            fill
+            sizes="(min-width: 1100px) 420px, (min-width: 640px) 50vw, 100vw"
+            placeholder={project.cover.blurDataURL ? "blur" : "empty"}
+            blurDataURL={project.cover.blurDataURL}
+            className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover/arrow:scale-[1.03]"
+          />
+        ) : (
+          <GeneratedCover
+            slug={project.slug}
+            title={project.title}
+            variant="grid"
+            className="h-full w-full"
+          />
+        )}
       </div>
 
-      <SplitTitle title={project.title} size={44} />
+      <CardHead label="project" meta={project.year} />
+
+      <h3
+        className="relative m-0 transition-colors group-hover/arrow:text-(--fg-brand)"
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontSize: 24,
+          fontWeight: 400,
+          lineHeight: 1.15,
+          letterSpacing: "-0.02em",
+          color: "var(--fg-primary)",
+        }}
+      >
+        {project.title}
+      </h3>
 
       <p
-        className="max-w-[46ch] text-sm leading-relaxed"
+        className="relative m-0 line-clamp-2 text-sm leading-relaxed"
         style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
       >
         {project.description}
       </p>
 
-      <div className="flex flex-wrap gap-1.5">
-        {project.tags.slice(0, 5).map((tag) => (
-          <CardBadge key={tag} variant="brand-soft">
-            {tag}
-          </CardBadge>
-        ))}
-      </div>
-
-      <div
-        className="mt-auto flex items-center justify-between gap-4 pt-2 font-mono text-[12px]"
-        style={{ color: "var(--fg-muted)" }}
-      >
-        <div className="flex gap-5">
-          {project.github && <ExternalLink href={project.github} icon="github" label="github ↗" />}
-          {project.live && <ExternalLink href={project.live} icon="live" label="live ↗" />}
-        </div>
-        <span
-          className="inline-flex items-center gap-1.5 transition-[gap]"
-          style={{ color: "var(--fg-brand)" }}
-        >
-          open .tsx
-          <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
-            →
-          </span>
-        </span>
-      </div>
-    </div>
-  )
-}
-
-// ─── Simple card — mirrors the home bento card ────────────────────────────────
-
-export function ProjectCard({ project }: { project: ProjectCardData }) {
-  const year = new Date(project.date).getFullYear()
-  const visibleTags = project.tags.slice(0, 3)
-  const remaining = project.tags.length - visibleTags.length
-
-  return (
-    <div className="bento-card group relative">
-      <Link
-        href={`/projects/${project.slug}`}
-        className="absolute inset-0 z-[1]"
-        aria-label={`View ${project.title}`}
-      />
-
-      {/* Dot pattern + glow — echoes the featured card, subtler */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          right: "-8%",
-          bottom: "-45%",
-          width: "48%",
-          aspectRatio: "1",
-          opacity: 0.45,
-          pointerEvents: "none",
-          backgroundImage: "radial-gradient(var(--fg-brand) 1px, transparent 1.4px)",
-          backgroundSize: "20px 20px",
-          maskImage: "radial-gradient(circle, #000 0%, transparent 62%)",
-          WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 62%)",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          right: "-12%",
-          top: "-30%",
-          width: 240,
-          height: 240,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, var(--bg-surface-brand), transparent 70%)",
-          opacity: 0.7,
-          pointerEvents: "none",
-        }}
-      />
-
-      <div
-        className="relative flex items-center justify-between font-mono text-[11px] tracking-[0.08em] uppercase"
-        style={{ color: "var(--fg-secondary)" }}
-      >
-        <span className="inline-flex items-center gap-1.5">
-          <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-            ◆
-          </span>
-          project
-        </span>
-        <span style={{ color: "var(--fg-muted)" }}>{year}</span>
-      </div>
-
-      <h2
-        className="relative transition-colors group-hover:[color:var(--fg-brand)]"
-        style={{
-          fontFamily: "var(--font-serif)",
-          fontWeight: 400,
-          fontSize: 26,
-          lineHeight: 1.1,
-          letterSpacing: "-0.02em",
-          color: "var(--fg-primary)",
-          margin: 0,
-        }}
-      >
-        {project.title}
-      </h2>
-
-      <p
-        className="relative line-clamp-2 text-sm leading-relaxed"
-        style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)", margin: 0 }}
-      >
-        {project.description}
-      </p>
-
       <div className="relative flex flex-wrap gap-1.5">
-        {visibleTags.map((tag) => (
-          <CardBadge key={tag}>{tag}</CardBadge>
+        {project.tags.slice(0, 4).map((tag) => (
+          <Badge key={tag} variant="brand-soft">
+            {tag}
+          </Badge>
         ))}
-        {remaining > 0 && <CardBadge>+{remaining}</CardBadge>}
+        {project.tags.length > 4 && <Badge>+{project.tags.length - 4}</Badge>}
       </div>
 
-      <div
-        className="relative mt-auto flex items-center justify-between gap-4 font-mono text-[12px]"
-        style={{ color: "var(--fg-muted)" }}
-      >
-        <div className="flex gap-4">
-          {project.github && <ExternalLink href={project.github} icon="github" label="github" />}
-          {project.live && <ExternalLink href={project.live} icon="live" label="live" />}
-        </div>
-        <span
-          className="inline-flex items-center gap-1.5 transition-[gap]"
-          style={{ color: "var(--fg-brand)" }}
-        >
-          open .tsx
-          <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
-            →
-          </span>
+      <CardFoot className="flex-wrap gap-y-2">
+        <span className="flex items-center gap-4">
+          {project.github && <OutLink href={project.github} kind="github" />}
+          {project.live && <OutLink href={project.live} kind="live" />}
+          {!project.github && !project.live && (
+            <span style={{ opacity: 0.6 }}>{"// case study"}</span>
+          )}
         </span>
-      </div>
-    </div>
+        <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
+          <ArrowAffordance>open .tsx</ArrowAffordance>
+        </span>
+      </CardFoot>
+    </motion.article>
   )
 }

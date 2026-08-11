@@ -20,7 +20,7 @@ import { ArrowAffordance } from "@/components/ui/arrow-link"
 import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
 import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
-import { PostCover, type CoverVariant } from "./post-cover"
+import { GeneratedCover, type CoverVariant } from "@/components/ui/generated-cover"
 
 export type PostItem = {
   slug: string
@@ -61,7 +61,7 @@ export function PostCard({
         <Spotlight {...spotlight} />
 
         <div className="relative flex gap-4 sm:gap-5">
-          <PostCover
+          <GeneratedCover
             slug={post.slug}
             title={post.title}
             variant={cover}

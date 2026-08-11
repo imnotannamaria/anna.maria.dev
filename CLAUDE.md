@@ -157,11 +157,11 @@ components/
   spotify/                  Now Playing widget
   wristkit/                 Apple Watch activity card
   blog/                     feed, post card, generated cover, MDX renderer, reading progress
-  projects/                 project card
+  projects/                 feed + project card
   about/                    GitHub calendar, stack graph, timeline, interest card
   contact/                  contact form
   brand/                    logo mark
-  ui/                       shared card + motion primitives (see below), icons, blur-fade
+  ui/                       shared card + motion primitives (see below), generated cover, icons, blur-fade
 
 emails/
   contact-email.tsx         React Email template
@@ -226,7 +226,20 @@ left border.
 
 ### `/projects`
 
-Two column card grid, thumbnail with brand-to-zinc gradient. Case study page: left sidebar with metadata (stack, links, period).
+The uniform feed: one card per project, cover on top, text below, two per row, newest first.
+Everything `/blog` does — the outline in the left rail listing years with a count, `useUrlFilter`
+for the tag pills, the header server-rendered and passed into the client feed as children — is the
+same here on purpose. Two sibling index pages solving the same problem differently is the
+divergence the Standardization check is about.
+
+Where they differ is the cover, and only there. Projects get **real images**: `cover: "./name.png"`
+in the frontmatter, co-located with the `.mdx` and passed through Velite's `s.image()`, which emits
+into `public/static` with a hash and returns width, height and a blur placeholder — so `next/image`
+works with no `remotePatterns` entry. The field is optional and stays optional: a project without
+one falls back to the generated cover, so the grid is never missing a tile and adding art later is
+a one-line frontmatter change.
+
+Case study page: left sidebar with metadata (stack, links, period).
 
 ### `/piano`
 
@@ -302,6 +315,7 @@ date: "2026-01-01"
 tags: ["next.js", "resend"]
 github: "https://github.com/imnotannamaria/name"
 live: "https://name.vercel.app"
+cover: "./name.png" # optional, co-located with the .mdx, goes through Velite
 featured: true
 published: true
 ---

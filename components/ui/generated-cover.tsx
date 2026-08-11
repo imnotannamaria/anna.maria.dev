@@ -1,14 +1,17 @@
 /**
- * A post's cover, drawn in code.
+ * A cover, drawn in code from nothing but a slug.
  *
- * Posts have no image in their frontmatter and deliberately never will: a cover per post is
- * recurring work, and every post written before the field existed would sit without one. The
- * two inputs here are the slug — which seeds a deterministic layout, so a post's cover is the
- * same on the server and the client and never flickers on hydration — and `--fg-brand`
+ * Two inputs: the slug, which seeds a deterministic layout — so the same entry gets the same
+ * cover on the server and the client, and it never flickers on hydration — and `--fg-brand`
  * through `color-mix`, so every cover follows the theme with no hardcoded colour anywhere.
  *
- * Three variants, chosen per call rather than per post. `minimap` is the default: it is the
- * post seen from far away, which is the same metaphor the rest of the site is built on.
+ * `/blog` uses it for every post, and deliberately has no `cover` field: a file per post is
+ * recurring work, and every post written before the field existed would sit without one.
+ * `/projects` is the other way round — those get real images — and falls back here for the
+ * ones that don't have one yet, so the grid never has a hole in it.
+ *
+ * Three variants, chosen per call. `minimap` is the default: it is the thing seen from far
+ * away, which is the metaphor the rest of the site is built on.
  */
 
 const BRAND = "var(--fg-brand)"
@@ -34,7 +37,7 @@ function seedOf(slug: string) {
 
 export type CoverVariant = "minimap" | "aura" | "grid"
 
-export function PostCover({
+export function GeneratedCover({
   slug,
   title,
   variant = "minimap",
