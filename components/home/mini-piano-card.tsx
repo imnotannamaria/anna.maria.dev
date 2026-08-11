@@ -14,8 +14,13 @@ import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 // fraction of the container, so the same markup works at 500px in the home grid
 // and at ~240px once a phone's sidebar has taken its cut.
 
-const WH = 62 // white key height
-const BH = 38 // black key height
+// Height is the one dimension that wasn't fluid: the keys narrowed with the card
+// and stayed 62px tall, so fifteen of them across a phone-width cell came out at
+// roughly 11 × 62 — slats, not keys. `--wk-h` / `--bk-h` are set in globals.css
+// off the card's own width, because this card is narrow on a phone *and* in the
+// two-up grid just past `md`, and those are the same problem.
+const WH = "var(--wk-h)" // white key height
+const BH = "var(--bk-h)" // black key height
 
 /** C–B twice, plus the C that closes the second octave. */
 const WHITE_NOTES = ["C", "D", "E", "F", "G", "A", "B", "C", "D", "E", "F", "G", "A", "B", "C"]
@@ -78,7 +83,11 @@ export function MiniPianoCard() {
 
   return (
     <Link href="/piano" style={{ textDecoration: "none", display: "block" }}>
-      <motion.div className="bento-card group/piano h-full" onMouseMove={onMouseMove} {...reveal}>
+      <motion.div
+        className="bento-card mini-piano group/piano h-full"
+        onMouseMove={onMouseMove}
+        {...reveal}
+      >
         <Spotlight {...spotlight} />
 
         {/* This was a mac title bar — traffic lights over a chrome-tinted strip
@@ -103,6 +112,7 @@ export function MiniPianoCard() {
           >
             {/* Keys */}
             <div
+              className="mini-piano-keys"
               style={{
                 position: "relative",
                 width: "100%",
@@ -184,7 +194,7 @@ export function MiniPianoCard() {
                   }}
                 >
                   <span
-                    className="hidden sm:block"
+                    className="mini-piano-bk-label"
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontSize: 7,

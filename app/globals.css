@@ -401,6 +401,31 @@
   }
 }
 
+/* The home page's mini piano. Its fifteen keys have always divided up whatever
+   width the card had; only the height was fixed, so a narrow card turned them
+   into slats. This scales the height with the card and drops the black-key
+   labels, which can't be read in a 7px-wide key anyway.
+
+   A container query, not a media query: the card is narrow on a phone AND in
+   the two-up grid just past `md`, where the page is still ~760px wide. Keyed
+   off the viewport, one of those two always gets the wrong keys. */
+.mini-piano {
+  container-type: inline-size;
+}
+.mini-piano-keys {
+  --wk-h: 62px;
+  --bk-h: 38px;
+}
+@container (max-width: 380px) {
+  .mini-piano-keys {
+    --wk-h: 44px;
+    --bk-h: 27px;
+  }
+  .mini-piano-bk-label {
+    display: none;
+  }
+}
+
 /* Wrist-kit activity card: rings + metrics sit side by side, but on a narrow
    card (phones, tight bento cells) the metric values can't fit next to the
    rings — so stack them. Keyed off the card's own width via a container query,
