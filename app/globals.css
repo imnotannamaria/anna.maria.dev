@@ -512,10 +512,23 @@ button:focus-visible,
   padding: 56px 48px 48px;
 }
 
+/* The dense end of the same card. `/log` packs a poster grid where 24px of padding on a
+   320px tile is most of the tile — this keeps the surface, the border, the hover and the
+   tokens identical and only tightens the box. A modifier, not a second card: the log used
+   to draw its own `rounded-[14px] border p-3.5` and drifted from everything else. */
+.bento-card-sm {
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  gap: 10px;
+}
+
 /* Tighten card padding on small screens so content isn't cramped */
 @media (max-width: 640px) {
   .bento-card {
     padding: 20px;
+  }
+  .bento-card-sm {
+    padding: 14px;
   }
   .bento-card-xl {
     padding: 32px 20px 28px;

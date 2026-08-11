@@ -151,7 +151,7 @@ content/
 components/
   chrome/                   titlebar, sidebar, command palette, page outline
   home/                     bento grid cards (stack, mini piano, GitHub, log)
-  log/                      feed card, star rating, filter feed
+  log/                      feed, catalog card, star rating
   roadmap/                  board, item card, progress card, status mark, sidebar link
   admin/                    entry + item forms, tables, rating input, quick add, delete dialogs
   spotify/                  Now Playing widget
@@ -265,7 +265,19 @@ consumer — this form's success state — while seventeen other files spoke `.b
 
 One feed for everything I finish: films, series, books, albums, podcasts, games. Catalog cards with poster, type badge, serif title, `creator · year` and a drawn star rating. Favourites carry a `♥`; entries with a note get an inline expand; entries with an external link make the whole card clickable.
 
-Ordered albums first, then favourites, then newest — `TYPE_ORDER` in `lib/log/queries.ts` decides. Filter pills are client-side and mirror into `?type=`, read through `useSyncExternalStore` rather than `useSearchParams` so every card lands in the server HTML.
+Grouped by type, with the outline in the left rail listing those types and their counts — the same
+arrangement `/blog` and `/projects` use. Grouping costs the ordering nothing here: `TYPE_ORDER` in
+`lib/log/queries.ts` is `["music"]`, and grouping in **arrival order** rather than by `LOG_TYPES`
+keeps it exactly — albums lead because the query already put them first, and favourites still lead
+inside each section.
+
+Filter pills mirror into `?type=` through `useUrlFilter`, read with `useSyncExternalStore` rather
+than `useSearchParams` so every card lands in the server HTML.
+
+The card is `.bento-card` + `.bento-card-sm`. It used to draw its own `rounded-[14px] border p-3.5`
+and was the one card on the site that didn't hover like the rest; `-sm` exists because 24px of
+padding on a 320px tile in a poster grid is most of the tile, and a density modifier is cheaper than
+a second card.
 
 Posters are plain `<img>`, not `next/image`, so no host allowlist has to be kept in sync. A URL that doesn't load falls back to the type label.
 
@@ -446,15 +458,16 @@ Every card on the site is built from the same pieces. Reaching for raw markup in
 
 ### The pieces
 
-| Piece                             | What it is                                              |
-| --------------------------------- | ------------------------------------------------------- |
-| `.bento-card` (globals.css)       | The card surface: padding, radius, border, hover        |
-| `CardHead` / `CardFoot` / `Badge` | `components/ui/card-parts` — the chrome inside a card   |
-| `ArrowLink` / `ArrowAffordance`   | A link with a travelling arrow and a rule that wipes in |
-| `useSpotlight` + `Spotlight`      | The glow that trails the cursor across a card           |
-| `useReveal` + `Reveal`            | The entrance every card shares                          |
-| `RollingNumber`                   | An odometer for any number worth watching land          |
-| `TypeIn`                          | Text that assembles itself a piece at a time            |
+| Piece                             | What it is                                                   |
+| --------------------------------- | ------------------------------------------------------------ |
+| `.bento-card` (globals.css)       | The card surface: padding, radius, border, hover             |
+| `.bento-card-sm` / `-xl`          | The same card, denser or roomier. A modifier, not a new card |
+| `CardHead` / `CardFoot` / `Badge` | `components/ui/card-parts` — the chrome inside a card        |
+| `ArrowLink` / `ArrowAffordance`   | A link with a travelling arrow and a rule that wipes in      |
+| `useSpotlight` + `Spotlight`      | The glow that trails the cursor across a card                |
+| `useReveal` + `Reveal`            | The entrance every card shares                               |
+| `RollingNumber`                   | An odometer for any number worth watching land               |
+| `TypeIn`                          | Text that assembles itself a piece at a time                 |
 
 Card shape is fixed: `◆ name` on the left of the head, muted meta on the right, no border and no fill on the head itself. The foot is a `//` comment on the left and an accent on the right. If a card needs something the pieces don't do, change the piece.
 
