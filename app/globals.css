@@ -726,9 +726,13 @@ button:focus-visible,
    without the component having to ask, the same deal as the equaliser bars.
 
    The delays start after the line has finished typing — twelve characters at
-   `TypeIn`'s 0.045s stagger plus its 0.28s fade — so the sentence assembles
-   first and the dots are what keeps moving while the query runs. `backwards`
-   holds them on the 0% frame, invisible, through that wait. */
+   `TypeIn`'s 0.022s stagger plus its 0.28s fade, so ~0.52s — and the dots are
+   what keeps moving after that. `backwards` holds them on the 0% frame,
+   invisible, through the wait.
+
+   Paced to a loading state, not to a hero: the whole line lands in about half a
+   second and the ellipsis cycles just under one. Slower reads as the page being
+   stuck, which is the one thing a loading state must not say. */
 @keyframes load-dot {
   0%,
   70%,
@@ -740,16 +744,16 @@ button:focus-visible,
   }
 }
 .load-dot {
-  animation: load-dot 1.4s ease-in-out infinite backwards;
+  animation: load-dot 0.9s ease-in-out infinite backwards;
 }
 .load-dot-1 {
-  animation-delay: 0.84s;
+  animation-delay: 0.52s;
 }
 .load-dot-2 {
-  animation-delay: 1s;
+  animation-delay: 0.64s;
 }
 .load-dot-3 {
-  animation-delay: 1.16s;
+  animation-delay: 0.76s;
 }
 
 @keyframes shimmer {

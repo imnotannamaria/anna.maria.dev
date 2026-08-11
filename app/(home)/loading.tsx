@@ -2,6 +2,14 @@
  * The home page is force-dynamic — the wristkit rings and the log shelf are supposed to read
  * as live — so it waits on Postgres before anything paints.
  *
+ * It lives in a `(home)` route group, and that is not cosmetic. As `app/loading.tsx` it was
+ * the Suspense boundary for **every** route in the app, so `notFound()` anywhere underneath
+ * was thrown after the response had started streaming: the status line said 200 and only the
+ * body said 404. Every missing post, project and mistyped URL on the site became a soft 404,
+ * which search engines keep in the index rather than dropping. Measured: with the file at the
+ * root, a bogus `/projects/x` answered 200; inside the group it answers 404 and the home page
+ * still gets its loading state.
+ *
  * This does not draw the page in grey. The first attempt did: a rounded rectangle for the
  * avatar, bars for the name and the stats, a pill for the CTA. A skeleton works when the
  * thing behind it is a uniform repeating shape, because then the grey blocks *are* the
@@ -18,6 +26,10 @@
  * in the DOM from the first render. The dots are CSS, and they loop: once the line has
  * landed, one thing should still be moving, and an ellipsis says "still working" where a
  * caret only says "cursor".
+ *
+ * It is deliberately quicker than the same animation on a page title. A hero can take its
+ * time because the reader arrived to look at it; this is in the way of what they asked for,
+ * and a slow one reads as the page being stuck rather than busy.
  */
 import { TypeIn } from "@/components/ui/type-in"
 
@@ -43,7 +55,7 @@ export default function HomeLoading() {
         <span aria-hidden style={{ color: "var(--fg-brand)" }}>
           $
         </span>{" "}
-        <TypeIn text="loading page" speed={0.045} />
+        <TypeIn text="loading page" speed={0.022} />
         <span aria-hidden>
           <span className="load-dot load-dot-1">.</span>
           <span className="load-dot load-dot-2">.</span>
