@@ -418,9 +418,13 @@ NEXT_PUBLIC_WORKOS_REDIRECT_URI=https://annamaria.app/api/auth/callback
 # Comma-separated emails allowed into /admin. AuthKit signs people in;
 # this is what decides who is actually let through.
 ADMIN_EMAILS=
+
+# GitHub GraphQL, for the contributions grid on / and /about, optional.
+# Classic PAT, `read:user` scope — see lib/github/contributions.ts.
+GITHUB_TOKEN=ghp_xxxxxxxxxxxx
 ```
 
-Everything except Resend and the base URL is optional. Without a database the wristkit card shows an error state and `/log` renders empty; without WorkOS `/admin` is unreachable. The rest of the site still builds and runs either way.
+Everything except Resend and the base URL is optional. Without a database the wristkit card shows an error state and `/log` renders empty; without WorkOS `/admin` is unreachable; without `GITHUB_TOKEN` the contributions card shows an empty state. The rest of the site still builds and runs either way.
 
 ---
 
