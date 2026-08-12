@@ -1,6 +1,22 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
+  /**
+   * `import { siReact, siHono, … } from "simple-icons"` reaches the barrel file, and that
+   * barrel re-exports roughly three thousand icons. Tree-shaking is supposed to drop the
+   * rest, but it can only do that after parsing every one of those re-exports, and it gives
+   * up entirely on anything it cannot prove side-effect-free. Lighthouse measured 347ms of
+   * script evaluation for `node_modules_simple-icons_index_mjs` on the home page — the page
+   * with the site's worst blocking time.
+   *
+   * This tells Next to rewrite those named imports into direct deep imports at build time,
+   * so the module graph only ever contains the ~36 icons lib/stack.ts actually names. Same
+   * source, no import-site change; it is a compiler instruction, not a refactor.
+   */
+  experimental: {
+    optimizePackageImports: ["simple-icons", "@phosphor-icons/react"],
+  },
+
   images: {
     // A local `src` is only optimised if it matches localPatterns; the default is
     // `[{ pathname: "/**", search: "" }]`, which covers /images/avatar.png and every other
