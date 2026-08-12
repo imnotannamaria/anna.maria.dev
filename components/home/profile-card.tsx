@@ -204,10 +204,22 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
    * contents while the container sat still, and the tree beside it did the
    * opposite — two cards in the same row disagreeing about what an entrance is.
    */
+  /*
+   * It rises, it does not fade — and that is a performance decision, not a taste one.
+   *
+   * Motion serialises `hidden` into the SSR markup as an inline style, so an entrance that
+   * starts at `opacity: 0` ships the card invisible and it cannot paint until React has
+   * hydrated. The bio paragraph below is the home page's LCP element; with the fade,
+   * Lighthouse measured 1568ms of "element render delay" against 60ms of TTFB — the whole
+   * metric was the wait for JS. `y` alone has no such cost: the text is painted from the
+   * first frame and the transform is what arrives late.
+   *
+   * The two beats survive: the card travels as one piece and its contents follow, which is
+   * what every other card on the page does. Only the opacity is gone.
+   */
   const container: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : 14 },
+    hidden: { y: reduce ? 0 : 14 },
     show: {
-      opacity: 1,
       y: 0,
       transition: {
         duration: reduce ? 0 : 0.5,
@@ -218,8 +230,8 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
     },
   }
   const item: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : 12 },
-    show: { opacity: 1, y: 0, transition: { duration: reduce ? 0 : 0.45, ease: EASE_OUT } },
+    hidden: { y: reduce ? 0 : 12 },
+    show: { y: 0, transition: { duration: reduce ? 0 : 0.45, ease: EASE_OUT } },
   }
 
   const cells: { value: number; label: string }[] = [
