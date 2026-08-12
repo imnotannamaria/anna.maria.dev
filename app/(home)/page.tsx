@@ -22,6 +22,8 @@ import { buildSiteTree, siteTreeRouteCount } from "@/lib/site-tree"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { createMetadata } from "@/lib/metadata"
 import { calcYearsOfExp, yearsWord } from "@/lib/experience"
+import { getContributions } from "@/lib/github/contributions"
+import { siteConfig } from "@/lib/site-config"
 
 /**
  * Rendered per request. Two cards here read live data — wristkit's activity rings and the
@@ -86,7 +88,7 @@ function SectHead({
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Home() {
-  const [activityState, logEntries] = await Promise.all([
+  const [activityState, logEntries, contributions] = await Promise.all([
     loadTodayActivity({ tz: "America/Sao_Paulo" }),
     // A database blip should cost the home page one card, not the whole page. /log has an
     // error boundary instead, because there the log IS the page.
@@ -95,6 +97,7 @@ export default async function Home() {
     // collapsing them means the counters can't tell "I don't know" from "none yet". A
     // genuine 0 is true and gets shown; a failed query shows nothing at all.
     getPublishedEntries().catch(() => null),
+    getContributions(siteConfig.githubUser),
   ])
   const logList = logEntries ?? []
   const posts = getPublishedPosts()
@@ -260,7 +263,7 @@ export default async function Home() {
       {/* ═══════════════ GITHUB ═══════════════ */}
       <section aria-labelledby="sec-github">
         <SectHead id="sec-github" cmd="git log --contributions" meta="github.com/imnotannamaria" />
-        <GithubCard username="imnotannamaria" />
+        <GithubCard username={siteConfig.githubUser} data={contributions} />
       </section>
     </div>
   )

@@ -1,6 +1,7 @@
 import Image from "next/image"
 import { createMetadata } from "@/lib/metadata"
 import { GithubCard } from "@/components/home/github-card"
+import { getContributions } from "@/lib/github/contributions"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
 import { Badge } from "@/app/components/entrepta/badge"
 import {
@@ -184,9 +185,10 @@ function withBadges(roles: Role[]): TimelineEntry[] {
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
-export default function AboutPage() {
+export default async function AboutPage() {
   const years = calcYearsOfExp()
   const yearsLower = yearsWord(years).toLowerCase()
+  const contributions = await getContributions(siteConfig.githubUser)
 
   return (
     <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">
@@ -512,7 +514,7 @@ export default function AboutPage() {
                 around the same calendar — head, footer, spotlight and entrance
                 all come with it. */}
             <div className="mt-8">
-              <GithubCard username="imnotannamaria" />
+              <GithubCard username={siteConfig.githubUser} data={contributions} />
             </div>
           </Section>
         </div>

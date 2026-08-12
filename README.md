@@ -91,6 +91,10 @@ NEXT_PUBLIC_WORKOS_REDIRECT_URI=https://yourdomain.com/api/auth/callback
 
 # Optional: comma-separated emails allowed into /admin
 ADMIN_EMAILS=you@example.com
+
+# Optional: GitHub GraphQL, for the contributions grid on / and /about
+# Classic PAT, `read:user` scope
+GITHUB_TOKEN=ghp_xxxxxxxxxxxx
 ```
 
 Leave out whatever you don't need. Only `RESEND_API_KEY` and `NEXT_PUBLIC_BASE_URL` are required.

@@ -1,33 +1,32 @@
 "use client"
 
-import dynamic from "next/dynamic"
 import { motion } from "motion/react"
-import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { ArrowLink } from "@/components/ui/arrow-link"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
 import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
-
-const GithubCalendarInner = dynamic(
-  () => import("@/components/about/github-calendar").then((m) => m.GithubCalendar),
-  {
-    ssr: false,
-    loading: () => <Skeleton className="h-[140px] w-full rounded-lg" />,
-  },
-)
+import { GithubCalendar } from "@/components/about/github-calendar"
+import type { ContributionYear } from "@/lib/github/contributions"
 
 /**
- * The calendar itself is still `react-github-calendar` and still due a rewrite —
- * see the roadmap. This is only the frame around it.
+ * The frame around the calendar. It used to be `.bento-card` copied out by
+ * hand into inline styles, with a React state hook driving the hover so it
+ * could also lift and cast a shadow. Everything it was reimplementing already
+ * exists: the class does the surface, `CardHead` and `CardFoot` do the chrome,
+ * `ArrowLink` does the link. The lift went with the state — no other card on
+ * the page lifts, and keeping it meant keeping a re-render on every pointer
+ * enter to do what CSS does free.
  *
- * That frame used to be `.bento-card` copied out by hand into inline styles,
- * with a React state hook driving the hover so it could also lift and cast a
- * shadow. Everything it was reimplementing already exists: the class does the
- * surface, `CardHead` and `CardFoot` do the chrome, `ArrowLink` does the link.
- * The lift went with the state — no other card on the page lifts, and keeping it
- * meant keeping a re-render on every pointer enter to do what CSS does free.
+ * `data` is fetched by the page, server-side — see `lib/github/contributions.ts`
+ * — so the grid is in the served HTML instead of behind a client fetch.
  */
-export function GithubCard({ username }: { username: string }) {
+export function GithubCard({
+  username,
+  data,
+}: {
+  username: string
+  data: ContributionYear | null
+}) {
   const { onMouseMove, spotlight } = useSpotlight(700)
   const reveal = useReveal()
 
@@ -37,9 +36,7 @@ export function GithubCard({ username }: { username: string }) {
 
       <CardHead label="contributions" as="h3" meta={username} />
 
-      <div className="relative overflow-x-auto">
-        <GithubCalendarInner username={username} />
-      </div>
+      <GithubCalendar data={data} />
 
       {/* Same dashed rule the tree and oss footers use — spelled with the token,
           not Tailwind's default border colour, which is a different grey. */}
