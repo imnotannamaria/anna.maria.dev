@@ -29,21 +29,17 @@ export function posterSrc(url: string): string {
   return `/api/v1/poster/${encodePosterToken(url)}`
 }
 
-/** Shared with the route, which reverses it. `btoa` is global in browsers and in Node. */
+/**
+ * `btoa` is global in browsers and in Node, so this runs on both sides of the render.
+ *
+ * Its inverse lives in lib/api/routes/poster.ts rather than here. Keeping a matched pair
+ * apart is a cost, and the reason it is worth paying is the file this one is: a card marked
+ * `"use client"` imports it, so anything in here is shipped to the browser, and the decoder
+ * has no caller there. Change one, change the other.
+ */
 export function encodePosterToken(url: string): string {
   const bytes = new TextEncoder().encode(url)
   let binary = ""
   for (const byte of bytes) binary += String.fromCharCode(byte)
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
-}
-
-/** Returns null on anything that is not valid base64url, which the route treats as a 400. */
-export function decodePosterToken(token: string): string | null {
-  try {
-    const binary = atob(token.replace(/-/g, "+").replace(/_/g, "/"))
-    const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0))
-    return new TextDecoder().decode(bytes)
-  } catch {
-    return null
-  }
 }
