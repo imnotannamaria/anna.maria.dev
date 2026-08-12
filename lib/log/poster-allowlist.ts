@@ -15,7 +15,16 @@ import { logEntries } from "./schema"
 /** A poster added in the admin should appear without waiting out a stale cache. */
 const TTL_MS = 60_000
 
+/**
+ * How often a miss is allowed to force a re-read. Without it, every unknown token is an
+ * unconditional `SELECT`, and because a miss is never cached the next identical request pays
+ * again — so a loop over random tokens is one Postgres query per request, forever. The
+ * expensive path would have been the abusive one.
+ */
+const MIN_REFRESH_MS = 5_000
+
 let cache: { urls: Set<string>; readAt: number } | null = null
+let lastRefresh = 0
 
 async function knownUrls(): Promise<Set<string>> {
   const now = Date.now()
@@ -46,13 +55,21 @@ async function knownUrls(): Promise<Set<string>> {
  * that gets fetched. A host allowlist would let anyone use this server to fetch anything on
  * Wikimedia; this lets them fetch the images already on the page.
  *
- * A miss re-reads once before answering no, so a poster saved seconds ago is not a broken
- * image for up to a minute — the cache exists to keep the common case off the database, not
- * to make new entries wait. A miss is also the only path that pays for it, and a miss is
- * either a new poster or an attempt to use this route as a proxy.
+ * A miss re-reads before answering no, so a poster saved seconds ago is not a broken image
+ * for up to a minute — the cache exists to keep the common case off the database, not to make
+ * new entries wait.
+ *
+ * That re-read is rate limited on its own, and it has to be: a miss is either a new poster or
+ * someone probing the route, and only one of those happens twice. Five seconds is invisible to
+ * whoever just hit save in the admin, and it turns "a query per unknown token" into "a query
+ * every five seconds" no matter how hard the route is hammered.
  */
 export async function isKnownPosterUrl(candidate: string): Promise<boolean> {
   if ((await knownUrls()).has(candidate)) return true
+
+  const now = Date.now()
+  if (now - lastRefresh < MIN_REFRESH_MS) return false
+  lastRefresh = now
 
   cache = null
   return (await knownUrls()).has(candidate)
