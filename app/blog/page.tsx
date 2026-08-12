@@ -5,7 +5,6 @@ import { BlogFeed, type TagCount } from "@/components/blog/blog-feed"
 import { type PostItem } from "@/components/blog/post-card"
 import { DocLabel, Em } from "@/components/chrome/page-parts"
 import { TypeIn } from "@/components/ui/type-in"
-import { Reveal } from "@/components/ui/reveal"
 
 export const metadata = createMetadata({
   title: "Blog",
@@ -76,19 +75,23 @@ export default function BlogPage() {
           }}
         />
 
-        <Reveal delay={0.4}>
-          <p
-            className="mt-4 text-[16px] leading-[1.6]"
-            style={{
-              fontFamily: "var(--font-sans)",
-              color: "var(--fg-secondary)",
-              maxWidth: "52ch",
-            }}
-          >
-            Notes on development, architecture, and the tools I reach for. Long-form thinking, build
-            logs, and the occasional <Em>opinion.</Em>
-          </p>
-        </Reveal>
+        {/* Not wrapped in <Reveal>, and that is the point: this paragraph is the page's LCP
+            element, and an entrance that starts at `opacity: 0` is serialised into the SSR
+            markup as an inline style — so the largest thing on the page is invisible until
+            hydration finishes and the delay runs out. Lighthouse measured ~1.6s of "element
+            render delay" here against 412ms of TTFB. The <TypeIn> title above already carries
+            the entrance; see the same shape on every other page header. */}
+        <p
+          className="mt-4 text-[16px] leading-[1.6]"
+          style={{
+            fontFamily: "var(--font-sans)",
+            color: "var(--fg-secondary)",
+            maxWidth: "52ch",
+          }}
+        >
+          Notes on development, architecture, and the tools I reach for. Long-form thinking, build
+          logs, and the occasional <Em>opinion.</Em>
+        </p>
       </div>
     </BlogFeed>
   )

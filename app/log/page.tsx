@@ -3,7 +3,6 @@ import { countByType } from "@/lib/log/counts"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { LogFeed } from "@/components/log/log-feed"
 import { DocLabel, Em } from "@/components/chrome/page-parts"
-import { Reveal } from "@/components/ui/reveal"
 import { TypeIn } from "@/components/ui/type-in"
 
 export const metadata = createMetadata({
@@ -62,29 +61,29 @@ export default async function LogPage() {
           }}
         />
 
-        <Reveal delay={0.35}>
-          <p
-            className="mt-4 text-base leading-relaxed"
-            style={{
-              fontFamily: "var(--font-sans)",
-              color: "var(--fg-secondary)",
-              maxWidth: "56ch",
-            }}
-          >
-            A single feed for <Em>everything</Em> I finish: films, series, books, albums, podcasts
-            and games. Rated when my heart demands, favorites marked{" "}
-            <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-              ♥
-            </span>
-            <span className="sr-only">with a heart</span>.
-          </p>
-        </Reveal>
+        {/* No <Reveal>: this paragraph is the page's LCP element, and an entrance starting at
+            `opacity: 0` ships that way in the SSR markup, so the largest thing on the page
+            stays invisible until hydration plus the delay. The <TypeIn> title carries the
+            entrance instead. Same shape on every page header. */}
+        <p
+          className="mt-4 text-base leading-relaxed"
+          style={{
+            fontFamily: "var(--font-sans)",
+            color: "var(--fg-secondary)",
+            maxWidth: "56ch",
+          }}
+        >
+          A single feed for <Em>everything</Em> I finish: films, series, books, albums, podcasts and
+          games. Rated when my heart demands, favorites marked{" "}
+          <span aria-hidden style={{ color: "var(--fg-brand)" }}>
+            ♥
+          </span>
+          <span className="sr-only">with a heart</span>.
+        </p>
 
-        <Reveal delay={0.42}>
-          <p className="mt-3 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
-            {"// still adding some favorite stuff."}
-          </p>
-        </Reveal>
+        <p className="mt-3 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+          {"// still adding some favorite stuff."}
+        </p>
       </div>
     </LogFeed>
   )

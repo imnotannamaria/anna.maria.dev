@@ -3,7 +3,6 @@ import { createMetadata } from "@/lib/metadata"
 import { PianoStudio } from "./piano-studio"
 import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
 import { KeymapCard, type KeyLine } from "@/components/piano/keymap-card"
-import { Reveal } from "@/components/ui/reveal"
 import { TypeIn } from "@/components/ui/type-in"
 import {
   DisplayH2,
@@ -144,21 +143,23 @@ export default function PianoPage() {
                 display: "block",
               }}
             />
-            <Reveal delay={0.5}>
-              <p
-                className="m-0 text-[17px] leading-[1.65]"
-                style={{
-                  fontFamily: "var(--font-sans)",
-                  color: "var(--fg-secondary)",
-                  maxWidth: "56ch",
-                }}
-              >
-                An offline piano across <Em>two</Em> octaves. Click the keys, use your physical
-                keyboard, or trigger one of the songs below. The bottom row <Kbd>Z</Kbd>–
-                <Kbd>M</Kbd> plays <Strong>C4–B4</Strong>, the top row <Kbd>Q</Kbd>–<Kbd>U</Kbd>{" "}
-                plays <Strong>C5–B5</Strong>.
-              </p>
-            </Reveal>
+            {/* No <Reveal>: this paragraph is the page's LCP element, and an entrance starting
+                at `opacity: 0` ships that way in the SSR markup, so the largest thing on the
+                page stays invisible until hydration plus the delay. The <TypeIn> title carries
+                the entrance instead. */}
+            <p
+              className="m-0 text-[17px] leading-[1.65]"
+              style={{
+                fontFamily: "var(--font-sans)",
+                color: "var(--fg-secondary)",
+                maxWidth: "56ch",
+              }}
+            >
+              An offline piano across <Em>two</Em> octaves. Click the keys, use your physical
+              keyboard, or trigger one of the songs below. The bottom row <Kbd>Z</Kbd>–<Kbd>M</Kbd>{" "}
+              plays <Strong>C4–B4</Strong>, the top row <Kbd>Q</Kbd>–<Kbd>U</Kbd> plays{" "}
+              <Strong>C5–B5</Strong>.
+            </p>
           </Section>
 
           {/* ══════════ KEYBOARD + SONGS (interactive) ══════════ */}

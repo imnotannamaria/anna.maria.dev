@@ -1,3 +1,4 @@
+import type { Context } from "hono"
 import { createMiddleware } from "hono/factory"
 
 type Bucket = { count: number; resetAt: number }
@@ -16,14 +17,29 @@ function clientIp(req: Request): string {
   return req.headers.get("x-real-ip") ?? "unknown"
 }
 
-export function rateLimit({ max = 30, windowMs = 5 * 60 * 1000 } = {}) {
+/**
+ * `key` decides what a bucket counts, and the default — the caller's IP — is only right when
+ * the caller is the browser. It is not always: anything the browser reaches through
+ * `next/image` arrives here from the server's own loopback, so every visitor lands in one
+ * bucket and the limit becomes a global cap rather than a per-visitor one. A route in that
+ * position should key on whatever it is actually trying to protect. See routes/poster.ts.
+ */
+export function rateLimit({
+  max = 30,
+  windowMs = 5 * 60 * 1000,
+  key,
+}: {
+  max?: number
+  windowMs?: number
+  key?: (c: Context) => string
+} = {}) {
   return createMiddleware(async (c, next) => {
-    const ip = clientIp(c.req.raw)
+    const bucketKey = key ? key(c) : clientIp(c.req.raw)
     const now = Date.now()
-    const existing = buckets.get(ip)
+    const existing = buckets.get(bucketKey)
 
     if (!existing || existing.resetAt <= now) {
-      buckets.set(ip, { count: 1, resetAt: now + windowMs })
+      buckets.set(bucketKey, { count: 1, resetAt: now + windowMs })
       return next()
     }
 

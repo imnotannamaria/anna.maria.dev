@@ -85,7 +85,11 @@ export function FilterPill({
         active
           ? {
               borderColor: "var(--fg-brand)",
-              color: "var(--fg-brand)",
+              // The border can stay --fg-brand; the label cannot. Brand ink on the brand
+              // tint is 4.43:1 at 12px in the default theme, and worse in five others —
+              // eight of the twelve theme×mode combinations fail. See --fg-brand-on-tint
+              // in globals.css for the measured table.
+              color: "var(--fg-brand-on-tint)",
               background: "var(--bg-surface-brand)",
             }
           : {
@@ -96,7 +100,10 @@ export function FilterPill({
       }
     >
       {label}
-      <span style={{ opacity: 0.55 }}>{count}</span>
+      {/* Not dimmed. It carried `opacity: 0.55`, which put it at 2.2–3.0:1 in every theme,
+          in both states — the count is information, not decoration, so it has to be as
+          legible as the label beside it. The gap is what separates them. */}
+      <span>{count}</span>
     </button>
   )
 }

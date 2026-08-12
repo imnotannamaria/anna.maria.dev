@@ -68,7 +68,14 @@ export function TypeIn({
   const split = (value: string) => (by === "char" ? Array.from(value) : value.split(/(\s+)/))
 
   return (
-    <Tag className={className} style={style} aria-label={text}>
+    <Tag className={className} style={style}>
+      {/* An `sr-only` copy rather than `aria-label` on the Tag.
+          `aria-label` is only honoured on elements that have a role, and the default Tag
+          here is `span` — a generic with none — so on /, /about and /roadmap the label was
+          silently dropped and the pieces stayed `aria-hidden`: a heading a screen reader
+          could not read at all. It worked for `as="h1"` and not for `as="span"`, which is
+          exactly the kind of difference that hides. This shape has no such split. */}
+      <span className="sr-only">{text}</span>
       <motion.span
         aria-hidden
         initial="hidden"

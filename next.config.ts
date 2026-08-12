@@ -1,9 +1,33 @@
 import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
+  /**
+   * `import { siReact, siHono, … } from "simple-icons"` reaches the barrel file, and that
+   * barrel re-exports roughly three thousand icons. Tree-shaking is supposed to drop the
+   * rest, but it can only do that after parsing every one of those re-exports, and it gives
+   * up entirely on anything it cannot prove side-effect-free. Lighthouse measured 347ms of
+   * script evaluation for `node_modules_simple-icons_index_mjs` on the home page — the page
+   * with the site's worst blocking time.
+   *
+   * This tells Next to rewrite those named imports into direct deep imports at build time,
+   * so the module graph only ever contains the ~36 icons lib/stack.ts actually names. Same
+   * source, no import-site change; it is a compiler instruction, not a refactor.
+   */
+  experimental: {
+    optimizePackageImports: ["simple-icons", "@phosphor-icons/react"],
+  },
+
   images: {
-    // Only for next/image. /log posters render through a plain <img> precisely so they
-    // do not need an entry here — a poster can come from any host without a config edit.
+    // No `localPatterns` here on purpose. The default is `[{ pathname: "/**", search: "" }]`,
+    // which already matches /api/v1/poster/<token> — that is exactly why the token is a path
+    // segment and not `?u=`, and the constraint is explained where it is enforced, in
+    // lib/log/poster-src.ts. Spelling the default out again was config that changed nothing.
+    //
+    // Still only github.com, and /log posters still do not need an entry — but for a
+    // different reason than before. They used to render through a plain <img> to avoid
+    // this list; they now render through next/image pointed at /api/v1/poster, which is a
+    // local path, so Next optimises them without any host appearing here. A poster can
+    // still come from anywhere with no config edit. See lib/api/routes/poster.ts.
     remotePatterns: [
       {
         protocol: "https",

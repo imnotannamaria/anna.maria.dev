@@ -297,7 +297,20 @@ and was the one card on the site that didn't hover like the rest; `-sm` exists b
 padding on a 320px tile in a poster grid is most of the tile, and a density modifier is cheaper than
 a second card.
 
-Posters are plain `<img>`, not `next/image`, so no host allowlist has to be kept in sync. A URL that doesn't load falls back to the type label.
+Posters go through `next/image` pointed at **`/api/v1/poster/<base64url>`** — a local path, so
+they are optimised without a single poster host appearing in `remotePatterns`. That property is
+the whole reason they used to be a plain `<img>`, and it is kept; what changed is that the plain
+`<img>` was costing 2.7 MB of oversized bytes on `/log` (one poster was 1791×2704 at 1.79 MB,
+drawn 92px wide — 275× more than it needed) and eleven third-party cookies, nine of them Adobe
+Analytics and Kampyle from `image.api.playstation.com`. Hotlinking hands every visitor to the
+poster host's analytics; that was the half that mattered, and it is what put the page's
+best-practices score at 77.
+
+The route only ever fetches a URL already stored in `log_entries.poster_url`, so it is not an
+open proxy — writing the entry is what authorises the image, and there is nothing to maintain.
+The URL rides in the path rather than a query string because `next/image` rejects a local `src`
+with a query unless `images.localPatterns` matches it, and a `LocalPattern`'s `search` is a
+literal with no wildcard. A URL that doesn't load falls back to the type label.
 
 Every entry has a slug, but there is no `/log/[slug]` page and there shouldn't be. An entry is a title, a creator, a year and maybe two sentences — a page per entry would be a hundred thin pages diluting a small site, competing for queries Letterboxd and Goodreads already own. The slug is there to be a stable anchor and to keep the option open, not as a route waiting to be built.
 

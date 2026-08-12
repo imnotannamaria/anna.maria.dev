@@ -678,7 +678,9 @@ button:focus-visible,
    that color, so a row using it would vanish exactly when you hover it. */
 .tree-row:hover {
   background: var(--bg-surface-brand);
-  color: var(--fg-brand);
+  /* --fg-brand-on-tint, not --fg-brand: brand ink on the brand tint fails contrast in eight
+     of the twelve theme×mode combinations. See the token's note above the theme blocks. */
+  color: var(--fg-brand-on-tint);
 }
 
 .tree-row:focus-visible {
@@ -1036,10 +1038,49 @@ button:focus-visible,
  * a table of its own: the two values are one decision.
  */
 
+/*
+ * `--fg-brand-on-tint` is the ink for brand text on a --bg-surface-brand fill: the active
+ * filter pill, `.tag-active`. It exists for the same reason --fg-on-brand does — it cannot
+ * be derived — but it is the harder case, because the background is the brand at 8–15%
+ * over the canvas, so both the ink and the surface move with the theme.
+ *
+ * --fg-brand itself was the ink, and it fails eight of the twelve theme×mode combinations.
+ * Lighthouse only caught one of them (entrepta dark, 4.43 — the whole finding was a pill
+ * on /log). --fg-brand-hover is not the fix either: it is defined as the LIGHTER shade, so
+ * it rescues dark mode and makes light mode worse, and it fails four combinations of its
+ * own. A dedicated token is the only thing that holds in both directions.
+ *
+ * Measured against the composited pill background, ink → ratio:
+ *
+ *   entrepta   dark   on #1a1830   #9b8eff  6.33   (brand 4.44 FAIL)
+ *   entrepta   light  on #efedfa   #5a4cd6  5.28   (brand 3.98 FAIL)
+ *   blossom    dark   on #240e11   #e8787d  6.47   (brand 3.50 FAIL)
+ *   blossom    light  on #f4e9e9   #b02028  5.73   (= --fg-brand, already passed)
+ *   marmalade  dark   on #2b1a0c   #ff9d45  8.09   (brand 6.73, lifted for consistency)
+ *   marmalade  light  on #f8eee6   #a14b00  5.21   (brand 2.99 FAIL — the worst one)
+ *   julia      dark   on #28141d   #f178a0  6.57   (brand 5.18)
+ *   julia      light  on #f6ebee   #af325b  5.26   (brand 4.12 FAIL)
+ *   ivy        dark   on #0f1f18   #4cba7c  7.01   (brand 5.35)
+ *   ivy        light  on #e9f1ec   #1e7142  5.22   (brand 3.78 FAIL)
+ *   bosco      dark   on #0d162a   #6b9bf5  6.55   (brand 3.49 FAIL)
+ *   bosco      light  on #e8ecf7   #1d4ed8  5.67   (= --fg-brand, already passed)
+ *
+ * The floor is 5.21, not 4.5, and that headroom is deliberate: this text is 12px, and 12px
+ * is where a "passes by 0.02" stops being a real pass on a real screen.
+ *
+ * It also means the ink must be used at full opacity. The pill's count used to be dimmed to
+ * `opacity: 0.55`, which drags every one of these under 3.5 — there is no dimming this text
+ * that survives, so the count is not dimmed any more.
+ *
+ * Changing --bg-surface-brand's alpha changes the background these were measured against.
+ * Re-measure if you touch it.
+ */
+
 :root {
   --fg-brand: #7c6bff;
   --fg-brand-hover: #9b8eff;
   --fg-on-brand: #09090b;
+  --fg-brand-on-tint: #9b8eff;
   --bg-surface-brand: rgba(124, 107, 255, 0.15);
   --ring: rgba(124, 107, 255, 0.5);
 }
@@ -1048,6 +1089,7 @@ button:focus-visible,
   --fg-brand: #6b5bff;
   --fg-brand-hover: #5848e0;
   --fg-on-brand: #fafafa;
+  --fg-brand-on-tint: #5a4cd6;
   --bg-surface-brand: rgba(107, 91, 255, 0.08);
   --ring: rgba(107, 91, 255, 0.4);
 }
@@ -1061,6 +1103,7 @@ button:focus-visible,
   --fg-brand: #cc2e36;
   --fg-brand-hover: #e04750;
   --fg-on-brand: #fafafa;
+  --fg-brand-on-tint: #e8787d;
   --bg-surface-brand: rgba(204, 46, 54, 0.14);
   --ring: rgba(204, 46, 54, 0.45);
 }
@@ -1068,6 +1111,7 @@ button:focus-visible,
   --fg-brand: #b02028;
   --fg-brand-hover: #cc2e36;
   --fg-on-brand: #fafafa;
+  --fg-brand-on-tint: #b02028;
   --bg-surface-brand: rgba(176, 32, 40, 0.08);
   --ring: rgba(176, 32, 40, 0.4);
 }
@@ -1076,6 +1120,7 @@ button:focus-visible,
   --fg-brand: #ff8213;
   --fg-brand-hover: #ff9d45;
   --fg-on-brand: #09090b;
+  --fg-brand-on-tint: #ff9d45;
   --bg-surface-brand: rgba(255, 130, 19, 0.14);
   --ring: rgba(255, 130, 19, 0.45);
 }
@@ -1083,6 +1128,7 @@ button:focus-visible,
   --fg-brand: #e06800;
   --fg-brand-hover: #ff8213;
   --fg-on-brand: #09090b;
+  --fg-brand-on-tint: #a14b00;
   --bg-surface-brand: rgba(224, 104, 0, 0.08);
   --ring: rgba(224, 104, 0, 0.4);
 }
@@ -1091,6 +1137,7 @@ button:focus-visible,
   --fg-brand: #e85a8a;
   --fg-brand-hover: #f178a0;
   --fg-on-brand: #09090b;
+  --fg-brand-on-tint: #f178a0;
   --bg-surface-brand: rgba(232, 90, 138, 0.14);
   --ring: rgba(232, 90, 138, 0.45);
 }
@@ -1098,6 +1145,7 @@ button:focus-visible,
   --fg-brand: #cc3a6a;
   --fg-brand-hover: #e85a8a;
   --fg-on-brand: #fafafa;
+  --fg-brand-on-tint: #af325b;
   --bg-surface-brand: rgba(204, 58, 106, 0.08);
   --ring: rgba(204, 58, 106, 0.4);
 }
@@ -1106,6 +1154,7 @@ button:focus-visible,
   --fg-brand: #35a365;
   --fg-brand-hover: #4cba7c;
   --fg-on-brand: #09090b;
+  --fg-brand-on-tint: #4cba7c;
   --bg-surface-brand: rgba(53, 163, 101, 0.14);
   --ring: rgba(53, 163, 101, 0.45);
 }
@@ -1113,6 +1162,7 @@ button:focus-visible,
   --fg-brand: #258a50;
   --fg-brand-hover: #35a365;
   --fg-on-brand: #09090b;
+  --fg-brand-on-tint: #1e7142;
   --bg-surface-brand: rgba(37, 138, 80, 0.08);
   --ring: rgba(37, 138, 80, 0.4);
 }
@@ -1121,6 +1171,7 @@ button:focus-visible,
   --fg-brand: #2563eb;
   --fg-brand-hover: #4f86f3;
   --fg-on-brand: #fafafa;
+  --fg-brand-on-tint: #6b9bf5;
   --bg-surface-brand: rgba(37, 99, 235, 0.14);
   --ring: rgba(37, 99, 235, 0.45);
 }
@@ -1128,6 +1179,7 @@ button:focus-visible,
   --fg-brand: #1d4ed8;
   --fg-brand-hover: #2563eb;
   --fg-on-brand: #fafafa;
+  --fg-brand-on-tint: #1d4ed8;
   --bg-surface-brand: rgba(29, 78, 216, 0.08);
   --ring: rgba(29, 78, 216, 0.4);
 }
@@ -1383,7 +1435,8 @@ button:focus-visible,
 }
 .rm-launcher[aria-current="page"] {
   background: var(--bg-surface-brand);
-  color: var(--fg-brand);
+  /* See .tree-row:hover — same pairing, same reason. */
+  color: var(--fg-brand-on-tint);
 }
 .rm-launcher:focus-visible {
   outline: 2px solid var(--fg-brand);

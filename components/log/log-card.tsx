@@ -1,6 +1,7 @@
 "use client"
 
 import { useId, useState } from "react"
+import Image from "next/image"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ArrowUpRightIcon, CaretDownIcon } from "@phosphor-icons/react"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
@@ -8,6 +9,7 @@ import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
 import { formatLoggedAt } from "@/lib/log/date"
+import { posterSrc } from "@/lib/log/poster-src"
 import { starLabel } from "@/lib/log/stars"
 import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
 import { StarRating } from "./star-rating"
@@ -111,7 +113,14 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
                 aria-expanded={open}
                 aria-controls={panelId}
                 // z-20 keeps it above the stretched link, so the note still toggles.
-                className="relative z-20 inline-flex shrink-0 cursor-pointer items-center gap-1 rounded font-mono text-[10px] transition-colors"
+                //
+                // `py-[5px] -my-[5px]` is the whole point of the pair: 10px mono type gives
+                // a 15px-tall target, and WCAG 2.5.8 wants 24. The padding grows the hit
+                // area to 25px and the negative margin gives it straight back to the layout,
+                // so the CardFoot row keeps the height it had — which matters here, because
+                // that row is `flex-wrap` and a taller button would push the stars onto a
+                // line of their own at 375px.
+                className="relative z-20 -my-[5px] inline-flex shrink-0 cursor-pointer items-center gap-1 rounded py-[5px] font-mono text-[10px] transition-colors"
                 style={{ color: open ? "var(--fg-secondary)" : "var(--fg-muted)" }}
               >
                 {"// note"}
@@ -171,17 +180,22 @@ function Poster({ entry }: { entry: LogEntry }) {
       style={{ borderColor: "var(--border-subtle)", background: "var(--bg-canvas)" }}
     >
       {showImage ? (
-        // Plain <img> rather than next/image. Optimising would mean listing every poster
-        // host in remotePatterns, and Spotify alone serves art from four of them — a list
-        // that has to be edited before a poster can even be saved. These are 92px wide
-        // and already come from a CDN, so there is little left to optimise.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={entry.posterUrl as string}
+        // next/image, via the proxy — and the proxy is what makes that possible without
+        // giving anything up. `posterSrc` returns a local path, so no poster host has to
+        // appear in remotePatterns, which was the reason this used to be a plain <img>.
+        //
+        // What that plain <img> was costing: 2.7 MB of oversized bytes on this page (one
+        // poster was 1791×2704 at 1.79 MB, drawn 92px wide) and eleven third-party cookies
+        // from the hosts it hotlinked. See lib/api/routes/poster.ts.
+        //
+        // `sizes` is the fixed 92px of the box above, so Next serves the 128px variant and
+        // a 256px one for retina, instead of whatever the upstream happened to store.
+        <Image
+          src={posterSrc(entry.posterUrl as string)}
           alt=""
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          sizes="92px"
+          className="object-cover"
           onError={() => setFailed(true)}
         />
       ) : (
