@@ -2,8 +2,20 @@ import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   images: {
-    // Only for next/image. /log posters render through a plain <img> precisely so they
-    // do not need an entry here — a poster can come from any host without a config edit.
+    // A local `src` is only optimised if it matches localPatterns; the default is
+    // `[{ pathname: "/**", search: "" }]`, which covers /images/avatar.png and every other
+    // static file, and stops the moment a path carries anything else. Poster tokens are a
+    // path segment, not a query string, precisely so they fit this — see posterSrc.
+    localPatterns: [
+      { pathname: "/**", search: "" },
+      { pathname: "/api/v1/poster/*", search: "" },
+    ],
+
+    // Still only github.com, and /log posters still do not need an entry — but for a
+    // different reason than before. They used to render through a plain <img> to avoid
+    // this list; they now render through next/image pointed at /api/v1/poster, which is a
+    // local path, so Next optimises them without any host appearing here. A poster can
+    // still come from anywhere with no config edit. See lib/api/routes/poster.ts.
     remotePatterns: [
       {
         protocol: "https",

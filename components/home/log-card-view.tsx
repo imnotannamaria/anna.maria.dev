@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { motion, useReducedMotion } from "motion/react"
 import { ArrowLink } from "@/components/ui/arrow-link"
 import { StarRating } from "@/components/log/star-rating"
@@ -9,6 +10,7 @@ import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
 import { CardHead } from "@/components/ui/card-parts"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { cn } from "@/lib/utils"
+import { posterSrc } from "@/lib/log/poster-src"
 import { TYPE_LABEL, TYPE_PLURAL, type LogEntry, type LogType } from "@/lib/log/validation"
 
 export function LogCardView({
@@ -126,14 +128,15 @@ function Hero({ entry, reduce }: { entry: LogEntry; reduce: boolean }) {
         style={{ borderColor: "var(--border-subtle)", background: "var(--bg-canvas)" }}
       >
         {entry.posterUrl ? (
-          // Plain <img>, same reason as the /log card: no host allowlist to maintain.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={entry.posterUrl}
+          // Through the proxy, same as the /log card — the home page hotlinked these too,
+          // so it was handing visitors the same third-party cookies. See
+          // lib/api/routes/poster.ts. The box is w-24 / sm:w-28, hence the two-branch sizes.
+          <Image
+            src={posterSrc(entry.posterUrl)}
             alt=""
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            sizes="(min-width: 640px) 112px, 96px"
+            className="object-cover"
           />
         ) : (
           <span
@@ -215,14 +218,8 @@ function Thumb({ entry }: { entry: LogEntry }) {
       style={{ borderColor: "var(--border-subtle)", background: "var(--bg-canvas)" }}
     >
       {entry.posterUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={entry.posterUrl}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+        // Through the proxy, like the hero above it. w-12, so 48px.
+        <Image src={posterSrc(entry.posterUrl)} alt="" fill sizes="48px" className="object-cover" />
       ) : (
         <span
           aria-hidden
