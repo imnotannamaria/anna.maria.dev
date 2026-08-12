@@ -97,20 +97,22 @@ export default function ContactPage() {
                   }}
                 />
 
-                <Reveal delay={0.45}>
-                  <p
-                    className="m-0 text-[16px] leading-[1.65]"
-                    style={{
-                      fontFamily: "var(--font-sans)",
-                      color: "var(--fg-secondary)",
-                      maxWidth: "52ch",
-                    }}
-                  >
-                    Type it below, or pick a channel on the right. I read everything that lands in
-                    my inbox and I try to reply within <Strong>a day</Strong>. If it&apos;s about{" "}
-                    <Em>work</Em>, tell me a bit about what you&apos;re building.
-                  </p>
-                </Reveal>
+                {/* No <Reveal>: this paragraph is the page's LCP element, and an entrance
+                    starting at `opacity: 0` ships that way in the SSR markup, so the largest
+                    thing on the page stays invisible until hydration plus the delay. The
+                    <TypeIn> title carries the entrance instead. */}
+                <p
+                  className="m-0 text-[16px] leading-[1.65]"
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    color: "var(--fg-secondary)",
+                    maxWidth: "52ch",
+                  }}
+                >
+                  Type it below, or pick a channel on the right. I read everything that lands in my
+                  inbox and I try to reply within <Strong>a day</Strong>. If it&apos;s about{" "}
+                  <Em>work</Em>, tell me a bit about what you&apos;re building.
+                </p>
               </div>
 
               <Reveal delay={0.55}>
