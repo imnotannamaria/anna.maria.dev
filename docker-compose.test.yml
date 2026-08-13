@@ -1,0 +1,26 @@
+# A disposable Postgres for integration tests. Shares nothing with the real Supabase
+# database — `docker compose down` (no -v needed, the data dir is tmpfs) discards
+# everything.
+#
+#   docker compose -f docker-compose.test.yml up -d
+#   DATABASE_URL=postgresql://postgres:postgres@localhost:5433/postgres npm run test:integration
+#
+# Scripts in docs/sql/ run once, in filename order (001, 002, 003), the first time the
+# container starts with an empty data directory — which is every time, since the data
+# directory is tmpfs.
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./docs/sql:/docker-entrypoint-initdb.d:ro
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 20

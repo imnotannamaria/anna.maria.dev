@@ -14,6 +14,10 @@
     "email:dev": "email dev --dir emails",
     "seed:log": "tsx scripts/seed-log.ts",
     "seed:roadmap": "tsx scripts/seed-roadmap.ts",
+    "test": "vitest run --project unit",
+    "test:watch": "vitest --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:e2e": "playwright test",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -71,6 +75,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20",
@@ -80,12 +85,15 @@
     "eslint-config-next": "16.2.3",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
+    "iron-session": "^8.0.4",
+    "jose": "^6.2.8",
     "lint-staged": "^16.4.0",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.8.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "^4",
     "tsx": "^4.23.9",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }
