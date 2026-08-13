@@ -1,6 +1,6 @@
-# anna.maria.dev
+# [anna.maria.dev](http://anna.maria.dev)
 
-![anna.maria.dev cover](public/images/og-cover.jpg)
+anna.maria.dev cover
 
 Personal portfolio and open source template for full-stack engineers. Built as an editor metaphor: titlebar with tabs, sidebar navigation, status bar, all styled with the entrepta design system. Dark first, TypeScript strict.
 
@@ -196,7 +196,7 @@ The Apple Watch activity card reads from your own Postgres database. See [wristk
 
 `/log` is a single feed for everything you finish, with an admin at `/admin/log` to manage it. It shares the same Postgres database as wristkit.
 
-1. Set `DATABASE_URL` and run [`docs/sql/001-log-entries.sql`](docs/sql/001-log-entries.sql) against it.
+1. Set `DATABASE_URL` and run `[docs/sql/001-log-entries.sql](docs/sql/001-log-entries.sql)` against it.
 2. Optionally seed it with sample entries: `npm run seed:log`.
 3. For the admin, create an application at [workos.com](https://workos.com), register `<your-domain>/api/auth/callback` as a redirect URI, and fill in the four `WORKOS_*` variables.
 4. Put your own email in `ADMIN_EMAILS`.
@@ -213,7 +213,7 @@ The design decisions behind all of it, phase by phase, are in [docs/log-plan.md]
 
 `/roadmap` is a board of what the site is going to become — to do, in progress, shipped — with an admin at `/admin/roadmap`. It rides on the same database and the same allowlist as the log, so if you already did the steps above there are only two left:
 
-1. Run [`docs/sql/003-roadmap-items.sql`](docs/sql/003-roadmap-items.sql) against `DATABASE_URL`.
+1. Run `[docs/sql/003-roadmap-items.sql](docs/sql/003-roadmap-items.sql)` against `DATABASE_URL`.
 2. Optionally seed it: `npm run seed:roadmap`.
 
 Items start with status `raw`, which never renders publicly — that is the holding pen for an idea you don't want to lose but haven't decided anything about. Promote one to `todo` when it becomes real.
@@ -221,6 +221,60 @@ Items start with status `raw`, which never renders publicly — that is the hold
 Without `DATABASE_URL` the board renders empty and the build still passes.
 
 The reasoning, phase by phase, is in [docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
+
+---
+
+## Testing
+
+```bash
+npm run test:all
+```
+
+That is the whole thing: it starts a throwaway Postgres, builds content, then runs all three
+layers — 123 unit, 38 integration, 9 end-to-end — and stops the database afterwards. Docker
+(or OrbStack) needs to be running; nothing else has to be set up, and no environment variable
+has to be exported.
+
+```bash
+npm run test:all -- --keep     # leave the database up, so the next run is faster
+npm run test:all -- --no-e2e   # skip the browser layer and its production build
+```
+
+The layers can still be run one at a time. Only the first needs no infrastructure:
+
+```bash
+npm test                  # unit — pure functions and the API surface
+npm run test:watch        # the same, in watch mode
+npm run test:integration  # + a real Postgres
+npm run test:e2e          # + Playwright, builds and starts the app itself
+```
+
+Run on their own, the last two expect the database and the e2e secret to already be in the
+environment — `npm run test:all` exists precisely because wiring that up by hand every time
+was five steps of ceremony:
+
+```bash
+docker compose -f docker-compose.test.yml up -d
+export DATABASE_URL=postgresql://postgres:postgres@localhost:5433/postgres
+export TEST_WORKOS_COOKIE_PASSWORD=$(openssl rand -base64 32)
+```
+
+**Both suites are destructive.** The integration setup `TRUNCATE`s `log_entries`,
+`roadmap_items` and `wristkit_samples` between every test, and the e2e suite writes and
+deletes real rows. Both refuse to run unless `DATABASE_URL` points at localhost, so
+pointing them at Supabase fails loudly instead of erasing it — override with
+`ALLOW_NONLOCAL_TEST_DB=true` only for a database you are willing to lose.
+
+`TEST_WORKOS_COOKIE_PASSWORD` is any 32+ character string. It seals throwaway admin sessions,
+signed against a local stand-in for WorkOS's JWKS rather than the real WorkOS, and is
+unrelated to the production `WORKOS_COOKIE_PASSWORD`. In CI it comes from a repo secret of
+the same name, which the workflow checks for before doing any work.
+
+The e2e layer also needs a browser once: `npx playwright install --with-deps chromium`.
+
+The full reasoning — why a mocked DB was ruled out, why the e2e auth setup runs a local
+JWKS server instead of stubbing WorkOS, what each test is actually guarding against — is in
+[docs/tests-plan.md](docs/tests-plan.md).
 
 ---
 

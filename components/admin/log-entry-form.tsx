@@ -135,7 +135,13 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
             placeholder="2024"
             state={errors.year ? "error" : "default"}
             aria-invalid={Boolean(errors.year)}
-            {...register("year", { setValueAs: (v) => (v === "" ? null : Number(v)) })}
+            {...register("year", {
+              // A field that's never been touched validates against defaultValues.year
+              // directly — the literal `null`, not the DOM's "" — so the `v === ""` check
+              // alone let `Number(null)` (which is 0, not NaN) through to `.min(1800)` and
+              // blocked every new entry that didn't have its year clicked into first.
+              setValueAs: (v) => (v === "" || v == null ? null : Number(v)),
+            })}
           />
         </Field>
       </div>

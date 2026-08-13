@@ -20,8 +20,11 @@ const MAX_REDIRECTS = 1
  * step; there is a pointer in both directions.
  *
  * Returns null on anything that is not valid base64url, which the caller treats as a 400.
+ *
+ * Exported only so the round trip with encodePosterToken can be tested directly — no other
+ * caller should need it, since posterSrc/encodePosterToken already do the encoding half.
  */
-function decodePosterToken(token: string): string | null {
+export function decodePosterToken(token: string): string | null {
   try {
     const binary = atob(token.replace(/-/g, "+").replace(/_/g, "/"))
     const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0))

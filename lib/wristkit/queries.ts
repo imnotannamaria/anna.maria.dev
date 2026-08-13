@@ -3,7 +3,9 @@ import { createDb } from "./db"
 import { samples } from "./schema"
 import type { Metric } from "./validation"
 
-function startOfToday(tz: string): Date {
+// Exported for testing — the string round-trip below is the gnarliest arithmetic in this
+// file and the one most worth pinning down directly, rather than only through a DB query.
+export function startOfToday(tz: string): Date {
   const now = new Date()
   const local = new Date(now.toLocaleString("en-US", { timeZone: tz }))
   const offsetMs = local.getTime() - now.getTime()

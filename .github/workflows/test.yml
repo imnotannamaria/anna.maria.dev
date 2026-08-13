@@ -1,0 +1,82 @@
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  static:
+    name: lint, typecheck, unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      # .velite is gitignored — lib/velite.ts imports it, and so does
+      # lib/velite-output.test.ts, so both tsc and the unit suite need it built first.
+      - run: npx velite build
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test
+
+  db:
+    name: integration + e2e (real Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      # Seals throwaway sessions for the e2e admin-gate/CRUD specs — unrelated to the real
+      # production WORKOS_COOKIE_PASSWORD. AuthKit requires 32+ chars or it throws.
+      TEST_WORKOS_COOKIE_PASSWORD: ${{ secrets.TEST_WORKOS_COOKIE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+
+      # An unset secret resolves to "", which AuthKit rejects from deep inside the Next
+      # server with "cookie password ... at least 32 characters" — a failure that points
+      # nowhere near the cause. Fail here instead, where the fix is obvious.
+      - name: check required secrets
+        run: |
+          if [ -z "$TEST_WORKOS_COOKIE_PASSWORD" ]; then
+            echo "::error::Set the TEST_WORKOS_COOKIE_PASSWORD repo secret (32+ chars: openssl rand -base64 32)"
+            exit 1
+          fi
+
+      # Glob order is 001, 002, 003 — which is also dependency order. Mirrors what
+      # docker-compose.test.yml does locally via docker-entrypoint-initdb.d.
+      - name: apply schema
+        run: |
+          for f in docs/sql/*.sql; do
+            echo "applying $f"
+            psql "$DATABASE_URL" -f "$f"
+          done
+
+      - run: npm run test:integration
+
+      - name: install Playwright's browser
+        run: npx playwright install --with-deps chromium
+
+      # playwright.config.ts's webServer builds and starts the app itself (`npm run build
+      # && npm start`), pointing WORKOS_API_HOSTNAME/PORT at the local JWKS server
+      # playwright/global-setup.ts stands up — see docs/tests-plan.md, "What the first
+      # draft of this plan got wrong", for why that's necessary instead of a simpler stub.
+      - run: npm run test:e2e
+
+      - name: upload playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
