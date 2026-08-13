@@ -227,17 +227,36 @@ The reasoning, phase by phase, is in [docs/roadmap-component-plan.md](docs/roadm
 ## Testing
 
 ```bash
-npm test               # unit tests — pure functions, no infrastructure needed
-npm run test:integration  # + a real Postgres, see below
+npm run test:all
+```
+
+That is the whole thing: it starts a throwaway Postgres, builds content, then runs all three
+layers — 123 unit, 38 integration, 9 end-to-end — and stops the database afterwards. Docker
+(or OrbStack) needs to be running; nothing else has to be set up, and no environment variable
+has to be exported.
+
+```bash
+npm run test:all -- --keep     # leave the database up, so the next run is faster
+npm run test:all -- --no-e2e   # skip the browser layer and its production build
+```
+
+The layers can still be run one at a time. Only the first needs no infrastructure:
+
+```bash
+npm test                  # unit — pure functions and the API surface
+npm run test:watch        # the same, in watch mode
+npm run test:integration  # + a real Postgres
 npm run test:e2e          # + Playwright, builds and starts the app itself
 ```
 
-Integration and e2e need a disposable Postgres:
+Run on their own, the last two expect the database and the e2e secret to already be in the
+environment — `npm run test:all` exists precisely because wiring that up by hand every time
+was five steps of ceremony:
 
 ```bash
 docker compose -f docker-compose.test.yml up -d
 export DATABASE_URL=postgresql://postgres:postgres@localhost:5433/postgres
-npm run test:integration
+export TEST_WORKOS_COOKIE_PASSWORD=$(openssl rand -base64 32)
 ```
 
 **Both suites are destructive.** The integration setup `TRUNCATE`s `log_entries`,
@@ -246,18 +265,12 @@ deletes real rows. Both refuse to run unless `DATABASE_URL` points at localhost,
 pointing them at Supabase fails loudly instead of erasing it — override with
 `ALLOW_NONLOCAL_TEST_DB=true` only for a database you are willing to lose.
 
-e2e additionally needs `TEST_WORKOS_COOKIE_PASSWORD` (any 32+ character string — it seals
-throwaway admin sessions signed against a local stand-in for WorkOS's JWKS, not the real
-WorkOS) and a browser: `npx playwright install --with-deps chromium` once, then:
+`TEST_WORKOS_COOKIE_PASSWORD` is any 32+ character string. It seals throwaway admin sessions,
+signed against a local stand-in for WorkOS's JWKS rather than the real WorkOS, and is
+unrelated to the production `WORKOS_COOKIE_PASSWORD`. In CI it comes from a repo secret of
+the same name, which the workflow checks for before doing any work.
 
-```bash
-export TEST_WORKOS_COOKIE_PASSWORD=$(openssl rand -base64 32)
-npm run test:e2e
-```
-
-In CI the same value comes from a `TEST_WORKOS_COOKIE_PASSWORD` repo secret, which the
-workflow checks for before doing any work. It is unrelated to the production
-`WORKOS_COOKIE_PASSWORD` and only ever seals throwaway sessions.
+The e2e layer also needs a browser once: `npx playwright install --with-deps chromium`.
 
 The full reasoning — why a mocked DB was ruled out, why the e2e auth setup runs a local
 JWKS server instead of stubbing WorkOS, what each test is actually guarding against — is in
