@@ -1,0 +1,45 @@
+---
+title: "Where does the accessibility of a hosted auth UI actually live?"
+description: "I added WorkOS AuthKit to my portfolio and started looking at its hosted login the way I look at my own components. That turned into a question about who owns a contrast ratio."
+date: "2026-08-14"
+tags: ["accessibility", "a11y", "authkit", "workos", "design-systems"]
+published: true
+---
+
+I added WorkOS AuthKit to my portfolio this week. It protects the admin area behind my blog, and getting it wired in took an afternoon.
+
+What I did next took longer. I build a design system on Radix, so I couldn't help looking at AuthKit's hosted login the way I look at my own components. Not "is it accessible," as a yes or no. The more useful question: where does the accessibility of a hosted auth UI actually live?
+
+## The lens I'm looking through
+
+When you build on Radix, a lot comes for free. Dialog, Dropdown, Tabs, Tooltip all inherit focus handling, keyboard support, and ARIA from the primitive. You compose on top with your own tokens. So the real work is never the parts Radix already solved. It's what's left over. States the primitive doesn't cover. A token that quietly breaks contrast. Theming a customer configures that nobody ever reviews.
+
+That last one is where hosted auth gets interesting.
+
+## Testing the hosted screen
+
+I ran two checks against the live sign-in screen, not the branding preview.
+
+First, the error state. Submit the form with the email field empty, and "Please enter your email" shows up in red under the input, on the near-black background AuthKit ships by default. It reads fine. Warm red, decent size, no squinting required. Nothing broke here.
+
+Second, I ran Lighthouse's accessibility audit against the page: 98, next to 97 performance, 92 best practices, 91 SEO. Lighthouse only checks the mechanical layer, labels, computable contrast ratios, ARIA attributes, not a real screen reader pass or a Tab-through-the-form session. But it's a decent floor. This screen cleared it before I touched a single style. That's WorkOS doing the homework on the part a component library actually controls.
+
+The default holds up under both tests. Whether it still holds once a customer starts customizing it is a different question.
+
+## The tension: whose job is that contrast ratio?
+
+Here's the part that isn't about any single screen. AuthKit lets customers brand the login through the dashboard: logo, colors, type. That's the right call for a product whose whole promise is "onboard fast, look like yourself."
+
+But branding and contrast pull against each other. A customer picks a brand color that fails AA against white. Now the login their end users see is inaccessible, and nobody in that flow was ever asked to check. So the question I kept coming back to: whose job is that contrast ratio?
+
+I tested it. In the branding dashboard I set the button background and the button text to the same black, hex for hex, and hit Save changes. No warning, no blocked save. WorkOS took the values and moved on.
+
+What that pair renders is a black button with no visible label. `Continue with SSO` is technically there, black text on a black button, in dark mode. The only way I could read it was hovering, because the hover state lightens the background just enough to separate it from the text. Rest state fails contrast outright. The hover state fixes it, but by accident, not by design. A screen reader user or someone navigating by keyboard never triggers hover. For them that button has no label at all.
+
+So now I have my answer. It doesn't validate. That's not a bug in a component, an off contrast ratio someone patches next sprint. It's a gap in the process. Accessibility stopped being WorkOS's problem the moment they handed me the color picker. It became mine, except I'm not the one who has to read the button. My users are.
+
+## Where I land
+
+I know which way AuthKit handles it now, and I'm not writing this to grade WorkOS. Taking whatever color a customer types and rendering it is a completely reasonable default to ship. Catching every unreadable combination in a branding dashboard is its own hard problem. I'm writing this because it's the kind of problem I like: "make it accessible" isn't a checklist on one screen, it's a decision about which layer owns the guarantee.
+
+If I were maintaining that design system, I'd want the contrast check living in the theming layer, not the component. Catch it where the color is chosen, not where it's rendered.

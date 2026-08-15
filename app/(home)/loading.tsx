@@ -18,20 +18,20 @@
  * loading one.
  *
  * So it says what is happening, in the voice the rest of the site already uses: the real
- * section prompt, then a `$` line that types itself in. Type cannot look broken the way a
- * bad mock can. `60vh` keeps the status bar from jumping up to meet it and back down again.
+ * section prompt, then a `$` line underneath. `60vh` keeps the status bar from jumping up
+ * to meet it and back down again.
  *
- * `TypeIn` is the site's typing animation, the one the page titles use — it fades every
- * character in from a stagger rather than growing a sliced string, so the whole sentence is
- * in the DOM from the first render. The dots are CSS, and they loop: once the line has
- * landed, one thing should still be moving, and an ellipsis says "still working" where a
- * caret only says "cursor".
- *
- * It is deliberately quicker than the same animation on a page title. A hero can take its
- * time because the reader arrived to look at it; this is in the way of what they asked for,
- * and a slow one reads as the page being stuck rather than busy.
+ * The line is plain text, not `TypeIn`. `TypeIn` fades its characters in on `whileInView`,
+ * which needs the client to hydrate and an `IntersectionObserver` to fire before anything
+ * shows — its `initial` state renders as `opacity: 0` in the SSR HTML. A page title can
+ * afford that beat, it sits on a page that stays put. A loading state can't: it exists only
+ * until the real data lands, and on a cold load that can happen before hydration finishes,
+ * so the line stayed invisible for the state's entire time on screen while the dots, plain
+ * CSS with no JS to wait on, animated the whole time regardless. The text needs to be there
+ * on first paint, not after a round trip to the client. The dots are still CSS, and they
+ * still loop: once the line has landed, one thing should still be moving, and an ellipsis
+ * says "still working" where a caret only says "cursor".
  */
-import { TypeIn } from "@/components/ui/type-in"
 
 export default function HomeLoading() {
   return (
@@ -55,7 +55,7 @@ export default function HomeLoading() {
         <span aria-hidden style={{ color: "var(--fg-brand)" }}>
           $
         </span>{" "}
-        <TypeIn text="loading page" speed={0.022} />
+        loading page
         <span aria-hidden>
           <span className="load-dot load-dot-1">.</span>
           <span className="load-dot load-dot-2">.</span>
