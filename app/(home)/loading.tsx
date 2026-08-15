@@ -51,12 +51,12 @@ export default function HomeLoading() {
         </span>
       </div>
 
-      <p className="m-0 font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
-        <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-          $
-        </span>{" "}
-        loading page
-        <span aria-hidden>
+      {/* The whole visible line is aria-hidden — the `role="status"` below is the one
+          announcement a screen reader gets, so the mono `$`, the text and the dots are all
+          decoration. Exposing the text here as well would announce the same fact twice. */}
+      <p aria-hidden className="m-0 font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
+        <span style={{ color: "var(--fg-brand)" }}>$</span> loading page
+        <span>
           <span className="load-dot load-dot-1">.</span>
           <span className="load-dot load-dot-2">.</span>
           <span className="load-dot load-dot-3">.</span>

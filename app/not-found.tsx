@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
+import { ChromeMessage } from "@/components/ui/chrome-message"
 
 export const metadata: Metadata = { title: "Page not found" }
 
@@ -13,43 +14,24 @@ export const metadata: Metadata = { title: "Page not found" }
  * rather than only the ones under that group. See `(home)/loading.tsx` for why the group
  * exists in the first place — this file has no such constraint, `notFound()` already sets
  * the status code correctly wherever it's thrown from.
+ *
+ * It shares `ChromeMessage` with the error boundaries. A server component here, a client one
+ * there, but the same surface — this passes a `<Link>` where they pass a reset `<Button>`.
  */
 export default function NotFound() {
   return (
-    <div
-      className="mx-auto flex flex-col px-4 py-6 sm:px-6 md:px-8 lg:px-12 lg:py-8"
-      style={{ maxWidth: 1280, minHeight: "60vh" }}
-    >
-      <div
-        className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
-        style={{ color: "var(--fg-muted)" }}
-      >
-        <span style={{ color: "var(--fg-brand)" }}>$</span> cat ./page
-      </div>
-
-      <p className="m-0 font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
-        cat: ./page: No such file or directory
-      </p>
-
-      <h1
-        className="mt-4 font-serif text-[40px] leading-none font-normal tracking-[-0.02em]"
-        style={{ color: "var(--fg-primary)" }}
-      >
-        Page not found
-      </h1>
-
-      <p className="mt-4 font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
-        {"// check the url, or head back."}
-      </p>
-
-      {/* buttonVariants, not <Button asChild>: Button always wraps its children in a span,
-          which breaks the Radix Slot single-child contract this needs — that combination
-          isn't used anywhere else in the codebase. */}
-      <div className="mt-6">
+    <ChromeMessage
+      command="cat ./page"
+      output="cat: ./page: No such file or directory"
+      title="Page not found"
+      note="// check the url, or head back."
+      action={
+        // buttonVariants, not <Button asChild>: Button always wraps its children in a span,
+        // which breaks the Radix Slot single-child contract that would need.
         <Link href="/" className={buttonVariants({ variant: "secondary" })}>
           cd ~
         </Link>
-      </div>
-    </div>
+      }
+    />
   )
 }
