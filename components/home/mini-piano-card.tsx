@@ -212,7 +212,7 @@ export function MiniPianoCard() {
         </div>
 
         <div
-          className="relative mt-auto flex items-center justify-between font-mono text-[11px]"
+          className="text-mono-sm relative mt-auto flex items-center justify-between font-mono"
           style={{ color: "var(--fg-muted)" }}
         >
           <span>

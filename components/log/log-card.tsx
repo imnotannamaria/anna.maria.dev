@@ -89,7 +89,7 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
 
           {(entry.creator || entry.year) && (
             <div
-              className="mt-[3px] truncate font-mono text-[11px]"
+              className="text-mono-sm mt-[3px] truncate font-mono"
               style={{ color: "var(--fg-muted)" }}
             >
               {[entry.creator, entry.year].filter(Boolean).join(" · ")}
@@ -120,7 +120,7 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
                 // so the CardFoot row keeps the height it had — which matters here, because
                 // that row is `flex-wrap` and a taller button would push the stars onto a
                 // line of their own at 375px.
-                className="relative z-20 -my-[5px] inline-flex shrink-0 cursor-pointer items-center gap-1 rounded py-[5px] font-mono text-[10px] transition-colors"
+                className="text-mono-xs relative z-20 -my-[5px] inline-flex shrink-0 cursor-pointer items-center gap-1 rounded py-[5px] font-mono transition-colors"
                 style={{ color: open ? "var(--fg-secondary)" : "var(--fg-muted)" }}
               >
                 {"// note"}
@@ -153,7 +153,7 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
             className="relative z-20 overflow-hidden"
           >
             <p
-              className="mt-3 border-t pt-3 font-sans text-[13px] leading-relaxed"
+              className="text-mono-md mt-3 border-t pt-3 font-sans leading-relaxed"
               style={{ borderColor: "var(--border-subtle)", color: "var(--fg-secondary)" }}
             >
               {entry.note}
@@ -200,7 +200,7 @@ function Poster({ entry }: { entry: LogEntry }) {
         />
       ) : (
         <span
-          className="absolute inset-0 grid place-items-center font-mono text-[9px] tracking-[0.06em] uppercase"
+          className="text-mono-xs absolute inset-0 grid place-items-center font-mono tracking-[0.06em] uppercase"
           style={{ color: "var(--fg-muted)" }}
           aria-hidden
         >

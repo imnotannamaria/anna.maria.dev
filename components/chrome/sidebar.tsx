@@ -101,7 +101,7 @@ export function Sidebar() {
                 <motion.span
                   layoutId="sidebar-active-mark"
                   transition={reduce ? { duration: 0 } : { duration: 0.32, ease: EASE_OUT }}
-                  className="pointer-events-none absolute top-1/2 -left-2.5 -translate-y-1/2 text-[9px] leading-none"
+                  className="text-mono-xs pointer-events-none absolute top-1/2 -left-2.5 -translate-y-1/2 leading-none"
                   style={{ color: "var(--fg-brand)" }}
                   aria-hidden
                 >

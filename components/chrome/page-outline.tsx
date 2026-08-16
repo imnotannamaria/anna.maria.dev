@@ -39,7 +39,7 @@ const PREFIX: Record<1 | 2 | 3, string> = { 1: "#", 2: "##", 3: "###" }
  */
 const RAIL = "sticky top-0 hidden self-start px-4 py-12 min-[1100px]:block"
 const RAIL_BORDER = { borderRight: "1px solid var(--border-subtle)" } as const
-const RAIL_HEADING = "font-mono text-[10px] font-medium tracking-[0.08em] uppercase"
+const RAIL_HEADING = "font-mono text-mono-xs font-medium tracking-[0.08em] uppercase"
 const RAIL_HEADING_STYLE = { color: "var(--fg-muted)", margin: "0 0 12px" } as const
 const FILE_CHIP =
   "mb-4 flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1.5 font-mono text-xs"
@@ -202,7 +202,7 @@ export function PageOutline({
 
       {footer && (
         <motion.div
-          className="mt-8 flex flex-col gap-1 pt-3 font-mono text-[10px] leading-[1.7]"
+          className="text-mono-xs mt-8 flex flex-col gap-1 pt-3 font-mono leading-[1.7]"
           style={{ borderTop: "1px dashed var(--border-subtle)", color: "var(--fg-muted)" }}
           variants={piece}
         >

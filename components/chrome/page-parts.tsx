@@ -88,7 +88,7 @@ export function DisplayH2({
 export function Prose({
   children,
   /** `mb-8` + 1.7 on /contact, `mb-6` + 1.65 on /piano. */
-  className = "mb-6 text-[15px] leading-[1.65]",
+  className = "mb-6 text-body-lg leading-[1.65]",
 }: {
   children: React.ReactNode
   className?: string
@@ -146,12 +146,12 @@ export function MetaCol({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
       <dt
-        className="font-mono text-[10px] tracking-[0.08em] uppercase"
+        className="text-mono-xs font-mono tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-muted)" }}
       >
         {label}
       </dt>
-      <dd className="font-mono text-[13px]" style={{ color: "var(--fg-primary)", margin: 0 }}>
+      <dd className="text-mono-md font-mono" style={{ color: "var(--fg-primary)", margin: 0 }}>
         {value}
       </dd>
     </div>
@@ -162,7 +162,7 @@ export function MetaCol({ label, value }: { label: string; value: string }) {
 export function Kbd({ children }: { children: React.ReactNode }) {
   return (
     <kbd
-      className="font-mono text-[12px]"
+      className="text-mono-sm font-mono"
       style={{
         padding: "1px 6px",
         border: "1px solid var(--border-strong)",

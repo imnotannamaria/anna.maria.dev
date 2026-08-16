@@ -180,7 +180,7 @@ export function Titlebar() {
                 className={cn(
                   "inline-flex h-full items-center gap-2 pl-3 sm:pl-4",
                   closable ? "pr-1.5" : "pr-3 sm:pr-4",
-                  "font-mono text-[12px] transition-colors duration-[120ms]",
+                  "text-mono-sm font-mono transition-colors duration-[120ms]",
                   active
                     ? "text-[var(--fg-primary)]"
                     : "text-[var(--fg-muted)] hover:text-[var(--fg-secondary)]",
@@ -201,7 +201,7 @@ export function Titlebar() {
                   onClick={() => router.push(closeTarget(tab.href))}
                   aria-label={`Close ${tab.name}`}
                   className={cn(
-                    "focus-ring mr-1.5 inline-grid h-6 w-6 shrink-0 place-items-center rounded-sm text-[12px]",
+                    "focus-ring text-mono-sm mr-1.5 inline-grid h-6 w-6 shrink-0 place-items-center rounded-sm",
                     "text-[var(--fg-muted)] opacity-60 transition-[opacity,background-color]",
                     "hover:bg-[var(--bg-hover-strong)] hover:opacity-100",
                   )}
@@ -224,7 +224,7 @@ export function Titlebar() {
       </nav>
 
       {/* Right meta */}
-      <div className="hidden shrink-0 items-center gap-4 px-4 font-mono text-[11px] text-[var(--fg-muted)] md:flex">
+      <div className="text-mono-sm hidden shrink-0 items-center gap-4 px-4 font-mono text-[var(--fg-muted)] md:flex">
         <span className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--fg-brand)]" />
           main

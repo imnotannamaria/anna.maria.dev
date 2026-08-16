@@ -51,7 +51,7 @@ export default async function RoadmapPage() {
         </div>
 
         <h1
-          className="font-serif text-[40px] leading-none font-normal tracking-[-0.02em] sm:text-5xl lg:text-[64px]"
+          className="text-display-md lg:text-display-lg font-serif leading-none font-normal tracking-[-0.02em] sm:text-5xl"
           style={{ color: "var(--fg-primary)" }}
         >
           Roadmap
@@ -93,7 +93,10 @@ export default async function RoadmapPage() {
       </header>
 
       {items.length === 0 ? (
-        <p className="mt-10 text-center font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
+        <p
+          className="text-mono-md mt-10 text-center font-mono"
+          style={{ color: "var(--fg-muted)" }}
+        >
           {"// nothing on the board yet."}
         </p>
       ) : (

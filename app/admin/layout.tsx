@@ -50,7 +50,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </nav>
 
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+          <span className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
             {user?.email}
           </span>
           <form

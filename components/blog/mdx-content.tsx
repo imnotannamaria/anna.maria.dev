@@ -119,7 +119,7 @@ const defaultComponents = {
   h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
       id={headingId(children)}
-      className="mt-12 mb-4 scroll-mt-6 text-[28px]"
+      className="text-heading-lg mt-12 mb-4 scroll-mt-6"
       style={{
         fontFamily: "var(--font-serif)",
         fontWeight: 400,
@@ -148,7 +148,7 @@ const defaultComponents = {
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
-      className="mb-4 text-[16px] leading-[1.7]"
+      className="text-body-lg mb-4 leading-[1.7]"
       style={{
         fontFamily: "var(--font-sans)",
         color: "var(--fg-secondary)",
@@ -175,7 +175,7 @@ const defaultComponents = {
   ),
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
-      className="mb-4 ml-6 list-disc space-y-1.5 text-[16px] leading-[1.7]"
+      className="text-body-lg mb-4 ml-6 list-disc space-y-1.5 leading-[1.7]"
       style={{
         fontFamily: "var(--font-sans)",
         color: "var(--fg-secondary)",
@@ -186,7 +186,7 @@ const defaultComponents = {
   ),
   ol: (props: React.HTMLAttributes<HTMLOListElement>) => (
     <ol
-      className="mb-4 ml-6 list-decimal space-y-1.5 text-[16px] leading-[1.7]"
+      className="text-body-lg mb-4 ml-6 list-decimal space-y-1.5 leading-[1.7]"
       style={{
         fontFamily: "var(--font-sans)",
         color: "var(--fg-secondary)",
@@ -230,7 +230,7 @@ const defaultComponents = {
     if (!props.className) {
       return (
         <code
-          className="rounded px-1.5 py-0.5 font-mono text-[13px]"
+          className="text-mono-md rounded px-1.5 py-0.5 font-mono"
           style={{
             background: "var(--bg-surface)",
             border: "1px solid var(--border-subtle)",

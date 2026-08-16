@@ -8,7 +8,7 @@ export default function EditLogEntryLoading() {
       >
         Edit
       </h1>
-      <p className="mb-6 font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+      <p className="text-mono-sm mb-6 font-mono" style={{ color: "var(--fg-muted)" }}>
         {"// loading…"}
       </p>
 

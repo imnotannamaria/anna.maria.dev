@@ -52,7 +52,7 @@ export function RoadmapQuickAdd() {
     <form onSubmit={submit} className="mb-8 flex flex-col gap-2">
       <label
         htmlFor="quick-add"
-        className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.08em] uppercase"
+        className="text-mono-xs flex items-center gap-1.5 font-mono tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-muted)" }}
       >
         <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9 }}>
@@ -76,7 +76,7 @@ export function RoadmapQuickAdd() {
         </Button>
       </div>
 
-      <span className="font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+      <span className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
         <span style={{ opacity: 0.6 }}>{"// "}</span>
         lands as raw. nothing raw ever renders on the site.
       </span>

@@ -43,7 +43,7 @@ export function StackGraph() {
       {wide ? <StackFlow /> : <Skeleton className="h-full w-full" />}
 
       <span
-        className="pointer-events-none absolute top-3 right-3 font-mono text-[10px]"
+        className="text-mono-xs pointer-events-none absolute top-3 right-3 font-mono"
         style={{ color: "var(--fg-muted)" }}
       >
         {"// click a category · drag to pan"}

@@ -25,8 +25,8 @@ const badgeVariants = cva(
         info: "",
       },
       size: {
-        sm: "h-5 px-1.5 text-[10px] rounded-[var(--radius-sm)]",
-        md: "h-6 px-2 text-[11px] rounded-[var(--radius-sm)]",
+        sm: "h-5 px-1.5 text-mono-xs rounded-[var(--radius-sm)]",
+        md: "h-6 px-2 text-mono-sm rounded-[var(--radius-sm)]",
       },
     },
     compoundVariants: [

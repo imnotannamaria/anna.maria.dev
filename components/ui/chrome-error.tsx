@@ -50,7 +50,7 @@ export function ChromeError({
       }
     >
       {showDigest && error.digest && (
-        <p className="mt-1 font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+        <p className="text-mono-sm mt-1 font-mono" style={{ color: "var(--fg-muted)" }}>
           {`// digest: ${error.digest}`}
         </p>
       )}

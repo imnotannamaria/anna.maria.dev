@@ -76,7 +76,7 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
             className={cn(
               "flex items-center gap-3 px-4 py-2",
               "border-b border-[var(--border-subtle)] bg-[var(--bg-chrome)]",
-              "font-mono text-[11px] text-[var(--fg-secondary)]",
+              "text-mono-sm font-mono text-[var(--fg-secondary)]",
             )}
           >
             {variant === "terminal" && (
@@ -90,7 +90,7 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
             <div className="ml-auto flex items-center gap-3">
               {meta && <span className="truncate text-[var(--fg-muted)]">{meta}</span>}
               {language && (
-                <span className="text-[10px] tracking-[0.08em] text-[var(--fg-brand)] uppercase">
+                <span className="text-mono-xs tracking-[0.08em] text-[var(--fg-brand)] uppercase">
                   {language}
                 </span>
               )}
@@ -102,7 +102,7 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                   data-state={copied ? "copied" : "idle"}
                   className={cn(
                     "inline-flex items-center gap-1.5 px-1.5 py-1",
-                    "rounded-[var(--radius-sm)] text-[10px] tracking-[0.08em] uppercase",
+                    "text-mono-xs rounded-[var(--radius-sm)] tracking-[0.08em] uppercase",
                     "border border-[var(--border-subtle)] bg-[var(--bg-canvas)]",
                     "text-[var(--fg-muted)] hover:border-[var(--border-strong)] hover:text-[var(--fg-primary)]",
                     "transition-colors duration-150",
@@ -131,11 +131,11 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
         )}
         <div className="overflow-x-auto">
           {children ? (
-            <div className="p-4 font-mono text-[13px] leading-relaxed whitespace-pre text-[var(--fg-secondary)]">
+            <div className="text-mono-md p-4 font-mono leading-relaxed whitespace-pre text-[var(--fg-secondary)]">
               {children}
             </div>
           ) : (
-            <pre className="m-0 p-4 font-mono text-[13px] leading-relaxed whitespace-pre text-[var(--fg-secondary)]">
+            <pre className="text-mono-md m-0 p-4 font-mono leading-relaxed whitespace-pre text-[var(--fg-secondary)]">
               <code>{code}</code>
             </pre>
           )}

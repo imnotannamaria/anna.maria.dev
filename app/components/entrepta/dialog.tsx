@@ -110,7 +110,7 @@ const DialogDescription = React.forwardRef<
   <DialogPrimitive.Description
     ref={ref}
     className={cn(
-      "m-0 font-sans text-[13px] leading-relaxed text-[var(--fg-secondary)]",
+      "text-mono-md m-0 font-sans leading-relaxed text-[var(--fg-secondary)]",
       className,
     )}
     {...props}
@@ -125,12 +125,12 @@ const DialogLabel = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
       ref={ref}
       className={cn(
         "inline-flex items-center gap-1.5",
-        "font-mono text-[11px] tracking-[0.08em] text-[var(--fg-secondary)] uppercase",
+        "text-mono-sm font-mono tracking-[0.08em] text-[var(--fg-secondary)] uppercase",
         className,
       )}
       {...props}
     >
-      <span aria-hidden className="text-[10px] leading-none text-[var(--fg-brand)]">
+      <span aria-hidden className="text-mono-xs leading-none text-[var(--fg-brand)]">
         ◆
       </span>
       {children}

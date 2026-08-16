@@ -140,7 +140,7 @@ export default function RootLayout({
               <>
                 <StatusBarItem className="gap-1.5">
                   <kbd
-                    className="rounded-[3px] px-1.5 py-px text-[10px]"
+                    className="text-mono-xs rounded-[3px] px-1.5 py-px"
                     style={{ border: "1px solid rgba(255,255,255,0.3)" }}
                   >
                     ⌘K
@@ -149,7 +149,7 @@ export default function RootLayout({
                     /
                   </span>
                   <kbd
-                    className="rounded-[3px] px-1.5 py-px text-[10px]"
+                    className="text-mono-xs rounded-[3px] px-1.5 py-px"
                     style={{ border: "1px solid rgba(255,255,255,0.3)" }}
                   >
                     Ctrl K

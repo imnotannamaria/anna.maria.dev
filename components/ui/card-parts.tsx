@@ -20,7 +20,7 @@ export function CardHead({
   const isHeading = as !== "span"
   return (
     <div
-      className="relative flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.08em] uppercase"
+      className="text-mono-sm relative flex items-center justify-between gap-3 font-mono tracking-[0.08em] uppercase"
       style={{ color: "var(--fg-secondary)" }}
     >
       <Label
@@ -50,7 +50,7 @@ export function CardFoot({
   return (
     <div
       className={cn(
-        "relative mt-auto flex items-center justify-between gap-3 font-mono text-[11px]",
+        "text-mono-sm relative mt-auto flex items-center justify-between gap-3 font-mono",
         className,
       )}
       style={{ color: "var(--fg-muted)" }}
@@ -74,14 +74,14 @@ export function Badge({
   variant?: "default" | "brand-soft" | "success-soft"
 }) {
   const styles: Record<string, { bg: string; fg: string }> = {
-    default: { bg: "rgba(255,255,255,0.06)", fg: "var(--fg-secondary)" },
+    default: { bg: "var(--bg-hover-soft)", fg: "var(--fg-secondary)" },
     "brand-soft": { bg: "var(--bg-surface-brand)", fg: "var(--fg-brand-hover)" },
     "success-soft": { bg: "var(--status-success-soft)", fg: "var(--status-success-fg)" },
   }
   const { bg, fg } = styles[variant]
   return (
     <span
-      className="inline-flex h-[22px] items-center rounded-[var(--radius-sm)] px-2 font-mono text-[11px] font-medium"
+      className="text-mono-sm inline-flex h-[22px] items-center rounded-[var(--radius-sm)] px-2 font-mono font-medium"
       style={{ background: bg, color: fg }}
     >
       {children}

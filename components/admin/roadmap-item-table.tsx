@@ -20,7 +20,7 @@ const STATUS_COLOR: Record<RoadmapStatus, string> = {
 export function RoadmapItemTable({ items }: { items: RoadmapItem[] }) {
   if (items.length === 0) {
     return (
-      <p className="mt-12 text-center font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
+      <p className="text-mono-md mt-12 text-center font-mono" style={{ color: "var(--fg-muted)" }}>
         {"// nothing captured yet."}
       </p>
     )
@@ -35,7 +35,7 @@ export function RoadmapItemTable({ items }: { items: RoadmapItem[] }) {
               <th
                 key={h}
                 scope="col"
-                className="px-2 py-2 font-mono text-[10px] tracking-[0.08em] whitespace-nowrap uppercase"
+                className="text-mono-xs px-2 py-2 font-mono tracking-[0.08em] whitespace-nowrap uppercase"
                 style={{ color: "var(--fg-muted)" }}
               >
                 {h}
@@ -46,7 +46,7 @@ export function RoadmapItemTable({ items }: { items: RoadmapItem[] }) {
         <tbody>
           {items.map((item) => (
             <tr key={item.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
-              <td className="px-2 py-3 font-mono text-[11px] whitespace-nowrap">
+              <td className="text-mono-sm px-2 py-3 font-mono whitespace-nowrap">
                 <span style={{ color: STATUS_COLOR[item.status] }}>
                   {STATUS_LABEL[item.status]}
                 </span>
@@ -55,14 +55,14 @@ export function RoadmapItemTable({ items }: { items: RoadmapItem[] }) {
               <td className="max-w-70 min-w-40 px-2 py-3">
                 <Link
                   href={`/admin/roadmap/${item.id}`}
-                  className="block truncate font-mono text-[13px] hover:underline"
+                  className="text-mono-md block truncate font-mono hover:underline"
                   style={{ color: "var(--fg-primary)" }}
                 >
                   {item.title}
                 </Link>
                 {item.blurb && (
                   <span
-                    className="block truncate font-mono text-[11px]"
+                    className="text-mono-sm block truncate font-mono"
                     style={{ color: "var(--fg-muted)" }}
                   >
                     {item.blurb}
@@ -71,21 +71,21 @@ export function RoadmapItemTable({ items }: { items: RoadmapItem[] }) {
               </td>
 
               <td
-                className="px-2 py-3 font-mono text-[11px] whitespace-nowrap"
+                className="text-mono-sm px-2 py-3 font-mono whitespace-nowrap"
                 style={{ color: "var(--fg-muted)" }}
               >
                 {item.position}
               </td>
 
               <td
-                className="max-w-50 px-2 py-3 font-mono text-[11px]"
+                className="text-mono-sm max-w-50 px-2 py-3 font-mono"
                 style={{ color: "var(--fg-muted)" }}
               >
                 <span className="block truncate">{item.planUrl ?? "—"}</span>
               </td>
 
               <td
-                className="px-2 py-3 font-mono text-[11px] whitespace-nowrap"
+                className="text-mono-sm px-2 py-3 font-mono whitespace-nowrap"
                 style={{ color: "var(--fg-muted)" }}
               >
                 {item.shippedAt ? <time dateTime={item.shippedAt}>{item.shippedAt}</time> : "—"}

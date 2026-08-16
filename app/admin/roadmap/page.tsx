@@ -32,7 +32,7 @@ export default async function AdminRoadmapPage() {
           >
             Roadmap
           </h1>
-          <p className="mt-2 font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+          <p className="text-mono-sm mt-2 font-mono" style={{ color: "var(--fg-muted)" }}>
             {items.length} total · {raw} raw
           </p>
         </div>

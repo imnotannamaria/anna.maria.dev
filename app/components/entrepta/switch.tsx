@@ -53,7 +53,7 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="cursor-pointer font-mono text-[13px] text-[var(--fg-secondary)] select-none"
+            className="text-mono-md cursor-pointer font-mono text-[var(--fg-secondary)] select-none"
           >
             {label}
           </label>

@@ -52,7 +52,7 @@ function OutLink({ href, kind }: { href: string; kind: "github" | "live" }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative z-[2] inline-flex min-h-6 items-center gap-1.5 font-mono text-[12px] transition-colors hover:text-(--fg-brand) focus-visible:text-(--fg-brand)"
+      className="text-mono-sm relative z-[2] inline-flex min-h-6 items-center gap-1.5 font-mono transition-colors hover:text-(--fg-brand) focus-visible:text-(--fg-brand)"
       style={{ color: "var(--fg-primary)" }}
     >
       {kind === "github" ? <GithubLogoIcon size={13} /> : <ArrowSquareOutIcon size={12} />}

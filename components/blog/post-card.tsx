@@ -72,7 +72,7 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
         <div className="flex items-baseline justify-between gap-3">
           <CardHead label="post" />
           <span
-            className="font-mono text-[11px] whitespace-nowrap"
+            className="text-mono-sm font-mono whitespace-nowrap"
             style={{ color: "var(--fg-muted)" }}
           >
             <time dateTime={post.date}>{post.dateLabel}</time> · {post.minutes} min
@@ -94,7 +94,7 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
         </h3>
 
         <p
-          className="m-0 line-clamp-2 text-[13.5px] leading-relaxed"
+          className="text-mono-md m-0 line-clamp-2 leading-relaxed"
           style={{
             fontFamily: "var(--font-sans)",
             color: "var(--fg-secondary)",

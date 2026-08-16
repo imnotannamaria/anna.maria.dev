@@ -141,7 +141,7 @@ function StackBadge({ tool }: { tool: Tool }) {
     <span
       className={cn(
         "inline-flex h-[26px] cursor-default items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5",
-        "border border-transparent font-mono text-[11px] font-medium",
+        "text-mono-sm border border-transparent font-mono font-medium",
         "transition-[transform,border-color,background-color] duration-150 ease-out",
         // Driven from the wrapper, which doesn't move. On its own `:hover` the
         // badge slid out from under the cursor at the bottom edge, ending the
@@ -272,12 +272,12 @@ export function StackCard() {
                   {branch.label}
                 </span>
 
-                <span className="font-mono text-[10px]" style={{ color: "var(--fg-muted)" }}>
+                <span className="text-mono-xs font-mono" style={{ color: "var(--fg-muted)" }}>
                   {`// ${branch.comment}`}
                 </span>
 
                 <span
-                  className="ml-auto font-mono text-[11px]"
+                  className="text-mono-sm ml-auto font-mono"
                   style={{ color: "var(--fg-muted)" }}
                 >
                   {branch.tools.length}

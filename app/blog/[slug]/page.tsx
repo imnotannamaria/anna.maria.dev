@@ -106,7 +106,7 @@ export default async function BlogPostPage({ params }: Props) {
             <header className="mb-12 border-b pb-8" style={{ borderColor: "var(--border-subtle)" }}>
               <div className="mb-4 flex flex-wrap gap-1.5">
                 {post.tags.map((tag) => (
-                  <Badge key={tag} variant="soft" color="brand" className="h-6 px-2.5 text-[11px]">
+                  <Badge key={tag} variant="soft" color="brand" className="text-mono-sm h-6 px-2.5">
                     {tag}
                   </Badge>
                 ))}
@@ -127,7 +127,7 @@ export default async function BlogPostPage({ params }: Props) {
               </h1>
 
               <p
-                className="text-[19px] leading-[1.6]"
+                className="text-heading-md leading-[1.6]"
                 style={{
                   fontFamily: "var(--font-sans)",
                   color: "var(--fg-secondary)",

@@ -28,7 +28,7 @@ const dropdownContentClass = cn(
 const dropdownItemClass = cn(
   "relative flex cursor-default select-none items-center gap-3",
   "rounded-[var(--radius-sm)] px-3 py-2",
-  "font-mono text-[13px] text-[var(--fg-secondary)]",
+  "font-mono text-mono-md text-[var(--fg-secondary)]",
   "outline-none transition-colors duration-150",
   "focus:bg-[var(--bg-surface-elevated)] focus:text-[var(--fg-primary)] focus:shadow-[inset_2px_0_0_var(--fg-brand)]",
   "data-[state=open]:bg-[var(--bg-surface-elevated)]",
@@ -165,7 +165,7 @@ const DropdownMenuLabel = React.forwardRef<
     ref={ref}
     className={cn(
       "px-3 pt-3 pb-2",
-      "font-mono text-[10px] tracking-[0.08em] text-[var(--fg-muted)] uppercase",
+      "text-mono-xs font-mono tracking-[0.08em] text-[var(--fg-muted)] uppercase",
       inset && "pl-9",
       className,
     )}
@@ -189,7 +189,7 @@ DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
   <span
     className={cn(
-      "ml-auto font-mono text-[11px] tracking-[0.04em] text-[var(--fg-muted)]",
+      "text-mono-sm ml-auto font-mono tracking-[0.04em] text-[var(--fg-muted)]",
       className,
     )}
     {...props}

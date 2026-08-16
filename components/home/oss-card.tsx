@@ -141,7 +141,7 @@ export function OssCard({
           </sub>
         </div>
         <span
-          className="mb-1 font-mono text-[11px] tracking-[0.06em]"
+          className="text-mono-sm mb-1 font-mono tracking-[0.06em]"
           style={{ color: "var(--fg-muted)" }}
         >
           shipped this year

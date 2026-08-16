@@ -80,7 +80,7 @@ export default function ProjectsPage() {
             stays invisible until hydration plus the delay. The <TypeIn> title carries the
             entrance instead. Same shape on every page header. */}
         <p
-          className="mt-4 text-[16px] leading-[1.6]"
+          className="text-body-lg mt-4 leading-[1.6]"
           style={{
             fontFamily: "var(--font-sans)",
             color: "var(--fg-secondary)",

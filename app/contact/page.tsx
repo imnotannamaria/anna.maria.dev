@@ -102,7 +102,7 @@ export default function ContactPage() {
                     thing on the page stays invisible until hydration plus the delay. The
                     <TypeIn> title carries the entrance instead. */}
                 <p
-                  className="m-0 text-[16px] leading-[1.65]"
+                  className="text-body-lg m-0 leading-[1.65]"
                   style={{
                     fontFamily: "var(--font-sans)",
                     color: "var(--fg-secondary)",
@@ -141,7 +141,7 @@ export default function ContactPage() {
             <DisplayH2 margin="0 0 16px">
               Type it <Em>here.</Em>
             </DisplayH2>
-            <Prose className="mb-8 text-[15px] leading-[1.7]">
+            <Prose className="text-body-lg mb-8 leading-[1.7]">
               This drops straight into my inbox. If it&apos;s about work, a couple of lines on what
               you&apos;re building and where I&apos;d fit in is all I need to get back to you.
             </Prose>

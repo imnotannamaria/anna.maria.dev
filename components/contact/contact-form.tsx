@@ -26,7 +26,7 @@ function FieldLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.08em] uppercase"
+      className="text-mono-xs flex items-center gap-1.5 font-mono tracking-[0.08em] uppercase"
       style={{ color: "var(--fg-muted)" }}
     >
       <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9 }}>
@@ -48,7 +48,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
     <span
       id={id}
       role="alert"
-      className="flex items-center gap-1 font-mono text-[11px]"
+      className="text-mono-sm flex items-center gap-1 font-mono"
       style={{ color: "var(--status-error-fg)" }}
     >
       <span aria-hidden style={{ opacity: 0.7 }}>
@@ -301,7 +301,7 @@ export function ContactForm({ email }: { email: string }) {
                 aria-invalid={errors.message ? true : undefined}
                 aria-describedby={errors.message ? "message-error" : undefined}
                 onChange={() => clearField("message")}
-                className="min-h-[140px] w-full resize-y border-0 bg-transparent font-mono text-[13px] leading-[1.6] outline-none placeholder:text-[var(--fg-muted)]"
+                className="text-mono-md min-h-[140px] w-full resize-y border-0 bg-transparent font-mono leading-[1.6] outline-none placeholder:text-[var(--fg-muted)]"
                 style={{ color: "var(--fg-primary)" }}
               />
             </div>
@@ -312,7 +312,7 @@ export function ContactForm({ email }: { email: string }) {
         {state === "error" && errorMessage && (
           <div
             role="alert"
-            className="mt-5 flex items-start gap-2.5 rounded-[var(--radius-md)] border px-4 py-3 font-mono text-[12px]"
+            className="text-mono-sm mt-5 flex items-start gap-2.5 rounded-[var(--radius-md)] border px-4 py-3 font-mono"
             style={{
               borderColor: "var(--status-error)",
               background: "var(--status-error-soft)",

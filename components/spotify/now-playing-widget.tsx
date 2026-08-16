@@ -180,7 +180,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
       <CardHead
         label="me, as a playlist"
         meta={
-          <ArrowLink href={track.spotifyUrl} external className="text-[10px]">
+          <ArrowLink href={track.spotifyUrl} external className="text-mono-xs">
             spotify
           </ArrowLink>
         }
@@ -235,7 +235,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
         <Equalizer />
       </div>
 
-      <div className="relative mt-auto flex items-center justify-between gap-3 font-mono text-[10px]">
+      <div className="text-mono-xs relative mt-auto flex items-center justify-between gap-3 font-mono">
         <span style={{ color: "var(--fg-muted)" }}>
           <span style={{ opacity: 0.6 }}>{"// "}</span>some of these my friends picked for me
         </span>

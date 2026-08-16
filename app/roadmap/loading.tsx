@@ -26,7 +26,7 @@ export default function RoadmapLoading() {
           <span style={{ color: "var(--fg-brand)" }}>$</span> roadmap --all --group=status
         </div>
         <h1
-          className="font-serif text-[40px] leading-none font-normal tracking-[-0.02em] sm:text-5xl lg:text-[64px]"
+          className="text-display-md lg:text-display-lg font-serif leading-none font-normal tracking-[-0.02em] sm:text-5xl"
           style={{ color: "var(--fg-primary)" }}
         >
           Roadmap

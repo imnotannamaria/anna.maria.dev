@@ -90,7 +90,7 @@ const CommandInput = React.forwardRef<
       {...props}
       className={cn(
         "flex-1 appearance-none border-0 bg-transparent outline-none",
-        "font-mono text-[14px] text-[var(--fg-primary)]",
+        "text-mono-md font-mono text-[var(--fg-primary)]",
         "placeholder:text-[var(--fg-muted)]",
         className,
       )}
@@ -102,7 +102,7 @@ const CommandInput = React.forwardRef<
           className={cn(
             "inline-flex shrink-0 items-center justify-center",
             "h-5 rounded-[4px] px-1.5",
-            "font-mono text-[11px] text-[var(--fg-muted)]",
+            "text-mono-sm font-mono text-[var(--fg-muted)]",
             "border border-[var(--border-subtle)]",
             "hover:border-[var(--border-strong)] hover:text-[var(--fg-primary)]",
             "transition-colors duration-150",
@@ -135,7 +135,7 @@ const CommandEmpty = React.forwardRef<
 >((props, ref) => (
   <CommandPrimitive.Empty
     ref={ref}
-    className="py-8 text-center font-mono text-[13px] text-[var(--fg-muted)]"
+    className="text-mono-md py-8 text-center font-mono text-[var(--fg-muted)]"
     {...props}
   />
 ))
@@ -154,7 +154,7 @@ const CommandGroup = React.forwardRef<
       "[&_[cmdk-group-heading]]:before:mr-1.5 [&_[cmdk-group-heading]]:before:content-['◆']",
       "[&_[cmdk-group-heading]]:before:text-[var(--fg-brand)]",
       "[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-2",
-      "[&_[cmdk-group-heading]]:font-mono [&_[cmdk-group-heading]]:text-[10px]",
+      "[&_[cmdk-group-heading]]:text-mono-xs [&_[cmdk-group-heading]]:font-mono",
       "[&_[cmdk-group-heading]]:tracking-[0.08em] [&_[cmdk-group-heading]]:uppercase",
       "[&_[cmdk-group-heading]]:text-[var(--fg-muted)]",
       className,
@@ -189,7 +189,7 @@ const CommandItem = React.forwardRef<
     ref={ref}
     className={cn(
       "flex items-center gap-3 rounded-[var(--radius-sm)] px-3 py-2",
-      "font-mono text-[13px] text-[var(--fg-secondary)]",
+      "text-mono-md font-mono text-[var(--fg-secondary)]",
       "cursor-default select-none",
       "transition-colors duration-150",
       "data-[selected=true]:bg-[var(--bg-surface-brand)] data-[selected=true]:text-[var(--fg-primary)]",
@@ -201,7 +201,7 @@ const CommandItem = React.forwardRef<
     {icon && <span className="shrink-0 text-[var(--fg-muted)]">{icon}</span>}
     <span className="flex-1">{children}</span>
     {shortcut && (
-      <span className="font-mono text-[11px] tracking-[0.04em] text-[var(--fg-muted)]">
+      <span className="text-mono-sm font-mono tracking-[0.04em] text-[var(--fg-muted)]">
         {shortcut}
       </span>
     )}
@@ -216,7 +216,7 @@ const CommandFoot = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
       className={cn(
         "flex items-center justify-between gap-3",
         "border-t border-[var(--border-subtle)] px-4 py-2",
-        "font-mono text-[11px] text-[var(--fg-muted)]",
+        "text-mono-sm font-mono text-[var(--fg-muted)]",
         className,
       )}
       {...props}

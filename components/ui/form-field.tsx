@@ -16,7 +16,7 @@ export function FieldLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.08em] uppercase"
+      className="text-mono-xs flex items-center gap-1.5 font-mono tracking-[0.08em] uppercase"
       style={{ color: "var(--fg-muted)" }}
     >
       <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9 }}>
@@ -38,7 +38,7 @@ export function FieldError({ id, message }: { id: string; message?: string }) {
     <span
       id={id}
       role="alert"
-      className="flex items-center gap-1 font-mono text-[11px]"
+      className="text-mono-sm flex items-center gap-1 font-mono"
       style={{ color: "var(--status-error-fg)" }}
     >
       <span aria-hidden style={{ opacity: 0.7 }}>
@@ -74,7 +74,7 @@ export function Field({
       {error ? (
         <FieldError id={`${id}-error`} message={error} />
       ) : hint ? (
-        <span className="font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+        <span className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
           {hint}
         </span>
       ) : null}

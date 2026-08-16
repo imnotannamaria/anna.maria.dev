@@ -142,7 +142,7 @@ function TechNodeView({ data }: NodeProps<TechNode>) {
   const icon = TECH_ICONS[data.label]
   return (
     <div
-      className="flex items-center gap-2 rounded-[var(--radius-sm)] border px-2.5 font-mono text-[11px]"
+      className="text-mono-sm flex items-center gap-2 rounded-[var(--radius-sm)] border px-2.5 font-mono"
       style={{
         width: TECH_W,
         height: TECH_H,

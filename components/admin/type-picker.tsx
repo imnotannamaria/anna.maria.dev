@@ -40,7 +40,7 @@ export function TypePicker({
           className={[
             "flex h-10 w-full cursor-pointer items-center justify-between gap-2",
             "rounded-md border bg-(--bg-surface) px-3",
-            "font-mono text-[13px] text-(--fg-primary)",
+            "text-mono-md font-mono text-(--fg-primary)",
             "transition-all duration-150 ease-out outline-none",
             "hover:border-(--fg-muted)",
             "focus-visible:border-(--fg-brand) focus-visible:shadow-[0_0_0_3px_var(--bg-surface-brand)]",

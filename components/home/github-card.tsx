@@ -48,7 +48,7 @@ export function GithubCard({
           <ArrowLink
             href={`https://github.com/${username}`}
             external
-            className="text-[11px] text-(--fg-brand)"
+            className="text-mono-sm text-(--fg-brand)"
           >
             github
           </ArrowLink>

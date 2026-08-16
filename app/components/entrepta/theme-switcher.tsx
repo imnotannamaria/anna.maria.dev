@@ -104,7 +104,7 @@ const ThemeSwitcher = React.forwardRef<HTMLDivElement, ThemeSwitcherProps>(
     return (
       <div
         ref={containerRef}
-        className={cn("fixed z-50 font-mono text-[11px]", POSITION_CLASS[position], className)}
+        className={cn("text-mono-sm fixed z-50 font-mono", POSITION_CLASS[position], className)}
         data-theme-switcher
         {...divProps}
       >
@@ -120,7 +120,7 @@ const ThemeSwitcher = React.forwardRef<HTMLDivElement, ThemeSwitcherProps>(
           >
             {showModeToggle && (
               <>
-                <div className="mb-1 border-b border-[var(--border-subtle)] px-2 py-1 text-[10px] tracking-[0.08em] text-[var(--fg-muted)] uppercase">
+                <div className="text-mono-xs mb-1 border-b border-[var(--border-subtle)] px-2 py-1 tracking-[0.08em] text-[var(--fg-muted)] uppercase">
                   mode
                 </div>
                 <button
@@ -136,12 +136,12 @@ const ThemeSwitcher = React.forwardRef<HTMLDivElement, ThemeSwitcherProps>(
                     </span>
                     <span className="text-[var(--fg-primary)]">{mode}</span>
                   </span>
-                  <span className="text-[10px] tracking-[0.08em] text-[var(--fg-muted)] uppercase">
+                  <span className="text-mono-xs tracking-[0.08em] text-[var(--fg-muted)] uppercase">
                     {mode === "dark" ? "→ light" : "→ dark"}
                   </span>
                 </button>
 
-                <div className="mt-2 mb-1 border-b border-[var(--border-subtle)] px-2 py-1 text-[10px] tracking-[0.08em] text-[var(--fg-muted)] uppercase">
+                <div className="text-mono-xs mt-2 mb-1 border-b border-[var(--border-subtle)] px-2 py-1 tracking-[0.08em] text-[var(--fg-muted)] uppercase">
                   theme
                 </div>
               </>
@@ -172,7 +172,7 @@ const ThemeSwitcher = React.forwardRef<HTMLDivElement, ThemeSwitcherProps>(
                     {t.label}
                   </span>
                   {isActive && (
-                    <span aria-hidden className="text-[10px] leading-none text-[var(--fg-brand)]">
+                    <span aria-hidden className="text-mono-xs leading-none text-[var(--fg-brand)]">
                       ◆
                     </span>
                   )}
@@ -200,7 +200,7 @@ const ThemeSwitcher = React.forwardRef<HTMLDivElement, ThemeSwitcherProps>(
             style={{ background: currentColor }}
           />
           {showModeToggle && (
-            <span className="text-[10px] tracking-[0.08em] text-[var(--fg-muted)] uppercase">
+            <span className="text-mono-xs tracking-[0.08em] text-[var(--fg-muted)] uppercase">
               {mode}
             </span>
           )}

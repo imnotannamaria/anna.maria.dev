@@ -19,7 +19,7 @@ export default function AdminLogLoading() {
         >
           Entries
         </h1>
-        <p className="mt-2 font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+        <p className="text-mono-sm mt-2 font-mono" style={{ color: "var(--fg-muted)" }}>
           {"// loading…"}
         </p>
       </div>

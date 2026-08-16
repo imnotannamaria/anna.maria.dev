@@ -17,7 +17,7 @@ const StatusBar = React.forwardRef<HTMLDivElement, StatusBarProps>(
         "flex items-center justify-between gap-4",
         "px-4 py-1.5",
         "bg-[var(--fg-brand)] text-[var(--zinc-50)]",
-        "font-mono text-[11px]",
+        "text-mono-sm font-mono",
         "hidden sm:flex",
         className,
       )}
