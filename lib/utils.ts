@@ -1,5 +1,29 @@
 import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { extendTailwindMerge } from "tailwind-merge"
+
+/**
+ * The custom font-size steps declared in `app/globals.css`.
+ *
+ * tailwind-merge cannot infer that `text-mono-sm` is a font size: without
+ * registering the scale it treats the class as a text colour and can discard
+ * it when a real colour token is present in the same `cn()` call.
+ */
+const TYPE_SCALE = [
+  "display-xl",
+  "display-lg",
+  "display-md",
+  "heading-lg",
+  "heading-md",
+  "body-lg",
+  "body-md",
+  "mono-md",
+  "mono-sm",
+  "mono-xs",
+]
+
+const twMerge = extendTailwindMerge({
+  extend: { classGroups: { "font-size": [{ text: TYPE_SCALE }] } },
+})
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
