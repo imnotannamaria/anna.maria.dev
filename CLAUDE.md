@@ -498,6 +498,44 @@ Everything except Resend and the base URL is optional. Without a database the wr
 - **Pages that read Postgres are `force-dynamic`, not ISR.** That covers `/`, `/log`, `/roadmap` and everything under `/admin`. The log and the wristkit rings are supposed to read as live — an activity ring frozen at this morning's numbers, or an entry I published ten minutes ago still missing from the feed, is a worse experience than the handful of milliseconds two indexed queries cost against a pooled connection. Caching them was buying convenience, not speed, and it bought it at the price of a `revalidatePath` call I'd have to remember every time a new page started reading the same table. Content that comes from MDX stays static — this is about the database, not about the site.
 - Because of the above, mutations do **not** call `revalidatePath`. If you ever put log or wristkit data on a cached page, that decision changes and the trade-off above is the one to re-argue.
 
+### Writing new UI: five things that broke silently once
+
+Every one of these shipped, passed `tsc`, `eslint` and the whole suite, and was found by
+looking at the screen. They are the questions to ask _while_ writing, not after.
+
+- **`cn()` is `twMerge`, and twMerge only knows Tailwind's vocabulary.** A class from a custom
+  `@theme` namespace gets filed under whatever group its shape resembles — `text-mono-sm` was
+  read as a text _colour_ — and then a real colour class in the same call silently deletes it,
+  or is deleted by it. Registering the namespace in `lib/utils.ts` is what makes the merge
+  correct; `lib/utils.test.ts` is what keeps it that way. **If you add a custom utility, add it
+  there in the same commit.**
+- **A row with two children and `justify-between` has no overflow contract until you write
+  one.** "It fits" is not a contract: the card heads fit at 11px and broke the day the scale
+  moved them to 12px, because `uppercase` plus `tracking-[0.08em]` widens every character.
+  Decide out loud what happens when the two stop fitting — the row wraps and the halves don't
+  (`CardHead`), or one half truncates. And remember `.bento-card` sets `overflow: hidden`, so
+  a `whitespace-nowrap` child that overflows is _clipped with no ellipsis_, which looks like
+  missing data rather than a layout bug.
+- **Text on a `--fg-brand` fill uses `--fg-on-brand`.** Never a fixed near-white or near-black:
+  a hardcoded `zinc-50` fails WCAG AA on 7 of the 12 theme × mode combinations, including the
+  default theme in dark mode at 3.72:1. The measured table is above `--fg-on-brand` in
+  `globals.css`. Same for a border on that fill — `color-mix()` from the token, not white at
+  30%.
+- **Don't override a component from its only caller.** The status bar hardcoded
+  `fixed right-0 bottom-0 left-0 z-40` and `app/layout.tsx` undid all five with inline styles.
+  entrepta is owned code: change the component. If a second consumer ever wants the other
+  behaviour, that is a variant, not an override.
+- **A glyph is not a type role.** `◆`, `♥`, `■`, the mini piano's key labels: they are matched
+  optically to the text beside them and keep a numeric inline size, all 18px and under. Use
+  `<Diamond />` for the brand mark rather than an inline span — that one reached eleven copies,
+  and the tenth had lost its `aria-hidden`, so a screen reader announced "black diamond suit"
+  before a file name.
+
+And two mechanical ones: **Tailwind v4 scans Markdown**, so a class written as an example in a
+doc compiles — a wildcard inside the brackets emits invalid CSS and warns on every build. And
+**satori does not resolve custom properties**, so `app/api/og` keeps numeric `fontSize`; a
+`var(--text-*)` there renders at size zero.
+
 ---
 
 ## The roadmap
@@ -598,6 +636,17 @@ The checks below are the ones this codebase has actually been bitten by. Read th
 - **Performance** — queries whose result is derivable from data already fetched in the same render (a `GROUP BY` beside the query returning the same rows is the usual shape); per-frame work that repaints rather than composites; plain `<img>` needs `loading="lazy"` and a fixed-aspect container so there is no CLS.
 - **Responsive** — reason about 375px minus the 56px sidebar; wide tables scroll rather than reflow; grid tracks use `min(Npx, 100%)`. Code-level checks only: hand the visual pass to Anna, never drive a browser.
 - **Bugs** — timezone traps around `new Date("YYYY-MM-DD")`; anything date-dependent computed on both sides of the server/client boundary, which is a hydration mismatch waiting for a render that straddles midnight; pages that would fail `next build` with the database unreachable.
+- **Class merging** — any class the diff invents outside Tailwind's own vocabulary: is its namespace registered in `TYPE_SCALE` / `extendTailwindMerge` in `lib/utils.ts`? An unregistered one is misfiled by twMerge and then deleted, or deletes a colour, and nothing fails. Read `cn()` calls as the merged string, not as the arguments: `cn(base, className)` with a caller-supplied class is where a component's own styling gets silently dropped, in either direction.
+- **Overflow contracts** — for every row the diff adds or touches with two children and `justify-between`: what happens when they stop fitting? If the answer is "they fit", that is not an answer. Especially inside `.bento-card`, which clips.
+- **Overriding a component from its caller** — inline styles or classes in a consumer that undo what the component sets. The fix is almost always in the component, since entrepta is owned code and most of them have one consumer.
+- **Type scale** — sizes come from the ten `@theme` steps; no `text-[Npx]`, no Tailwind default step, no numeric inline `fontSize` above glyph size. `lib/type-scale.test.ts` enforces all three, so a diff that needs an exception has to argue for it in the diff.
+
+**What the checks cannot see.** If a diff changes rendered size, spacing or wrapping and nothing
+else, then `lint`, `tsc` and the whole suite passing says almost nothing — they do not measure
+text. Say so in the review, and hand back a concrete list: which page, which element, which
+breakpoint, and what changed in pixels. "Do a visual pass" is not that list. The typography
+branch is the case study: three of the first three places Anna looked were broken, and every
+check was green the whole time.
 
 Also run `npm run lint` and `npx tsc --noEmit` and report the result.
 
