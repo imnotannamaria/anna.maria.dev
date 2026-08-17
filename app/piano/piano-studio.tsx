@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { DisplayH2, DocLabel, Em, Kbd, Prose, Section } from "@/components/chrome/page-parts"
+import { Diamond } from "@/components/ui/diamond"
 
 /* ════════════════════════════════════════════════
    DATA — 2 octaves, C4 → B5
@@ -572,9 +573,7 @@ export function PianoStudio() {
               className="text-mono-xs tracking-[0.08em] uppercase"
               style={{ color: "var(--fg-muted)" }}
             >
-              <span aria-hidden style={{ color: "var(--fg-brand)", marginRight: 6, fontSize: 9 }}>
-                ◆
-              </span>
+              <Diamond style={{ marginRight: 6 }} />
               piano · <span className="min-[481px]:hidden">1</span>
               <span className="hidden min-[481px]:inline">2</span> oct
             </span>

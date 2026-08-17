@@ -6,6 +6,7 @@ import { PlusIcon } from "@phosphor-icons/react"
 import { Button } from "@/app/components/entrepta/button"
 import { Input } from "@/app/components/entrepta/input"
 import { toast } from "@/app/components/entrepta/toast"
+import { Diamond } from "@/components/ui/diamond"
 
 /**
  * One field, because this is what has to replace typing a line into ROADMAP.md.
@@ -55,9 +56,7 @@ export function RoadmapQuickAdd() {
         className="text-mono-xs flex items-center gap-1.5 font-mono tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-muted)" }}
       >
-        <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9 }}>
-          ◆
-        </span>
+        <Diamond />
         capture
       </label>
 

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { Diamond } from "@/components/ui/diamond"
 
 /**
  * The bits every home card shares. They lived as locals in app/page.tsx until
@@ -33,9 +34,7 @@ export function CardHead({
         className="inline-flex items-center gap-1.5 whitespace-nowrap"
         style={isHeading ? { margin: 0, fontSize: "inherit", fontWeight: "inherit" } : undefined}
       >
-        <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-          ◆
-        </span>
+        <Diamond size={10} />
         {label}
       </Label>
       {meta && (

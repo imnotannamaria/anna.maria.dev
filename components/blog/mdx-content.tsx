@@ -2,6 +2,7 @@ import * as runtime from "react/jsx-runtime"
 import Image from "next/image"
 import { InfoIcon } from "@phosphor-icons/react/dist/ssr"
 import { slugify } from "@/lib/utils"
+import { Diamond } from "@/components/ui/diamond"
 
 /** Derive a stable slug id from heading children so the outline/TOC can anchor to it. */
 function headingId(children: React.ReactNode): string | undefined {
@@ -214,9 +215,7 @@ const defaultComponents = {
         className="h-px flex-1"
         style={{ background: "linear-gradient(to right, transparent, var(--border-strong))" }}
       />
-      <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 9, lineHeight: 1 }}>
-        ◆
-      </span>
+      <Diamond style={{ lineHeight: 1 }} />
       <span
         className="h-px flex-1"
         style={{ background: "linear-gradient(to left, transparent, var(--border-strong))" }}

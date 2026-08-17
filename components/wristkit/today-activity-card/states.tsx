@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "motion/react"
 import { revealViewport } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import type { TodayData } from "./load"
+import { Diamond } from "@/components/ui/diamond"
 
 const colors = {
   move: "var(--fg-brand)",
@@ -172,9 +173,7 @@ function Header({
           textTransform: "uppercase",
         }}
       >
-        <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-          ◆
-        </span>
+        <Diamond size={10} />
         today / activity
       </h3>
       <span

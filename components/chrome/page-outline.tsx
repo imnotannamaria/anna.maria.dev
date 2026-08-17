@@ -20,6 +20,7 @@
 import { useEffect, useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
+import { Diamond } from "@/components/ui/diamond"
 
 export type OutlineItem = {
   id: string
@@ -155,9 +156,7 @@ export function PageOutline({
       </motion.h2>
 
       <motion.div className={FILE_CHIP} style={FILE_CHIP_STYLE} variants={piece}>
-        <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9 }}>
-          ◆
-        </span>
+        <Diamond />
         {file}
       </motion.div>
 
@@ -233,7 +232,7 @@ export function OutlineSkeleton({ file, rows = 3 }: { file: string; rows?: numbe
       </div>
 
       <div className={FILE_CHIP} style={FILE_CHIP_STYLE}>
-        <span style={{ color: "var(--fg-brand)", fontSize: 9 }}>◆</span>
+        <Diamond />
         {file}
       </div>
 

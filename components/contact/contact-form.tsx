@@ -11,6 +11,7 @@ import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { contactSchema, type ContactFieldErrors } from "@/lib/contact-schema"
 import { cn } from "@/lib/utils"
+import { Diamond } from "@/components/ui/diamond"
 
 type FormState = "idle" | "loading" | "success" | "error"
 
@@ -29,9 +30,7 @@ function FieldLabel({
       className="text-mono-xs flex items-center gap-1.5 font-mono tracking-[0.08em] uppercase"
       style={{ color: "var(--fg-muted)" }}
     >
-      <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9 }}>
-        ◆
-      </span>
+      <Diamond />
       {children}
       {required && (
         <span aria-hidden style={{ color: "var(--fg-brand)" }}>

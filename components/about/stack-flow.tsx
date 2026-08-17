@@ -34,6 +34,7 @@ import {
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
 import { STACK_GROUPS, STACK_TOTAL, TECH_ICONS } from "@/lib/stack"
+import { Diamond } from "@/components/ui/diamond"
 
 // ─── Geometry ────────────────────────────────────────────────────────────────
 
@@ -86,9 +87,7 @@ function RootNodeView({ data }: NodeProps<RootNode>) {
         color: "var(--fg-brand-hover)",
       }}
     >
-      <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-        ◆
-      </span>
+      <Diamond size={10} />
       stack
       <span style={{ opacity: 0.6 }}>{data.count}</span>
       <Port type="source" position={Position.Right} />
@@ -164,9 +163,7 @@ function TechNodeView({ data }: NodeProps<TechNode>) {
           <path d={icon} />
         </svg>
       ) : (
-        <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9, flexShrink: 0 }}>
-          ◆
-        </span>
+        <Diamond style={{ flexShrink: 0 }} />
       )}
       <span className="truncate">{data.label}</span>
     </div>
