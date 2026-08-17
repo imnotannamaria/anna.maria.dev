@@ -98,7 +98,7 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
 
           {/* Wraps rather than squeezing: at 375px the text column is only ~200px, and
               five 18px stars plus the trigger do not always share a line. */}
-          <CardFoot className="flex-wrap gap-x-2 gap-y-1 pt-2.5">
+          <CardFoot className="gap-x-2 pt-2.5">
             {entry.rating != null ? (
               <StarRating rating={entry.rating} size={18} />
             ) : (

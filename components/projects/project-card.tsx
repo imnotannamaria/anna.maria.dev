@@ -132,7 +132,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
         {project.tags.length > 4 && <Badge>+{project.tags.length - 4}</Badge>}
       </div>
 
-      <CardFoot className="flex-wrap gap-y-2">
+      <CardFoot className="gap-y-2">
         <span className="flex items-center gap-4">
           {project.github && <OutLink href={project.github} kind="github" />}
           {project.live && <OutLink href={project.live} kind="live" />}

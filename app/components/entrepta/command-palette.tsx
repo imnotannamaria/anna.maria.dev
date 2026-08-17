@@ -214,7 +214,10 @@ const CommandFoot = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     <div
       ref={ref}
       className={cn(
-        "flex items-center justify-between gap-3",
+        // Same contract as CardHead: the row wraps, the halves don't. The hint string is
+        // 38 characters of mono, so on a phone it needs the whole line to itself rather
+        // than breaking into "↑↓ to" / "navigate".
+        "flex flex-wrap items-center justify-between gap-x-3 gap-y-1",
         "border-t border-[var(--border-subtle)] px-4 py-2",
         "text-mono-sm font-mono text-[var(--fg-muted)]",
         className,
@@ -223,13 +226,13 @@ const CommandFoot = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
     >
       {children ?? (
         <>
-          <span>
+          <span className="whitespace-nowrap">
             <span aria-hidden style={{ opacity: 0.6 }}>
               {"// "}
             </span>
             palette
           </span>
-          <span>⌘K to close · ↑↓ to navigate · ↵ to go</span>
+          <span className="whitespace-nowrap">⌘K to close · ↑↓ to navigate · ↵ to go</span>
         </>
       )}
     </div>
