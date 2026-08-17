@@ -118,7 +118,7 @@ export function OssCard({
         <div
           style={{
             fontFamily: "var(--font-serif)",
-            fontSize: 48,
+            fontSize: "var(--text-display-md)",
             lineHeight: 1,
             color: "var(--fg-primary)",
             letterSpacing: "-0.02em",
@@ -129,7 +129,7 @@ export function OssCard({
           <sub
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: 12,
+              fontSize: "var(--text-mono-sm)",
               color: "var(--fg-muted)",
               fontWeight: 400,
               marginLeft: 4,

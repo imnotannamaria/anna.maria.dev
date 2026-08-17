@@ -106,7 +106,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
         className="relative m-0 transition-colors group-hover/arrow:text-(--fg-brand)"
         style={{
           fontFamily: "var(--font-serif)",
-          fontSize: 24,
+          fontSize: "var(--text-heading-lg)",
           fontWeight: 400,
           lineHeight: 1.15,
           letterSpacing: "-0.02em",
@@ -117,7 +117,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
       </h3>
 
       <p
-        className="relative m-0 line-clamp-2 text-sm leading-relaxed"
+        className="text-body-md relative m-0 line-clamp-2 leading-relaxed"
         style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
       >
         {project.description}

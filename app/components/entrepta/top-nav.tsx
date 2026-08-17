@@ -62,7 +62,7 @@ const TopNavLogoMark = React.forwardRef<HTMLSpanElement, TopNavLogoMarkProps>(
         "inline-grid shrink-0 place-items-center",
         "size-6 rounded-[var(--radius-sm)]",
         "bg-[var(--fg-brand)] text-[var(--fg-on-brand)]",
-        "font-serif text-sm leading-none italic",
+        "text-body-md font-serif leading-none italic",
         className,
       )}
       {...props}

@@ -599,7 +599,7 @@ export function PianoStudio() {
                     fontFamily: "var(--font-serif)",
                     fontStyle: "italic",
                     color: "var(--fg-brand)",
-                    fontSize: 14,
+                    fontSize: "var(--text-body-md)",
                   }}
                 >
                   {nowNote.note}
@@ -845,7 +845,7 @@ export function PianoStudio() {
                     style={{
                       fontFamily: "var(--font-serif)",
                       fontStyle: "italic",
-                      fontSize: 17,
+                      fontSize: "var(--text-heading-md)",
                       lineHeight: 1.2,
                       color: "var(--fg-primary)",
                     }}
@@ -893,7 +893,7 @@ export function PianoStudio() {
               style={{
                 fontFamily: "var(--font-serif)",
                 fontStyle: "italic",
-                fontSize: 15,
+                fontSize: "var(--text-body-lg)",
                 color: "var(--fg-primary)",
               }}
             >

@@ -51,7 +51,10 @@ function Callout({
         style={{ color: styles.icon }}
         aria-hidden="true"
       />
-      <div className="text-sm leading-relaxed [&>p]:mb-0" style={{ color: "var(--fg-secondary)" }}>
+      <div
+        className="text-body-md leading-relaxed [&>p]:mb-0"
+        style={{ color: "var(--fg-secondary)" }}
+      >
         {children}
       </div>
     </div>
@@ -63,7 +66,7 @@ function ImageCaption({ src, alt, caption }: { src: string; alt: string; caption
     <figure className="my-8">
       <Image src={src} alt={alt} width={800} height={450} className="w-full rounded-lg" />
       {caption && (
-        <figcaption className="text-text-muted mt-2 text-center text-sm italic">
+        <figcaption className="text-text-muted text-body-md mt-2 text-center italic">
           {caption}
         </figcaption>
       )}
@@ -104,7 +107,7 @@ const defaultComponents = {
   h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1
       id={headingId(children)}
-      className="mt-12 mb-4 scroll-mt-6 text-3xl"
+      className="text-display-md mt-12 mb-4 scroll-mt-6"
       style={{
         fontFamily: "var(--font-serif)",
         fontWeight: 400,
@@ -135,7 +138,7 @@ const defaultComponents = {
   h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
       id={headingId(children)}
-      className="mt-10 mb-3 scroll-mt-6 text-xl"
+      className="text-heading-md mt-10 mb-3 scroll-mt-6"
       style={{
         fontFamily: "var(--font-serif)",
         fontWeight: 500,
@@ -222,7 +225,7 @@ const defaultComponents = {
   ),
   pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
     <pre
-      className="my-6 overflow-x-auto rounded-lg border border-[var(--border-subtle)] bg-[#0d0d14] p-4 text-sm"
+      className="text-mono-md my-6 overflow-x-auto rounded-lg border border-[var(--border-subtle)] bg-[#0d0d14] p-4"
       {...props}
     />
   ),

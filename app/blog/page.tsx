@@ -45,7 +45,7 @@ export default function BlogPage() {
     <BlogFeed posts={items} tags={tags}>
       <nav
         aria-label="Breadcrumb"
-        className="mb-8 font-mono text-xs"
+        className="text-mono-sm mb-8 font-mono"
         style={{ color: "var(--fg-muted)" }}
       >
         <span>~</span>

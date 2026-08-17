@@ -45,7 +45,7 @@ export default function HomeLoading() {
         className="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-dashed pb-3"
         style={{ borderColor: "var(--border-subtle)" }}
       >
-        <span className="font-mono text-xs tracking-[0.08em] uppercase">
+        <span className="text-mono-sm font-mono tracking-[0.08em] uppercase">
           <span style={{ color: "var(--fg-brand)" }}>$</span>{" "}
           <span style={{ color: "var(--fg-muted)" }}>whoami</span>
         </span>

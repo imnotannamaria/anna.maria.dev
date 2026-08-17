@@ -77,7 +77,7 @@ function Port({ type, position }: { type: "source" | "target"; position: Positio
 function RootNodeView({ data }: NodeProps<RootNode>) {
   return (
     <div
-      className="flex items-center justify-center gap-1.5 rounded-[var(--radius-md)] border font-mono text-xs"
+      className="text-mono-sm flex items-center justify-center gap-1.5 rounded-[var(--radius-md)] border font-mono"
       style={{
         width: ROOT_W,
         height: ROOT_H,
@@ -108,7 +108,7 @@ function CategoryNodeView({ data }: NodeProps<CategoryNode>) {
         type="button"
         onClick={data.onToggle}
         aria-expanded={data.open}
-        className="nodrag nopan focus-ring flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius-md)] border px-3 font-mono text-xs transition-colors duration-150"
+        className="nodrag nopan focus-ring text-mono-sm flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius-md)] border px-3 font-mono transition-colors duration-150"
         style={{
           width: CAT_W,
           height: CAT_H,

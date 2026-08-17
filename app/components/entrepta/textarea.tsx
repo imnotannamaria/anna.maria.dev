@@ -10,7 +10,7 @@ const textareaVariants = cva(
     "bg-[var(--bg-surface)]",
     "border rounded-[var(--radius-md)]",
     "px-3 py-2.5",
-    "font-sans text-mono-md leading-relaxed text-[var(--fg-primary)]",
+    "font-sans text-body-md leading-relaxed text-[var(--fg-primary)]",
     "placeholder:text-[var(--fg-muted)] placeholder:font-mono",
     "appearance-none outline-none resize-y",
     "transition-all duration-150 ease-out",

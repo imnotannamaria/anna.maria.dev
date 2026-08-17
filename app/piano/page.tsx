@@ -112,7 +112,7 @@ export default function PianoPage() {
           {/* Breadcrumb */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-8 font-mono text-xs"
+            className="text-mono-sm mb-8 font-mono"
             style={{ color: "var(--fg-muted)" }}
           >
             <Link href="/" className="transition-colors hover:text-[color:var(--fg-primary)]">

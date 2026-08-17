@@ -31,7 +31,7 @@ function Stat({ value, label, delay }: { value: number; label: string; delay: nu
         height={34}
         style={{
           fontFamily: "var(--font-serif)",
-          fontSize: 30,
+          fontSize: "var(--text-heading-lg)",
           color: "var(--fg-primary)",
           fontVariantNumeric: "tabular-nums",
         }}
@@ -296,7 +296,7 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
 
       <motion.p
         variants={item}
-        className="relative max-w-[42ch] text-sm leading-relaxed"
+        className="text-body-md relative max-w-[42ch] leading-relaxed"
         style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)", margin: 0 }}
       >
         Full-stack Software Engineer at{" "}

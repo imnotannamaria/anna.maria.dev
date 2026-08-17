@@ -56,7 +56,7 @@ export function InterestCard({
       </span>
 
       <p
-        className="text-mono-md relative m-0 leading-relaxed"
+        className="text-body-md relative m-0 leading-relaxed"
         style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
       >
         {children}

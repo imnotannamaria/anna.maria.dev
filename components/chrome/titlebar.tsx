@@ -217,7 +217,7 @@ export function Titlebar() {
           onClick={toggle}
           aria-label="Open command palette"
           title="Open command palette (⌘K)"
-          className="focus-ring flex shrink-0 cursor-pointer items-center px-3 font-mono text-sm text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
+          className="focus-ring text-mono-md flex shrink-0 cursor-pointer items-center px-3 font-mono text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
         >
           +
         </button>

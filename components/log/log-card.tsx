@@ -72,7 +72,7 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
           />
 
           <h3
-            className="mt-[9px] font-serif text-xl leading-[1.15] font-normal tracking-[-0.01em]"
+            className="text-heading-md mt-[9px] font-serif leading-[1.15] font-normal tracking-[-0.01em]"
             style={{ color: "var(--fg-primary)" }}
           >
             {entry.title}
@@ -153,7 +153,7 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
             className="relative z-20 overflow-hidden"
           >
             <p
-              className="text-mono-md mt-3 border-t pt-3 font-sans leading-relaxed"
+              className="text-body-md mt-3 border-t pt-3 font-sans leading-relaxed"
               style={{ borderColor: "var(--border-subtle)", color: "var(--fg-secondary)" }}
             >
               {entry.note}

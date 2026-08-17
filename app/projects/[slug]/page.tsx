@@ -82,7 +82,7 @@ export default async function ProjectPage({ params }: Props) {
           {/* Breadcrumb */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 font-mono text-xs"
+            className="text-mono-sm mb-4 font-mono"
             style={{ color: "var(--fg-muted)" }}
           >
             <Link
@@ -178,7 +178,7 @@ export default async function ProjectPage({ params }: Props) {
           <div className="mt-16 border-t pt-6" style={{ borderColor: "var(--border-subtle)" }}>
             <Link
               href="/projects"
-              className="inline-flex items-center gap-1.5 font-mono text-xs text-[color:var(--fg-muted)] transition-colors hover:text-[color:var(--fg-primary)]"
+              className="text-mono-sm inline-flex items-center gap-1.5 font-mono text-[color:var(--fg-muted)] transition-colors hover:text-[color:var(--fg-primary)]"
             >
               <span aria-hidden style={{ color: "var(--fg-brand)" }}>
                 ←

@@ -39,7 +39,7 @@ export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, n
           {...roll.handlers}
         >
           <RollingNumber value={counts.done} cycle={roll.cycle} delay={roll.delay} height={30} />
-          <span className="text-lg" style={{ color: "var(--fg-muted)" }}>
+          <span className="text-heading-md" style={{ color: "var(--fg-muted)" }}>
             /{total}
           </span>
         </span>

@@ -266,7 +266,7 @@ export function StackCard() {
                 <RadioDot active={isOpen} />
 
                 <span
-                  className="font-mono text-sm font-semibold transition-colors duration-150 group-hover/branch:text-(--fg-brand)"
+                  className="text-mono-md font-mono font-semibold transition-colors duration-150 group-hover/branch:text-(--fg-brand)"
                   style={{ color: "var(--fg-primary)" }}
                 >
                   {branch.label}

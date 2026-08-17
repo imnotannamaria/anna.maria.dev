@@ -262,7 +262,7 @@ export default async function AboutPage() {
                         href={href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/social inline-flex min-h-6 w-full items-center gap-2 py-0.5 font-mono text-xs text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand)] focus-visible:text-[var(--fg-brand)]"
+                        className="group/social text-mono-sm inline-flex min-h-6 w-full items-center gap-2 py-0.5 font-mono text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand)] focus-visible:text-[var(--fg-brand)]"
                       >
                         <Icon size={14} style={{ opacity: 0.7 }} />
                         <span>{label}</span>
@@ -310,7 +310,7 @@ export default async function AboutPage() {
                     into `text` it would end up in the aria-label, and a screen reader would
                     open the line with "slash slash". */}
                 <p
-                  className="mb-6 font-mono text-xs tracking-[0.08em] uppercase"
+                  className="text-mono-sm mb-6 font-mono tracking-[0.08em] uppercase"
                   style={{ color: "var(--fg-muted)" }}
                 >
                   <span aria-hidden style={{ color: "var(--fg-brand)" }}>
@@ -324,7 +324,7 @@ export default async function AboutPage() {
                 </p>
 
                 <div
-                  className="flex flex-col gap-4 text-base leading-[1.7]"
+                  className="text-body-lg flex flex-col gap-4 leading-[1.7]"
                   style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
                 >
                   <Reveal delay={0.62}>
@@ -501,7 +501,7 @@ export default async function AboutPage() {
             </DisplayH2>
             <Reveal delay={0.12}>
               <p
-                className="mt-4 max-w-[60ch] text-sm leading-relaxed"
+                className="text-body-md mt-4 max-w-[60ch] leading-relaxed"
                 style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
               >
                 My <Em>GitHub</Em> activity over the past year. It&apos;s a rough snapshot of the

@@ -24,7 +24,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b pb-4"
         style={{ borderColor: "var(--border-subtle)" }}
       >
-        <nav aria-label="Breadcrumb" className="font-mono text-xs">
+        <nav aria-label="Breadcrumb" className="text-mono-sm font-mono">
           <Link href="/admin/log" style={{ color: "var(--fg-muted)" }}>
             ~
           </Link>
@@ -37,7 +37,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </nav>
 
         {/* Two things live here now, so the layout has to say so. */}
-        <nav aria-label="Admin sections" className="flex items-center gap-3 font-mono text-xs">
+        <nav aria-label="Admin sections" className="text-mono-sm flex items-center gap-3 font-mono">
           <Link href="/admin/log" style={{ color: "var(--fg-secondary)" }}>
             log
           </Link>

@@ -58,7 +58,7 @@ export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
           className="relative"
           style={{
             fontFamily: "var(--font-serif)",
-            fontSize: 22,
+            fontSize: "var(--text-heading-lg)",
             lineHeight: 1.2,
             color: "var(--fg-primary)",
             margin: 0,
@@ -67,7 +67,7 @@ export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
 
         {post.description && (
           <p
-            className="relative line-clamp-3 text-sm leading-relaxed"
+            className="text-body-md relative line-clamp-3 leading-relaxed"
             style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)", margin: 0 }}
           >
             {post.description}

@@ -80,7 +80,7 @@ export function FilterPill({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className="inline-flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-md border px-3 font-mono text-xs whitespace-nowrap transition-all duration-120 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
+      className="text-mono-sm inline-flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-md border px-3 font-mono whitespace-nowrap transition-all duration-120 ease-[cubic-bezier(0.2,0.8,0.2,1)]"
       style={
         active
           ? {

@@ -31,7 +31,7 @@ export default async function RoadmapPage() {
     <div className="mx-auto w-full max-w-[1180px] px-5 py-12 sm:px-8 lg:px-11">
       <nav
         aria-label="Breadcrumb"
-        className="mb-6 font-mono text-xs"
+        className="text-mono-sm mb-6 font-mono"
         style={{ color: "var(--fg-muted)" }}
       >
         <span>~</span>
@@ -43,7 +43,7 @@ export default async function RoadmapPage() {
 
       <header className="mb-8 border-b pb-7" style={{ borderColor: "var(--border-subtle)" }}>
         <div
-          className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
+          className="text-mono-sm mb-3 font-mono tracking-[0.08em] uppercase"
           style={{ color: "var(--fg-muted)" }}
         >
           <span style={{ color: "var(--fg-brand)" }}>$</span>{" "}
@@ -51,14 +51,14 @@ export default async function RoadmapPage() {
         </div>
 
         <h1
-          className="text-display-md lg:text-display-lg font-serif leading-none font-normal tracking-[-0.02em] sm:text-5xl"
+          className="text-display-md lg:text-display-lg font-serif leading-none font-normal tracking-[-0.02em]"
           style={{ color: "var(--fg-primary)" }}
         >
           Roadmap
         </h1>
 
         <p
-          className="mt-4 max-w-[58ch] font-sans text-base leading-relaxed"
+          className="text-body-lg mt-4 max-w-[58ch] font-sans leading-relaxed"
           style={{ color: "var(--fg-secondary)" }}
         >
           Hi. You&apos;re probably wondering why a portfolio has a roadmap. The honest answer is
@@ -71,7 +71,7 @@ export default async function RoadmapPage() {
         </p>
 
         <p
-          className="mt-3 max-w-[58ch] font-sans text-base leading-relaxed"
+          className="text-body-lg mt-3 max-w-[58ch] font-sans leading-relaxed"
           style={{ color: "var(--fg-secondary)" }}
         >
           So this is what might come next. Loose ideas, nothing else. No dates, no promises.
@@ -86,7 +86,7 @@ export default async function RoadmapPage() {
             tell me what to build next
           </Link>
 
-          <p className="m-0 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+          <p className="text-mono-sm m-0 font-mono" style={{ color: "var(--fg-muted)" }}>
             {"// an idea that grows up leaves here and becomes a plan in docs/."}
           </p>
         </div>

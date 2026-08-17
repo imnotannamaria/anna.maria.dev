@@ -61,7 +61,7 @@ function SectHead({
     >
       <Label
         id={id}
-        className="font-mono text-xs font-normal"
+        className="text-mono-sm font-mono font-normal"
         style={
           as === "h2"
             ? { margin: 0, color: "var(--fg-secondary)" }
@@ -206,7 +206,7 @@ export default async function Home() {
             <div className="bento-card">
               <CardHead label="featured" />
               <p
-                className="text-sm"
+                className="text-body-md"
                 style={{ color: "var(--fg-muted)", fontFamily: "var(--font-sans)" }}
               >
                 No featured projects yet.

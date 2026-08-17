@@ -42,7 +42,7 @@ const RAIL_BORDER = { borderRight: "1px solid var(--border-subtle)" } as const
 const RAIL_HEADING = "font-mono text-mono-xs font-medium tracking-[0.08em] uppercase"
 const RAIL_HEADING_STYLE = { color: "var(--fg-muted)", margin: "0 0 12px" } as const
 const FILE_CHIP =
-  "mb-4 flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1.5 font-mono text-xs"
+  "mb-4 flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1.5 font-mono text-mono-sm"
 const FILE_CHIP_STYLE = {
   background: "var(--bg-surface-brand)",
   color: "var(--fg-primary)",
@@ -175,7 +175,7 @@ export function PageOutline({
                    sighted readers only. `location` rather than `page`: every row points
                    inside the page already open, not at a different one. */
                 aria-current={isActive ? "location" : undefined}
-                className="flex items-baseline gap-1.5 py-1 font-mono text-xs transition-colors"
+                className="text-mono-sm flex items-baseline gap-1.5 py-1 font-mono transition-colors"
                 style={{
                   color: isActive ? "var(--fg-primary)" : "var(--fg-secondary)",
                   paddingLeft: item.level === 3 ? 12 : 0,

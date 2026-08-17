@@ -46,7 +46,7 @@ export function LogCardView({
       />
 
       <p
-        className="relative font-serif text-xl leading-none"
+        className="text-heading-md relative font-serif leading-none"
         style={{ color: "var(--fg-primary)", margin: 0 }}
       >
         A few{" "}
@@ -158,7 +158,7 @@ function Hero({ entry, reduce }: { entry: LogEntry; reduce: boolean }) {
         </span>
 
         <p
-          className="font-serif text-xl leading-tight"
+          className="text-heading-md font-serif leading-tight"
           style={{ color: "var(--fg-primary)", margin: 0 }}
         >
           {entry.title}
@@ -187,7 +187,7 @@ function Hero({ entry, reduce }: { entry: LogEntry; reduce: boolean }) {
             be here rather than staying buried behind a click on /log. */}
         {entry.note && (
           <p
-            className="text-mono-md mt-0.5 line-clamp-3 leading-relaxed"
+            className="text-body-md mt-0.5 line-clamp-3 leading-relaxed"
             style={{
               fontFamily: "var(--font-sans)",
               color: "var(--fg-secondary)",
@@ -371,7 +371,7 @@ function StatTile({
         height={30}
         className="font-serif italic"
         style={{
-          fontSize: 26,
+          fontSize: "var(--text-heading-lg)",
           lineHeight: 1,
           letterSpacing: "-0.02em",
           color: "var(--fg-brand)",

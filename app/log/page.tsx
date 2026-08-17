@@ -31,7 +31,7 @@ export default async function LogPage() {
     <LogFeed entries={entries} counts={counts}>
       <nav
         aria-label="Breadcrumb"
-        className="mb-8 font-mono text-xs"
+        className="text-mono-sm mb-8 font-mono"
         style={{ color: "var(--fg-muted)" }}
       >
         <span>~</span>
@@ -66,7 +66,7 @@ export default async function LogPage() {
             stays invisible until hydration plus the delay. The <TypeIn> title carries the
             entrance instead. Same shape on every page header. */}
         <p
-          className="mt-4 text-base leading-relaxed"
+          className="text-body-lg mt-4 leading-relaxed"
           style={{
             fontFamily: "var(--font-sans)",
             color: "var(--fg-secondary)",
@@ -81,7 +81,7 @@ export default async function LogPage() {
           <span className="sr-only">with a heart</span>.
         </p>
 
-        <p className="mt-3 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+        <p className="text-mono-sm mt-3 font-mono" style={{ color: "var(--fg-muted)" }}>
           {"// still adding some favorite stuff."}
         </p>
       </div>

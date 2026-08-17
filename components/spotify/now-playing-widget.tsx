@@ -87,7 +87,7 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
       <CardHead label="me, as a playlist" />
       <div className="flex items-center gap-4">
         <div
-          className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-lg border border-dashed text-2xl"
+          className="text-heading-lg flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-lg border border-dashed"
           style={{
             background: "var(--bg-surface-elevated)",
             borderColor: "var(--border-strong)",
@@ -98,21 +98,21 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
         </div>
         <div className="min-w-0 flex-1">
           <div
-            className="mb-1 font-mono text-sm font-medium"
+            className="text-mono-md mb-1 font-mono font-medium"
             style={{ color: "var(--fg-secondary)" }}
           >
             playlist unavailable
           </div>
-          <div className="mb-3 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+          <div className="text-mono-sm mb-3 font-mono" style={{ color: "var(--fg-muted)" }}>
             spotify api didn&apos;t respond
           </div>
           <div className="flex items-center gap-2.5">
-            <span className="font-mono text-xs" style={{ color: "var(--zinc-600)" }}>
+            <span className="text-mono-sm font-mono" style={{ color: "var(--zinc-600)" }}>
               $
             </span>
             <button
               onClick={onRetry}
-              className="font-mono text-xs transition-colors"
+              className="text-mono-sm font-mono transition-colors"
               style={{ color: "var(--fg-brand)" }}
             >
               retry →
@@ -219,7 +219,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
             className="truncate"
             style={{
               fontFamily: "var(--font-serif)",
-              fontSize: 24,
+              fontSize: "var(--text-heading-lg)",
               lineHeight: 1.15,
               letterSpacing: "-0.01em",
               color: "var(--fg-primary)",
@@ -227,7 +227,10 @@ export function NowPlayingWidget({ className }: { className?: string }) {
           >
             {track.name}
           </span>
-          <span className="truncate font-mono text-xs" style={{ color: "var(--fg-secondary)" }}>
+          <span
+            className="text-mono-sm truncate font-mono"
+            style={{ color: "var(--fg-secondary)" }}
+          >
             {track.artist}
           </span>
         </div>

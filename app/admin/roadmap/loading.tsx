@@ -8,13 +8,13 @@ export default function AdminRoadmapLoading() {
     <>
       <div className="mb-6">
         <div
-          className="mb-2 font-mono text-xs tracking-[0.08em] uppercase"
+          className="text-mono-sm mb-2 font-mono tracking-[0.08em] uppercase"
           style={{ color: "var(--fg-muted)" }}
         >
           <span style={{ color: "var(--fg-brand)" }}>$</span> roadmap --admin
         </div>
         <h1
-          className="font-serif text-4xl leading-none font-normal tracking-[-0.02em]"
+          className="text-display-md font-serif leading-none font-normal tracking-[-0.02em]"
           style={{ color: "var(--fg-primary)" }}
         >
           Roadmap

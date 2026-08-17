@@ -94,7 +94,7 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
         </h3>
 
         <p
-          className="text-mono-md m-0 line-clamp-2 leading-relaxed"
+          className="text-body-md m-0 line-clamp-2 leading-relaxed"
           style={{
             fontFamily: "var(--font-sans)",
             color: "var(--fg-secondary)",

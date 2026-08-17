@@ -118,7 +118,7 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
                 style={{
                   fontFamily: "var(--font-serif)",
                   fontStyle: "italic",
-                  fontSize: 22,
+                  fontSize: "var(--text-heading-lg)",
                   lineHeight: 1.2,
                   color: "var(--fg-primary)",
                 }}
@@ -148,7 +148,7 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
             </motion.div>
 
             <motion.p
-              className="m-0 text-sm leading-relaxed"
+              className="text-body-md m-0 leading-relaxed"
               style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
               variants={v.rise}
             >

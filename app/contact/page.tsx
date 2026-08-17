@@ -61,7 +61,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
           <nav
             aria-label="Breadcrumb"
-            className="mb-8 font-mono text-xs"
+            className="text-mono-sm mb-8 font-mono"
             style={{ color: "var(--fg-muted)" }}
           >
             <span>~</span>
@@ -117,7 +117,7 @@ export default function ContactPage() {
 
               <Reveal delay={0.55}>
                 <div
-                  className="inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-xs"
+                  className="text-mono-sm inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 font-mono"
                   style={{
                     borderColor: "var(--border-subtle)",
                     background: "var(--bg-surface)",

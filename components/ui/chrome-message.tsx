@@ -47,7 +47,7 @@ export function ChromeMessage({
       )}
     >
       <div
-        className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
+        className="text-mono-sm mb-3 font-mono tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-muted)" }}
       >
         <span style={{ color: prompt }}>$</span> {command}

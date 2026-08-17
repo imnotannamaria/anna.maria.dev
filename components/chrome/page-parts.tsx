@@ -43,7 +43,7 @@ export function DocLabel({ level, children }: { level: "#" | "##"; children: Rea
   return (
     <Reveal>
       <div
-        className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
+        className="text-mono-sm mb-3 font-mono tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-muted)" }}
       >
         <span aria-hidden style={{ color: "var(--fg-brand)" }}>

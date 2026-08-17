@@ -197,7 +197,7 @@ export function ContactForm({ email }: { email: string }) {
             className="m-0"
             style={{
               fontFamily: "var(--font-serif)",
-              fontSize: 26,
+              fontSize: "var(--text-heading-lg)",
               lineHeight: 1.2,
               color: "var(--fg-primary)",
             }}
@@ -205,7 +205,7 @@ export function ContactForm({ email }: { email: string }) {
             Message <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>sent.</em>
           </p>
           <p
-            className="m-0 text-sm leading-relaxed"
+            className="text-body-md m-0 leading-relaxed"
             style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
           >
             Thanks for reaching out. It landed in my inbox and I&apos;ll get back to you within a

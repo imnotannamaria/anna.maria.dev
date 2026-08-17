@@ -12,7 +12,7 @@ export default async function EditLogEntryPage({ params }: { params: Promise<{ i
   return (
     <>
       <h1
-        className="mb-1 font-serif text-4xl leading-none font-normal tracking-[-0.02em]"
+        className="text-display-md mb-1 font-serif leading-none font-normal tracking-[-0.02em]"
         style={{ color: "var(--fg-primary)" }}
       >
         Edit
