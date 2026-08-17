@@ -94,6 +94,47 @@ Editor metaphor. The site looks like a code editor: titlebar with tabs (like VSC
 
 Mono is the default, not sans. Sans only shows up in long running text.
 
+#### The size scale
+
+Every size comes from `@theme` in `globals.css`. There are ten steps and no eleventh:
+
+| Token             | Size / leading | The role it was cut for                              |
+| ----------------- | -------------- | ---------------------------------------------------- |
+| `text-display-xl` | 80 / 0.95      | The one hero on a page, serif                        |
+| `text-display-lg` | 64 / 1         | Page titles, serif                                   |
+| `text-display-md` | 40 / 1.1       | Page titles at narrow widths, admin h1, MDX h1       |
+| `text-heading-lg` | 24 / 1.3       | Card titles and MDX h2, serif. Also card figures     |
+| `text-heading-md` | 18 / 1.4       | MDX h3, entry titles in dense cards, decks           |
+| `text-body-lg`    | 16 / 1.6       | Prose: posts, bios, page intros                      |
+| `text-body-md`    | 14 / 1.5       | Secondary prose: blurbs, captions, card descriptions |
+| `text-mono-md`    | 14 / 1.5       | Mono body: inputs, palette and dropdown items, code  |
+| `text-mono-sm`    | 12 / 1.4       | The default UI label: card heads, badges, meta       |
+| `text-mono-xs`    | 10 / 1.3       | The smallest label: field labels, group headings     |
+
+Rules, each one paid for:
+
+- **A token sets size and leading, never family.** `font-serif` / `font-sans` / `font-mono`
+  stays at the call site, because mono is the default here and prose is the exception — a size
+  that dragged a family with it would fight more call sites than it helped. Prefer the token
+  whose name matches the family you are using; when the size you need only exists under
+  another name, use it anyway and let the call site's `font-*` win.
+- **No `text-[Npx]`, and no Tailwind default steps.** `text-xs` is the same 12px as
+  `text-mono-sm` and `text-sm` the same 14px as `text-mono-md`; two spellings for one size is
+  the ambiguity the scale removes. `lib/type-scale.test.ts` fails on either.
+- **A new step has to be registered in `TYPE_SCALE` in `lib/utils.ts`.** tailwind-merge cannot
+  tell that `text-mono-sm` is a font size, so an unregistered step gets filed as a text colour
+  and silently deleted by any arbitrary colour class in the same `cn()` — see the comment
+  there, and `lib/utils.test.ts`. (Write such a class out in full when you mention it in a doc:
+  Tailwind v4 scans Markdown too, so a wildcard inside the brackets compiles to invalid CSS.)
+- **No adjacent pair closer than ~25%.** That is why there is no 20 between 18 and 24, and no
+  48 between 40 and 64. If two steps are 9% apart, they are one step with two names, and the
+  question the scale exists to kill ("13 or 14?") comes straight back.
+- **Two exceptions, both deliberate.** A decorative glyph (`◆`, `♥`, `■`, the mini piano's key
+  labels) keeps a numeric inline size, because it is matched optically to the text beside it
+  rather than filling a role — they are all 18px and under, which is what the test asserts. And
+  a page title may be fluid, `fontSize: clamp(...)`, since a title that scales with the
+  viewport is a technique rather than a missing step.
+
 ### Chrome
 
 ```
