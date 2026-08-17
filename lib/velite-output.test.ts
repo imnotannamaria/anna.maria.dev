@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from "node:fs"
+import { existsSync, readFileSync, readdirSync } from "node:fs"
 import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 import { blog, projects } from "@/.velite"
@@ -56,5 +56,38 @@ describe("every cover path in the output has a file behind it", () => {
       .map((project) => `${project.title}: ${project.cover}`)
 
     expect(missing).toEqual([])
+  })
+})
+
+/**
+ * The page owns the `<h1>` — it renders the title from frontmatter. A `# ` in the body adds a
+ * second one, which breaks the document outline for a screen reader and gives a crawler two
+ * competing titles. It is also a size problem: the MDX `h1` is `text-display-md` (40px) while
+ * the page title is `clamp(38px, 6vw, 68px)`, so on a narrow viewport the clamp sits at its
+ * 38px floor and a body heading renders *larger* than the title of the post it is inside.
+ *
+ * Neither symptom is visible today because no file does it, which is exactly when a rule is
+ * cheap to write down. Bodies start at `##`.
+ */
+function topLevelHeadings(dir: "blog" | "projects"): string[] {
+  const files = readdirSync(join(process.cwd(), "content", dir)).filter((f) => f.endsWith(".mdx"))
+  return files.flatMap((file) => {
+    const lines = readFileSync(join(process.cwd(), "content", dir, file), "utf8").split("\n")
+    let inFence = false
+    const hits: string[] = []
+    lines.forEach((line, i) => {
+      // A fence toggles, so `# comment` inside a bash block is not a heading. One project
+      // already ships `# before` / `# after` inside a ```bash block.
+      if (/^\s*(```|~~~)/.test(line)) inFence = !inFence
+      else if (!inFence && /^#\s+\S/.test(line))
+        hits.push(`${dir}/${file}:${i + 1} — ${line.trim()}`)
+    })
+    return hits
+  })
+}
+
+describe("MDX bodies start at ##, because the page owns the h1", () => {
+  it("has no top-level heading in any post or project", () => {
+    expect([...topLevelHeadings("blog"), ...topLevelHeadings("projects")]).toEqual([])
   })
 })
