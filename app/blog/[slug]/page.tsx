@@ -80,7 +80,7 @@ export default async function BlogPostPage({ params }: Props) {
         />
 
         <div className="min-w-0">
-          <article className="mx-auto max-w-[760px] px-5 py-12 sm:px-8 lg:px-12">
+          <article className="mx-auto max-w-[760px] px-5 py-12 sm:px-8 md:px-12">
             {/* Breadcrumb */}
             <nav
               aria-label="Breadcrumb"
