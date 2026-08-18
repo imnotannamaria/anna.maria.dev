@@ -64,6 +64,9 @@ Copy the example and fill in your values:
 cp .env.example .env.local
 ```
 
+(The live site manages its own secrets with [Infisical](https://infisical.com) instead of a
+committed `.env.local` — see step 4. For a fork, `.env.local` is the simpler path.)
+
 ```bash
 # Required: get yours at resend.com
 RESEND_API_KEY=re_xxxxxxxxxxxx
@@ -117,6 +120,13 @@ Edit the following files with your own data:
 
 ```bash
 npm run dev
+```
+
+If you're pulling secrets from Infisical instead of `.env.local`, run it through Infisical so
+the variables get injected into the process:
+
+```bash
+infisical run -- npm run dev
 ```
 
 Open [localhost:3000](http://localhost:3000).
