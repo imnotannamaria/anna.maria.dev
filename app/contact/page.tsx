@@ -61,7 +61,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
           <nav
             aria-label="Breadcrumb"
-            className="mb-8 font-mono text-xs"
+            className="text-mono-sm mb-8 font-mono"
             style={{ color: "var(--fg-muted)" }}
           >
             <span>~</span>
@@ -102,7 +102,7 @@ export default function ContactPage() {
                     thing on the page stays invisible until hydration plus the delay. The
                     <TypeIn> title carries the entrance instead. */}
                 <p
-                  className="m-0 text-[16px] leading-[1.65]"
+                  className="text-body-lg m-0 leading-[1.65]"
                   style={{
                     fontFamily: "var(--font-sans)",
                     color: "var(--fg-secondary)",
@@ -117,7 +117,7 @@ export default function ContactPage() {
 
               <Reveal delay={0.55}>
                 <div
-                  className="inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-xs"
+                  className="text-mono-sm inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 font-mono"
                   style={{
                     borderColor: "var(--border-subtle)",
                     background: "var(--bg-surface)",
@@ -141,7 +141,7 @@ export default function ContactPage() {
             <DisplayH2 margin="0 0 16px">
               Type it <Em>here.</Em>
             </DisplayH2>
-            <Prose className="mb-8 text-[15px] leading-[1.7]">
+            <Prose className="text-body-lg mb-8 leading-[1.7]">
               This drops straight into my inbox. If it&apos;s about work, a couple of lines on what
               you&apos;re building and where I&apos;d fit in is all I need to get back to you.
             </Prose>

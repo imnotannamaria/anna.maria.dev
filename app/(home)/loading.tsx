@@ -45,7 +45,7 @@ export default function HomeLoading() {
         className="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-dashed pb-3"
         style={{ borderColor: "var(--border-subtle)" }}
       >
-        <span className="font-mono text-xs tracking-[0.08em] uppercase">
+        <span className="text-mono-sm font-mono tracking-[0.08em] uppercase">
           <span style={{ color: "var(--fg-brand)" }}>$</span>{" "}
           <span style={{ color: "var(--fg-muted)" }}>whoami</span>
         </span>
@@ -54,7 +54,7 @@ export default function HomeLoading() {
       {/* The whole visible line is aria-hidden — the `role="status"` below is the one
           announcement a screen reader gets, so the mono `$`, the text and the dots are all
           decoration. Exposing the text here as well would announce the same fact twice. */}
-      <p aria-hidden className="m-0 font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
+      <p aria-hidden className="text-mono-md m-0 font-mono" style={{ color: "var(--fg-muted)" }}>
         <span style={{ color: "var(--fg-brand)" }}>$</span> loading page
         <span>
           <span className="load-dot load-dot-1">.</span>

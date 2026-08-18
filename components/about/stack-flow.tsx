@@ -34,6 +34,7 @@ import {
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
 import { STACK_GROUPS, STACK_TOTAL, TECH_ICONS } from "@/lib/stack"
+import { Diamond } from "@/components/ui/diamond"
 
 // ─── Geometry ────────────────────────────────────────────────────────────────
 
@@ -77,7 +78,7 @@ function Port({ type, position }: { type: "source" | "target"; position: Positio
 function RootNodeView({ data }: NodeProps<RootNode>) {
   return (
     <div
-      className="flex items-center justify-center gap-1.5 rounded-[var(--radius-md)] border font-mono text-xs"
+      className="text-mono-sm flex items-center justify-center gap-1.5 rounded-[var(--radius-md)] border font-mono"
       style={{
         width: ROOT_W,
         height: ROOT_H,
@@ -86,9 +87,7 @@ function RootNodeView({ data }: NodeProps<RootNode>) {
         color: "var(--fg-brand-hover)",
       }}
     >
-      <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-        ◆
-      </span>
+      <Diamond size={10} />
       stack
       <span style={{ opacity: 0.6 }}>{data.count}</span>
       <Port type="source" position={Position.Right} />
@@ -108,7 +107,7 @@ function CategoryNodeView({ data }: NodeProps<CategoryNode>) {
         type="button"
         onClick={data.onToggle}
         aria-expanded={data.open}
-        className="nodrag nopan focus-ring flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius-md)] border px-3 font-mono text-xs transition-colors duration-150"
+        className="nodrag nopan focus-ring text-mono-sm flex w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius-md)] border px-3 font-mono transition-colors duration-150"
         style={{
           width: CAT_W,
           height: CAT_H,
@@ -142,7 +141,7 @@ function TechNodeView({ data }: NodeProps<TechNode>) {
   const icon = TECH_ICONS[data.label]
   return (
     <div
-      className="flex items-center gap-2 rounded-[var(--radius-sm)] border px-2.5 font-mono text-[11px]"
+      className="text-mono-sm flex items-center gap-2 rounded-[var(--radius-sm)] border px-2.5 font-mono"
       style={{
         width: TECH_W,
         height: TECH_H,
@@ -164,9 +163,7 @@ function TechNodeView({ data }: NodeProps<TechNode>) {
           <path d={icon} />
         </svg>
       ) : (
-        <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9, flexShrink: 0 }}>
-          ◆
-        </span>
+        <Diamond style={{ flexShrink: 0 }} />
       )}
       <span className="truncate">{data.label}</span>
     </div>

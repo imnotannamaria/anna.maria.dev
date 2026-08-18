@@ -11,6 +11,7 @@ import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { contactSchema, type ContactFieldErrors } from "@/lib/contact-schema"
 import { cn } from "@/lib/utils"
+import { Diamond } from "@/components/ui/diamond"
 
 type FormState = "idle" | "loading" | "success" | "error"
 
@@ -26,12 +27,10 @@ function FieldLabel({
   return (
     <label
       htmlFor={htmlFor}
-      className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.08em] uppercase"
+      className="text-mono-xs flex items-center gap-1.5 font-mono tracking-[0.08em] uppercase"
       style={{ color: "var(--fg-muted)" }}
     >
-      <span aria-hidden style={{ color: "var(--fg-brand)", fontSize: 9 }}>
-        ◆
-      </span>
+      <Diamond />
       {children}
       {required && (
         <span aria-hidden style={{ color: "var(--fg-brand)" }}>
@@ -48,7 +47,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
     <span
       id={id}
       role="alert"
-      className="flex items-center gap-1 font-mono text-[11px]"
+      className="text-mono-sm flex items-center gap-1 font-mono"
       style={{ color: "var(--status-error-fg)" }}
     >
       <span aria-hidden style={{ opacity: 0.7 }}>
@@ -197,7 +196,7 @@ export function ContactForm({ email }: { email: string }) {
             className="m-0"
             style={{
               fontFamily: "var(--font-serif)",
-              fontSize: 26,
+              fontSize: "var(--text-heading-lg)",
               lineHeight: 1.2,
               color: "var(--fg-primary)",
             }}
@@ -205,7 +204,7 @@ export function ContactForm({ email }: { email: string }) {
             Message <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>sent.</em>
           </p>
           <p
-            className="m-0 text-sm leading-relaxed"
+            className="text-body-md m-0 leading-relaxed"
             style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
           >
             Thanks for reaching out. It landed in my inbox and I&apos;ll get back to you within a
@@ -301,7 +300,7 @@ export function ContactForm({ email }: { email: string }) {
                 aria-invalid={errors.message ? true : undefined}
                 aria-describedby={errors.message ? "message-error" : undefined}
                 onChange={() => clearField("message")}
-                className="min-h-[140px] w-full resize-y border-0 bg-transparent font-mono text-[13px] leading-[1.6] outline-none placeholder:text-[var(--fg-muted)]"
+                className="text-mono-md min-h-[140px] w-full resize-y border-0 bg-transparent font-mono leading-[1.6] outline-none placeholder:text-[var(--fg-muted)]"
                 style={{ color: "var(--fg-primary)" }}
               />
             </div>
@@ -312,7 +311,7 @@ export function ContactForm({ email }: { email: string }) {
         {state === "error" && errorMessage && (
           <div
             role="alert"
-            className="mt-5 flex items-start gap-2.5 rounded-[var(--radius-md)] border px-4 py-3 font-mono text-[12px]"
+            className="text-mono-sm mt-5 flex items-start gap-2.5 rounded-[var(--radius-md)] border px-4 py-3 font-mono"
             style={{
               borderColor: "var(--status-error)",
               background: "var(--status-error-soft)",

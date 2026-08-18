@@ -31,13 +31,13 @@ function Stat({ value, label, delay }: { value: number; label: string; delay: nu
         height={34}
         style={{
           fontFamily: "var(--font-serif)",
-          fontSize: 30,
+          fontSize: "var(--text-heading-lg)",
           color: "var(--fg-primary)",
           fontVariantNumeric: "tabular-nums",
         }}
       />
       <span
-        className="font-mono text-[10px] tracking-[0.1em] uppercase transition-colors duration-200 group-hover/stat:text-(--fg-brand)"
+        className="text-mono-xs font-mono tracking-[0.1em] uppercase transition-colors duration-200 group-hover/stat:text-(--fg-brand)"
         style={{ color: "var(--fg-muted)" }}
       >
         {label}
@@ -166,7 +166,7 @@ function SocialButton({
       <span
         aria-hidden
         className={cn(
-          "pointer-events-none absolute -bottom-4 translate-y-1 font-mono text-[10px] tracking-[0.06em] opacity-0",
+          "text-mono-xs pointer-events-none absolute -bottom-4 translate-y-1 font-mono tracking-[0.06em] opacity-0",
           "text-(--fg-brand) transition-all duration-200 ease-out",
           // focus as well as hover: a keyboard user gets the same reveal.
           "group-hover/social:translate-y-0 group-hover/social:opacity-100",
@@ -289,14 +289,14 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
         >
           Anna <em style={{ fontStyle: "italic", color: "var(--fg-brand)" }}>Maria</em>
         </h1>
-        <span className="font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+        <span className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
           @{siteConfig.githubUser} · Pernambuco, Brasil
         </span>
       </motion.div>
 
       <motion.p
         variants={item}
-        className="relative max-w-[42ch] text-sm leading-relaxed"
+        className="text-body-md relative max-w-[42ch] leading-relaxed"
         style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)", margin: 0 }}
       >
         Full-stack Software Engineer at{" "}
@@ -338,7 +338,7 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
         </div>
 
         <p
-          className="font-mono text-[10px] leading-relaxed"
+          className="text-mono-xs font-mono leading-relaxed"
           style={{ color: "var(--fg-muted)", margin: 0 }}
         >
           <span aria-hidden style={{ opacity: 0.6 }}>

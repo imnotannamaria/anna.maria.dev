@@ -61,7 +61,7 @@ function SectHead({
     >
       <Label
         id={id}
-        className="font-mono text-xs font-normal"
+        className="text-mono-sm font-mono font-normal"
         style={
           as === "h2"
             ? { margin: 0, color: "var(--fg-secondary)" }
@@ -75,7 +75,7 @@ function SectHead({
       </Label>
       {meta && (
         <span
-          className="font-mono text-[11px] tracking-[0.08em] uppercase"
+          className="text-mono-sm font-mono tracking-[0.08em] uppercase"
           style={{ color: "var(--fg-muted)" }}
         >
           {meta}
@@ -188,7 +188,7 @@ export default async function Home() {
           meta={
             <Link
               href="/projects"
-              className="font-mono text-[11px] tracking-normal transition-all duration-150 hover:tracking-[0.08em]"
+              className="text-mono-sm font-mono tracking-normal transition-all duration-150 hover:tracking-[0.08em]"
               style={{ color: "var(--fg-brand)", textTransform: "none" }}
             >
               all projects ↗
@@ -206,7 +206,7 @@ export default async function Home() {
             <div className="bento-card">
               <CardHead label="featured" />
               <p
-                className="text-sm"
+                className="text-body-md"
                 style={{ color: "var(--fg-muted)", fontFamily: "var(--font-sans)" }}
               >
                 No featured projects yet.

@@ -38,7 +38,7 @@ export function LogCardView({
         label="log"
         meta={
           <span style={{ color: "var(--fg-brand)" }}>
-            <ArrowLink href="/log" className="text-[11px] text-(--fg-brand)">
+            <ArrowLink href="/log" className="text-mono-sm text-(--fg-brand)">
               open the log
             </ArrowLink>
           </span>
@@ -46,7 +46,7 @@ export function LogCardView({
       />
 
       <p
-        className="relative font-serif text-xl leading-none"
+        className="text-heading-md relative font-serif leading-none"
         style={{ color: "var(--fg-primary)", margin: 0 }}
       >
         A few{" "}
@@ -141,7 +141,7 @@ function Hero({ entry, reduce }: { entry: LogEntry; reduce: boolean }) {
         ) : (
           <span
             aria-hidden
-            className="absolute inset-0 grid place-items-center font-mono text-[10px] uppercase"
+            className="text-mono-xs absolute inset-0 grid place-items-center font-mono uppercase"
             style={{ color: "var(--fg-muted)" }}
           >
             {TYPE_LABEL[entry.type]}
@@ -151,21 +151,21 @@ function Hero({ entry, reduce }: { entry: LogEntry; reduce: boolean }) {
 
       <div className="flex min-w-0 flex-col gap-1.5">
         <span
-          className="font-mono text-[10px] tracking-[0.08em] uppercase"
+          className="text-mono-xs font-mono tracking-[0.08em] uppercase"
           style={{ color: "var(--fg-muted)" }}
         >
           {TYPE_LABEL[entry.type]}
         </span>
 
         <p
-          className="font-serif text-xl leading-tight"
+          className="text-heading-md font-serif leading-tight"
           style={{ color: "var(--fg-primary)", margin: 0 }}
         >
           {entry.title}
         </p>
 
         {(entry.creator || entry.year) && (
-          <p className="font-mono text-[11px]" style={{ color: "var(--fg-secondary)", margin: 0 }}>
+          <p className="text-mono-sm font-mono" style={{ color: "var(--fg-secondary)", margin: 0 }}>
             {[entry.creator, entry.year].filter(Boolean).join(" · ")}
           </p>
         )}
@@ -187,7 +187,7 @@ function Hero({ entry, reduce }: { entry: LogEntry; reduce: boolean }) {
             be here rather than staying buried behind a click on /log. */}
         {entry.note && (
           <p
-            className="mt-0.5 line-clamp-3 text-[13px] leading-relaxed"
+            className="text-body-md mt-0.5 line-clamp-3 leading-relaxed"
             style={{
               fontFamily: "var(--font-sans)",
               color: "var(--fg-secondary)",
@@ -223,7 +223,7 @@ function Thumb({ entry }: { entry: LogEntry }) {
       ) : (
         <span
           aria-hidden
-          className="absolute inset-0 grid place-items-center font-mono text-[8px] uppercase"
+          className="text-mono-xs absolute inset-0 grid place-items-center font-mono uppercase"
           style={{ color: "var(--fg-muted)" }}
         >
           {TYPE_LABEL[entry.type]}
@@ -288,7 +288,7 @@ function TypeBreakdown({
       {byType.map((t, i) => (
         <div key={t.type} className="group/row flex items-center gap-3">
           <span
-            className="w-16 shrink-0 font-mono text-[10px] tracking-[0.06em] transition-colors duration-200 group-hover/row:text-(--fg-brand)"
+            className="text-mono-xs w-16 shrink-0 font-mono tracking-[0.06em] transition-colors duration-200 group-hover/row:text-(--fg-brand)"
             style={{ color: "var(--fg-secondary)" }}
           >
             {TYPE_PLURAL[t.type]}
@@ -316,7 +316,7 @@ function TypeBreakdown({
           </span>
 
           <span
-            className="w-16 shrink-0 text-right font-mono text-[10px]"
+            className="text-mono-xs w-16 shrink-0 text-right font-mono"
             style={{ color: "var(--fg-muted)" }}
           >
             <span style={{ color: "var(--fg-secondary)" }}>{t.count}</span>
@@ -359,7 +359,7 @@ function StatTile({
       {...roll.handlers}
     >
       <div
-        className="mb-1 font-mono text-[10px] tracking-[0.08em] uppercase transition-colors duration-200 group-hover/tile:text-(--fg-brand)"
+        className="text-mono-xs mb-1 font-mono tracking-[0.08em] uppercase transition-colors duration-200 group-hover/tile:text-(--fg-brand)"
         style={{ color: "var(--fg-muted)" }}
       >
         {label}
@@ -371,7 +371,7 @@ function StatTile({
         height={30}
         className="font-serif italic"
         style={{
-          fontSize: 26,
+          fontSize: "var(--text-heading-lg)",
           lineHeight: 1,
           letterSpacing: "-0.02em",
           color: "var(--fg-brand)",

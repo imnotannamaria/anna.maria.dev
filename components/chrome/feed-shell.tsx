@@ -133,7 +133,7 @@ export function FeedShell<T>({
           </div>
 
           {groups.length === 0 ? (
-            <p className="mt-12 font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
+            <p className="text-mono-md mt-12 font-mono" style={{ color: "var(--fg-muted)" }}>
               {totalCount === 0 ? empty.all : empty.filtered}
             </p>
           ) : (
@@ -159,7 +159,7 @@ export function FeedShell<T>({
                     {group.label}
                   </h2>
                   <span
-                    className="font-mono text-[11px] tracking-[0.08em] uppercase"
+                    className="text-mono-sm font-mono tracking-[0.08em] uppercase"
                     style={{ color: "var(--fg-muted)" }}
                   >
                     {groupMeta(group)}

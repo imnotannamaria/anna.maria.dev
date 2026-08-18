@@ -20,7 +20,7 @@ export default function LogLoading() {
         <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
           <nav
             aria-label="Breadcrumb"
-            className="mb-8 font-mono text-xs"
+            className="text-mono-sm mb-8 font-mono"
             style={{ color: "var(--fg-muted)" }}
           >
             <span>~</span>
@@ -31,7 +31,7 @@ export default function LogLoading() {
           </nav>
 
           <div
-            className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
+            className="text-mono-sm mb-3 font-mono tracking-[0.08em] uppercase"
             style={{ color: "var(--fg-muted)" }}
           >
             <span aria-hidden style={{ color: "var(--fg-brand)" }}>
@@ -47,7 +47,7 @@ export default function LogLoading() {
             Log.
           </h1>
 
-          <p className="mt-4 font-mono text-xs" style={{ color: "var(--fg-muted)" }}>
+          <p className="text-mono-sm mt-4 font-mono" style={{ color: "var(--fg-muted)" }}>
             {"// loading…"}
           </p>
 

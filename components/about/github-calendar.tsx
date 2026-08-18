@@ -217,7 +217,7 @@ export function GithubCalendar({ data }: { data: ContributionYear | null }) {
 
   if (!data) {
     return (
-      <p className="font-mono text-[12px]" style={{ color: "var(--fg-muted)" }}>
+      <p className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
         contributions unavailable
       </p>
     )
@@ -252,7 +252,7 @@ export function GithubCalendar({ data }: { data: ContributionYear | null }) {
               <div key={i} className="relative" style={{ flex: "1 1 0", minWidth: MIN_COL }}>
                 {label && (
                   <span
-                    className="absolute top-0 left-0 font-mono text-[10px] whitespace-nowrap"
+                    className="text-mono-xs absolute top-0 left-0 font-mono whitespace-nowrap"
                     style={{ color: "var(--fg-muted)" }}
                   >
                     {label}
@@ -338,13 +338,13 @@ export function GithubCalendar({ data }: { data: ContributionYear | null }) {
                       transition={{ duration: reduce ? 0 : 0.13, ease: EASE_OUT }}
                     >
                       <span
-                        className="block font-mono text-[12px]"
+                        className="text-mono-sm block font-mono"
                         style={{ color: "var(--fg-primary)" }}
                       >
                         {plural(active.count)}
                       </span>
                       <span
-                        className="block font-mono text-[11px]"
+                        className="text-mono-sm block font-mono"
                         style={{ color: "var(--fg-muted)" }}
                       >
                         {formatFull(active.date)}
@@ -360,7 +360,7 @@ export function GithubCalendar({ data }: { data: ContributionYear | null }) {
 
       <div className="mt-3 flex items-center justify-between gap-3">
         <div
-          className="flex shrink-0 items-center gap-1 font-mono text-[10px]"
+          className="text-mono-xs flex shrink-0 items-center gap-1 font-mono"
           style={{ color: "var(--fg-muted)" }}
           aria-hidden
         >
@@ -381,7 +381,7 @@ export function GithubCalendar({ data }: { data: ContributionYear | null }) {
           more
         </div>
 
-        <span className="truncate font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+        <span className="text-mono-sm truncate font-mono" style={{ color: "var(--fg-muted)" }}>
           {total.toLocaleString("en-US")} contributions this year
         </span>
       </div>

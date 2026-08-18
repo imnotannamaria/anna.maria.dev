@@ -118,14 +118,14 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
                 style={{
                   fontFamily: "var(--font-serif)",
                   fontStyle: "italic",
-                  fontSize: 22,
+                  fontSize: "var(--text-heading-lg)",
                   lineHeight: 1.2,
                   color: "var(--fg-primary)",
                 }}
               >
                 {item.org}
               </span>
-              <span className="font-mono text-[13px]" style={{ color: "var(--fg-secondary)" }}>
+              <span className="text-mono-md font-mono" style={{ color: "var(--fg-secondary)" }}>
                 <span aria-hidden style={{ opacity: 0.5, marginRight: 6 }}>
                   ·
                 </span>
@@ -134,7 +134,7 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
             </motion.div>
 
             <motion.div
-              className="mb-3 font-mono text-[11px] tracking-[0.04em]"
+              className="text-mono-sm mb-3 font-mono tracking-[0.04em]"
               style={{ color: "var(--fg-muted)" }}
               variants={v.rise}
             >
@@ -148,7 +148,7 @@ export function Timeline({ entries }: { entries: TimelineEntry[] }) {
             </motion.div>
 
             <motion.p
-              className="m-0 text-sm leading-relaxed"
+              className="text-body-md m-0 leading-relaxed"
               style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
               variants={v.rise}
             >

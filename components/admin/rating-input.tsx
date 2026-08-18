@@ -83,7 +83,7 @@ export function RatingInput({
                   half-star glyph exists but does not render in every font. */}
               <span
                 aria-hidden
-                className="pointer-events-none absolute inset-0 grid place-items-center text-[26px] leading-none"
+                className="text-heading-lg pointer-events-none absolute inset-0 grid place-items-center leading-none"
                 style={{ color: "var(--border-strong)" }}
               >
                 ★
@@ -95,7 +95,7 @@ export function RatingInput({
                   style={{ width: half ? "50%" : "100%" }}
                 >
                   <span
-                    className="grid h-8 w-8 place-items-center text-[26px] leading-none"
+                    className="text-heading-lg grid h-8 w-8 place-items-center leading-none"
                     style={{ color: "var(--fg-brand)" }}
                   >
                     ★
@@ -111,7 +111,7 @@ export function RatingInput({
           Arrowing through values would otherwise change the rating silently. */}
       <span
         aria-live="polite"
-        className="font-mono text-[11px]"
+        className="text-mono-sm font-mono"
         style={{ color: "var(--fg-muted)" }}
       >
         {starLabel(value)}
@@ -121,7 +121,7 @@ export function RatingInput({
         <button
           type="button"
           onClick={() => onChange(null)}
-          className="cursor-pointer font-mono text-[11px] underline underline-offset-2"
+          className="text-mono-sm cursor-pointer font-mono underline underline-offset-2"
           style={{ color: "var(--fg-muted)" }}
         >
           clear

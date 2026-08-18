@@ -3,12 +3,12 @@ export default function EditRoadmapItemLoading() {
   return (
     <>
       <h1
-        className="mb-1 font-serif text-4xl leading-none font-normal tracking-[-0.02em]"
+        className="text-display-md mb-1 font-serif leading-none font-normal tracking-[-0.02em]"
         style={{ color: "var(--fg-primary)" }}
       >
         Edit
       </h1>
-      <p className="mb-6 font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+      <p className="text-mono-sm mb-6 font-mono" style={{ color: "var(--fg-muted)" }}>
         {"// loading…"}
       </p>
 

@@ -45,7 +45,7 @@ export default function BlogPage() {
     <BlogFeed posts={items} tags={tags}>
       <nav
         aria-label="Breadcrumb"
-        className="mb-8 font-mono text-xs"
+        className="text-mono-sm mb-8 font-mono"
         style={{ color: "var(--fg-muted)" }}
       >
         <span>~</span>
@@ -82,7 +82,7 @@ export default function BlogPage() {
             render delay" here against 412ms of TTFB. The <TypeIn> title above already carries
             the entrance; see the same shape on every other page header. */}
         <p
-          className="mt-4 text-[16px] leading-[1.6]"
+          className="text-body-lg mt-4 leading-[1.6]"
           style={{
             fontFamily: "var(--font-sans)",
             color: "var(--fg-secondary)",

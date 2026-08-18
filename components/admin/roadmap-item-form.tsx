@@ -179,7 +179,7 @@ export function RoadmapItemForm({ item }: { item?: RoadmapItem }) {
         />
       </Field>
 
-      <p className="m-0 font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+      <p className="text-mono-sm m-0 font-mono" style={{ color: "var(--fg-muted)" }}>
         <span style={{ opacity: 0.6 }}>{"// "}</span>
         shipped date is set by the server when status becomes shipped, and cleared when it leaves
       </p>

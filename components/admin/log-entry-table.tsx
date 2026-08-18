@@ -15,7 +15,7 @@ const COLUMNS = ["type", "title", "rating", "logged", "status", ""]
 export function LogEntryTable({ entries }: { entries: LogEntry[] }) {
   if (entries.length === 0) {
     return (
-      <p className="mt-12 text-center font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
+      <p className="text-mono-md mt-12 text-center font-mono" style={{ color: "var(--fg-muted)" }}>
         {"// nothing logged yet."}
       </p>
     )
@@ -30,7 +30,7 @@ export function LogEntryTable({ entries }: { entries: LogEntry[] }) {
               <th
                 key={h}
                 scope="col"
-                className="px-2 py-2 font-mono text-[10px] tracking-[0.08em] whitespace-nowrap uppercase"
+                className="text-mono-xs px-2 py-2 font-mono tracking-[0.08em] whitespace-nowrap uppercase"
                 style={{ color: "var(--fg-muted)" }}
               >
                 {h}
@@ -43,7 +43,7 @@ export function LogEntryTable({ entries }: { entries: LogEntry[] }) {
             <tr key={entry.id} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
               <td className="px-2 py-3">
                 <span
-                  className="inline-flex h-5 items-center rounded-[5px] px-2 font-mono text-[10px] uppercase"
+                  className="text-mono-xs inline-flex h-5 items-center rounded-[5px] px-2 font-mono uppercase"
                   style={{
                     background: "var(--bg-surface-brand)",
                     color: "var(--fg-brand-hover)",
@@ -56,14 +56,14 @@ export function LogEntryTable({ entries }: { entries: LogEntry[] }) {
               <td className="max-w-70 min-w-40 px-2 py-3">
                 <Link
                   href={`/admin/log/${entry.id}`}
-                  className="block truncate font-mono text-[13px] hover:underline"
+                  className="text-mono-md block truncate font-mono hover:underline"
                   style={{ color: "var(--fg-primary)" }}
                 >
                   {entry.title}
                 </Link>
                 {entry.creator && (
                   <span
-                    className="block truncate font-mono text-[11px]"
+                    className="text-mono-sm block truncate font-mono"
                     style={{ color: "var(--fg-muted)" }}
                   >
                     {entry.creator}
@@ -94,13 +94,13 @@ export function LogEntryTable({ entries }: { entries: LogEntry[] }) {
               </td>
 
               <td
-                className="px-2 py-3 font-mono text-[11px] whitespace-nowrap"
+                className="text-mono-sm px-2 py-3 font-mono whitespace-nowrap"
                 style={{ color: "var(--fg-muted)" }}
               >
                 <time dateTime={entry.loggedAt}>{formatLoggedAt(entry.loggedAt)}</time>
               </td>
 
-              <td className="px-2 py-3 font-mono text-[11px] whitespace-nowrap">
+              <td className="text-mono-sm px-2 py-3 font-mono whitespace-nowrap">
                 <span
                   style={{
                     color: entry.published ? "var(--status-success-fg)" : "var(--fg-muted)",

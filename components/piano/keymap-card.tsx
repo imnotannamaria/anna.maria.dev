@@ -47,7 +47,7 @@ export function KeymapCard({
             style={{ borderTop: i === 0 ? "none" : "1px dashed var(--border-subtle)" }}
           >
             <span
-              className="rounded-[3px] border px-1.5 py-0.5 text-center font-mono text-[11px] uppercase"
+              className="text-mono-sm rounded-[3px] border px-1.5 py-0.5 text-center font-mono uppercase"
               style={{
                 color: "var(--fg-primary)",
                 background: "var(--bg-canvas)",
@@ -56,7 +56,7 @@ export function KeymapCard({
             >
               {line.kbd}
             </span>
-            <span className="font-mono text-[12px]" style={{ color: "var(--fg-secondary)" }}>
+            <span className="text-mono-sm font-mono" style={{ color: "var(--fg-secondary)" }}>
               <em
                 style={{
                   fontFamily: "var(--font-serif)",

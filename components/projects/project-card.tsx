@@ -52,7 +52,7 @@ function OutLink({ href, kind }: { href: string; kind: "github" | "live" }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative z-[2] inline-flex min-h-6 items-center gap-1.5 font-mono text-[12px] transition-colors hover:text-(--fg-brand) focus-visible:text-(--fg-brand)"
+      className="text-mono-sm relative z-[2] inline-flex min-h-6 items-center gap-1.5 font-mono transition-colors hover:text-(--fg-brand) focus-visible:text-(--fg-brand)"
       style={{ color: "var(--fg-primary)" }}
     >
       {kind === "github" ? <GithubLogoIcon size={13} /> : <ArrowSquareOutIcon size={12} />}
@@ -106,7 +106,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
         className="relative m-0 transition-colors group-hover/arrow:text-(--fg-brand)"
         style={{
           fontFamily: "var(--font-serif)",
-          fontSize: 24,
+          fontSize: "var(--text-heading-lg)",
           fontWeight: 400,
           lineHeight: 1.15,
           letterSpacing: "-0.02em",
@@ -117,7 +117,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
       </h3>
 
       <p
-        className="relative m-0 line-clamp-2 text-sm leading-relaxed"
+        className="text-body-md relative m-0 line-clamp-2 leading-relaxed"
         style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
       >
         {project.description}
@@ -132,7 +132,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
         {project.tags.length > 4 && <Badge>+{project.tags.length - 4}</Badge>}
       </div>
 
-      <CardFoot className="flex-wrap gap-y-2">
+      <CardFoot className="gap-y-2">
         <span className="flex items-center gap-4">
           {project.github && <OutLink href={project.github} kind="github" />}
           {project.live && <OutLink href={project.live} kind="live" />}

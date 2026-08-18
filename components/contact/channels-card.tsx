@@ -87,13 +87,13 @@ export function ChannelsCard({ index = 0 }: { index?: number }) {
 
               <span className="flex min-w-0 flex-col">
                 <span
-                  className="font-mono text-[10px] tracking-[0.08em] uppercase"
+                  className="text-mono-xs font-mono tracking-[0.08em] uppercase"
                   style={{ color: "var(--fg-muted)" }}
                 >
                   {label}
                 </span>
                 <span
-                  className="truncate font-mono text-[12.5px] transition-colors group-hover/row:text-[var(--fg-brand)] group-focus-visible/row:text-[var(--fg-brand)]"
+                  className="text-mono-sm truncate font-mono transition-colors group-hover/row:text-[var(--fg-brand)] group-focus-visible/row:text-[var(--fg-brand)]"
                   style={{ color: "var(--fg-primary)" }}
                 >
                   {value}

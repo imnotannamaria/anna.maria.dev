@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { DisplayH2, DocLabel, Em, Kbd, Prose, Section } from "@/components/chrome/page-parts"
+import { Diamond } from "@/components/ui/diamond"
 
 /* ════════════════════════════════════════════════
    DATA — 2 octaves, C4 → B5
@@ -546,7 +547,7 @@ export function PianoStudio() {
         >
           {/* toolbar */}
           <div
-            className="flex flex-wrap items-center gap-4 border-b px-4 py-3 font-mono text-[11px]"
+            className="text-mono-sm flex flex-wrap items-center gap-4 border-b px-4 py-3 font-mono"
             style={{
               borderColor: "var(--border-subtle)",
               background: "var(--bg-chrome)",
@@ -569,12 +570,10 @@ export function PianoStudio() {
             </div>
 
             <span
-              className="text-[10px] tracking-[0.08em] uppercase"
+              className="text-mono-xs tracking-[0.08em] uppercase"
               style={{ color: "var(--fg-muted)" }}
             >
-              <span aria-hidden style={{ color: "var(--fg-brand)", marginRight: 6, fontSize: 9 }}>
-                ◆
-              </span>
+              <Diamond style={{ marginRight: 6 }} />
               piano · <span className="min-[481px]:hidden">1</span>
               <span className="hidden min-[481px]:inline">2</span> oct
             </span>
@@ -599,7 +598,7 @@ export function PianoStudio() {
                     fontFamily: "var(--font-serif)",
                     fontStyle: "italic",
                     color: "var(--fg-brand)",
-                    fontSize: 14,
+                    fontSize: "var(--text-body-md)",
                   }}
                 >
                   {nowNote.note}
@@ -614,7 +613,7 @@ export function PianoStudio() {
             {/* sustain */}
             <div className="inline-flex items-center gap-2">
               <span
-                className="text-[10px] tracking-[0.08em] uppercase"
+                className="text-mono-xs tracking-[0.08em] uppercase"
                 style={{ color: "var(--fg-muted)" }}
               >
                 sustain
@@ -638,7 +637,7 @@ export function PianoStudio() {
             {/* volume */}
             <div className="inline-flex items-center gap-2">
               <span
-                className="text-[10px] tracking-[0.08em] uppercase"
+                className="text-mono-xs tracking-[0.08em] uppercase"
                 style={{ color: "var(--fg-muted)" }}
               >
                 vol
@@ -706,14 +705,14 @@ export function PianoStudio() {
                     >
                       {note === "C5" && (
                         <span
-                          className="absolute top-2 font-mono text-[10px] tracking-[0.04em]"
+                          className="text-mono-xs absolute top-2 font-mono tracking-[0.04em]"
                           style={{ color: on ? "rgba(255,255,255,0.7)" : "var(--piano-key-label)" }}
                         >
                           C5
                         </span>
                       )}
                       <span
-                        className="font-mono text-[11px] tracking-[0.04em] uppercase"
+                        className="text-mono-sm font-mono tracking-[0.04em] uppercase"
                         style={{ color: on ? "rgba(255,255,255,0.85)" : "var(--piano-key-label)" }}
                       >
                         {kbd}
@@ -757,7 +756,7 @@ export function PianoStudio() {
                       }}
                     >
                       <span
-                        className="font-mono text-[10px] uppercase"
+                        className="text-mono-xs font-mono uppercase"
                         style={{
                           color: on ? "rgba(255,255,255,0.9)" : "var(--piano-black-key-label)",
                         }}
@@ -773,7 +772,7 @@ export function PianoStudio() {
 
           {/* hint */}
           <div
-            className="px-4 pt-3 pb-4 text-center font-mono text-[11px]"
+            className="text-mono-sm px-4 pt-3 pb-4 text-center font-mono"
             style={{
               color: "var(--fg-muted)",
               background: "var(--piano-hint)",
@@ -845,7 +844,7 @@ export function PianoStudio() {
                     style={{
                       fontFamily: "var(--font-serif)",
                       fontStyle: "italic",
-                      fontSize: 17,
+                      fontSize: "var(--text-heading-md)",
                       lineHeight: 1.2,
                       color: "var(--fg-primary)",
                     }}
@@ -853,7 +852,7 @@ export function PianoStudio() {
                     {song.title}
                   </span>
                   <span
-                    className="font-mono text-[10px] tracking-[0.08em] uppercase"
+                    className="text-mono-xs font-mono tracking-[0.08em] uppercase"
                     style={{ color: "var(--fg-muted)" }}
                   >
                     {song.meta} · {seconds}s
@@ -862,7 +861,7 @@ export function PianoStudio() {
 
                 <span
                   aria-hidden
-                  className="font-mono text-[16px] transition-transform group-hover:translate-x-0.5"
+                  className="text-body-lg font-mono transition-transform group-hover:translate-x-0.5"
                   style={{ color: "var(--fg-brand)" }}
                 >
                   {playing ? "■" : "→"}
@@ -874,14 +873,14 @@ export function PianoStudio() {
 
         {currentSong && (
           <div
-            className="mt-4 flex flex-wrap items-center gap-3 rounded-[var(--radius-md)] border px-4 py-3 font-mono text-[12px]"
+            className="text-mono-sm mt-4 flex flex-wrap items-center gap-3 rounded-[var(--radius-md)] border px-4 py-3 font-mono"
             style={{
               background: "var(--bg-surface-brand)",
               borderColor: "var(--border-brand)",
             }}
           >
             <span
-              className="text-[10px] tracking-[0.08em] uppercase"
+              className="text-mono-xs tracking-[0.08em] uppercase"
               style={{ color: "var(--fg-brand-hover)" }}
             >
               <span aria-hidden style={{ marginRight: 4 }}>
@@ -893,7 +892,7 @@ export function PianoStudio() {
               style={{
                 fontFamily: "var(--font-serif)",
                 fontStyle: "italic",
-                fontSize: 15,
+                fontSize: "var(--text-body-lg)",
                 color: "var(--fg-primary)",
               }}
             >
@@ -915,7 +914,7 @@ export function PianoStudio() {
             <button
               type="button"
               onClick={stopSong}
-              className="rounded-[var(--radius-sm)] border px-2.5 py-1 font-mono text-[11px] transition-colors hover:border-[var(--fg-brand)]"
+              className="text-mono-sm rounded-[var(--radius-sm)] border px-2.5 py-1 font-mono transition-colors hover:border-[var(--fg-brand)]"
               style={{ borderColor: "var(--border-strong)", color: "var(--fg-primary)" }}
             >
               <span aria-hidden style={{ color: "var(--fg-brand)", marginRight: 4, fontSize: 9 }}>

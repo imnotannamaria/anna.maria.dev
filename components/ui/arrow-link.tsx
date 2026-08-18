@@ -72,7 +72,7 @@ export function ArrowLink({
       aria-label={ariaLabel}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className={cn(
-        "group/arrow inline-flex font-mono text-xs",
+        "group/arrow text-mono-sm inline-flex font-mono",
         "text-(--fg-primary) transition-colors duration-200",
         "hover:text-(--fg-brand) focus-visible:text-(--fg-brand) focus-visible:outline-none",
         className,

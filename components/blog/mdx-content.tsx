@@ -2,6 +2,7 @@ import * as runtime from "react/jsx-runtime"
 import Image from "next/image"
 import { InfoIcon } from "@phosphor-icons/react/dist/ssr"
 import { slugify } from "@/lib/utils"
+import { Diamond } from "@/components/ui/diamond"
 
 /** Derive a stable slug id from heading children so the outline/TOC can anchor to it. */
 function headingId(children: React.ReactNode): string | undefined {
@@ -51,7 +52,10 @@ function Callout({
         style={{ color: styles.icon }}
         aria-hidden="true"
       />
-      <div className="text-sm leading-relaxed [&>p]:mb-0" style={{ color: "var(--fg-secondary)" }}>
+      <div
+        className="text-body-md leading-relaxed [&>p]:mb-0"
+        style={{ color: "var(--fg-secondary)" }}
+      >
         {children}
       </div>
     </div>
@@ -63,7 +67,7 @@ function ImageCaption({ src, alt, caption }: { src: string; alt: string; caption
     <figure className="my-8">
       <Image src={src} alt={alt} width={800} height={450} className="w-full rounded-lg" />
       {caption && (
-        <figcaption className="text-text-muted mt-2 text-center text-sm italic">
+        <figcaption className="text-text-muted text-body-md mt-2 text-center italic">
           {caption}
         </figcaption>
       )}
@@ -104,7 +108,7 @@ const defaultComponents = {
   h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1
       id={headingId(children)}
-      className="mt-12 mb-4 scroll-mt-6 text-3xl"
+      className="text-display-md mt-12 mb-4 scroll-mt-6"
       style={{
         fontFamily: "var(--font-serif)",
         fontWeight: 400,
@@ -119,7 +123,7 @@ const defaultComponents = {
   h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
       id={headingId(children)}
-      className="mt-12 mb-4 scroll-mt-6 text-[28px]"
+      className="text-heading-lg mt-12 mb-4 scroll-mt-6"
       style={{
         fontFamily: "var(--font-serif)",
         fontWeight: 400,
@@ -135,7 +139,7 @@ const defaultComponents = {
   h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
       id={headingId(children)}
-      className="mt-10 mb-3 scroll-mt-6 text-xl"
+      className="text-heading-md mt-10 mb-3 scroll-mt-6"
       style={{
         fontFamily: "var(--font-serif)",
         fontWeight: 500,
@@ -148,7 +152,7 @@ const defaultComponents = {
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
-      className="mb-4 text-[16px] leading-[1.7]"
+      className="text-body-lg mb-4 leading-[1.7]"
       style={{
         fontFamily: "var(--font-sans)",
         color: "var(--fg-secondary)",
@@ -175,7 +179,7 @@ const defaultComponents = {
   ),
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
-      className="mb-4 ml-6 list-disc space-y-1.5 text-[16px] leading-[1.7]"
+      className="text-body-lg mb-4 ml-6 list-disc space-y-1.5 leading-[1.7]"
       style={{
         fontFamily: "var(--font-sans)",
         color: "var(--fg-secondary)",
@@ -186,7 +190,7 @@ const defaultComponents = {
   ),
   ol: (props: React.HTMLAttributes<HTMLOListElement>) => (
     <ol
-      className="mb-4 ml-6 list-decimal space-y-1.5 text-[16px] leading-[1.7]"
+      className="text-body-lg mb-4 ml-6 list-decimal space-y-1.5 leading-[1.7]"
       style={{
         fontFamily: "var(--font-sans)",
         color: "var(--fg-secondary)",
@@ -211,9 +215,7 @@ const defaultComponents = {
         className="h-px flex-1"
         style={{ background: "linear-gradient(to right, transparent, var(--border-strong))" }}
       />
-      <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 9, lineHeight: 1 }}>
-        ◆
-      </span>
+      <Diamond style={{ lineHeight: 1 }} />
       <span
         className="h-px flex-1"
         style={{ background: "linear-gradient(to left, transparent, var(--border-strong))" }}
@@ -222,7 +224,7 @@ const defaultComponents = {
   ),
   pre: (props: React.HTMLAttributes<HTMLPreElement>) => (
     <pre
-      className="my-6 overflow-x-auto rounded-lg border border-[var(--border-subtle)] bg-[#0d0d14] p-4 text-sm"
+      className="text-mono-md my-6 overflow-x-auto rounded-lg border border-[var(--border-subtle)] bg-[#0d0d14] p-4"
       {...props}
     />
   ),
@@ -230,7 +232,7 @@ const defaultComponents = {
     if (!props.className) {
       return (
         <code
-          className="rounded px-1.5 py-0.5 font-mono text-[13px]"
+          className="text-mono-md rounded px-1.5 py-0.5 font-mono"
           style={{
             background: "var(--bg-surface)",
             border: "1px solid var(--border-subtle)",

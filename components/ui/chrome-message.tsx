@@ -47,21 +47,21 @@ export function ChromeMessage({
       )}
     >
       <div
-        className="mb-3 font-mono text-xs tracking-[0.08em] uppercase"
+        className="text-mono-sm mb-3 font-mono tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-muted)" }}
       >
         <span style={{ color: prompt }}>$</span> {command}
       </div>
 
       {output && (
-        <p className="m-0 font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
+        <p className="text-mono-md m-0 font-mono" style={{ color: "var(--fg-muted)" }}>
           {output}
         </p>
       )}
 
       <h1
         className={cn(
-          "font-serif text-[40px] leading-none font-normal tracking-[-0.02em]",
+          "text-display-md font-serif leading-none font-normal tracking-[-0.02em]",
           output && "mt-4",
         )}
         style={{ color: "var(--fg-primary)" }}
@@ -69,7 +69,7 @@ export function ChromeMessage({
         {title}
       </h1>
 
-      <p className="mt-4 font-mono text-[13px]" style={{ color: "var(--fg-muted)" }}>
+      <p className="text-mono-md mt-4 font-mono" style={{ color: "var(--fg-muted)" }}>
         {note}
       </p>
 

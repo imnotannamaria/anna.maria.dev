@@ -7,7 +7,7 @@ export default async function NewRoadmapItemPage() {
   return (
     <>
       <h1
-        className="mb-6 font-serif text-4xl leading-none font-normal tracking-[-0.02em]"
+        className="text-display-md mb-6 font-serif leading-none font-normal tracking-[-0.02em]"
         style={{ color: "var(--fg-primary)" }}
       >
         New item

@@ -112,7 +112,7 @@ export default function PianoPage() {
           {/* Breadcrumb */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-8 font-mono text-xs"
+            className="text-mono-sm mb-8 font-mono"
             style={{ color: "var(--fg-muted)" }}
           >
             <Link href="/" className="transition-colors hover:text-[color:var(--fg-primary)]">
@@ -148,7 +148,7 @@ export default function PianoPage() {
                 page stays invisible until hydration plus the delay. The <TypeIn> title carries
                 the entrance instead. */}
             <p
-              className="m-0 text-[17px] leading-[1.65]"
+              className="text-heading-md m-0 leading-[1.65]"
               style={{
                 fontFamily: "var(--font-sans)",
                 color: "var(--fg-secondary)",
@@ -193,7 +193,7 @@ export default function PianoPage() {
               ))}
             </div>
 
-            <p className="mt-6 font-mono text-[11px]" style={{ color: "var(--fg-muted)" }}>
+            <p className="text-mono-sm mt-6 font-mono" style={{ color: "var(--fg-muted)" }}>
               <span aria-hidden style={{ opacity: 0.7 }}>
                 {"// "}
               </span>

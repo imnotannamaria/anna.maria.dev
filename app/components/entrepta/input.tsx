@@ -41,7 +41,7 @@ const inputWrapperVariants = cva(
 const inputBaseClass = [
   "flex-1 min-w-0 h-full",
   "bg-transparent border-0 appearance-none outline-none",
-  "font-mono text-[13px] text-[var(--fg-primary)]",
+  "font-mono text-mono-md text-[var(--fg-primary)]",
   "placeholder:text-[var(--fg-muted)]",
   "disabled:cursor-not-allowed",
 ].join(" ")
@@ -76,7 +76,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {variant === "command" && (
           <kbd
             aria-hidden
-            className="inline-flex shrink-0 items-center gap-0.5 font-mono text-[11px] tracking-wide text-[var(--fg-muted)] select-none"
+            className="text-mono-sm inline-flex shrink-0 items-center gap-0.5 font-mono tracking-wide text-[var(--fg-muted)] select-none"
           >
             <span>⌘</span>
             <span>K</span>

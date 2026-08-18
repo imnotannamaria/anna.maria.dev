@@ -78,11 +78,11 @@ export default async function ProjectPage({ params }: Props) {
       />
 
       <div className="min-w-0">
-        <article className="mx-auto max-w-[760px] px-5 py-12 sm:px-8 lg:px-12">
+        <article className="mx-auto max-w-[760px] px-5 py-12 sm:px-8 md:px-12">
           {/* Breadcrumb */}
           <nav
             aria-label="Breadcrumb"
-            className="mb-4 font-mono text-xs"
+            className="text-mono-sm mb-4 font-mono"
             style={{ color: "var(--fg-muted)" }}
           >
             <Link
@@ -110,7 +110,7 @@ export default async function ProjectPage({ params }: Props) {
           <header className="mb-12 border-b pb-8" style={{ borderColor: "var(--border-subtle)" }}>
             <div className="mb-4 flex flex-wrap items-center gap-1.5">
               {project.featured && (
-                <Badge variant="soft" color="brand" className="h-6 px-2.5 text-[11px]">
+                <Badge variant="soft" color="brand" className="text-mono-sm h-6 px-2.5">
                   featured
                 </Badge>
               )}
@@ -119,7 +119,7 @@ export default async function ProjectPage({ params }: Props) {
                   key={tag}
                   variant="outline"
                   color="neutral"
-                  className="h-6 px-2.5 text-[11px]"
+                  className="text-mono-sm h-6 px-2.5"
                 >
                   {tag}
                 </Badge>
@@ -141,7 +141,7 @@ export default async function ProjectPage({ params }: Props) {
             </h1>
 
             <p
-              className="text-[19px] leading-[1.6]"
+              className="text-heading-md leading-[1.6]"
               style={{
                 fontFamily: "var(--font-sans)",
                 color: "var(--fg-secondary)",
@@ -178,7 +178,7 @@ export default async function ProjectPage({ params }: Props) {
           <div className="mt-16 border-t pt-6" style={{ borderColor: "var(--border-subtle)" }}>
             <Link
               href="/projects"
-              className="inline-flex items-center gap-1.5 font-mono text-xs text-[color:var(--fg-muted)] transition-colors hover:text-[color:var(--fg-primary)]"
+              className="text-mono-sm inline-flex items-center gap-1.5 font-mono text-[color:var(--fg-muted)] transition-colors hover:text-[color:var(--fg-primary)]"
             >
               <span aria-hidden style={{ color: "var(--fg-brand)" }}>
                 ←
@@ -198,7 +198,7 @@ function CtaLink({ href, label }: { href: string; label: string }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="font-mono text-[13px] transition-all duration-150 hover:tracking-[0.06em] hover:[color:var(--fg-brand)]"
+      className="text-mono-md font-mono transition-all duration-150 hover:tracking-[0.06em] hover:[color:var(--fg-brand)]"
       style={{ color: "var(--fg-primary)" }}
     >
       {label}

@@ -34,12 +34,12 @@ export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, n
 
       <div className="relative flex flex-wrap items-center gap-4">
         <span
-          className="flex items-baseline gap-1 font-mono text-[28px] leading-none"
+          className="text-heading-lg flex items-baseline gap-1 font-mono leading-none"
           style={{ color: "var(--fg-primary)" }}
           {...roll.handlers}
         >
           <RollingNumber value={counts.done} cycle={roll.cycle} delay={roll.delay} height={30} />
-          <span className="text-lg" style={{ color: "var(--fg-muted)" }}>
+          <span className="text-heading-md" style={{ color: "var(--fg-muted)" }}>
             /{total}
           </span>
         </span>
@@ -80,7 +80,7 @@ export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, n
                 {counts[status]}
               </span>
               <span
-                className="font-mono text-[11px] tracking-[0.08em] whitespace-nowrap uppercase"
+                className="text-mono-sm font-mono tracking-[0.08em] whitespace-nowrap uppercase"
                 style={{ color: state === "idle" ? "var(--fg-muted)" : "var(--fg-secondary)" }}
               >
                 {STATUS_LABEL[status]}

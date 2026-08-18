@@ -291,7 +291,7 @@ function PosterPreview({ url }: { url?: string }) {
       ) : (
         <span
           aria-hidden
-          className="absolute inset-0 grid place-items-center px-1 text-center font-mono text-[8px] leading-tight uppercase"
+          className="text-mono-xs absolute inset-0 grid place-items-center px-1 text-center font-mono leading-tight uppercase"
           style={{ color: "var(--status-error-fg)" }}
         >
           {failed ? "broken" : "bad url"}

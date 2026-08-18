@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "motion/react"
 import { revealViewport } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import type { TodayData } from "./load"
+import { Diamond } from "@/components/ui/diamond"
 
 const colors = {
   move: "var(--fg-brand)",
@@ -167,14 +168,12 @@ function Header({
           margin: 0,
           fontWeight: 400,
           color: "var(--fg-secondary)",
-          fontSize: 11,
+          fontSize: "var(--text-mono-sm)",
           letterSpacing: "0.08em",
           textTransform: "uppercase",
         }}
       >
-        <span aria-hidden="true" style={{ color: "var(--fg-brand)", fontSize: 10 }}>
-          ◆
-        </span>
+        <Diamond size={10} />
         today / activity
       </h3>
       <span
@@ -183,7 +182,7 @@ function Header({
           alignItems: "center",
           gap: 5,
           color: statusColor,
-          fontSize: 11,
+          fontSize: "var(--text-mono-sm)",
           letterSpacing: "0.12em",
           textTransform: "uppercase",
         }}
@@ -255,7 +254,7 @@ function MetricRow({
       <span
         style={{
           color: "var(--fg-muted)",
-          fontSize: 10,
+          fontSize: "var(--text-mono-xs)",
           letterSpacing: "0.12em",
           minWidth: 64,
           textTransform: "uppercase",
@@ -267,7 +266,7 @@ function MetricRow({
         <span
           style={{
             fontFamily: "var(--font-serif)",
-            fontSize: 26,
+            fontSize: "var(--text-heading-lg)",
             fontWeight: 400,
             fontStyle: "italic",
           }}
@@ -275,7 +274,11 @@ function MetricRow({
           {value}
         </span>
         {suffix ? (
-          <span style={{ color: "var(--fg-muted)", marginLeft: 6, fontSize: 11 }}>{suffix}</span>
+          <span
+            style={{ color: "var(--fg-muted)", marginLeft: 6, fontSize: "var(--text-mono-sm)" }}
+          >
+            {suffix}
+          </span>
         ) : null}
       </span>
     </motion.div>
@@ -304,8 +307,8 @@ function Footer({
         ...extraStyle,
       }}
     >
-      <span style={{ color: "var(--fg-muted)", fontSize: 11 }}>{left}</span>
-      <span style={{ color: "var(--fg-secondary)", fontSize: 11 }}>{right}</span>
+      <span style={{ color: "var(--fg-muted)", fontSize: "var(--text-mono-sm)" }}>{left}</span>
+      <span style={{ color: "var(--fg-secondary)", fontSize: "var(--text-mono-sm)" }}>{right}</span>
     </div>
   )
 }
@@ -413,7 +416,13 @@ export function TodayActivityCardError({ className }: { className?: string }) {
     <Panel className={className}>
       <Header status="error" statusColor={colors.danger} />
       <div
-        style={{ flex: 1, marginTop: 12, color: "var(--fg-muted)", fontSize: 13, lineHeight: 1.5 }}
+        style={{
+          flex: 1,
+          marginTop: 12,
+          color: "var(--fg-muted)",
+          fontSize: "var(--text-mono-md)",
+          lineHeight: 1.5,
+        }}
       >
         <div style={{ color: "var(--fg-primary)", marginBottom: 6 }}>Something went wrong.</div>
         <div>We couldn&apos;t load today&apos;s activity. Try again later.</div>

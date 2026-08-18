@@ -91,44 +91,24 @@ export default function RootLayout({
           skip to content
         </a>
 
-        {/* Editor chrome — fixed full-viewport grid */}
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            display: "grid",
-            gridTemplateRows: "40px 1fr 28px",
-            gridTemplateColumns: "minmax(0, 1fr)",
-          }}
-        >
+        {/* Editor chrome — fixed full-viewport grid. Titlebar 40px, content, status bar 28px. */}
+        <div className="fixed inset-0 grid grid-cols-[minmax(0,1fr)] grid-rows-[40px_1fr_28px]">
           <Titlebar />
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "56px minmax(0, 1fr)",
-              overflow: "hidden",
-              minWidth: 0,
-            }}
-          >
+          <div className="grid min-w-0 grid-cols-[56px_minmax(0,1fr)] overflow-hidden">
             <Sidebar />
             <main
               id="main-content"
               tabIndex={-1}
-              style={{ minWidth: 0, overflowX: "hidden", overflowY: "auto", outline: "none" }}
+              className="min-w-0 overflow-x-hidden overflow-y-auto outline-none"
             >
               {children}
             </main>
           </div>
 
+          {/* No position override: StatusBar is `relative` now, so it sits in the grid row
+              rather than being pinned and then un-pinned from here. */}
           <StatusBar
-            style={{
-              position: "relative",
-              bottom: "auto",
-              left: "auto",
-              right: "auto",
-              zIndex: "auto",
-            }}
             left={
               <>
                 <StatusBarItem>◆ annamaria.app</StatusBarItem>
@@ -140,8 +120,10 @@ export default function RootLayout({
               <>
                 <StatusBarItem className="gap-1.5">
                   <kbd
-                    className="rounded-[3px] px-1.5 py-px text-[10px]"
-                    style={{ border: "1px solid rgba(255,255,255,0.3)" }}
+                    className="text-mono-xs rounded-[3px] px-1.5 py-px"
+                    style={{
+                      border: "1px solid color-mix(in srgb, var(--fg-on-brand) 30%, transparent)",
+                    }}
                   >
                     ⌘K
                   </kbd>
@@ -149,8 +131,10 @@ export default function RootLayout({
                     /
                   </span>
                   <kbd
-                    className="rounded-[3px] px-1.5 py-px text-[10px]"
-                    style={{ border: "1px solid rgba(255,255,255,0.3)" }}
+                    className="text-mono-xs rounded-[3px] px-1.5 py-px"
+                    style={{
+                      border: "1px solid color-mix(in srgb, var(--fg-on-brand) 30%, transparent)",
+                    }}
                   >
                     Ctrl K
                   </kbd>

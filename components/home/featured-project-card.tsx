@@ -115,7 +115,7 @@ export function FeaturedProjectCard({
       <CardHead label="featured" meta={<Badge variant="brand-soft">SHIPPED</Badge>} />
 
       <p
-        className="relative font-mono text-xs tracking-[0.04em]"
+        className="text-mono-sm relative font-mono tracking-[0.04em]"
         style={{ color: "var(--fg-brand)" }}
       >
         {String(index).padStart(2, "0")} / {String(total).padStart(2, "0")}
@@ -126,7 +126,7 @@ export function FeaturedProjectCard({
         style={{
           fontFamily: "var(--font-serif)",
           fontWeight: 400,
-          fontSize: 48,
+          fontSize: "var(--text-display-md)",
           lineHeight: 1,
           letterSpacing: "-0.02em",
           color: "var(--fg-primary)",
@@ -153,7 +153,7 @@ export function FeaturedProjectCard({
       </h3>
 
       <p
-        className="relative max-w-[44ch] text-sm leading-relaxed"
+        className="text-body-md relative max-w-[44ch] leading-relaxed"
         style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
       >
         {project.description}
