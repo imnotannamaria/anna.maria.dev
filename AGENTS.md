@@ -428,6 +428,12 @@ Only the most recent `featured: true` project shows on the home page.
 
 ## Environment variables
 
+Secrets are managed with [Infisical](https://infisical.com), not a committed `.env.local`.
+Run local dev as `infisical run -- npm run dev` (needs `infisical login` once; the project id
+lives in `.infisical.json`, which is committed since it holds no secret). A plain `npm run dev`
+only works if you still have a `.env.local` — `.env.example` lists the same variables below as
+a fallback.
+
 ```bash
 # Resend, required for the contact form
 RESEND_API_KEY=re_xxxxxxxxxxxx
@@ -483,6 +489,10 @@ Everything except Resend and the base URL is optional. Without a database the wr
   "seed:roadmap": "tsx scripts/seed-roadmap.ts"
 }
 ```
+
+`dev`, `build` and anything else that reads env vars expects them already in the process —
+run it via `infisical run -- <script>` rather than adding Infisical into the script itself,
+so the scripts still work for anyone using a plain `.env.local`.
 
 ---
 
