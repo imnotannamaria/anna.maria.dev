@@ -19,6 +19,7 @@
  * and arrives as `children` — the whole reason the feeds take children rather than a `title`.
  */
 
+import { useMemo } from "react"
 import { PageOutline, type OutlineItem } from "./page-outline"
 import { FilterPill } from "@/components/ui/url-filter"
 
@@ -67,6 +68,7 @@ export function FeedShell<T>({
   empty,
   listClassName,
   renderItem,
+  preOutline,
   children,
 }: {
   /** The name in the outline chip: `posts/`, `projects/`, `log.tsx`. */
@@ -93,18 +95,35 @@ export function FeedShell<T>({
   listClassName: string
   /** Must return a keyed element. `index` is already the staggered one. */
   renderItem: (item: T, index: number) => React.ReactNode
+  /**
+   * Outline rows for content the page renders *above* the feed, prepended to the generated
+   * ones. /components uses it for its token subsections; the other three pages pass nothing
+   * and render exactly as they did.
+   */
+  preOutline?: OutlineItem[]
   /** The server-rendered page header. */
   children: React.ReactNode
 }) {
-  const outline: OutlineItem[] = [
-    { id: root.id, label: root.label, level: 1 },
-    ...groups.map((group) => ({
-      id: group.id,
-      label: group.label,
-      level: 2 as const,
-      count: group.items.length,
-    })),
-  ]
+  /**
+   * Memoised, and not only for the render cost. `PageOutline` keys its IntersectionObserver
+   * effect on `items`, so a fresh array identity every render tore the observer down and
+   * rebuilt it on every render — including every filter-pill click. Harmless while the lists
+   * were short; this page has the most outline rows on the site, token subsections plus
+   * showcase groups.
+   */
+  const outline: OutlineItem[] = useMemo(
+    () => [
+      ...(preOutline ?? []),
+      { id: root.id, label: root.label, level: 1 },
+      ...groups.map((group) => ({
+        id: group.id,
+        label: group.label,
+        level: 2 as const,
+        count: group.items.length,
+      })),
+    ],
+    [preOutline, root.id, root.label, groups],
+  )
 
   return (
     <div className="mx-auto grid w-full max-w-[1160px] grid-cols-1 min-[1100px]:grid-cols-[200px_minmax(0,1fr)]">

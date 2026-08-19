@@ -38,12 +38,12 @@ wiring, the nav entry, and the review pass twice for that one reader. One route:
 opens on what the site is drawn from, then shows what's built from it. The outline rail does
 double duty as the table of contents for both halves.
 
-A screenshot of `bpaulino.com/system/` came along as a reference — a numbered console readout
-of colour and type — and it set the _shape_: swatch grids, a type scale table, meta badges in
-the header. None of its _content_ transfers. That page is a single dark theme with radius 0 and
-no shadows; this site is six themes across two modes, five radii, and three shadow tokens. The
-tokens section below is read straight out of `app/globals.css`, and where the two disagree, this
-site's own file wins — see "The tokens section" for what that means in practice.
+A reference came along for the shape of the tokens half — a numbered console readout of colour
+and type — and what it lent is exactly that: numbered sections, swatch grids, a type scale
+table, meta badges in the header. None of the content transfers, because it described a single
+dark theme with radius 0 and no shadows and this site is six themes across two modes, five
+radii and three shadow tokens. Everything in the tokens section is read straight out of
+`app/globals.css` — see "The tokens section" for what that means in practice.
 
 ---
 
@@ -819,10 +819,11 @@ without failing.
 `generated-cover`, `timeline` and the rest render from props that cannot fail. Giving them a
 loading state would be ceremony, and the audit above is what says which is which.
 
-**No copy of `bpaulino.com/system/`'s claims.** Dark only, radius 0, no shadows are true of that
-page and false of this one. What it lent is the shape — numbered sections, a swatch grid, a type
-scale table, meta badges — and the content underneath is `app/globals.css`, read straight, not a
-second draft of someone else's design system with this site's hex values swapped in.
+**No borrowed claims.** "Dark only", "radius 0", "no shadows" are things other design-system
+pages say about themselves, and all three are false here. The reference lent a shape — numbered
+sections, a swatch grid, a type scale table, meta badges — and the content underneath is
+`app/globals.css`, read straight, not a second draft of someone else's system with this site's
+hex values swapped in.
 
 **No frozen contrast table.** The twelve-row measurement already lives as a comment in
 `globals.css` and stays there, unduplicated. The page prints one live number for whichever

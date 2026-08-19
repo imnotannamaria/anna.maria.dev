@@ -66,6 +66,10 @@ const SITE_TREE: TreeNode[] = [
          in memory, and it has no reason to fetch roadmap items — a number in this row would
          cost a query for a row that is one word wide. */
       { name: "roadmap.md", kind: "file", href: "/roadmap" },
+      /* No count here for the same reason roadmap.md has none: the counts in this tree come
+         off lists the home page already holds, and the showcase registry is not one of them.
+         A number would mean importing it for a row one word wide. */
+      { name: "components/", kind: "folder", href: "/components" },
       { name: "contact.tsx", kind: "file", href: "/contact" },
     ],
   },

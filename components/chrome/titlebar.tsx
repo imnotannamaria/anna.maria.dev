@@ -14,6 +14,7 @@ import {
   SquaresFourIcon,
   FileIcon,
   ListChecksIcon,
+  SwatchesIcon,
 } from "@phosphor-icons/react"
 import { motion, useReducedMotion } from "motion/react"
 import { EASE_OUT } from "@/components/ui/reveal"
@@ -45,6 +46,7 @@ const NAV_TABS: Tab[] = [
   { href: "/log", name: "log.tsx", icon: SquaresFourIcon },
   { href: "/piano", name: "piano.tsx", icon: PianoKeysIcon },
   { href: "/roadmap", name: "roadmap.md", icon: ListChecksIcon },
+  { href: "/components", name: "components/", icon: SwatchesIcon },
 ]
 
 /**
@@ -58,6 +60,8 @@ function getDynamicTab(pathname: string): Tab | null {
   if (blogMatch) return { href: pathname, name: `${blogMatch[1]}.mdx`, icon: FileIcon }
   const projectMatch = pathname.match(/^\/projects\/(.+)/)
   if (projectMatch) return { href: pathname, name: `${projectMatch[1]}.tsx`, icon: FileIcon }
+  const componentMatch = pathname.match(/^\/components\/(.+)/)
+  if (componentMatch) return { href: pathname, name: `${componentMatch[1]}.mdx`, icon: FileIcon }
   return null
 }
 
@@ -69,6 +73,7 @@ function getDynamicTab(pathname: string): Tab | null {
 function closeTarget(href: string): string {
   if (href.startsWith("/blog/")) return "/blog"
   if (href.startsWith("/projects/")) return "/projects"
+  if (href.startsWith("/components/")) return "/components"
   return "/"
 }
 
@@ -78,6 +83,7 @@ function isTabActive(href: string, pathname: string): boolean {
   // directory tabs: active only if no dynamic tab takes over
   if (href === "/blog" && pathname.startsWith("/blog/")) return false
   if (href === "/projects" && pathname.startsWith("/projects/")) return false
+  if (href === "/components" && pathname.startsWith("/components/")) return false
   return false
 }
 

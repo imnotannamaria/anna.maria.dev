@@ -71,7 +71,8 @@ export function FilterPill({
   onClick,
 }: {
   label: string
-  count: number
+  /** Omitted where there is nothing to tally — the showcase's state pills, for one. */
+  count?: number
   active: boolean
   onClick: () => void
 }) {
@@ -103,7 +104,7 @@ export function FilterPill({
       {/* Not dimmed. It carried `opacity: 0.55`, which put it at 2.2–3.0:1 in every theme,
           in both states — the count is information, not decoration, so it has to be as
           legible as the label beside it. The gap is what separates them. */}
-      <span>{count}</span>
+      {count != null && <span>{count}</span>}
     </button>
   )
 }

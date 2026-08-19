@@ -7,6 +7,7 @@ import { StatusBar, StatusBarItem, StatusBarSeparator } from "@/app/components/e
 import { ThemeScript } from "@/app/components/entrepta/theme-switcher"
 import { ThemeSwitcher } from "@/app/components/entrepta/theme-switcher"
 import { Toaster } from "@/app/components/entrepta/toast"
+import { THEMES } from "@/lib/site-config"
 import { calcYearsOfExp } from "@/lib/experience"
 import "./globals.css"
 
@@ -35,15 +36,6 @@ const mono = JetBrains_Mono({
   variable: "--font-mono",
   fallback: ["SF Mono", "Menlo", "monospace"],
 })
-
-const THEMES = [
-  { id: "entrepta", label: "entrepta", color: "#7c6bff", lightColor: "#6b5bff" },
-  { id: "blossom", label: "blossom", color: "#cc2e36", lightColor: "#b02028" },
-  { id: "marmalade", label: "marmalade", color: "#ff8213", lightColor: "#e06800" },
-  { id: "julia", label: "julia", color: "#e85a8a", lightColor: "#cc3a6a" },
-  { id: "ivy", label: "ivy", color: "#35a365", lightColor: "#258a50" },
-  { id: "bosco", label: "bosco", color: "#2563eb", lightColor: "#1d4ed8" },
-] as const
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

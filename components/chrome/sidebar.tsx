@@ -12,6 +12,7 @@ import {
   PianoKeysIcon,
   SquaresFourIcon,
   ListChecksIcon,
+  SwatchesIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { EASE_OUT } from "@/components/ui/reveal"
@@ -25,6 +26,7 @@ const NAV_ITEMS = [
   { href: "/log", icon: SquaresFourIcon, label: "Log" },
   { href: "/piano", icon: PianoKeysIcon, label: "Piano" },
   { href: "/roadmap", icon: ListChecksIcon, label: "Roadmap" },
+  { href: "/components", icon: SwatchesIcon, label: "Components" },
 ]
 
 function isNavActive(href: string, pathname: string): boolean {

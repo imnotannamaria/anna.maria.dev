@@ -12,6 +12,7 @@ import {
   SquaresFourIcon,
   LockSimpleIcon,
   ListChecksIcon,
+  SwatchesIcon,
 } from "@phosphor-icons/react"
 import {
   CommandDialog,
@@ -35,6 +36,7 @@ const PAGES: Page[] = [
   { href: "/log", name: "log.tsx", hint: "~/log", icon: SquaresFourIcon },
   { href: "/piano", name: "piano.tsx", hint: "~/piano", icon: PianoKeysIcon },
   { href: "/roadmap", name: "roadmap.md", hint: "~/roadmap", icon: ListChecksIcon },
+  { href: "/components", name: "components/", hint: "~/components", icon: SwatchesIcon },
 ]
 
 /**

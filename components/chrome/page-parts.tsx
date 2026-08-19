@@ -142,7 +142,7 @@ export function MetaGrid({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function MetaCol({ label, value }: { label: string; value: string }) {
+export function MetaCol({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5">
       <dt
@@ -151,6 +151,9 @@ export function MetaCol({ label, value }: { label: string; value: string }) {
       >
         {label}
       </dt>
+      {/* ReactNode rather than string: a case study passes a date, a component doc passes a
+          row of badges. A string is still a ReactNode, so every existing call site is
+          unchanged. */}
       <dd className="text-mono-md font-mono" style={{ color: "var(--fg-primary)", margin: 0 }}>
         {value}
       </dd>
