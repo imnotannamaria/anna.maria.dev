@@ -19,6 +19,7 @@
 
 import dynamic from "next/dynamic"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
+import { ChunkBoundary } from "@/components/ui/chunk-boundary"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
 const StackFlow = dynamic(() => import("./stack-flow").then((m) => m.StackFlow), {
@@ -40,7 +41,34 @@ export function StackGraph() {
         height: "clamp(420px, 62vh, 620px)",
       }}
     >
-      {wide ? <StackFlow /> : <Skeleton className="h-full w-full" />}
+      {/* Below `md` the pane is never built, and that is a state rather than a failure — the
+          badge list on the page is `md:sr-only`, so nothing is missing, it is just shown a
+          different way. Above it, the chunk can fail, and `next/dynamic` has no error UI of
+          its own: a dropped request left this blank forever with nothing to retry. */}
+      {wide ? (
+        <ChunkBoundary
+          logTag="[stack-graph] chunk failed"
+          fallback={(retry) => (
+            <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
+              <p className="text-mono-sm m-0 font-mono" style={{ color: "var(--fg-secondary)" }}>
+                {"// the graph didn't load"}
+              </p>
+              <button
+                type="button"
+                onClick={retry}
+                className="text-mono-sm cursor-pointer font-mono transition-colors"
+                style={{ color: "var(--fg-brand)" }}
+              >
+                try again →
+              </button>
+            </div>
+          )}
+        >
+          <StackFlow />
+        </ChunkBoundary>
+      ) : (
+        <Skeleton className="h-full w-full" />
+      )}
 
       <span
         className="text-mono-xs pointer-events-none absolute top-3 right-3 font-mono"
