@@ -65,7 +65,8 @@ cp .env.example .env.local
 ```
 
 (The live site manages its own secrets with [Infisical](https://infisical.com) instead of a
-committed `.env.local` — see step 4. For a fork, `.env.local` is the simpler path.)
+committed `.env.local`, which is why `npm run dev` is wrapped in it — see step 4 for the fork
+path.)
 
 ```bash
 # Required: get yours at resend.com
@@ -122,12 +123,16 @@ Edit the following files with your own data:
 npm run dev
 ```
 
-If you're pulling secrets from Infisical instead of `.env.local`, run it through Infisical so
-the variables get injected into the process:
+`dev` is wrapped in [Infisical](https://infisical.com), which is how this repo keeps its own
+secrets out of the working tree. **On a fork, that is not what you want** — use the script that
+reads your `.env.local` instead:
 
 ```bash
-infisical run -- npm run dev
+npm run dev:local
 ```
+
+(Or run `infisical login` and point `.infisical.json` at your own workspace, if you'd rather
+have a secrets manager too.)
 
 Open [localhost:3000](http://localhost:3000).
 

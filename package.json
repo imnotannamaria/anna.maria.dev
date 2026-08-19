@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "run-p dev:velite dev:next",
+    "dev": "infisical run -- run-p dev:velite dev:next",
+    "dev:local": "run-p dev:velite dev:next",
     "dev:next": "next dev",
     "dev:velite": "velite --watch",
     "build": "velite build && next build",
