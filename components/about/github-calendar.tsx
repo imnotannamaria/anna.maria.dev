@@ -5,6 +5,7 @@ import { createPortal } from "react-dom"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
 import { EASE_OUT } from "@/components/ui/reveal"
 import type { ContributionWeek, ContributionYear } from "@/lib/github/contributions"
+import type { CardState } from "@/lib/showcase/state"
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -138,7 +139,8 @@ const Column = memo(function Column({
   )
 })
 
-export function GithubCalendar({ data }: { data: ContributionYear | null }) {
+export function GithubCalendar({ state }: { state: CardState<ContributionYear> }) {
+  const data = state.kind === "ok" || state.kind === "stale" ? state.data : null
   const reduce = useReducedMotion() ?? false
   const [hover, setHover] = useState<Hover>(null)
 
@@ -215,10 +217,16 @@ export function GithubCalendar({ data }: { data: ContributionYear | null }) {
   const hoveredDay = hover ? (weeks[hover.week]?.[hover.day] ?? null) : null
   const active = hoveredDay?.date ? hoveredDay : null
 
+  // Two branches, not one. This used to be a single `if (!data)` that printed
+  // "contributions unavailable" whether GitHub was unreachable or the account
+  // genuinely had a quiet year — the first is about this server and the second is
+  // about the account, and only one of them is the visitor's business.
   if (!data) {
     return (
       <p className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
-        contributions unavailable
+        {state.kind === "empty"
+          ? "no public contributions in the last 12 months"
+          : "couldn't reach github"}
       </p>
     )
   }

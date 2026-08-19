@@ -1,5 +1,7 @@
 import "server-only"
 
+import type { CardState } from "@/lib/showcase/state"
+
 export type ContributionLevel = 0 | 1 | 2 | 3 | 4
 export type ContributionDay = { date: string; count: number; level: ContributionLevel }
 export type ContributionWeek = ContributionDay[]
@@ -42,15 +44,20 @@ type GraphQLDay = { date: string; contributionCount: number; contributionLevel: 
 type GraphQLWeek = { contributionDays: GraphQLDay[] }
 
 /**
- * A year of public contributions, or null when it cannot be had.
+ * A year of public contributions, as a state rather than a nullable.
  *
- * Null rather than a throw: this feeds a card on two pages, and neither should
- * fail to render because a token is missing locally or GitHub is having a
- * moment. The card owns the empty state.
+ * A state rather than a throw, for the reason it always was: this feeds a card on two pages
+ * and neither should fail to render because a token is missing locally or GitHub is having a
+ * moment. What changed is that it used to return `null` for four different things — no token,
+ * a non-200, a GraphQL error, and an account with no contributions — so the card had a single
+ * `if (!data)` branch doing all four jobs and told visitors "no contributions yet" when the
+ * truth was "I could not reach GitHub". One of those is about the account and three are about
+ * this server; they are different sentences and the card can only say the right one if the
+ * difference survives the return.
  */
-export async function getContributions(login: string): Promise<ContributionYear | null> {
+export async function getContributions(login: string): Promise<CardState<ContributionYear>> {
   const token = process.env.GITHUB_TOKEN
-  if (!token) return null
+  if (!token) return { kind: "error", message: "GITHUB_TOKEN not set" }
 
   try {
     const res = await fetch("https://api.github.com/graphql", {
@@ -65,7 +72,7 @@ export async function getContributions(login: string): Promise<ContributionYear 
 
     if (!res.ok) {
       console.error(`[contributions] GitHub responded ${res.status}`)
-      return null
+      return { kind: "error", message: `GitHub responded ${res.status}` }
     }
 
     const json = await res.json()
@@ -75,11 +82,13 @@ export async function getContributions(login: string): Promise<ContributionYear 
       // message only — never the response body, which echoes the query and
       // could end up carrying more than intended in a future edit.
       console.error("[contributions] GraphQL error:", json.errors[0]?.message)
-      return null
+      return { kind: "error", message: "GraphQL error" }
     }
 
     const calendar = json?.data?.user?.contributionsCollection?.contributionCalendar
-    if (!calendar?.weeks?.length) return null
+    // The one branch that is genuinely about the account rather than about this server: the
+    // request worked and the answer is that there is nothing to draw.
+    if (!calendar?.weeks?.length) return { kind: "empty" }
 
     const weeks: ContributionWeek[] = calendar.weeks.map((week: GraphQLWeek, i: number) => {
       const days: ContributionDay[] = week.contributionDays.map((day) => ({
@@ -97,7 +106,7 @@ export async function getContributions(login: string): Promise<ContributionYear 
       return i === 0 ? [...pad, ...days] : [...days, ...pad]
     })
 
-    return { weeks, total: calendar.totalContributions }
+    return { kind: "ok", data: { weeks, total: calendar.totalContributions } }
   } catch (err) {
     // Logged server-side only — never returned to the caller, which is what
     // the security check means by no stack traces in a response. `err.message`
@@ -105,6 +114,6 @@ export async function getContributions(login: string): Promise<ContributionYear 
     // request that produced it, and the request carries the Authorization
     // header.
     console.error("[contributions] fetch failed:", err instanceof Error ? err.message : err)
-    return null
+    return { kind: "error", message: "fetch failed" }
   }
 }

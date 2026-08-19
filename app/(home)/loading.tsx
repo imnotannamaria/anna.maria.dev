@@ -1,6 +1,16 @@
 /**
- * The home page is force-dynamic — the wristkit rings and the log shelf are supposed to read
- * as live — so it waits on Postgres before anything paints.
+ * What the home page shows before the shell itself is ready — which is now a much smaller job
+ * than it was.
+ *
+ * This used to cover everything: `Home()` awaited one `Promise.all` of three queries, so a slow
+ * log query held the whole page here, including the featured project, the stack card and the
+ * piano, none of which touch a database. Every card that reads something now sits behind its
+ * own `<Suspense>` with its own `CardLoading`, so the shell paints immediately and each card
+ * fills in on its own clock. This file is what is left: the frame around a page whose slow
+ * parts announce themselves individually.
+ *
+ * The page is still force-dynamic — the wristkit rings and the log shelf are supposed to read
+ * as live — and streaming does not change that.
  *
  * It lives in a `(home)` route group, and that is not cosmetic. As `app/loading.tsx` it was
  * the Suspense boundary for **every** route in the app, so `notFound()` anywhere underneath
