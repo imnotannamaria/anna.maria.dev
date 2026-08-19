@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { motion } from "motion/react"
+import { useReveal } from "@/components/ui/reveal"
 import { useRouter } from "next/navigation"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -34,6 +36,7 @@ export function RoadmapItemForm({ item }: { item?: RoadmapItem }) {
   const router = useRouter()
   const editing = Boolean(item)
   const [submitting, setSubmitting] = useState(false)
+  const reveal = useReveal()
 
   const {
     register,
@@ -79,7 +82,7 @@ export function RoadmapItemForm({ item }: { item?: RoadmapItem }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+    <motion.form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6" {...reveal}>
       <Field id="title" label="title" required error={errors.title?.message}>
         <Input
           id="title"
@@ -195,6 +198,6 @@ export function RoadmapItemForm({ item }: { item?: RoadmapItem }) {
           cancel
         </Button>
       </div>
-    </form>
+    </motion.form>
   )
 }

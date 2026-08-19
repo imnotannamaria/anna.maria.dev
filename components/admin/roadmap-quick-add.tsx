@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { motion } from "motion/react"
+import { useReveal } from "@/components/ui/reveal"
 import { useRouter } from "next/navigation"
 import { PlusIcon } from "@phosphor-icons/react"
 import { Button } from "@/app/components/entrepta/button"
@@ -19,6 +21,7 @@ export function RoadmapQuickAdd() {
   const router = useRouter()
   const [title, setTitle] = useState("")
   const [saving, setSaving] = useState(false)
+  const reveal = useReveal()
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -50,7 +53,7 @@ export function RoadmapQuickAdd() {
   }
 
   return (
-    <form onSubmit={submit} className="mb-8 flex flex-col gap-2">
+    <motion.form onSubmit={submit} className="mb-8 flex flex-col gap-2" {...reveal}>
       <label
         htmlFor="quick-add"
         className="text-mono-xs flex items-center gap-1.5 font-mono tracking-[0.08em] uppercase"
@@ -79,6 +82,6 @@ export function RoadmapQuickAdd() {
         <span style={{ opacity: 0.6 }}>{"// "}</span>
         lands as raw. nothing raw ever renders on the site.
       </span>
-    </form>
+    </motion.form>
   )
 }
