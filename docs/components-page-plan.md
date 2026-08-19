@@ -803,6 +803,36 @@ built, phase 7 is what stops 0–3 and 6 both from rotting unseen.
 
 ---
 
+## What the build taught us
+
+Four things the plan did not know, found while executing it. Each one is in the code now; they
+are recorded here because they are the kind of thing that gets re-discovered otherwise.
+
+**`velite build` exits 0 on a validation failure.** It reports schema issues, drops the offending
+document, and returns success — so neither the new refinements _nor the existing `cover` one_
+ever failed a build. That is precisely the `wirstkit.mdx` story CLAUDE.md tells: one typo, every
+project missing from `/projects`, and a green build. The flag is `--strict`, and `build` now
+carries it. Verified both directions: a broken path exits 1, a valid tree exits 0.
+
+**A pure card module must not re-export a server-only loader.**
+`components/wristkit/today-activity-card/index.tsx` re-exported `loadTodayActivity`, which imports
+the Postgres client. That was invisible until a client component rendered the card from a fixture,
+at which point the build failed with four errors pointing at the wrong files. The index exports the
+card; callers that need the query import `./load`.
+
+**`useSyncExternalStore`, not state synced in an effect.** The theme lives on `<html>`, which makes
+it an external store — and React's `set-state-in-effect` lint says so. The subscribe/snapshot shape
+`components/ui/url-filter.tsx` already uses for the URL is the same shape here, with the snapshot
+being `data-theme:data-mode` as a string. It also removes the SSR question: the server snapshot is
+empty, so nothing is read during prerender.
+
+**A permissive colour parser fails silently.** The first `parseRgb` scraped numbers out of any
+string, so `color-mix(in srgb, #7c6bff 35%, transparent)` parsed into a colour built from the
+hex digits — quietly wrong on exactly the input it sees when someone forgets the probe element.
+Its own unit test caught it. It is anchored to `rgb(`/`rgba(` now and returns null otherwise.
+
+---
+
 ## What this plan deliberately does not do
 
 **No component playground.** No prop editors, no live code editing, no copy-to-clipboard of a
