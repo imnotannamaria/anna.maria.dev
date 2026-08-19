@@ -52,10 +52,22 @@ export function useUrlFilter<T extends string>(
 
   const active = useSyncExternalStore(subscribe, read, serverSnapshot)
 
-  /** pushState rather than replaceState, so the back button undoes a filter. */
+  /**
+   * pushState rather than replaceState, so the back button undoes a filter.
+   *
+   * Built from the params already in the URL rather than from `param` alone. This used to write
+   * `${basePath}?${param}=${next}`, which threw away every other query param — fine while each
+   * page had exactly one filter, and silently wrong the moment one has two. `/components` has
+   * the view tab and the group filter side by side, and switching tabs would have dropped the
+   * filter without anything appearing to go wrong.
+   */
   const write = useCallback(
     (next: T | null) => {
-      window.history.pushState(null, "", next ? `${basePath}?${param}=${next}` : basePath)
+      const params = new URLSearchParams(window.location.search)
+      if (next) params.set(param, next)
+      else params.delete(param)
+      const query = params.toString()
+      window.history.pushState(null, "", query ? `${basePath}?${query}` : basePath)
       window.dispatchEvent(new Event(event))
     },
     [basePath, param, event],

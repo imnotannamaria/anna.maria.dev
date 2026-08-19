@@ -1,26 +1,25 @@
 "use client"
 
 /**
- * The client half of `/components`: the filter, and the cards.
+ * The showcase grid: the filter row, and one card per component.
  *
- * `FeedShell` does the layout, as it does for /blog, /projects and /log. This is the fourth
- * index page on the site and inventing a fourth arrangement is the divergence the
- * Standardization check is about.
- *
- * The tokens section arrives as `children` — server-rendered, above the filter — and its
- * outline rows come in through `preOutline`, so the rail is one list rather than two.
+ * It is not drawn in `FeedShell`. That shell's own doc comment says what it is — "the shell the
+ * three index pages are drawn in: /blog, /projects and /log" — and a tabbed documentation page
+ * is not that shape: the rail belongs to the page rather than to this list, and two of the three
+ * tabs are not feeds at all. What it does reuse is every *piece* that makes those pages look
+ * like this site: `FilterPill`, `.bento-card`, `CardHead`/`CardFoot`, the same section-head
+ * rhythm and the same 880px column. Standardization is about the vocabulary, not about routing
+ * a different problem through one component.
  */
 
-import { FeedShell, groupInOrder, type FeedGroup } from "@/components/chrome/feed-shell"
-import { useUrlFilter } from "@/components/ui/url-filter"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
 import { ArrowLink } from "@/components/ui/arrow-link"
-import type { OutlineItem } from "@/components/chrome/page-outline"
+import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
 import { GROUP_LABEL, type ShowcaseEntry } from "@/lib/showcase/registry"
 import { sourceUrl } from "@/lib/showcase/source"
 import { StateCarousel } from "./state-carousel"
 
-const GROUPS = ["home", "about", "shared"] as const
+export const SHOWCASE_GROUPS = ["home", "about", "shared"] as const
 
 /** Roughly how tall each card ends up, so a frame reserves the right box before it mounts. */
 const MIN_HEIGHT: Record<string, number> = {
@@ -74,76 +73,85 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
   )
 }
 
-export function ShowcaseFeed({
-  entries,
-  preOutline,
-  children,
-}: {
-  entries: ShowcaseEntry[]
-  preOutline: OutlineItem[]
-  children: React.ReactNode
-}) {
+export function ShowcaseFeed({ entries }: { entries: ShowcaseEntry[] }) {
   // useUrlFilter, never useSearchParams: on a statically rendered route the latter makes
-  // prerender emit the nearest Suspense fallback, and every card would be missing from the
-  // HTML a crawler reads — on the one page whose job is listing components.
-  const [active, setFilter] = useUrlFilter("where", GROUPS, "/components")
-
-  // FeedShell's onFilter is typed for any string, since it does not know the union each page
-  // allows. Narrowing here rather than widening useUrlFilter keeps the filter's own type
-  // honest — a value that is not one of GROUPS clears the filter, which is what a junk
-  // ?where= in the URL should do anyway.
-  const onFilter = (next: string | null) =>
-    setFilter(
-      next && (GROUPS as readonly string[]).includes(next)
-        ? (next as (typeof GROUPS)[number])
-        : null,
-    )
+  // prerender emit the nearest Suspense fallback, and every card would be missing from the HTML
+  // a crawler reads — on the one tab whose job is listing components.
+  const [active, setFilter] = useUrlFilter("where", SHOWCASE_GROUPS, "/components")
 
   const visible = active ? entries.filter((e) => e.group === active) : entries
 
-  const groups: FeedGroup<ShowcaseEntry>[] = groupInOrder(visible, (e) => e.group).map(
-    ({ key, items }) => ({
-      id: `group-${key}`,
-      label: GROUP_LABEL[key as ShowcaseEntry["group"]],
-      items,
-    }),
-  )
-
-  const pills = GROUPS.map((g) => ({
+  const pills = SHOWCASE_GROUPS.map((g) => ({
     key: g,
     label: GROUP_LABEL[g],
     count: entries.filter((e) => e.group === g).length,
   })).filter((p) => p.count > 0)
 
   return (
-    <FeedShell
-      file="components/"
-      root={{ id: "showcase", label: "components" }}
-      preOutline={preOutline}
-      filterLabel="Filter by page"
-      pills={pills}
-      totalCount={entries.length}
-      active={active}
-      onFilter={onFilter}
-      groups={groups}
-      groupMeta={(g) => `${g.items.length} ${g.items.length === 1 ? "component" : "components"}`}
-      empty={{
-        all: "nothing documented yet.",
-        filtered: "nothing on that page yet.",
-      }}
-      listClassName="flex flex-col gap-6"
-      renderItem={(entry) => <ShowcaseCard key={entry.slug} entry={entry} />}
-      footer={
-        <>
-          <div className="flex justify-between">
-            <span>{"// components"}</span>
-            <span>{entries.length}</span>
-          </div>
-          <div>{"// every state, every deploy"}</div>
-        </>
-      }
-    >
-      {children}
-    </FeedShell>
+    <div>
+      <div role="group" aria-label="Filter by page" className="flex flex-wrap gap-2">
+        <FilterPill
+          label="all"
+          count={entries.length}
+          active={!active}
+          onClick={() => setFilter(null)}
+        />
+        {pills.map((pill) => (
+          <FilterPill
+            key={pill.key}
+            label={pill.label}
+            count={pill.count}
+            active={active === pill.key}
+            onClick={() => setFilter(active === pill.key ? null : pill.key)}
+          />
+        ))}
+      </div>
+
+      {SHOWCASE_GROUPS.filter((g) => visible.some((e) => e.group === g)).map((group) => {
+        const items = visible.filter((e) => e.group === group)
+        return (
+          <section
+            key={group}
+            id={`group-${group}`}
+            className="mt-10 border-t pt-8"
+            style={{ borderColor: "var(--border-subtle)", scrollMarginTop: 24 }}
+          >
+            <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+              <h3
+                className="m-0"
+                style={{
+                  fontFamily: "var(--font-serif)",
+                  fontWeight: 400,
+                  fontSize: "clamp(24px, 3vw, 32px)",
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
+                  color: "var(--fg-primary)",
+                }}
+              >
+                {GROUP_LABEL[group]}
+              </h3>
+              <span
+                className="text-mono-sm font-mono tracking-[0.08em] uppercase"
+                style={{ color: "var(--fg-muted)" }}
+              >
+                {items.length} {items.length === 1 ? "component" : "components"}
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-6">
+              {items.map((entry) => (
+                <ShowcaseCard key={entry.slug} entry={entry} />
+              ))}
+            </div>
+          </section>
+        )
+      })}
+
+      {visible.length === 0 && (
+        <p className="text-mono-md mt-12 font-mono" style={{ color: "var(--fg-muted)" }}>
+          {entries.length === 0 ? "nothing documented yet." : "nothing on that page yet."}
+        </p>
+      )}
+    </div>
   )
 }

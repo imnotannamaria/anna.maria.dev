@@ -68,7 +68,6 @@ export function FeedShell<T>({
   empty,
   listClassName,
   renderItem,
-  preOutline,
   children,
 }: {
   /** The name in the outline chip: `posts/`, `projects/`, `log.tsx`. */
@@ -95,25 +94,16 @@ export function FeedShell<T>({
   listClassName: string
   /** Must return a keyed element. `index` is already the staggered one. */
   renderItem: (item: T, index: number) => React.ReactNode
-  /**
-   * Outline rows for content the page renders *above* the feed, prepended to the generated
-   * ones. /components uses it for its token subsections; the other three pages pass nothing
-   * and render exactly as they did.
-   */
-  preOutline?: OutlineItem[]
   /** The server-rendered page header. */
   children: React.ReactNode
 }) {
   /**
-   * Memoised, and not only for the render cost. `PageOutline` keys its IntersectionObserver
-   * effect on `items`, so a fresh array identity every render tore the observer down and
-   * rebuilt it on every render — including every filter-pill click. Harmless while the lists
-   * were short; this page has the most outline rows on the site, token subsections plus
-   * showcase groups.
+   * Memoised because `PageOutline` keys its IntersectionObserver effect on `items`: a fresh
+   * array identity every render tore the observer down and rebuilt it on every render,
+   * including every filter-pill click.
    */
   const outline: OutlineItem[] = useMemo(
     () => [
-      ...(preOutline ?? []),
       { id: root.id, label: root.label, level: 1 },
       ...groups.map((group) => ({
         id: group.id,
@@ -122,7 +112,7 @@ export function FeedShell<T>({
         count: group.items.length,
       })),
     ],
-    [preOutline, root.id, root.label, groups],
+    [root.id, root.label, groups],
   )
 
   return (

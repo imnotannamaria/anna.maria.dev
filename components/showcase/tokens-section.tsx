@@ -333,71 +333,64 @@ function Group({ group, index }: { group: TokenGroup; index: number }) {
 export function TokensSection({ themeCount }: { themeCount: number }) {
   return (
     <div>
-      <div
-        className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-dashed pb-3"
-        style={{ borderColor: "var(--border-subtle)" }}
-      >
-        <h2 className="text-mono-sm m-0 font-mono" style={{ color: "var(--fg-secondary)" }}>
-          <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-            ${" "}
-          </span>
-          cat globals.css
-        </h2>
-        <span
-          className="text-mono-xs font-mono tracking-[0.08em] uppercase"
-          style={{ color: "var(--fg-muted)" }}
-        >
-          {themeCount} themes · 2 modes · {TOKEN_GROUPS.length} groups
-        </span>
-      </div>
-
-      <p className="text-body-md mt-4 font-sans" style={{ color: "var(--fg-secondary)" }}>
+      <p className="text-body-md m-0 font-sans" style={{ color: "var(--fg-secondary)" }}>
         Every value below is read off this document as you are looking at it. Change the theme or
         the mode with the switcher in the corner and the swatches, the values and the contrast
-        ratios all follow — nothing here is a screenshot or a number someone typed in.
+        ratios all follow — nothing here is a screenshot or a number someone typed in.{" "}
+        <span style={{ color: "var(--fg-muted)" }}>
+          {themeCount} themes × 2 modes, {TOKEN_GROUPS.length} groups.
+        </span>
       </p>
 
       {TOKEN_GROUPS.map((group, i) => (
         <Group key={group.id} group={group} index={i} />
       ))}
-
-      <section id="tokens-rules" style={{ scrollMarginTop: 24 }} className="mt-12">
-        <div
-          className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b pb-2"
-          style={{ borderColor: "var(--border-subtle)" }}
-        >
-          <h3 className="text-mono-sm m-0 font-mono tracking-[0.08em] uppercase">
-            <span style={{ color: "var(--fg-brand)" }}>
-              {String(TOKEN_GROUPS.length).padStart(2, "0")} /{" "}
-            </span>
-            <span style={{ color: "var(--fg-secondary)" }}>rules</span>
-          </h3>
-          <span className="text-mono-xs font-mono" style={{ color: "var(--fg-muted)" }}>
-            each one paid for
-          </span>
-        </div>
-
-        <ul className="m-0 flex list-none flex-col gap-3 p-0">
-          {RULES.map((rule) => (
-            <li
-              key={rule.do}
-              className="rounded-[var(--radius-md)] border p-3.5"
-              style={{ borderColor: "var(--border-subtle)" }}
-            >
-              <div className="text-mono-sm flex gap-2 font-mono">
-                <Diamond />
-                <span style={{ color: "var(--fg-primary)" }}>{rule.do}</span>
-              </div>
-              <div
-                className="text-mono-sm mt-1.5 pl-[18px] font-mono"
-                style={{ color: "var(--fg-muted)" }}
-              >
-                {`// not: ${rule.dont}`}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
     </div>
+  )
+}
+
+/**
+ * The do's and don'ts, on their own tab. Every one is here because something shipped broken
+ * first — they are lifted from the two sections in CLAUDE.md written for exactly this.
+ */
+export function RulesSection() {
+  return (
+    <section id="tokens-rules" style={{ scrollMarginTop: 24 }} className="mt-12">
+      <div
+        className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b pb-2"
+        style={{ borderColor: "var(--border-subtle)" }}
+      >
+        <h3 className="text-mono-sm m-0 font-mono tracking-[0.08em] uppercase">
+          <span style={{ color: "var(--fg-brand)" }}>
+            {String(TOKEN_GROUPS.length).padStart(2, "0")} /{" "}
+          </span>
+          <span style={{ color: "var(--fg-secondary)" }}>rules</span>
+        </h3>
+        <span className="text-mono-xs font-mono" style={{ color: "var(--fg-muted)" }}>
+          each one paid for
+        </span>
+      </div>
+
+      <ul className="m-0 flex list-none flex-col gap-3 p-0">
+        {RULES.map((rule) => (
+          <li
+            key={rule.do}
+            className="rounded-[var(--radius-md)] border p-3.5"
+            style={{ borderColor: "var(--border-subtle)" }}
+          >
+            <div className="text-mono-sm flex gap-2 font-mono">
+              <Diamond />
+              <span style={{ color: "var(--fg-primary)" }}>{rule.do}</span>
+            </div>
+            <div
+              className="text-mono-sm mt-1.5 pl-[18px] font-mono"
+              style={{ color: "var(--fg-muted)" }}
+            >
+              {`// not: ${rule.dont}`}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }
