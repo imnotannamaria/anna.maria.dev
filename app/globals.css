@@ -710,52 +710,31 @@ button:focus-visible,
   }
 }
 
-@keyframes npw-eq-1 {
-  0%,
-  100% {
-    height: 30%;
-  }
-  50% {
-    height: 90%;
-  }
-}
-@keyframes npw-eq-2 {
-  0%,
-  100% {
-    height: 70%;
-  }
-  50% {
-    height: 25%;
-  }
-}
-@keyframes npw-eq-3 {
-  0%,
-  100% {
-    height: 45%;
-  }
-  50% {
-    height: 100%;
+/* The record turning.
+ *
+ * CSS rather than Motion, the same deal as the equaliser bars below: the global
+ * prefers-reduced-motion reset zeroes CSS animations, so this stops without the
+ * component having to ask useReducedMotion() itself.
+ *
+ * Pausing is `animation-play-state`, never toggling the animation off. Removing the
+ * animation snaps the disc back to 0deg, so every pause would jump the record to its
+ * starting angle; `paused` freezes it exactly where the needle left it, which is the
+ * only version that behaves like an object.
+ *
+ * 3.2s is not 33⅓rpm (that would be 1.8s). A real LP turning at speed reads as a blur
+ * at this size; slower is legible as rotation, which is the thing being drawn. */
+@keyframes vinyl-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
-.npw-eq-bar {
-  display: block;
-  width: 3px;
-  border-radius: 1px;
-  background: var(--fg-brand);
-  transform-origin: bottom;
-  align-self: flex-end;
+.vinyl-disc {
+  animation: vinyl-spin 3.2s linear infinite;
 }
-.npw-eq-1 {
-  animation: npw-eq-1 0.9s ease-in-out infinite;
-}
-.npw-eq-2 {
-  animation: npw-eq-2 0.9s ease-in-out infinite;
-  animation-delay: 0.15s;
-}
-.npw-eq-3 {
-  animation: npw-eq-3 0.9s ease-in-out infinite;
-  animation-delay: 0.3s;
+
+.vinyl-disc[data-running="false"] {
+  animation-play-state: paused;
 }
 
 @keyframes pulse-ok {
