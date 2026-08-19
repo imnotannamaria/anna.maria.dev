@@ -1,0 +1,35 @@
+---
+title: "The stack"
+description: "Every tool grouped by layer, as a branch list that opens one branch at a time."
+entry: "stack"
+source: "components/home/stack-card.tsx"
+deps: ["motion", "simple-icons", "@phosphor-icons/react"]
+---
+
+The whole toolchain, grouped into front, back, data and infra, drawn as a list of branches that
+open one at a time. Icons come from `simple-icons` as raw SVG paths rather than components, so
+nothing is bundled that is not actually on the list.
+
+## Static data is a state too
+
+This card reads nothing. There is no query, no fetch and no chunk to load, so it has exactly one
+state and giving it a loading skeleton would be ceremony. That is worth saying out loud, because
+the rule elsewhere in this repo is that anything non-static gets three frames — the corollary is
+that deciding which components are genuinely static is part of the work, not an oversight.
+
+## One branch open at a time
+
+An accordion rather than independent toggles. With four branches expanded the card is taller
+than the viewport on a phone and the thing you opened first has scrolled away, so opening one
+closes the others.
+
+## Icons as paths
+
+```ts
+import { siTypescript } from "simple-icons"
+// siTypescript.path is a `d` attribute, not a component
+```
+
+`simple-icons` ships every brand mark in one package. Importing the named export gets a plain
+object with a path string, which is inlined into an `<svg>` — no per-icon component, no runtime,
+and tree-shaking that actually works because there is nothing to shake but a string.

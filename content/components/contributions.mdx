@@ -1,0 +1,62 @@
+---
+title: "Contributions"
+description: "A year of GitHub activity, fetched server-side, with four distinct failures instead of one blank grid."
+entry: "contributions"
+source: "components/about/github-calendar.tsx"
+deps: ["motion"]
+---
+
+A year of public contributions as a grid of 53 columns, with a portalled tooltip on hover. The
+data is fetched on the server via the GraphQL API, so the grid is in the served HTML rather than
+behind a client fetch — which matters for a card that appears on two pages.
+
+## Four failures, not one null
+
+The loader used to return `null` for four different things: a missing token, a non-200, a
+GraphQL error, and an account with nothing to show. The card had a single `if (!data)` branch
+covering all four, so a visitor was told "contributions unavailable" whether GitHub was
+unreachable or the year had genuinely been quiet.
+
+Three of those are about the server and one is about the account. They are different sentences,
+and the card can only pick the right one if the difference survives the return:
+
+```ts
+export async function getContributions(login: string): Promise<CardState<ContributionYear>> {
+  if (!token) return { kind: "error", message: "GITHUB_TOKEN not set" }
+  // …
+  if (!calendar?.weeks?.length) return { kind: "empty" }
+  return { kind: "ok", data: { weeks, total } }
+}
+```
+
+GitHub reports a bad login or an exhausted quota as **200 plus an `errors` array**, so that case
+is not covered by checking `res.ok` and needs its own branch.
+
+## What never leaves the server
+
+The `message` on an error state is for the logs, not the DOM. A thrown `fetch` error can carry
+the request that produced it, and that request carries the `Authorization` header — so what gets
+logged is `err.message`, never the error object, and never the response body, which echoes the
+query back.
+
+## Squaring off the grid
+
+GitHub truncates the first week at its start and the last at its end, so padding goes on
+opposite sides:
+
+```ts
+const pad = Array.from({ length: 7 - days.length }, () => EMPTY)
+return i === 0 ? [...pad, ...days] : [...days, ...pad]
+```
+
+Every column ends up with seven cells, which is what lets the grid be a plain flex row of
+columns rather than a real grid with placement rules.
+
+## The scale follows the theme
+
+Every level is mixed from `--fg-brand`, so the calendar changes colour with the site's theme
+instead of being stuck on one accent:
+
+```css
+color-mix(in srgb, var(--fg-brand) 50%, var(--bg-surface))
+```

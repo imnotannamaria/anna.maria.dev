@@ -1,0 +1,48 @@
+---
+title: "The tree"
+description: "The site's own routes as a browsable file tree, with counts that come from the same sources the pages do."
+entry: "tree"
+source: "components/home/tree-card.tsx"
+deps: ["motion", "@phosphor-icons/react"]
+---
+
+A file tree of the site itself. Folders open and close, files link to the real routes, and the
+numbers beside them come from the same places the pages read, so the tree cannot claim twelve
+posts when there are fourteen.
+
+## Hand-written, not derived
+
+Walking the App Router to build this automatically sounds obviously right until you ask it
+questions it cannot answer. Should `/admin` appear? What order do the branches go in? Does
+`blog/[slug]` become a folder or disappear? Every one of those is an editorial call, and a
+derived tree would need a config file to override them — which is the hand-written tree again,
+plus a walker to maintain.
+
+So the shape is a typed array in `lib/site-tree.ts` and the numbers arrive at render. The tree
+going stale means a page was added and nobody added the node, and that is a one-line fix in a
+file that sits next to the component.
+
+## Counts are a state, not a number
+
+`logCount` is `number | null`, and the difference matters. Zero entries is a real count and
+gets shown. A database that did not answer has no number to report, and the row renders without
+one rather than asserting a zero nobody measured.
+
+```ts
+buildSiteTree({ posts, projects, logCount: logEntries?.length ?? null })
+```
+
+The counts come off lists the page already has in memory, so the tree costs no extra query.
+
+## The animation
+
+Folders expand with a height transition and their children stagger in — but the stagger is
+dropped past `STAGGER_LIMIT` children, because a delay multiplied across a long list stops
+reading as choreography and starts reading as lag.
+
+Closing is faster than opening (160ms against 220ms). A folder you just closed should not make
+you wait for a decision you have already made.
+
+The reduced-motion branch is written out by hand rather than relying on the global CSS reset:
+Motion animates through JavaScript and walks straight past that block, so the component asks
+`useReducedMotion()` and returns the same state changes with no transition.

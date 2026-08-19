@@ -1,0 +1,52 @@
+---
+title: "The stack graph"
+description: "The same stack as a React Flow canvas, gated twice so it is only ever built at the width it is meant for."
+entry: "stack-graph"
+source: "components/about/stack-graph.tsx"
+deps: ["@xyflow/react"]
+---
+
+The stack as a node graph you can pan and click through, on `/about`. React Flow is the largest
+dependency in this repo, which makes this component mostly a story about not loading it.
+
+## Two gates, and neither is redundant
+
+```tsx
+const StackFlow = dynamic(() => import("./stack-flow").then((m) => m.StackFlow), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+})
+
+const wide = useMediaQuery("(min-width: 768px)")
+```
+
+`ssr: false` because the pane measures the DOM before it can place a node — a server render
+produces an empty canvas, so this states that rather than paying for it.
+
+The media query is the one people skip, and it is not the same as the `hidden md:block` on the
+page. **CSS hides pixels; React still mounts the component**, and a mounted `next/dynamic`
+fetches its chunk. Phones were downloading 180 KB of React Flow to render a `display: none` box.
+
+Nothing is lost below `md`: the badge list on the page is `md:sr-only`, so it stays in the DOM
+and in the accessibility tree at every width. Below the breakpoint the graph is not a failure,
+it is a different presentation of the same information.
+
+## A chunk that never arrives
+
+`next/dynamic` gives you a loading state and no error state. When the chunk request fails — a
+dropped connection mid-navigation, a stale hashed filename after a deploy, a captive portal —
+the component never resolves and the pane sits blank forever, with nothing admitting anything
+went wrong and no way to ask again.
+
+`ChunkBoundary` is a small error boundary that catches it and offers a retry. It has to be a
+class component, because `componentDidCatch` still has no hook equivalent.
+
+The retry bumps a key rather than re-importing:
+
+```tsx
+this.setState((s) => ({ failed: false, key: s.key + 1 }))
+```
+
+A failed dynamic import is cached by the bundler's module registry, so calling the same import
+again returns the same rejected promise. Remounting the subtree is what actually gives it
+another go.

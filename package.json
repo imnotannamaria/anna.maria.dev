@@ -7,7 +7,7 @@
     "dev:local": "run-p dev:velite dev:next",
     "dev:next": "next dev",
     "dev:velite": "velite --watch",
-    "build": "velite build && next build",
+    "build": "velite build --strict && next build",
     "postbuild": "next-sitemap",
     "start": "next start",
     "lint": "eslint . && prettier --check .",
