@@ -1,0 +1,93 @@
+---
+title: "capacity"
+description: "A small dispatch board: crews and trucks as columns, jobs scheduled inside time windows, draggable between crews and between days."
+date: "2026-08-20"
+tags:
+  [
+    "nextjs",
+    "typescript",
+    "apollo-client",
+    "graphql",
+    "dnd-kit",
+    "flask",
+    "graphene",
+    "postgresql",
+    "turborepo",
+    "reference-implementation",
+  ]
+kind: "demo"
+github: "https://github.com/imnotannamaria/capacity"
+live: "https://capacity-crew.vercel.app/"
+cover: "/projects/capacity.png"
+featured: false
+published: true
+---
+
+## Overview
+
+A small dispatch board: crews and trucks as columns, jobs scheduled inside time windows,
+draggable between crews and between days — by mouse, touch, or keyboard. Arrow keys move a
+picked-up job, `Tab`/`Shift+Tab` switches days mid-drag, and neither one is an afterthought
+bolted on after the mouse path was done.
+
+It's a personal project, not a product. I built it to practice GraphQL, Apollo Client, and
+drag-and-drop across groups that aren't all on screen at once, in one real flow instead of
+three separate tutorials. The domain is moving-company dispatch, picked because it comes with
+real constraints — finite crews, finite trucks, time windows that collide — so the interesting
+problems show up on their own instead of getting forced onto a generic to-do list.
+
+## What it proves
+
+dnd-kit handles the drag mechanics. The part that actually matters starts at the drop:
+
+- An optimistic mutation with a real, visible response to rejection. The block snaps back to
+  where it was and a toast says why — a mutation that only handles the accept case is the
+  happy-path demo this project exists to not be.
+- Cross-day drag through tab auto-switch on hover, and the keyboard equivalent, not a fallback
+  for it.
+- Every list resolver batches through a DataLoader, with a query-count test that fails on
+  purpose if one gets removed.
+- Concurrency with no WebSocket, subscription, or polling. Two people editing the same board
+  resolve on "the server decides, the client undoes."
+
+## Reproducing the conflict
+
+Open two tabs on the same board. Drag a job into an empty slot in the first tab and confirm
+the move. Without reloading the second tab, drag a different job into that exact slot — its
+local collision preview shows nothing wrong, because it has no way to know the first tab
+already took it. On drop, the server rejects the move: the block snaps back and a toast names
+what's already there. `apps/web/e2e/concurrency-conflict.spec.ts` runs the same scenario with
+two Playwright browser contexts.
+
+## Stack
+
+- Next.js, Apollo Client, dnd-kit on the frontend
+- Flask, Graphene, and SQLAlchemy on Postgres for the API
+- Turborepo and npm workspaces tying the two together
+
+## Running locally
+
+There's a live demo at the link above. To run it locally instead:
+
+```bash
+docker compose up -d postgres
+npm install
+cd apps/api && uv run python seed.py && cd ../..
+npm run dev
+```
+
+Opens at `localhost:3000`. No `.env` file needed for the default setup — Postgres is mapped to
+`localhost:5434`, and both apps already fall back to that.
+
+## Tests
+
+The full pyramid: Vitest for the pure logic (geometry, snapping, local collision, the
+auto-switch threshold — none of it needs a DOM), Testing Library for focus and ARIA, Apollo's
+`MockedProvider` for loading, error, and rollback, Playwright for the real drag and the
+two-context conflict, and pytest on the API for resolvers and query counting.
+
+## Links
+
+https://capacity-crew.vercel.app/
+
+https://github.com/imnotannamaria/capacity

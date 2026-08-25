@@ -29,6 +29,18 @@ export type FeedGroup<T> = {
   /** The section's heading, and the outline row's label: `2026`, `albums`. */
   label: string
   items: T[]
+  /**
+   * A second grouping level within this section — /projects nests year under kind, so the
+   * outline keeps the year breakdown /blog has even though the section itself is now "Open
+   * source" / "Demos" rather than a year. Optional and unused by /blog and /log, which have
+   * only one axis to group by.
+   *
+   * A subgroup only gets its own `<h3>` in the grid when there's more than one — right now
+   * every project is dated 2026, so each kind has exactly one subgroup and the grid stays a
+   * single flat run. The outline still lists it; the visual split shows up on its own the day
+   * a second year exists.
+   */
+  subgroups?: { id: string; label: string; items: T[] }[]
 }
 
 export type FeedPill = { key: string; label: string; count: number }
@@ -98,12 +110,15 @@ export function FeedShell<T>({
 }) {
   const outline: OutlineItem[] = [
     { id: root.id, label: root.label, level: 1 },
-    ...groups.map((group) => ({
-      id: group.id,
-      label: group.label,
-      level: 2 as const,
-      count: group.items.length,
-    })),
+    ...groups.flatMap((group) => [
+      { id: group.id, label: group.label, level: 2 as const, count: group.items.length },
+      ...(group.subgroups ?? []).map((sub) => ({
+        id: sub.id,
+        label: sub.label,
+        level: 3 as const,
+        count: sub.items.length,
+      })),
+    ]),
   ]
 
   return (
@@ -166,11 +181,32 @@ export function FeedShell<T>({
                   </span>
                 </div>
 
-                <div className={listClassName}>
-                  {/* The stagger belongs to the first group only. Past it every card would be
-                      waiting out a delay for an entrance the reader scrolled to deliberately. */}
-                  {group.items.map((item, i) => renderItem(item, gi === 0 ? i : 0))}
-                </div>
+                {group.subgroups ? (
+                  group.subgroups.map((sub, si) => (
+                    <div key={sub.id} id={sub.id} style={{ scrollMarginTop: 24 }}>
+                      {/* Only earns its own heading once there's more than one — see the note
+                          on `subgroups` above. */}
+                      {group.subgroups!.length > 1 && (
+                        <h3
+                          className="text-mono-sm mt-6 mb-3 font-mono tracking-[0.08em] uppercase first:mt-0"
+                          style={{ color: "var(--fg-muted)" }}
+                        >
+                          {sub.label}
+                        </h3>
+                      )}
+                      <div className={listClassName}>
+                        {/* The stagger belongs to the very first run only. */}
+                        {sub.items.map((item, i) => renderItem(item, gi === 0 && si === 0 ? i : 0))}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className={listClassName}>
+                    {/* The stagger belongs to the first group only. Past it every card would be
+                        waiting out a delay for an entrance the reader scrolled to deliberately. */}
+                    {group.items.map((item, i) => renderItem(item, gi === 0 ? i : 0))}
+                  </div>
+                )}
               </section>
             ))
           )}
