@@ -21,6 +21,7 @@
 
 import { PageOutline, type OutlineItem } from "./page-outline"
 import { FilterPill } from "@/components/ui/url-filter"
+import { cn } from "@/lib/utils"
 
 /** One `<section>` in the feed, one row in the outline. */
 export type FeedGroup<T> = {
@@ -185,10 +186,16 @@ export function FeedShell<T>({
                   group.subgroups.map((sub, si) => (
                     <div key={sub.id} id={sub.id} style={{ scrollMarginTop: 24 }}>
                       {/* Only earns its own heading once there's more than one — see the note
-                          on `subgroups` above. */}
+                          on `subgroups` above. `si > 0` for the top margin, not `first:mt-0`:
+                          every subgroup is the first child of its own wrapper div, so
+                          `:first-child` matched all of them and the gap between the first
+                          and second year never rendered. */}
                       {group.subgroups!.length > 1 && (
                         <h3
-                          className="text-mono-sm mt-6 mb-3 font-mono tracking-[0.08em] uppercase first:mt-0"
+                          className={cn(
+                            "text-mono-sm mb-3 font-mono tracking-[0.08em] uppercase",
+                            si > 0 && "mt-6",
+                          )}
                           style={{ color: "var(--fg-muted)" }}
                         >
                           {sub.label}
