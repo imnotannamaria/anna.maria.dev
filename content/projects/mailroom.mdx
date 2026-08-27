@@ -1,0 +1,109 @@
+---
+title: "mailroom"
+description: "A reference webhook receiver for the Stable API."
+date: "2026-08-10"
+tags:
+  [
+    "nextjs",
+    "typescript",
+    "hono",
+    "inngest",
+    "supabase",
+    "drizzle-orm",
+    "zod",
+    "svix",
+    "tailwindcss",
+    "reference-implementation",
+  ]
+kind: "demo"
+github: "https://github.com/imnotannamaria/mailroom"
+live: "https://mailroom-stable.vercel.app/"
+cover: "/projects/mailroom.png"
+featured: false
+published: true
+---
+
+## Overview
+
+A reference webhook receiver for the [Stable](https://www.usestable.com) API. Stable is a
+virtual mailbox service — it receives physical mail for US companies, scans it, extracts the
+data, and deposits any checks found inside — and tells integrators about all of it through
+webhooks delivered by Svix. mailroom is the receiving end, plus a UI that lets you trigger each
+failure mode on purpose and watch the system absorb it.
+
+There's no real Stable account behind this. Stable has no free tier and no public sandbox, and
+activating a mailbox needs a signed USPS Form 1583 with US identity documents. Every event here
+comes from a local simulator that signs and replays the exact payload shapes published in
+Stable's public Svix event catalog. It's a reference implementation, not a production
+integration, and it doesn't claim to be one.
+
+## The problem it solves
+
+Receiving a webhook looks like a ten-line endpoint. It isn't, because the Stable event stream
+has four properties that corrupt state if you insert and update blindly:
+
+- **Redelivery.** Svix retries on any timeout or non-2xx response, so the same event can arrive
+  twice. A blind insert double-counts money.
+- **Out-of-order arrival.** `mailItem.scan.ocrCompleted` can land before
+  `mailItem.scan.completed`. A blind update lets a stale event overwrite fresh state.
+- **Reversal.** A check can move from `completed` to `failed` — never the reverse — and that
+  transition means funds were already deducted. It's an accounting event, not a status change.
+- **Skipped states.** If a deposit is requested before a check is transcribed, `check.processing`
+  is never emitted; the state jumps straight from `created` to `completed` or `failed`.
+
+The `/chaos` panel fires each of these as a real, signed sequence into the real webhook route
+and shows the result live.
+
+## How it's built
+
+Three tables, on purpose:
+
+- `webhook_events` — the source of truth. Append-only, the body stored exactly as received,
+  deduplicated by a `UNIQUE` constraint on `svix_id`, not an `if exists` check in application
+  code.
+- `mail_items` — a projection, derived and rebuildable from the log. A `state_rank` integer
+  enforces the monotonic guard, so a late event can't roll state backwards.
+- `check_entries` — an append-only ledger. One row per transition, signed `amount_cents`.
+  There's no mutable status column on a check; a settled check that later fails becomes a new
+  `reversed` row, never a mutation of the settled one.
+
+What Stable sends is fact. What I conclude from it is interpretation, and the two are stored
+separately. If the projection logic has a bug, I fix it and replay `webhook_events` — the
+original event was never destroyed.
+
+## Stack
+
+- Next.js, with Hono mounted in a catch-all route
+- Inngest for durability and retries
+- Supabase Postgres through Drizzle
+- Zod for validation at the boundary
+- `svix` for signature verification
+- entrepta on the `bosco` theme
+
+## Scope
+
+Nine events across two pipelines: mail (`created`, `scan.processing`, `scan.completed`,
+`scan.ocrCompleted`, `summary.created`) and checks (`created`, `processing`, `completed`,
+`failed`). Forwarding, shredding, deposits, and OCR results are out of scope on purpose — they
+add event volume, not new problems.
+
+## Running locally
+
+```bash
+npm install
+INNGEST_DEV=1 npm run dev
+npx inngest-cli@latest dev -u http://localhost:3000/api/inngest
+```
+
+Needs a Supabase Postgres connection string (the transaction pooler, port 6543) and a `whsec_`
+signing secret shared between the simulator and the route. Open `/chaos` and press a button.
+
+## License
+
+MIT.
+
+## Links
+
+https://mailroom-stable.vercel.app/
+
+https://github.com/imnotannamaria/mailroom

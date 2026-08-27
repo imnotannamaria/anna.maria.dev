@@ -24,6 +24,7 @@ export default function ProjectsPage() {
     title: project.title,
     description: project.description,
     tags: project.tags,
+    kind: project.kind,
     github: project.github,
     live: project.live,
     date: project.date,
