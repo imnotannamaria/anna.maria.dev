@@ -23,7 +23,15 @@ export type ShowcaseEntry = {
   group: "home" | "about" | "shared"
   /** Routes it is used on, shown in the doc page's metadata column. */
   where: string[]
-  /** Which frames the carousel offers, in the order it offers them. */
+  /**
+   * Every frame this component genuinely wears in production, in lifecycle order — loading,
+   * empty, error, stale, ok. Not a wish list: a state here has to be one the component actually
+   * reaches on a real page, and one the component itself renders, so `demos.tsx` can hand back
+   * the real frame rather than a lookalike.
+   *
+   * The order is the order the picker lists them in. It is not the frame the specimen opens on
+   * — see `defaultState`.
+   */
   states: readonly CardStateKind[]
   /** External docs instead of a page here. wristkit is the only one. */
   external?: { href: string; label: string }
@@ -44,7 +52,16 @@ export const SHOWCASE = {
     source: "components/home/tree-card.tsx",
     group: "home",
     where: ["/"],
-    states: ["ok", "empty"],
+    /**
+     * `loading` was missing, and the home page had one all along: the tree streams inside
+     * `<Suspense>` beside the profile card, with a four-row `CardLoading` as its fallback. The
+     * registry said the card had two states while the site rendered three — which is the exact
+     * failure this page exists to catch, on the page that catches it.
+     *
+     * `empty` is a fresh fork of this template: no posts, no projects, and no database, so the
+     * structure is all there and every count is gone.
+     */
+    states: ["loading", "empty", "ok"],
   },
   stack: {
     slug: "stack",

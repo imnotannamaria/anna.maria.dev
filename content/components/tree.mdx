@@ -34,6 +34,21 @@ buildSiteTree({ posts, projects, logCount: logEntries?.length ?? null })
 
 The counts come off lists the page already has in memory, so the tree costs no extra query.
 
+## Three frames, and the one that was missing
+
+The tree is not static, even though the structure is. It streams inside a `<Suspense>` on the
+home page beside the profile card, because both need the log count and the count comes from
+Postgres — so there is a real moment where the card is a four-row skeleton, and that skeleton
+has been on the site since the day the home page was split into slots.
+
+`/components` did not know that. It listed two states, `ok` and `empty`, and the third one was
+shipping in production the whole time. The registry is the only place that claim lives, so a
+wrong entry there is not caught by `tsc` or by any test — it is caught by someone opening the
+page, noticing the tree has no loading frame, and remembering that it does.
+
+`empty` is a fresh fork of this template: no posts, no projects, and no `DATABASE_URL`. Every
+branch is still there, because the branches are hand-written, and every number is gone.
+
 ## The animation
 
 Folders expand with a height transition and their children stagger in — but the stagger is

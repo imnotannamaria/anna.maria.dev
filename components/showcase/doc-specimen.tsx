@@ -13,7 +13,7 @@
 
 import { useState } from "react"
 import { DemoStage, StateList } from "./demo-viewer"
-import type { CardStateKind } from "@/lib/showcase/state"
+import { defaultState, type CardStateKind } from "@/lib/showcase/state"
 
 export function DocSpecimen({
   slug,
@@ -24,7 +24,7 @@ export function DocSpecimen({
   name: string
   states: readonly CardStateKind[]
 }) {
-  const [active, setActive] = useState<CardStateKind>(states[0])
+  const [active, setActive] = useState<CardStateKind>(defaultState(states))
 
   return (
     <div className="grid grid-cols-1 gap-x-5 gap-y-3 min-[720px]:grid-cols-[minmax(0,150px)_minmax(0,1fr)]">

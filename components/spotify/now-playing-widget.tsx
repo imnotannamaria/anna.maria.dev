@@ -12,97 +12,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useNowPlayingStore } from "@/store/nowPlayingStore"
-import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { CardHead } from "@/components/ui/card-parts"
-import { COVER, Disc, SleeveCard } from "./sleeve-card"
-
-function StateCard({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="bento-card">
-      <CardHead label="me, as a playlist" />
-      <div className="flex items-center gap-4">{children}</div>
-    </div>
-  )
-}
-
-function LoadingSkeleton() {
-  return (
-    <StateCard>
-      <Skeleton className="shrink-0 rounded-sm" style={{ width: COVER, height: COVER }} />
-      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-        <Skeleton variant="line" className="h-3.5 w-[78%]" />
-        <Skeleton variant="line" className="h-2.5 w-[52%]" />
-      </div>
-    </StateCard>
-  )
-}
-
-/**
- * Empty used to `return null`, which took the card out of the bento grid and left a hole in
- * the row — the page silently reflowed around a component that had decided not to exist. An
- * empty playlist is a fact, not an absence, and it says so with the record still on the deck.
- */
-function EmptyState() {
-  return (
-    <StateCard>
-      <div className="shrink-0 opacity-40">
-        <Disc size={COVER} running={false} />
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="text-mono-md mb-1 font-mono" style={{ color: "var(--fg-secondary)" }}>
-          nothing on the turntable
-        </div>
-        <div className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
-          {"// the playlist came back empty"}
-        </div>
-      </div>
-    </StateCard>
-  )
-}
-
-function ErrorState({ onRetry }: { onRetry: () => void }) {
-  return (
-    <StateCard>
-      <div
-        className="text-heading-lg flex shrink-0 items-center justify-center rounded-sm border border-dashed"
-        style={{
-          width: COVER,
-          height: COVER,
-          background: "var(--bg-surface-elevated)",
-          borderColor: "var(--border-strong)",
-          color: "var(--zinc-600)",
-        }}
-        aria-hidden
-      >
-        ✕
-      </div>
-      <div className="min-w-0 flex-1">
-        <div
-          className="text-mono-md mb-1 font-mono font-medium"
-          style={{ color: "var(--fg-secondary)" }}
-        >
-          playlist unavailable
-        </div>
-        <div className="text-mono-sm mb-3 font-mono" style={{ color: "var(--fg-muted)" }}>
-          spotify api didn&apos;t respond
-        </div>
-        <div className="flex items-center gap-2.5">
-          <span className="text-mono-sm font-mono" style={{ color: "var(--zinc-600)" }} aria-hidden>
-            $
-          </span>
-          <button
-            type="button"
-            onClick={onRetry}
-            className="text-mono-sm cursor-pointer font-mono transition-colors"
-            style={{ color: "var(--fg-brand)" }}
-          >
-            retry →
-          </button>
-        </div>
-      </div>
-    </StateCard>
-  )
-}
+import { SleeveCard, SleeveEmpty, SleeveError, SleeveLoading } from "./sleeve-card"
 
 export function NowPlayingWidget({ className }: { className?: string }) {
   const { tracks, currentIndex, elapsedMs, status, running, load, tick, toggle, next, prev } =
@@ -154,9 +64,9 @@ export function NowPlayingWidget({ className }: { className?: string }) {
     }
   }, [running, armed, track?.previewUrl, currentIndex])
 
-  if (status === "idle" || status === "loading") return <LoadingSkeleton />
-  if (status === "error") return <ErrorState onRetry={load} />
-  if (status === "empty" || !track) return <EmptyState />
+  if (status === "idle" || status === "loading") return <SleeveLoading className={className} />
+  if (status === "error") return <SleeveError onRetry={load} className={className} />
+  if (status === "empty" || !track) return <SleeveEmpty className={className} />
 
   const arm = (fn: () => void) => () => {
     setArmed(true)

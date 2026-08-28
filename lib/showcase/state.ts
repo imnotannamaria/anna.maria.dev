@@ -25,3 +25,16 @@ export type CardState<T> =
 export type CardStateKind = CardState<unknown>["kind"]
 
 export const CARD_STATE_KINDS = ["loading", "empty", "error", "stale", "ok"] as const
+
+/**
+ * Which frame a specimen opens on.
+ *
+ * `states[0]` used to decide it, and the registry lists states in lifecycle order — loading,
+ * empty, error, stale, ok — so four of the seven specimens opened as a grey skeleton. On the one
+ * page whose job is showing the components, more than half of them were showing the moment
+ * before the component exists. The list keeps the lifecycle order, because that is the order the
+ * states happen in and the order they read in; only the default moves.
+ */
+export function defaultState(states: readonly CardStateKind[]): CardStateKind {
+  return states.includes("ok") ? "ok" : states[0]
+}

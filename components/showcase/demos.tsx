@@ -27,12 +27,17 @@ import {
   TREE_FIXTURE,
   TREE_FIXTURE_EMPTY,
 } from "@/lib/showcase/fixtures"
-import { CardError, CardLoading } from "@/components/ui/card-states"
+import { CardLoading } from "@/components/ui/card-states"
 import { GithubCard } from "@/components/home/github-card"
 import { TreeCard } from "@/components/home/tree-card"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
-import { SleeveCard } from "@/components/spotify/sleeve-card"
+import {
+  SleeveCard,
+  SleeveEmpty,
+  SleeveError,
+  SleeveLoading,
+} from "@/components/spotify/sleeve-card"
 import { TodayActivityCard } from "@/components/wristkit/today-activity-card"
 import { siteTreeRouteCount } from "@/lib/site-tree"
 
@@ -43,11 +48,25 @@ export type DemoMap = {
   }
 }
 
-// The two heavy ones. Requested when their frame scrolls into view, never before, and never at
-// all below `md` — the gate lives on the index card, not here.
+/**
+ * The heavy one. Requested when its frame scrolls into view, never before.
+ *
+ * Its own loading and error frames come from the same module, so they arrive with the chunk —
+ * which is fine, because both are only reachable once someone has picked them, and picking one
+ * means the frame is already on screen. Importing them statically would drag React Flow into
+ * this module and make the gating decoration.
+ */
 const StackGraph = dynamic(
   () => import("@/components/about/stack-graph").then((m) => m.StackGraph),
   { ssr: false, loading: () => <CardLoading label="stack graph" rows={0} minHeight={420} /> },
+)
+const StackGraphLoading = dynamic(
+  () => import("@/components/about/stack-graph").then((m) => m.StackGraphLoading),
+  { ssr: false },
+)
+const StackGraphError = dynamic(
+  () => import("@/components/about/stack-graph").then((m) => m.StackGraphError),
+  { ssr: false },
 )
 
 /** The playlist card takes callbacks; on a documentation page they do nothing. */
@@ -55,8 +74,11 @@ const noop = () => {}
 
 export const DEMOS: DemoMap = {
   tree: {
-    ok: () => <TreeCard items={TREE_FIXTURE} routeCount={siteTreeRouteCount()} />,
+    // Character for character what `WhoamiRowFallback` in `app/(home)/page.tsx` renders. Four
+    // rows because the tree IS a repeating shape — the one card here that a skeleton suits.
+    loading: () => <CardLoading label="tree" rows={4} minHeight={320} />,
     empty: () => <TreeCard items={TREE_FIXTURE_EMPTY} routeCount={siteTreeRouteCount()} />,
+    ok: () => <TreeCard items={TREE_FIXTURE} routeCount={siteTreeRouteCount()} />,
   },
 
   stack: {
@@ -64,16 +86,11 @@ export const DEMOS: DemoMap = {
   },
 
   playlist: {
-    loading: () => <CardLoading label="me, as a playlist" media={92} minHeight={220} />,
-    empty: () => <CardLoading label="me, as a playlist" rows={0} minHeight={220} />,
-    error: () => (
-      <CardError
-        label="me, as a playlist"
-        title="playlist unavailable"
-        note="spotify api didn't respond"
-        minHeight={220}
-      />
-    ),
+    // The card's own frames, not lookalikes. The `empty` one used to be a `CardLoading` with
+    // `rows={0}`, so this page drew the words "$ loading..." under the label "empty".
+    loading: () => <SleeveLoading />,
+    empty: () => <SleeveEmpty />,
+    error: () => <SleeveError />,
     ok: () => (
       <SleeveCard
         track={TRACK_FIXTURE}
@@ -102,15 +119,10 @@ export const DEMOS: DemoMap = {
   },
 
   "stack-graph": {
-    loading: () => <CardLoading label="stack graph" rows={0} minHeight={420} />,
-    error: () => (
-      <CardError
-        label="stack graph"
-        title="the graph didn't load"
-        note="a dynamic chunk that never arrives has no error state of its own"
-        minHeight={420}
-      />
-    ),
+    // The real pane in both cases: this card is not a `.bento-card`, it is a bordered canvas
+    // with a fixed height, and a card-shaped skeleton claimed a shape it never has.
+    loading: () => <StackGraphLoading />,
+    error: () => <StackGraphError />,
     ok: () => <StackGraph />,
   },
 

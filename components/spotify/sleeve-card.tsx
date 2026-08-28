@@ -19,6 +19,7 @@ import Image from "next/image"
 import { motion } from "motion/react"
 import { PauseIcon, PlayIcon, SkipBackIcon, SkipForwardIcon } from "@phosphor-icons/react"
 import type { SimplifiedTrack } from "@/lib/spotify"
+import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { ArrowLink } from "@/components/ui/arrow-link"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
 import { useReveal } from "@/components/ui/reveal"
@@ -375,5 +376,118 @@ export function SleeveCard({
         />
       </div>
     </motion.div>
+  )
+}
+
+// ─── The other three frames ───────────────────────────────────────────────────
+
+/**
+ * Loading, empty and error, and they live *here* rather than next door in the widget.
+ *
+ * They were private to `now-playing-widget.tsx`, so `/components` could not render them and
+ * hand-rolled approximations instead — which is how the showcase ended up drawing the *loading*
+ * frame under the word "empty". A documentation page that shows a lookalike is worse than one
+ * that shows nothing: it is wrong and it looks right.
+ *
+ * This is the pure half of the card, so a frame that takes no props and no store belongs in it.
+ * The widget picks between them; the showcase renders them directly; neither owns a copy.
+ */
+function StateCard({ className, children }: { className?: string; children: React.ReactNode }) {
+  return (
+    <div className={cn("bento-card", className)}>
+      <CardHead label="me, as a playlist" />
+      <div className="flex items-center gap-4">{children}</div>
+    </div>
+  )
+}
+
+export function SleeveLoading({ className }: { className?: string }) {
+  return (
+    <StateCard className={className}>
+      <Skeleton className="shrink-0 rounded-sm" style={{ width: COVER, height: COVER }} />
+      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+        <Skeleton variant="line" className="h-3.5 w-[78%]" />
+        <Skeleton variant="line" className="h-2.5 w-[52%]" />
+      </div>
+      <span className="sr-only">Loading me, as a playlist</span>
+    </StateCard>
+  )
+}
+
+/**
+ * Empty used to `return null`, which took the card out of the bento grid and left a hole in
+ * the row — the page silently reflowed around a component that had decided not to exist. An
+ * empty playlist is a fact, not an absence, and it says so with the record still on the deck.
+ */
+export function SleeveEmpty({ className }: { className?: string }) {
+  return (
+    <StateCard className={className}>
+      <div className="shrink-0 opacity-40">
+        <Disc size={COVER} running={false} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-mono-md mb-1 font-mono" style={{ color: "var(--fg-secondary)" }}>
+          nothing on the turntable
+        </div>
+        <div className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
+          {"// the playlist came back empty"}
+        </div>
+      </div>
+    </StateCard>
+  )
+}
+
+/**
+ * `onRetry` is optional for the same reason `CardError`'s is: the showcase renders this frame
+ * with nothing behind it to re-run, and a retry button that does nothing is a worse lie than
+ * no button.
+ */
+export function SleeveError({ onRetry, className }: { onRetry?: () => void; className?: string }) {
+  return (
+    <StateCard className={className}>
+      <div
+        className="text-heading-lg flex shrink-0 items-center justify-center rounded-sm border border-dashed"
+        style={{
+          width: COVER,
+          height: COVER,
+          background: "var(--bg-surface-elevated)",
+          borderColor: "var(--border-strong)",
+          color: "var(--zinc-600)",
+        }}
+        aria-hidden
+      >
+        ✕
+      </div>
+      <div className="min-w-0 flex-1">
+        <div
+          className="text-mono-md mb-1 font-mono font-medium"
+          style={{ color: "var(--fg-secondary)" }}
+        >
+          playlist unavailable
+        </div>
+        <div className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
+          {"// spotify api didn't respond"}
+        </div>
+        {onRetry && (
+          <div className="mt-3 flex items-center gap-2.5">
+            <span
+              className="text-mono-sm font-mono"
+              style={{ color: "var(--zinc-600)" }}
+              aria-hidden
+            >
+              $
+            </span>
+            <button
+              type="button"
+              onClick={onRetry}
+              className="text-mono-sm cursor-pointer font-mono transition-colors"
+              style={{ color: "var(--fg-brand)" }}
+            >
+              retry →
+            </button>
+          </div>
+        )}
+      </div>
+    </StateCard>
   )
 }

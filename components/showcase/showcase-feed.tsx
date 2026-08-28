@@ -33,7 +33,7 @@ import {
 } from "@phosphor-icons/react"
 import { GROUP_LABEL, type ShowcaseEntry } from "@/lib/showcase/registry"
 import { sourceUrl } from "@/lib/showcase/source"
-import type { CardStateKind } from "@/lib/showcase/state"
+import { defaultState, type CardStateKind } from "@/lib/showcase/state"
 import { DemoStage, StateList } from "./demo-viewer"
 
 export const SHOWCASE_GROUPS = ["home", "about", "shared"] as const
@@ -57,7 +57,7 @@ const MIN_HEIGHT: Record<string, number> = {
 }
 
 function Specimen({ entry }: { entry: ShowcaseEntry }) {
-  const [active, setActive] = useState<CardStateKind>(entry.states[0])
+  const [active, setActive] = useState<CardStateKind>(defaultState(entry.states))
 
   return (
     <article className="grid grid-cols-1 gap-x-6 gap-y-4 min-[900px]:grid-cols-[minmax(0,220px)_minmax(0,1fr)]">

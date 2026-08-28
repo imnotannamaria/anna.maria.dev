@@ -2,6 +2,7 @@ import { existsSync } from "node:fs"
 import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 import { SHOWCASE, SHOWCASE_LIST } from "./registry"
+import { CARD_STATE_KINDS, defaultState } from "./state"
 import { sourceUrl } from "./source"
 
 /**
@@ -42,6 +43,30 @@ describe("the showcase registry", () => {
       (e) => !e.external && !existsSync(join(process.cwd(), "content/components", `${e.slug}.mdx`)),
     )
     expect(undocumented.map((e) => e.slug)).toEqual([])
+  })
+
+  /**
+   * The order is not cosmetic: it is what the picker lists, and a reader scanning a column of
+   * states is reading a lifecycle. One entry listing `ok` first and the next listing it last is
+   * the same fact told two ways — which is what the registry actually looked like before this
+   * ran, and how `tree` got away with claiming two states while the home page rendered three.
+   */
+  it("lists every entry's states in lifecycle order", () => {
+    const rank = (k: string) => CARD_STATE_KINDS.indexOf(k as (typeof CARD_STATE_KINDS)[number])
+    const outOfOrder = SHOWCASE_LIST.filter((e) =>
+      e.states.some((kind, i) => i > 0 && rank(kind) <= rank(e.states[i - 1])),
+    )
+    expect(outOfOrder.map((e) => `${e.slug}: ${e.states.join(", ")}`)).toEqual([])
+  })
+
+  /**
+   * Whatever the list order is, a specimen opens on the working component. Four of the seven
+   * used to open on a grey skeleton, on the page whose whole job is showing what the components
+   * look like.
+   */
+  it("opens every entry on a state that isn't loading", () => {
+    const opensGrey = SHOWCASE_LIST.filter((e) => defaultState(e.states) === "loading")
+    expect(opensGrey.map((e) => e.slug)).toEqual([])
   })
 
   it("builds a source link on main, not on a SHA", () => {
