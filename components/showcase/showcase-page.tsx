@@ -169,7 +169,7 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
             layoutId="showcase-active-tab"
             activeSurface="var(--bg-card)"
             onKeyDown={onKeyDown}
-            className="mt-10 !flex-none border-b border-[var(--border-subtle)]"
+            className="mt-10 border-b border-[var(--border-subtle)]"
             tabs={TABS.map((tab) => ({
               key: tab.id,
               id: `${tablistId}-${tab.id}`,
@@ -184,7 +184,7 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
             }))}
           >
             <span
-              className="text-mono-xs ml-auto hidden shrink-0 self-center pr-1 pl-4 font-mono tracking-[0.08em] uppercase sm:block"
+              className="text-mono-xs hidden shrink-0 self-center pr-2 pl-4 font-mono tracking-[0.08em] whitespace-nowrap uppercase sm:block"
               style={{ color: "var(--fg-muted)" }}
             >
               {meta}

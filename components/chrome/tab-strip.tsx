@@ -17,6 +17,13 @@
  * `<Link>` with `aria-current="page"`; the showcase's tabs switch a panel in place, so they
  * render as `<button role="tab">`. That is the one real difference between the two and it stays
  * at the call site.
+ *
+ * Two things it has to carry itself, both learned by putting it somewhere that is not the
+ * titlebar. It needs **its own height**: the tabs are `h-full`, and in the titlebar that is
+ * filled by the layout's `grid-rows-[40px_…]`. Anywhere else there is no such parent, so the row
+ * collapsed to the height of its own text and the underline hugged the labels. And whatever is
+ * **pinned to the right sits outside the scroller** — inside it, it scrolls away with the tabs
+ * and gets eaten by the fade mask, which is how a trailing label ended up reading "DO'S AND DON'".
  */
 
 import { useEffect, useRef, useState } from "react"
@@ -106,113 +113,116 @@ export function TabStrip({
   const fadeMask = `linear-gradient(to right, transparent 0, #000 ${fadeLeft}, #000 calc(100% - ${fadeRight}), transparent 100%)`
 
   return (
-    <div
-      ref={scrollerRef}
-      role={role}
-      aria-label={label}
-      onKeyDown={onKeyDown}
-      className={cn(
-        "flex flex-1 items-stretch overflow-x-auto",
-        "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-        className,
-      )}
-      style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}
-    >
-      {tabs.map((tab) => {
-        const { active } = tab
-        const TabIcon = tab.icon
-        const closable = active && Boolean(tab.onClose)
+    <div className={cn("flex min-h-10 items-stretch", className)}>
+      <div
+        ref={scrollerRef}
+        role={role}
+        aria-label={label}
+        onKeyDown={onKeyDown}
+        className={cn(
+          "flex flex-1 items-stretch overflow-x-auto",
+          "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        )}
+        style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}
+      >
+        {tabs.map((tab) => {
+          const { active } = tab
+          const TabIcon = tab.icon
+          const closable = active && Boolean(tab.onClose)
 
-        const inner = (
-          <>
-            <TabIcon
-              size={15}
-              weight={active ? "fill" : "regular"}
-              style={{ color: active ? "var(--fg-brand)" : "currentColor" }}
-              className="shrink-0 transition-transform duration-200 ease-out group-hover:scale-115"
-            />
-            {/* The filename is always on for the active tab and only from sm up for the rest,
-                so a phone shows icons plus the one name that matters. */}
-            <span className={cn(active ? "inline" : "hidden sm:inline")}>{tab.name}</span>
-          </>
-        )
-
-        const innerClass = cn(
-          "inline-flex h-full items-center gap-2 pl-3 sm:pl-4",
-          closable ? "pr-1.5" : "pr-3 sm:pr-4",
-          "text-mono-sm font-mono transition-colors duration-[120ms]",
-          active
-            ? "text-[var(--fg-primary)]"
-            : "text-[var(--fg-muted)] hover:text-[var(--fg-secondary)]",
-        )
-
-        return (
-          <div
-            key={tab.key}
-            className={cn(
-              "group relative inline-flex h-full shrink-0 items-center border-r border-[var(--border-subtle)]",
-              "transition-colors duration-150",
-              !active && "hover:bg-[var(--bg-hover-soft)]",
-            )}
-            style={active ? { background: activeSurface } : undefined}
-          >
-            {/* One underline for the whole row, travelling to whichever tab is active. The
-                same `layoutId` trick as the sidebar's diamond. */}
-            {active && (
-              <motion.span
-                layoutId={layoutId}
-                transition={reduce ? { duration: 0 } : { duration: 0.32, ease: EASE_OUT }}
-                aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
-                style={{ background: "var(--fg-brand)" }}
+          const inner = (
+            <>
+              <TabIcon
+                size={15}
+                weight={active ? "fill" : "regular"}
+                style={{ color: active ? "var(--fg-brand)" : "currentColor" }}
+                className="shrink-0 transition-transform duration-200 ease-out group-hover:scale-115"
               />
-            )}
+              {/* The filename is always on for the active tab and only from sm up for the rest,
+                so a phone shows icons plus the one name that matters. */}
+              <span className={cn(active ? "inline" : "hidden sm:inline")}>{tab.name}</span>
+            </>
+          )
 
-            {tab.href ? (
-              <Link
-                href={tab.href}
-                title={tab.name}
-                aria-label={tab.name}
-                aria-current={active ? "page" : undefined}
-                className={innerClass}
-              >
-                {inner}
-              </Link>
-            ) : (
-              <button
-                type="button"
-                id={tab.id}
-                role={role === "tablist" ? "tab" : undefined}
-                aria-selected={role === "tablist" ? active : undefined}
-                aria-controls={tab.controls}
-                // Roving tabindex: one stop for the whole row, arrows move within it.
-                tabIndex={role === "tablist" ? (active ? 0 : -1) : undefined}
-                title={tab.name}
-                onClick={tab.onSelect}
-                className={cn(innerClass, "cursor-pointer")}
-              >
-                {inner}
-              </button>
-            )}
+          const innerClass = cn(
+            "inline-flex h-full items-center gap-2 pl-3 sm:pl-4",
+            closable ? "pr-1.5" : "pr-3 sm:pr-4",
+            "text-mono-sm font-mono transition-colors duration-[120ms]",
+            active
+              ? "text-[var(--fg-primary)]"
+              : "text-[var(--fg-muted)] hover:text-[var(--fg-secondary)]",
+          )
 
-            {closable && (
-              <button
-                type="button"
-                onClick={tab.onClose}
-                aria-label={`Close ${tab.name}`}
-                className={cn(
-                  "focus-ring text-mono-sm mr-1.5 inline-grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-sm",
-                  "text-[var(--fg-muted)] opacity-60 transition-[opacity,background-color]",
-                  "hover:bg-[var(--bg-hover-strong)] hover:opacity-100",
-                )}
-              >
-                ×
-              </button>
-            )}
-          </div>
-        )
-      })}
+          return (
+            <div
+              key={tab.key}
+              className={cn(
+                "group relative inline-flex h-full shrink-0 items-center border-r border-[var(--border-subtle)]",
+                "transition-colors duration-150",
+                !active && "hover:bg-[var(--bg-hover-soft)]",
+              )}
+              style={active ? { background: activeSurface } : undefined}
+            >
+              {/* One underline for the whole row, travelling to whichever tab is active. The
+                same `layoutId` trick as the sidebar's diamond. */}
+              {active && (
+                <motion.span
+                  layoutId={layoutId}
+                  transition={reduce ? { duration: 0 } : { duration: 0.32, ease: EASE_OUT }}
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+                  style={{ background: "var(--fg-brand)" }}
+                />
+              )}
 
+              {tab.href ? (
+                <Link
+                  href={tab.href}
+                  title={tab.name}
+                  aria-label={tab.name}
+                  aria-current={active ? "page" : undefined}
+                  className={innerClass}
+                >
+                  {inner}
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  id={tab.id}
+                  role={role === "tablist" ? "tab" : undefined}
+                  aria-selected={role === "tablist" ? active : undefined}
+                  aria-controls={tab.controls}
+                  // Roving tabindex: one stop for the whole row, arrows move within it.
+                  tabIndex={role === "tablist" ? (active ? 0 : -1) : undefined}
+                  title={tab.name}
+                  onClick={tab.onSelect}
+                  className={cn(innerClass, "cursor-pointer")}
+                >
+                  {inner}
+                </button>
+              )}
+
+              {closable && (
+                <button
+                  type="button"
+                  onClick={tab.onClose}
+                  aria-label={`Close ${tab.name}`}
+                  className={cn(
+                    "focus-ring text-mono-sm mr-1.5 inline-grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-sm",
+                    "text-[var(--fg-muted)] opacity-60 transition-[opacity,background-color]",
+                    "hover:bg-[var(--bg-hover-strong)] hover:opacity-100",
+                  )}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Pinned, outside the scroller: it must not scroll away with the tabs, and it must not
+          be clipped by the fade mask. */}
       {children}
     </div>
   )
