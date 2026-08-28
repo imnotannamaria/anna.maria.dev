@@ -17,7 +17,7 @@
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { EASE_OUT } from "@/components/ui/reveal"
-import { CardLoading } from "@/components/ui/card-states"
+import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { renderDemo } from "./demos"
 import type { CardStateKind } from "@/lib/showcase/state"
 
@@ -171,7 +171,10 @@ export function DemoStage({
             </motion.div>
           </AnimatePresence>
         ) : (
-          <CardLoading label={name} rows={0} minHeight={minHeight - 32} />
+          // Not a card, and not this component's own skeleton either: nothing has been
+          // requested yet, so there is nothing to be a skeleton *of*. One shimmering block
+          // holding the stage's height until the observer fires.
+          <Skeleton style={{ height: minHeight - 32, borderRadius: "var(--radius-md)" }} />
         )}
       </div>
 

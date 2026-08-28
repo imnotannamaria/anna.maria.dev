@@ -1,6 +1,5 @@
 import { Suspense } from "react"
 import Link from "next/link"
-import { CardLoading } from "@/components/ui/card-states"
 import {
   getFeaturedPosts,
   getFeaturedProjects,
@@ -19,8 +18,9 @@ import { loadTodayActivity } from "@/components/wristkit/today-activity-card/loa
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
 import { LatestLogCard } from "@/components/home/latest-log-card"
-import { ProfileCard } from "@/components/home/profile-card"
-import { TreeCard } from "@/components/home/tree-card"
+import { LogCardSkeleton } from "@/components/home/log-card-view"
+import { ProfileCard, ProfileCardSkeleton } from "@/components/home/profile-card"
+import { TreeCard, TreeCardSkeleton } from "@/components/home/tree-card"
 import { buildSiteTree, siteTreeRouteCount } from "@/lib/site-tree"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { createMetadata } from "@/lib/metadata"
@@ -163,12 +163,19 @@ async function WhoamiRow() {
   )
 }
 
-/** The same grid, in grey, so nothing below it moves when the row lands. */
+/**
+ * The same grid, in grey, so nothing below it moves when the row lands.
+ *
+ * Both halves are the cards' own skeletons rather than a generic pair of boxes — the profile
+ * card's avatar frame and stats rail, the tree's real rows at their real indents. A skeleton
+ * that could belong to any card tells you a card is coming and nothing else; one you recognise
+ * tells you *which* card is coming, which is the only thing worth knowing while you wait.
+ */
 function WhoamiRowFallback() {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
-      <CardLoading label="whoami" rows={0} minHeight={320} />
-      <CardLoading label="tree" rows={4} minHeight={320} />
+      <ProfileCardSkeleton />
+      <TreeCardSkeleton routeCount={siteTreeRouteCount()} className="max-h-130 md:max-h-none" />
     </div>
   )
 }
@@ -299,7 +306,7 @@ export default function Home() {
           <Suspense
             fallback={
               <div className="md:row-span-2 md:h-full">
-                <CardLoading label="today" rows={0} className="h-full" minHeight={420} />
+                <TodayActivityCard state={{ kind: "loading" }} className="h-full" />
               </div>
             }
           >
@@ -310,7 +317,7 @@ export default function Home() {
 
         {/* The log gets the full width underneath, laid out as a shelf. */}
         <div className="mt-6">
-          <Suspense fallback={<CardLoading label="log" rows={0} minHeight={280} />}>
+          <Suspense fallback={<LogCardSkeleton />}>
             <LogShelfSlot />
           </Suspense>
         </div>
@@ -319,7 +326,9 @@ export default function Home() {
       {/* ═══════════════ GITHUB ═══════════════ */}
       <section aria-labelledby="sec-github">
         <SectHead id="sec-github" cmd="git log --contributions" meta="github.com/imnotannamaria" />
-        <Suspense fallback={<CardLoading label="contributions" rows={0} minHeight={220} />}>
+        <Suspense
+          fallback={<GithubCard username={siteConfig.githubUser} state={{ kind: "loading" }} />}
+        >
           <GithubSlot />
         </Suspense>
       </section>

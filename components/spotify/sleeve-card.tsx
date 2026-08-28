@@ -401,16 +401,79 @@ function StateCard({ className, children }: { className?: string; children: Reac
   )
 }
 
+/**
+ * The card before the playlist answers.
+ *
+ * It traces the whole card, not the top third of it: the head with its `spotify` link slot, the
+ * sleeve at `COVER + OUT_STOPPED` so the disc's parked edge is already accounted for, the serif
+ * title and the artist line, the elapsed/total clock, the footer comment, three control buttons
+ * at their real 26px, and the 2px progress rail on the card's bottom edge. The previous version
+ * was a square and two bars, which is every card on the site.
+ *
+ * The disc is drawn for real rather than greyed. It is not data — it is the object the card is,
+ * it costs one gradient, and a turntable with nothing on it is what the *empty* frame means.
+ */
 export function SleeveLoading({ className }: { className?: string }) {
   return (
-    <StateCard className={className}>
-      <Skeleton className="shrink-0 rounded-sm" style={{ width: COVER, height: COVER }} />
-      <div className="flex min-w-0 flex-1 flex-col gap-2.5">
-        <Skeleton variant="line" className="h-3.5 w-[78%]" />
-        <Skeleton variant="line" className="h-2.5 w-[52%]" />
+    <div className={cn("bento-card relative", className)}>
+      <CardHead
+        label="me, as a playlist"
+        meta={<Skeleton style={{ width: 46, height: 9, borderRadius: 3 }} />}
+      />
+
+      <div className="flex items-center gap-4" aria-hidden>
+        <div className="relative shrink-0" style={{ width: COVER + OUT_STOPPED, height: COVER }}>
+          <div
+            className="absolute top-0 left-0 opacity-60"
+            style={{ transform: `translateX(${OUT_STOPPED}px)` }}
+          >
+            <Disc size={COVER} running={false} />
+          </div>
+          <Skeleton
+            className="absolute top-0 left-0 rounded-sm"
+            style={{
+              width: COVER,
+              height: COVER,
+              border: "1px solid var(--border-subtle)",
+              boxShadow: "2px 0 10px rgba(0,0,0,.45)",
+            }}
+          />
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <Skeleton delay={0.06} style={{ width: "72%", height: 20, borderRadius: 4 }} />
+          <Skeleton delay={0.12} style={{ width: "48%", height: 10, borderRadius: 3 }} />
+          <Skeleton delay={0.18} style={{ width: 62, height: 8, borderRadius: 3 }} />
+        </div>
       </div>
-      <span className="sr-only">Loading me, as a playlist</span>
-    </StateCard>
+
+      <CardFoot comment="reading the playlist">
+        <div className="flex items-center gap-1" aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <Skeleton
+              key={i}
+              delay={0.24 + i * 0.06}
+              // h-7 w-7 rounded-full, exactly what `ControlButton` is.
+              variant="circle"
+              style={{ width: 28, height: 28 }}
+            />
+          ))}
+        </div>
+      </CardFoot>
+
+      {/* The rail keeps its 2px so the card is exactly as tall as it will be, with no brand
+          fill on it — there is no position to report yet, and a bar sitting at zero would be
+          a claim rather than a placeholder. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0"
+        style={{ height: 2, background: "var(--border-subtle)" }}
+      />
+
+      <span className="sr-only" role="status">
+        Loading me, as a playlist
+      </span>
+    </div>
   )
 }
 
@@ -438,7 +501,7 @@ export function SleeveEmpty({ className }: { className?: string }) {
 }
 
 /**
- * `onRetry` is optional for the same reason `CardError`'s is: the showcase renders this frame
+ * `onRetry` is optional because the showcase renders this frame
  * with nothing behind it to re-run, and a retry button that does nothing is a worse lie than
  * no button.
  */

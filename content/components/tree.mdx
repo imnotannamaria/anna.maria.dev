@@ -38,8 +38,13 @@ The counts come off lists the page already has in memory, so the tree costs no e
 
 The tree is not static, even though the structure is. It streams inside a `<Suspense>` on the
 home page beside the profile card, because both need the log count and the count comes from
-Postgres — so there is a real moment where the card is a four-row skeleton, and that skeleton
-has been on the site since the day the home page was split into slots.
+Postgres — so there is a real moment where the card is a skeleton, and that skeleton has been
+on the site since the day the home page was split into slots.
+
+`TreeCardSkeleton` is that frame, and it is the card: the same `.bento-card`, the same
+`CardHead` with the same `N routes` meta — `siteTreeRouteCount()` is arithmetic over a
+hand-written constant, so it is known without a query — the same 32px rows at the same indents,
+the same footer. Only the words are grey.
 
 `/components` did not know that. It listed two states, `ok` and `empty`, and the third one was
 shipping in production the whole time. The registry is the only place that claim lives, so a

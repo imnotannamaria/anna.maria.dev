@@ -3,6 +3,7 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
+import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { EASE_OUT } from "@/components/ui/reveal"
 import type { ContributionWeek, ContributionYear } from "@/lib/github/contributions"
 import type { CardState } from "@/lib/showcase/state"
@@ -139,6 +140,68 @@ const Column = memo(function Column({
   )
 })
 
+/**
+ * The grid before the fetch lands: 53 columns of 7, at the same `MIN_COL` floor and the same
+ * `GAP` the real one uses, under an empty month-label row and over the same legend line.
+ *
+ * It is the highest-fidelity skeleton on the site almost by accident — a contribution grid is
+ * already a field of identical squares, so tracing it is just drawing the squares without a
+ * colour. The shimmer walks the columns rather than firing all 371 cells at once, which is what
+ * makes it read as a sweep across a year instead of a flickering wall.
+ */
+function CalendarSkeleton() {
+  return (
+    <div className="relative" aria-hidden>
+      {/* The same padded, negatively-margined, horizontally scrolling box the real grid sits
+          in, so the card is exactly as wide and as tall before the fetch as after it. */}
+      <div
+        className="overflow-x-auto"
+        style={{ padding: RING + 1, margin: -(RING + 1), paddingBottom: RING + 5 }}
+      >
+        <div className="relative" style={{ minWidth: 53 * MIN_COL + 52 * GAP }}>
+          {/* The month row is left empty rather than greyed: it is thin text on a transparent
+              background, and a bar there would be the one piece claiming more ink than the
+              thing it stands in for. It still reserves its 14px. */}
+          <div className="h-3.5" />
+
+          <div className="relative flex" style={{ gap: GAP }}>
+            {Array.from({ length: 53 }, (_, wi) => (
+              <div
+                key={wi}
+                className="flex flex-col"
+                style={{ flex: "1 1 0", minWidth: MIN_COL, gap: GAP }}
+              >
+                {Array.from({ length: 7 }, (_, di) => (
+                  <span
+                    key={di}
+                    className="relative block w-full"
+                    style={{
+                      aspectRatio: "1 / 1",
+                      borderRadius: 2,
+                      background: "var(--bg-surface-elevated)",
+                    }}
+                  />
+                ))}
+              </div>
+            ))}
+
+            <span className="skeleton-sweep" />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <Skeleton style={{ width: 128, height: 9, borderRadius: 3 }} />
+        <Skeleton delay={0.2} style={{ width: 96, height: 9, borderRadius: 3 }} />
+      </div>
+
+      <span className="sr-only" role="status">
+        Loading contributions
+      </span>
+    </div>
+  )
+}
+
 export function GithubCalendar({ state }: { state: CardState<ContributionYear> }) {
   const data = state.kind === "ok" || state.kind === "stale" ? state.data : null
   const reduce = useReducedMotion() ?? false
@@ -217,10 +280,13 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
   const hoveredDay = hover ? (weeks[hover.week]?.[hover.day] ?? null) : null
   const active = hoveredDay?.date ? hoveredDay : null
 
-  // Two branches, not one. This used to be a single `if (!data)` that printed
-  // "contributions unavailable" whether GitHub was unreachable or the account
-  // genuinely had a quiet year — the first is about this server and the second is
-  // about the account, and only one of them is the visitor's business.
+  // Three branches now, and the third is the one the card was missing. This used to be a
+  // single `if (!data)` that printed "contributions unavailable" whether GitHub was
+  // unreachable or the account genuinely had a quiet year — the first is about this server
+  // and the second is about the account, and only one of them is the visitor's business.
+  // `loading` is neither: it is the grid, in grey, at the size the real grid will be.
+  if (state.kind === "loading") return <CalendarSkeleton />
+
   if (!data) {
     return (
       <p className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>

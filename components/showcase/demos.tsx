@@ -27,9 +27,8 @@ import {
   TREE_FIXTURE,
   TREE_FIXTURE_EMPTY,
 } from "@/lib/showcase/fixtures"
-import { CardLoading } from "@/components/ui/card-states"
 import { GithubCard } from "@/components/home/github-card"
-import { TreeCard } from "@/components/home/tree-card"
+import { TreeCard, TreeCardSkeleton } from "@/components/home/tree-card"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
 import {
@@ -58,7 +57,7 @@ export type DemoMap = {
  */
 const StackGraph = dynamic(
   () => import("@/components/about/stack-graph").then((m) => m.StackGraph),
-  { ssr: false, loading: () => <CardLoading label="stack graph" rows={0} minHeight={420} /> },
+  { ssr: false },
 )
 const StackGraphLoading = dynamic(
   () => import("@/components/about/stack-graph").then((m) => m.StackGraphLoading),
@@ -74,9 +73,9 @@ const noop = () => {}
 
 export const DEMOS: DemoMap = {
   tree: {
-    // Character for character what `WhoamiRowFallback` in `app/(home)/page.tsx` renders. Four
-    // rows because the tree IS a repeating shape — the one card here that a skeleton suits.
-    loading: () => <CardLoading label="tree" rows={4} minHeight={320} />,
+    // The card's own skeleton, which is what `WhoamiRowFallback` in `app/(home)/page.tsx`
+    // renders too. One copy, so the demo cannot show a frame the home page doesn't.
+    loading: () => <TreeCardSkeleton routeCount={siteTreeRouteCount()} />,
     empty: () => <TreeCard items={TREE_FIXTURE_EMPTY} routeCount={siteTreeRouteCount()} />,
     ok: () => <TreeCard items={TREE_FIXTURE} routeCount={siteTreeRouteCount()} />,
   },
@@ -86,8 +85,8 @@ export const DEMOS: DemoMap = {
   },
 
   playlist: {
-    // The card's own frames, not lookalikes. The `empty` one used to be a `CardLoading` with
-    // `rows={0}`, so this page drew the words "$ loading..." under the label "empty".
+    // The card's own frames, not lookalikes. The `empty` one used to be a generic card frame
+    // printing "$ loading…", so this page drew a loading state under the label "empty".
     loading: () => <SleeveLoading />,
     empty: () => <SleeveEmpty />,
     error: () => <SleeveError />,
@@ -110,7 +109,7 @@ export const DEMOS: DemoMap = {
   },
 
   contributions: {
-    loading: () => <CardLoading label="contributions" rows={0} minHeight={220} />,
+    loading: () => <GithubCard username="imnotannamaria" state={{ kind: "loading" }} />,
     empty: () => <GithubCard username="imnotannamaria" state={{ kind: "empty" }} />,
     error: () => <GithubCard username="imnotannamaria" state={{ kind: "error" }} />,
     ok: () => (

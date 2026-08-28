@@ -710,6 +710,47 @@ button:focus-visible,
   }
 }
 
+/* One band of light travelling across a field of skeleton pieces.
+ *
+ * The contributions grid is 371 squares. Giving each one its own `shimmer` means 371
+ * elements repainting a gradient every frame, which is exactly the "card-sized repaint at
+ * 60fps starves whatever else is animating" trap in CLAUDE.md — only 371 times over. So the
+ * squares hold still and one overlay moves, on a transform, which the compositor handles
+ * without touching paint.
+ *
+ * `-45%` to `145%` rather than `-100%` to `100%`: the band is 60% of the container wide, and
+ * those are the two positions where it is exactly off each edge. */
+@keyframes skeleton-sweep {
+  0% {
+    transform: translateX(-45%);
+  }
+  100% {
+    transform: translateX(145%);
+  }
+}
+
+.skeleton-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.skeleton-sweep::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 60%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--fg-primary) 7%, transparent) 50%,
+    transparent 100%
+  );
+  animation: skeleton-sweep 1.9s linear infinite;
+}
+
 /* The record turning.
  *
  * CSS rather than Motion, the same deal as the equaliser bars below: the global

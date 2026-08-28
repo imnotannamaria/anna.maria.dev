@@ -5,7 +5,7 @@
  * This used to cover everything: `Home()` awaited one `Promise.all` of three queries, so a slow
  * log query held the whole page here, including the featured project, the stack card and the
  * piano, none of which touch a database. Every card that reads something now sits behind its
- * own `<Suspense>` with its own `CardLoading`, so the shell paints immediately and each card
+ * own `<Suspense>` with its own skeleton, so the shell paints immediately and each card
  * fills in on its own clock. This file is what is left: the frame around a page whose slow
  * parts announce themselves individually.
  *
@@ -20,16 +20,17 @@
  * root, a bogus `/projects/x` answered 200; inside the group it answers 404 and the home page
  * still gets its loading state.
  *
- * This does not draw the page in grey. The first attempt did: a rounded rectangle for the
- * avatar, bars for the name and the stats, a pill for the CTA. A skeleton works when the
- * thing behind it is a uniform repeating shape, because then the grey blocks *are* the
- * layout. The first row here is a bespoke card — a photo, a serif name, an odometer, three
- * social buttons — and a grey caricature of that reads as a broken page rather than a
- * loading one.
+ * This does not draw the page in grey, and that is now a decision about *scope* rather than
+ * about skeletons. Each card has one — `ProfileCardSkeleton`, `TreeCardSkeleton`,
+ * `LogCardSkeleton`, the calendar's grid, wristkit's rings — because each of those stands in
+ * for one known box and can trace it exactly. This file stands in for the whole page before
+ * any of them exist, and a grey rectangle per card is a caricature of a layout rather than a
+ * picture of one: it is the version that reads as broken.
  *
  * So it says what is happening, in the voice the rest of the site already uses: the real
- * section prompt, then a `$` line underneath. `60vh` keeps the status bar from jumping up
- * to meet it and back down again.
+ * section prompt, then a `$` line underneath. That line is this file's alone — no component
+ * prints it any more. `60vh` keeps the status bar from jumping up to meet it and back down
+ * again.
  *
  * The line is plain text, not `TypeIn`. `TypeIn` fades its characters in on `whileInView`,
  * which needs the client to hydrate and an `IntersectionObserver` to fire before anything

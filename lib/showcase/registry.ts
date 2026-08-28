@@ -54,7 +54,7 @@ export const SHOWCASE = {
     where: ["/"],
     /**
      * `loading` was missing, and the home page had one all along: the tree streams inside
-     * `<Suspense>` beside the profile card, with a four-row `CardLoading` as its fallback. The
+     * `<Suspense>` beside the profile card, with `TreeCardSkeleton` as its fallback. The
      * registry said the card had two states while the site rendered three — which is the exact
      * failure this page exists to catch, on the page that catches it.
      *

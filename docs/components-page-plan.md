@@ -224,7 +224,7 @@ the entrepta `Skeleton` — so a card's non-ok states are three components with 
 
 ```tsx
 /** Grey bars in the card's own shape. `rows` and `media` describe the layout being stood in for. */
-export function CardLoading({ label, meta, rows, media, minHeight }: …)
+export function TreeCardSkeleton({ routeCount }: …)   // and one per card
 
 /** Not a failure. "Nothing yet" is a fact, and it reads in the site's voice: `// nothing logged yet.` */
 export function CardEmpty({ label, note, minHeight }: …)
@@ -243,7 +243,7 @@ already uses `role="img"` with an `aria-label`, which is the right call — keep
 length and it is right: a skeleton works when the thing behind it is a uniform repeating shape.
 For a card that is a photo, a serif name, an odometer and three buttons, grey blocks read as
 broken rather than loading. Those cards get a `CardEmpty`-shaped "loading" with a `$` line, not
-a skeleton. `rows`/`media` on `CardLoading` exist so this is a per-card decision, made once.
+a skeleton — so every card owns its own, tracing its real boxes, and there is no shared one.
 
 ### Motion for a state change
 
