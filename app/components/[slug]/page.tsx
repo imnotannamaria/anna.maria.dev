@@ -5,7 +5,7 @@ import { getComponentDocBySlug, getComponentDocs, getComponentDocToc } from "@/l
 import { MDXContent } from "@/components/blog/mdx-content"
 import { PageOutline } from "@/components/chrome/page-outline"
 import { MetaCol, MetaGrid } from "@/components/chrome/page-parts"
-import { StateCarousel } from "@/components/showcase/state-carousel"
+import { DocSpecimen } from "@/components/showcase/doc-specimen"
 import { SHOWCASE, type ShowcaseSlug } from "@/lib/showcase/registry"
 import { sourceUrl } from "@/lib/showcase/source"
 import { Badge } from "@/app/components/entrepta/badge"
@@ -108,10 +108,11 @@ export default async function ComponentDocPage({ params }: Props) {
             {doc.description}
           </p>
 
-          {/* The carousel leads. Someone who clicked in from the index came to compare states,
-              so it is the headline rather than an illustration halfway down the prose. */}
+          {/* The specimen leads. Someone who clicked in from the index came to compare states,
+              so it is the headline rather than an illustration halfway down the prose — and it
+              is the same split the index uses, so arriving here is not a change of language. */}
           <div className="mt-8">
-            <StateCarousel slug={entry.slug} name={entry.name} states={entry.states} />
+            <DocSpecimen slug={entry.slug} name={entry.name} states={entry.states} />
           </div>
 
           <div className="mt-8">

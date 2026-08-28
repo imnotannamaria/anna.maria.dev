@@ -18,13 +18,18 @@
  * The active tab lives in the URL through `useUrlFilter`, like every other choice on this site,
  * so a tab is linkable and the back button steps through them. `/components` with no param is
  * the components tab, which keeps the canonical URL clean.
+ *
+ * **The strip is drawn as editor tabs, not as an underline.** The first attempt was three muted
+ * mono labels on a hairline with a 1px rule under the active one, and it did not read as tabs at
+ * all — nothing about it was a *surface*. That is the "too faint" case, and the fix for too faint
+ * is more weight rather than more contrast. So the active tab now wears the panel's own
+ * background, sits flush against it by eating the strip's bottom rule, and carries a 2px brand
+ * line on top. Tab and panel read as one object, which is the whole point of a tab.
  */
 
 import { useId } from "react"
-import { motion, useReducedMotion } from "motion/react"
 import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
 import { useUrlFilter } from "@/components/ui/url-filter"
-import { EASE_OUT } from "@/components/ui/reveal"
 import { TOKEN_GROUPS } from "@/lib/design-tokens"
 import { SHOWCASE_LIST, GROUP_LABEL, type ShowcaseEntry } from "@/lib/showcase/registry"
 import { ShowcaseFeed, SHOWCASE_GROUPS } from "./showcase-feed"
@@ -66,7 +71,6 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
   const entries = [...SHOWCASE_LIST]
   const [param, setParam] = useUrlFilter("view", VIEWS, "/components")
   const view: View = param ?? "components"
-  const reduce = useReducedMotion() ?? false
   const tablistId = useId()
 
   const tabs = TABS.map((t) => ({ ...t, meta: t.meta(entries) }))
@@ -132,15 +136,15 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
             you only see when something has gone wrong.
           </p>
 
-          {/* The tab strip, in the titlebar's language: squared tabs on a rule, with a brand
-              underline that travels to the active one. `layoutId` is what moves it, so the
-              underline is one element sliding rather than three fading. */}
+          {/* The strip. Squared tabs on a rule; the active one is the panel's surface and
+              joins it. `marginBottom: -1` with a matching bottom border is what removes the
+              line under the active tab, so the two stop being separate boxes. */}
           <div
             role="tablist"
             aria-label="Components view"
             onKeyDown={onKeyDown}
-            className="-mx-1 mt-8 flex overflow-x-auto border-b"
-            style={{ borderColor: "var(--border-subtle)" }}
+            className="mt-10 flex overflow-x-auto"
+            style={{ borderBottom: "1px solid var(--border-subtle)" }}
           >
             {tabs.map((tab) => {
               const isActive = view === tab.id
@@ -157,18 +161,20 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
                   onClick={() =>
                     setParam(tab.id === "components" ? null : (tab.id as (typeof VIEWS)[number]))
                   }
-                  className="text-mono-sm relative shrink-0 cursor-pointer px-3.5 py-2.5 font-mono whitespace-nowrap transition-colors"
-                  style={{ color: isActive ? "var(--fg-primary)" : "var(--fg-muted)" }}
+                  className="text-mono-md relative shrink-0 cursor-pointer px-4 py-2.5 font-mono whitespace-nowrap transition-colors"
+                  style={{
+                    color: isActive ? "var(--fg-primary)" : "var(--fg-muted)",
+                    background: isActive ? "var(--bg-card)" : "transparent",
+                    borderTop: `2px solid ${isActive ? "var(--fg-brand)" : "transparent"}`,
+                    borderLeft: `1px solid ${isActive ? "var(--border-subtle)" : "transparent"}`,
+                    borderRight: `1px solid ${isActive ? "var(--border-subtle)" : "transparent"}`,
+                    marginBottom: -1,
+                    borderBottom: `1px solid ${isActive ? "var(--bg-card)" : "transparent"}`,
+                    borderTopLeftRadius: "var(--radius-sm)",
+                    borderTopRightRadius: "var(--radius-sm)",
+                  }}
                 >
                   {tab.label}
-                  {isActive && (
-                    <motion.span
-                      layoutId="showcase-tab-underline"
-                      className="absolute inset-x-0 -bottom-px block h-px"
-                      style={{ background: "var(--fg-brand)" }}
-                      transition={reduce ? { duration: 0 } : { duration: 0.28, ease: EASE_OUT }}
-                    />
-                  )}
                 </button>
               )
             })}
@@ -181,39 +187,49 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
             </span>
           </div>
 
-          {/* All three panels are in the document. `hidden` is what makes the inactive ones
-              invisible *and* zero-area, so their demos never trip a visibility observer. */}
+          {/* The panel. One surface for all three tabs, so switching does not change the box —
+              only what is inside it. All three are in the document with the inactive ones
+              `hidden`: conditional rendering would put two thirds of the prose outside the HTML
+              a crawler reads, and `hidden` is `display: none`, so those panels also have no
+              boxes and their demos never trip a visibility observer. */}
           <div
-            id="panel-components"
-            role="tabpanel"
-            aria-labelledby={`${tablistId}-components`}
-            hidden={view !== "components"}
-            className="mt-8"
-            style={{ scrollMarginTop: 24 }}
+            className="px-4 py-8 sm:px-6"
+            style={{
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-subtle)",
+              borderTop: "none",
+              borderRadius: "0 0 var(--radius-lg) var(--radius-lg)",
+            }}
           >
-            <ShowcaseFeed entries={entries} />
-          </div>
+            <div
+              id="panel-components"
+              role="tabpanel"
+              aria-labelledby={`${tablistId}-components`}
+              hidden={view !== "components"}
+              style={{ scrollMarginTop: 24 }}
+            >
+              <ShowcaseFeed entries={entries} />
+            </div>
 
-          <div
-            id="panel-tokens"
-            role="tabpanel"
-            aria-labelledby={`${tablistId}-tokens`}
-            hidden={view !== "tokens"}
-            className="mt-8"
-            style={{ scrollMarginTop: 24 }}
-          >
-            <TokensSection themeCount={themeCount} />
-          </div>
+            <div
+              id="panel-tokens"
+              role="tabpanel"
+              aria-labelledby={`${tablistId}-tokens`}
+              hidden={view !== "tokens"}
+              style={{ scrollMarginTop: 24 }}
+            >
+              <TokensSection themeCount={themeCount} />
+            </div>
 
-          <div
-            id="panel-rules"
-            role="tabpanel"
-            aria-labelledby={`${tablistId}-rules`}
-            hidden={view !== "rules"}
-            className="mt-8"
-            style={{ scrollMarginTop: 24 }}
-          >
-            <RulesSection />
+            <div
+              id="panel-rules"
+              role="tabpanel"
+              aria-labelledby={`${tablistId}-rules`}
+              hidden={view !== "rules"}
+              style={{ scrollMarginTop: 24 }}
+            >
+              <RulesSection />
+            </div>
           </div>
         </div>
       </div>
