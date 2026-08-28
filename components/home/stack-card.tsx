@@ -100,13 +100,21 @@ const BRANCHES: { id: string; label: string; comment: string; tools: Tool[] }[] 
 
 const TOTAL_TOOLS = BRANCHES.reduce((sum, b) => sum + b.tools.length, 0)
 
-// Divider borders per cell, adapting to the column count at each breakpoint:
-// 1 col (mobile) → bottom between rows · 2 col (sm) → right on col 0, bottom on row 0
-// 4 col (lg) → right between columns, no bottom
+/**
+ * Divider borders per cell, adapting to the column count at each step:
+ * 1 col → bottom between rows · 2 col → right on col 0, bottom on row 0
+ * 4 col → right between columns, no bottom
+ *
+ * Container queries, not viewport ones. This card is full width on the home page and about
+ * 580px wide inside its stage on `/components`, and a viewport breakpoint cannot tell those
+ * apart — so on a wide screen the four-column layout fired inside the narrow stage and the
+ * branch headings printed on top of each other. `@container` asks the box, which is the
+ * question that was always being asked.
+ */
 const CELL_BORDERS = [
-  "border-b sm:border-r lg:border-b-0",
-  "border-b lg:border-r lg:border-b-0",
-  "border-b sm:border-r sm:border-b-0",
+  "border-b @md:border-r @2xl:border-b-0",
+  "border-b @2xl:border-r @2xl:border-b-0",
+  "border-b @md:border-r @md:border-b-0",
   "",
 ]
 
@@ -233,105 +241,118 @@ export function StackCard() {
 
       <CardHead label="stack" as="h2" id="card-stack" meta={`${BRANCHES.length} branches`} />
 
-      <div
-        className="relative grid grid-cols-1 overflow-hidden sm:grid-cols-2 lg:grid-cols-4"
-        style={{ border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)" }}
-      >
-        {BRANCHES.map((branch, i) => {
-          const isOpen = open.has(branch.id)
-          const panelId = `stack-panel-${branch.id}`
+      {/* The `@container` has to be a *wrapper*: `container-type` establishes a query container
+          for an element's descendants, never for itself, so `@md:` sitting on the same node as
+          `@container` would resolve against some ancestor container instead — which is to say,
+          against nothing. */}
+      <div className="@container">
+        <div
+          className="relative grid grid-cols-1 overflow-hidden @md:grid-cols-2 @2xl:grid-cols-4"
+          style={{ border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)" }}
+        >
+          {BRANCHES.map((branch, i) => {
+            const isOpen = open.has(branch.id)
+            const panelId = `stack-panel-${branch.id}`
 
-          return (
-            <div
-              key={branch.id}
-              className={cn(
-                "group/branch flex flex-col border-(--border-subtle) transition-colors duration-150",
-                "hover:bg-(--bg-hover-soft) has-[:focus-visible]:bg-(--bg-hover-soft)",
-                CELL_BORDERS[i],
-              )}
-            >
-              {/*
-               * A real <button>, not a div with role="button" and a hand-rolled
-               * keydown handler. Enter and Space come free, and only the header
-               * toggles — clicking a badge no longer collapses the branch you
-               * opened to read it.
-               */}
-              <button
-                type="button"
-                aria-expanded={isOpen}
-                aria-controls={panelId}
-                onClick={() => toggle(branch.id)}
-                className="flex w-full items-center gap-2 p-4 text-left outline-none"
+            return (
+              <div
+                key={branch.id}
+                className={cn(
+                  "group/branch flex flex-col border-(--border-subtle) transition-colors duration-150",
+                  "hover:bg-(--bg-hover-soft) has-[:focus-visible]:bg-(--bg-hover-soft)",
+                  CELL_BORDERS[i],
+                )}
               >
-                <RadioDot active={isOpen} />
-
-                <span
-                  className="text-mono-md font-mono font-semibold transition-colors duration-150 group-hover/branch:text-(--fg-brand)"
-                  style={{ color: "var(--fg-primary)" }}
+                {/*
+                 * A real <button>, not a div with role="button" and a hand-rolled
+                 * keydown handler. Enter and Space come free, and only the header
+                 * toggles — clicking a badge no longer collapses the branch you
+                 * opened to read it.
+                 */}
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={panelId}
+                  onClick={() => toggle(branch.id)}
+                  className="flex w-full min-w-0 items-center gap-2 p-4 text-left outline-none"
                 >
-                  {branch.label}
-                </span>
+                  <RadioDot active={isOpen} />
 
-                <span className="text-mono-xs font-mono" style={{ color: "var(--fg-muted)" }}>
-                  {`// ${branch.comment}`}
-                </span>
+                  <span
+                    className="text-mono-md min-w-0 truncate font-mono font-semibold transition-colors duration-150 group-hover/branch:text-(--fg-brand)"
+                    style={{ color: "var(--fg-primary)" }}
+                  >
+                    {branch.label}
+                  </span>
 
-                <span
-                  className="text-mono-sm ml-auto font-mono"
-                  style={{ color: "var(--fg-muted)" }}
-                >
-                  {branch.tools.length}
-                  <span className="sr-only"> tools</span>
-                </span>
+                  {/* Supporting text, so it is the first thing to go when the cell is tight —
+                    at two columns in a 580px stage there is not room for it beside the label,
+                    the count and the caret. Hidden, not shrunk: a truncated "// clie" is worse
+                    than no comment. */}
+                  <span
+                    className="text-mono-xs hidden truncate font-mono @lg:inline"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    {`// ${branch.comment}`}
+                  </span>
 
-                <CaretRightIcon
-                  aria-hidden
-                  size={11}
-                  weight="bold"
-                  className="shrink-0 transition-transform duration-200"
-                  style={{
-                    color: isOpen ? "var(--fg-brand)" : "var(--fg-secondary)",
-                    transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
-                  }}
-                />
-              </button>
+                  <span
+                    className="text-mono-sm ml-auto font-mono"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    {branch.tools.length}
+                    <span className="sr-only"> tools</span>
+                  </span>
 
-              {/* Kept mounted behind `inert` so the tool names stay in the server
+                  <CaretRightIcon
+                    aria-hidden
+                    size={11}
+                    weight="bold"
+                    className="shrink-0 transition-transform duration-200"
+                    style={{
+                      color: isOpen ? "var(--fg-brand)" : "var(--fg-secondary)",
+                      transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                    }}
+                  />
+                </button>
+
+                {/* Kept mounted behind `inert` so the tool names stay in the server
                   HTML and the height animation has something to measure. */}
-              <motion.div
-                id={panelId}
-                className="overflow-hidden"
-                initial={false}
-                animate={isOpen ? "open" : "closed"}
-                variants={panel}
-                inert={!isOpen}
-              >
-                {/* The padding lives on this inner div, not the animated one.
+                <motion.div
+                  id={panelId}
+                  className="overflow-hidden"
+                  initial={false}
+                  animate={isOpen ? "open" : "closed"}
+                  variants={panel}
+                  inert={!isOpen}
+                >
+                  {/* The padding lives on this inner div, not the animated one.
                     With border-box, `height: 0` on a padded box still clamps to
                     padding-top + padding-bottom, so a closed branch would leave
                     a 16px ghost. This one is a motion.div with no `animate` of
                     its own, which keeps the stagger propagating to the badges. */}
-                {/* pt-1 is not spacing, it is clearance. The badges lift on hover inside a
+                  {/* pt-1 is not spacing, it is clearance. The badges lift on hover inside a
                     panel that has to clip for the height animation, so without a little
                     room above them the top of the border gets cut off. */}
-                <motion.div className="flex flex-wrap gap-1.5 px-4 pt-1 pb-4">
-                  {branch.tools.map((tool) => (
-                    <motion.span
-                      key={tool.name}
-                      variants={badge}
-                      className="group/badge inline-flex"
-                    >
-                      <StackBadge tool={tool} />
-                    </motion.span>
-                  ))}
+                  <motion.div className="flex flex-wrap gap-1.5 px-4 pt-1 pb-4">
+                    {branch.tools.map((tool) => (
+                      <motion.span
+                        key={tool.name}
+                        variants={badge}
+                        className="group/badge inline-flex"
+                      >
+                        <StackBadge tool={tool} />
+                      </motion.span>
+                    ))}
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            </div>
-          )
-        })}
-      </div>
+              </div>
+            )
+          })}
+        </div>
 
-      {/* Footer — mirrors the tree card's. */}
+        {/* Footer — mirrors the tree card's. */}
+      </div>
       <CardFoot
         comment="click a branch to fold it away"
         className="border-t border-dashed border-(--border-subtle) pt-3"

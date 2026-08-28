@@ -24,12 +24,26 @@
 import { useState } from "react"
 import { ArrowLink } from "@/components/ui/arrow-link"
 import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
+import {
+  HouseLineIcon,
+  ShareNetworkIcon,
+  SquaresFourIcon,
+  UserSquareIcon,
+  type Icon,
+} from "@phosphor-icons/react"
 import { GROUP_LABEL, type ShowcaseEntry } from "@/lib/showcase/registry"
 import { sourceUrl } from "@/lib/showcase/source"
 import type { CardStateKind } from "@/lib/showcase/state"
 import { DemoStage, StateList } from "./demo-viewer"
 
 export const SHOWCASE_GROUPS = ["home", "about", "shared"] as const
+
+/** The same glyph the sidebar uses for the same place, so a filter names somewhere real. */
+const GROUP_ICON: Record<(typeof SHOWCASE_GROUPS)[number], Icon> = {
+  home: HouseLineIcon,
+  about: UserSquareIcon,
+  shared: ShareNetworkIcon,
+}
 
 /** Roughly how tall each demo ends up, so the stage reserves the right box before it mounts. */
 const MIN_HEIGHT: Record<string, number> = {
@@ -117,6 +131,7 @@ export function ShowcaseFeed({ entries }: { entries: ShowcaseEntry[] }) {
   const pills = SHOWCASE_GROUPS.map((g) => ({
     key: g,
     label: GROUP_LABEL[g],
+    icon: GROUP_ICON[g],
     count: entries.filter((e) => e.group === g).length,
   })).filter((p) => p.count > 0)
 
@@ -125,6 +140,7 @@ export function ShowcaseFeed({ entries }: { entries: ShowcaseEntry[] }) {
       <div role="group" aria-label="Filter by page" className="flex flex-wrap gap-2">
         <FilterPill
           label="all"
+          icon={SquaresFourIcon}
           count={entries.length}
           active={!active}
           onClick={() => setFilter(null)}
@@ -133,6 +149,7 @@ export function ShowcaseFeed({ entries }: { entries: ShowcaseEntry[] }) {
           <FilterPill
             key={pill.key}
             label={pill.label}
+            icon={pill.icon}
             count={pill.count}
             active={active === pill.key}
             onClick={() => setFilter(active === pill.key ? null : pill.key)}

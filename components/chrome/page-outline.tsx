@@ -77,6 +77,19 @@ export function PageOutline({
    * *changed*, so reducing over `entries` compares whichever sections happened to cross the
    * band in that tick. Visibility is kept in a map and the answer is computed from all of it.
    */
+  /**
+   * A stable key for "the same set of rows", so the effect below does not depend on the array
+   * itself.
+   *
+   * `items` is built inline by every caller, which makes it a new identity on every render. An
+   * IntersectionObserver invokes its callback the moment you `observe()` an element that is
+   * already on screen — so keying the effect on the array gave: observe → setActive → render →
+   * new array → tear down → observe → … forever. On `/components` that left every row frozen on
+   * its `initial` variant, i.e. a rail of invisible links. Callers should memoise anyway, but
+   * this is what stops the failure being silent when one forgets.
+   */
+  const key = items.map((i) => i.id).join("|")
+
   useEffect(() => {
     const sections = items
       .map((i) => document.getElementById(i.id))
@@ -107,7 +120,9 @@ export function PageOutline({
 
     sections.forEach((s) => observer.observe(s))
     return () => observer.disconnect()
-  }, [items])
+    // `key`, not `items` — see above. eslint cannot see that one stands in for the other.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key])
 
   const jump = (e: React.MouseEvent, id: string) => {
     e.preventDefault()

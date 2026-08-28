@@ -17,6 +17,7 @@
  */
 
 import { useCallback, useSyncExternalStore } from "react"
+import type { Icon } from "@phosphor-icons/react"
 
 /** Namespaced per param, so two filters on one page never wake each other up. */
 const eventName = (param: string) => `urlfilter:${param}`
@@ -81,12 +82,20 @@ export function FilterPill({
   count,
   active,
   onClick,
+  icon: PillIcon,
 }: {
   label: string
   /** Omitted where there is nothing to tally — the showcase's state pills, for one. */
   count?: number
   active: boolean
   onClick: () => void
+  /**
+   * Optional, and optional on purpose. /blog and /projects filter by tag and /log by type —
+   * open sets with no fixed icon between them, and inventing one per tag would be noise. The
+   * showcase filters by a closed set of three pages that already have icons in the nav, so
+   * there it is the same glyph the sidebar uses for the same place.
+   */
+  icon?: Icon
 }) {
   return (
     <button
@@ -112,11 +121,33 @@ export function FilterPill({
             }
       }
     >
+      {PillIcon && (
+        <PillIcon
+          size={12}
+          weight={active ? "fill" : "regular"}
+          aria-hidden
+          className="shrink-0"
+          // A filled glyph covers more area than the text beside it, so it reads louder at the
+          // same colour. Dropping its contrast is the counterweight.
+          style={{ color: active ? "currentColor" : "var(--fg-muted)" }}
+        />
+      )}
       {label}
       {/* Not dimmed. It carried `opacity: 0.55`, which put it at 2.2–3.0:1 in every theme,
           in both states — the count is information, not decoration, so it has to be as
           legible as the label beside it. The gap is what separates them. */}
-      {count != null && <span>{count}</span>}
+      {count != null && (
+        <span
+          className="rounded-full px-1.5 tabular-nums"
+          style={{
+            // The count gets its own chip so the pill reads as "label · how many" rather than
+            // as two words that happen to be adjacent.
+            background: active ? "var(--bg-hover-strong)" : "var(--bg-surface-elevated)",
+          }}
+        >
+          {count}
+        </span>
+      )}
     </button>
   )
 }

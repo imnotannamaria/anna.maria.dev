@@ -146,6 +146,7 @@ export default async function ComponentDocPage({ params }: Props) {
               />
 
               <MetaCol
+                span
                 label="source"
                 value={
                   <a
