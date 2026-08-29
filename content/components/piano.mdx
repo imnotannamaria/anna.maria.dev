@@ -7,7 +7,7 @@ deps: ["motion"]
 ---
 
 Fifteen white keys and ten black ones that animate a short phrase on their own, as a card
-linking to `/piano`. It makes no sound — the card says so — because a home page that starts
+linking to `/piano`. It makes no sound, and the card says so, because a home page that starts
 playing music when you scroll past it is a home page people close.
 
 ## Everything horizontal is a fraction
@@ -22,18 +22,19 @@ const BLACK_W = `calc(100% / ${N} * 0.62)`
 ```
 
 Height was the one dimension that was not fluid, and it showed. The keys narrowed with the card
-and stayed 62px tall, so fifteen of them across a phone-width cell came out at roughly 11 × 62 —
-slats, not keys. `--wk-h` and `--bk-h` are set in `globals.css` off the card's own width,
-because this card is narrow on a phone _and_ in the two-up grid just past `md`, and those are
-the same problem wearing different clothes.
+and stayed 62px tall. Fifteen of them across a phone-width cell came out at roughly 11 × 62.
+Slats, not keys.
+
+So `--wk-h` and `--bk-h` are set in `globals.css` off the card's own width. This card is narrow
+on a phone _and_ in the two-up grid just past `md`. Same problem, different clothes.
 
 ## The real one, and what it had to learn
 
-`/piano` is the same geometry with Web Audio behind it, and it carries a state this card does
-not need: audio can be unsupported, or held suspended by an autoplay policy that did not accept
-your gesture.
+`/piano` is the same geometry with Web Audio behind it. It carries a state this card does not
+need: audio can be unsupported, or held suspended by an autoplay policy that did not accept your
+gesture.
 
-That used to throw from inside a click handler — which React error boundaries do not catch — so
+That used to throw from inside a click handler. React error boundaries do not catch those, so
 the key went down, no sound came out, an uncaught error went to the console, and the page said
 nothing. Silence is the one failure an instrument cannot leave unexplained, because it is
 indistinguishable from the instrument working and the volume being off.

@@ -355,9 +355,9 @@ export function TokensSection({ themeCount }: { themeCount: number }) {
   return (
     <div>
       <p className="text-body-md m-0 font-sans" style={{ color: "var(--fg-secondary)" }}>
-        Every value below is read off this document as you are looking at it. Change the theme or
-        the mode with the switcher in the corner and the swatches, the values and the contrast
-        ratios all follow — nothing here is a screenshot or a number someone typed in.{" "}
+        Every value below is read off this page as you look at it. Change the theme or the mode with
+        the switcher in the corner and the swatches follow, along with the numbers under them.
+        Nothing here is a screenshot.{" "}
         <span style={{ color: "var(--fg-muted)" }}>
           {themeCount} themes × 2 modes, {TOKEN_GROUPS.length} groups.
         </span>

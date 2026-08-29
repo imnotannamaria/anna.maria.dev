@@ -14,7 +14,7 @@ nothing is bundled that is not actually on the list.
 
 This card reads nothing. There is no query, no fetch and no chunk to load, so it has exactly one
 state and giving it a loading skeleton would be ceremony. That is worth saying out loud, because
-the rule elsewhere in this repo is that anything non-static gets three frames — the corollary is
+the rule elsewhere in this repo is that anything non-static gets three frames. The corollary is
 that deciding which components are genuinely static is part of the work, not an oversight.
 
 ## One branch open at a time
@@ -31,5 +31,5 @@ import { siTypescript } from "simple-icons"
 ```
 
 `simple-icons` ships every brand mark in one package. Importing the named export gets a plain
-object with a path string, which is inlined into an `<svg>` — no per-icon component, no runtime,
+object with a path string, which is inlined into an `<svg>`. No per-icon component, no runtime,
 and tree-shaking that actually works because there is nothing to shake but a string.

@@ -141,8 +141,7 @@ function GraphSkeletonBody() {
   )
 }
 
-/** The same body, framed — for the two callers that do not already have a pane around them:
- *  the narrow gate below, and `/components`. */
+/** The same body, framed — for `/components`, which renders this frame with no pane around it. */
 export function StackGraphLoading() {
   return (
     <GraphPane>
@@ -178,13 +177,41 @@ export function StackGraphError({ onRetry }: { onRetry?: () => void }) {
   )
 }
 
+/**
+ * What the pane says below `md`, where the graph is never built.
+ *
+ * It used to say `StackGraphLoading` — a skeleton that would sit there forever, because nothing
+ * is coming. On `/about` nobody saw it (the page is `hidden md:block` there), which is exactly
+ * why it lasted; on `/components` the stage is not hidden, so picking the `ok` state on a phone
+ * showed a loading frame under the word "ok". A loading state that cannot resolve is the one
+ * lie a set of states must not tell.
+ *
+ * Not a failure either. The graph is deliberately not built at this width — 180 KB of React
+ * Flow to render a canvas nobody can usefully pan — and the same information is on the page as
+ * a badge list. So it says that, in the same voice the rest of the card uses.
+ */
+export function StackGraphNarrow() {
+  return (
+    <GraphPane>
+      <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">
+        <p className="text-mono-sm m-0 font-mono" style={{ color: "var(--fg-secondary)" }}>
+          {"// not built below 768px"}
+        </p>
+        <p className="text-mono-xs m-0 font-mono" style={{ color: "var(--fg-muted)" }}>
+          the same stack is a list of badges at this width
+        </p>
+      </div>
+    </GraphPane>
+  )
+}
+
 export function StackGraph() {
   // Matches the `md` the page hides this at. Below it, and before hydration, the pane is
   // never rendered — so its chunk is never requested. The badge list on the page is
   // `md:sr-only`, so nothing is missing there, it is just shown a different way.
   const wide = useMediaQuery("(min-width: 768px)")
 
-  if (!wide) return <StackGraphLoading />
+  if (!wide) return <StackGraphNarrow />
 
   return (
     <GraphPane>

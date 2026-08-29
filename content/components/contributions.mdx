@@ -8,7 +8,7 @@ deps: ["motion"]
 
 A year of public contributions as a grid of 53 columns, with a portalled tooltip on hover. The
 data is fetched on the server via the GraphQL API, so the grid is in the served HTML rather than
-behind a client fetch — which matters for a card that appears on two pages.
+behind a client fetch. That matters for a card that appears on two pages.
 
 ## Four failures, not one null
 
@@ -17,8 +17,8 @@ GraphQL error, and an account with nothing to show. The card had a single `if (!
 covering all four, so a visitor was told "contributions unavailable" whether GitHub was
 unreachable or the year had genuinely been quiet.
 
-Three of those are about the server and one is about the account. They are different sentences,
-and the card can only pick the right one if the difference survives the return:
+Three of those are about the server and one is about the account. They are different sentences.
+The card can only pick the right one if the difference survives the return:
 
 ```ts
 export async function getContributions(login: string): Promise<CardState<ContributionYear>> {
@@ -29,13 +29,13 @@ export async function getContributions(login: string): Promise<CardState<Contrib
 }
 ```
 
-GitHub reports a bad login or an exhausted quota as **200 plus an `errors` array**, so that case
-is not covered by checking `res.ok` and needs its own branch.
+One case does not look like a failure at all. GitHub reports a bad login or an exhausted quota
+as **200 plus an `errors` array**, so checking `res.ok` misses it. It gets its own branch.
 
 ## What never leaves the server
 
 The `message` on an error state is for the logs, not the DOM. A thrown `fetch` error can carry
-the request that produced it, and that request carries the `Authorization` header — so what gets
+the request that produced it, and that request carries the `Authorization` header. So what gets
 logged is `err.message`, never the error object, and never the response body, which echoes the
 query back.
 
@@ -49,8 +49,8 @@ const pad = Array.from({ length: 7 - days.length }, () => EMPTY)
 return i === 0 ? [...pad, ...days] : [...days, ...pad]
 ```
 
-Every column ends up with seven cells, which is what lets the grid be a plain flex row of
-columns rather than a real grid with placement rules.
+Every column ends up with seven cells. That is what lets the grid be a plain flex row of
+columns instead of a real grid with placement rules.
 
 ## The scale follows the theme
 

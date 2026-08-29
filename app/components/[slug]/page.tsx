@@ -73,7 +73,9 @@ export default async function ComponentDocPage({ params }: Props) {
       />
 
       <div className="min-w-0">
-        <article className="mx-auto max-w-[760px] px-5 py-12 sm:px-8 lg:px-12">
+        {/* Narrower gutter on a phone for the same reason as the index — see the note in
+            `showcase-page.tsx`. Prose reads fine at 12px of margin; a specimen does not. */}
+        <article className="mx-auto max-w-[760px] px-4 py-12 sm:px-8 lg:px-12">
           <nav
             aria-label="Breadcrumb"
             className="text-mono-sm mb-4 font-mono"

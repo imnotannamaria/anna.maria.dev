@@ -163,7 +163,11 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
       />
 
       <div className="min-w-0">
-        <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
+        {/* `px-3` on a phone, not `px-5`. At 375px the sidebar takes 56 and this column is
+            319 wide, and what sits inside it is three more paddings deep — this one, the
+            panel's, the stage's, and then the card's own. Two units here is 16px back, which
+            is 5% of the component's width. */}
+        <div className="mx-auto max-w-[880px] px-3 py-12 sm:px-8 lg:px-12">
           <h1
             className="text-display-md m-0"
             style={{
@@ -179,9 +183,9 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
             className="text-body-lg mt-3 max-w-[62ch] font-sans"
             style={{ color: "var(--fg-secondary)" }}
           >
-            The tokens this site is drawn from, and the components built out of them. Every card is
-            the real thing running, shown in each state it can actually be in — including the ones
-            you only see when something has gone wrong.
+            The tokens this site is drawn from, and the components built out of them. Every card
+            here is the real thing running, in each state it can actually be in. That includes the
+            states you only see when something has gone wrong.
           </p>
 
           <TabStrip
@@ -218,7 +222,9 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
               a crawler reads, and `hidden` is `display: none`, so those panels also have no
               boxes and their demos never trip a visibility observer. */}
           <div
-            className="px-4 py-8 sm:px-6"
+            // Almost no side padding on a phone: the stage inside already draws its own inset
+            // frame, so a second gutter here only narrows the component for nothing.
+            className="px-1.5 py-8 sm:px-6"
             style={{
               background: "var(--bg-card)",
               border: "1px solid var(--border-subtle)",

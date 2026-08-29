@@ -168,7 +168,9 @@ export function DemoStage({
       className={cn("flex flex-col justify-center", className)}
       style={{ ...STAGE, margin: 0, minHeight }}
     >
-      <div className="w-full p-4">
+      {/* The inset the specimen sits in, and the last of four nested paddings before the
+          component's own — so it is halved on a phone rather than kept for symmetry. */}
+      <div className="w-full p-2 sm:p-4">
         {near ? (
           <AnimatePresence mode="wait" initial={false}>
             {/* Keyed on the state, so switching crossfades rather than snapping. Not an

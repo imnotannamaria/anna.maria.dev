@@ -44,7 +44,7 @@ export const TOKEN_GROUPS: TokenGroup[] = [
       { token: "--bg-canvas", note: "the page itself" },
       {
         token: "--bg-card",
-        note: "the bento surface — a hair above the canvas, defined by its border",
+        note: "the bento surface: a hair above the canvas, defined by its border",
       },
       {
         token: "--bg-surface",
@@ -65,7 +65,7 @@ export const TOKEN_GROUPS: TokenGroup[] = [
       { token: "--fg-secondary", note: "body copy", on: ["--bg-card", "--bg-canvas"] },
       {
         token: "--fg-muted",
-        note: "labels and meta — lightened from zinc-500 to clear AA",
+        note: "labels and meta, lightened from zinc-500 to clear AA",
         on: ["--bg-card", "--bg-canvas"],
       },
       {
@@ -75,7 +75,7 @@ export const TOKEN_GROUPS: TokenGroup[] = [
       },
       {
         token: "--fg-on-brand",
-        note: "text on a solid brand fill. Cannot be derived — a fixed near-white fails 7 of 12 combinations",
+        note: "text on a solid brand fill. Cannot be derived: a fixed near-white fails 7 of 12 combinations",
         on: ["--fg-brand"],
       },
       {
@@ -93,15 +93,15 @@ export const TOKEN_GROUPS: TokenGroup[] = [
     entries: [
       { token: "--border-subtle", note: "card borders, dividers, dashed rules" },
       { token: "--border-strong", note: "inputs, and anything asking to be noticed" },
-      { token: "--border-brand", note: "derived — a brand edge at 35%" },
-      { token: "--border-brand-strong", note: "derived — the hover edge on a linked card" },
+      { token: "--border-brand", note: "derived. A brand edge at 35%" },
+      { token: "--border-brand-strong", note: "derived. The hover edge on a linked card" },
     ],
   },
   {
     id: "tokens-type",
     label: "type",
     kind: "value",
-    note: "Ten steps and no eleventh. A token sets size and leading, never family — font-serif / font-sans / font-mono stays at the call site, because mono is the default here and prose is the exception.",
+    note: "Ten steps and no eleventh. A token sets size and leading, never family. font-serif / font-sans / font-mono stays at the call site, because mono is the default here and prose is the exception.",
     entries: [
       { token: "--text-display-xl", note: "the one hero on a page, serif" },
       { token: "--text-display-lg", note: "page titles, serif" },
@@ -119,17 +119,17 @@ export const TOKEN_GROUPS: TokenGroup[] = [
     id: "tokens-space",
     label: "space",
     kind: "value",
-    note: "A 4px base, thinning out as it grows — the steps people actually reach for, not every multiple.",
+    note: "A 4px base, thinning out as it grows. The steps people actually reach for, not every multiple.",
     entries: [
       { token: "--space-1", note: "4" },
       { token: "--space-2", note: "8" },
       { token: "--space-3", note: "12" },
       { token: "--space-4", note: "16" },
-      { token: "--space-6", note: "24 — the card's own padding" },
+      { token: "--space-6", note: "24. The card's own padding" },
       { token: "--space-8", note: "32" },
       { token: "--space-12", note: "48" },
       { token: "--space-16", note: "64" },
-      { token: "--space-24", note: "96 — between page sections" },
+      { token: "--space-24", note: "96. Between page sections" },
     ],
   },
   {
@@ -148,12 +148,12 @@ export const TOKEN_GROUPS: TokenGroup[] = [
     id: "tokens-motion",
     label: "motion",
     kind: "value",
-    note: "Three durations and two curves. Everything animated through JS asks useReducedMotion() itself — the global reset only reaches CSS.",
+    note: "Three durations and two curves. Everything animated through JS asks useReducedMotion() itself. The global reset only reaches CSS.",
     entries: [
       { token: "--motion-fast", note: "colour and opacity on hover" },
       { token: "--motion-base", note: "the default: transforms, expands" },
       { token: "--motion-slow", note: "entrances, and anything crossing the viewport" },
-      { token: "--ease-out", note: "arrivals — the site's default curve" },
+      { token: "--ease-out", note: "arrivals. The site's default curve" },
       { token: "--ease-in-out", note: "things that leave and come back" },
     ],
   },
@@ -167,7 +167,7 @@ export const TOKEN_GROUPS: TokenGroup[] = [
 export const RULES: { do: string; dont: string }[] = [
   {
     do: "Derive brand accents from --fg-brand with color-mix()",
-    dont: "Hardcode the violet — it stops reacting the moment someone picks another theme",
+    dont: "Hardcode the violet. It stops reacting the moment someone picks another theme",
   },
   {
     do: "Use --fg-on-brand for text on a brand fill",
@@ -175,22 +175,22 @@ export const RULES: { do: string; dont: string }[] = [
   },
   {
     do: "Trigger entrances with whileInView and once, everywhere",
-    dont: "Use animate for things above the fold — one trigger means no judgement call to get wrong",
+    dont: "Use animate for things above the fold. One trigger means no judgement call to get wrong",
   },
   {
     do: "Put the trigger on an ancestor with a real box",
-    dont: "Observe an element that starts at scaleX(0) — no area means the observer never fires",
+    dont: "Observe an element that starts at scaleX(0). No area means the observer never fires",
   },
   {
     do: "Ask useReducedMotion() in anything animated through JS",
-    dont: "Assume the global CSS reset caught it — Motion walks straight past that block",
+    dont: "Assume the global CSS reset caught it. Motion walks straight past that block",
   },
   {
     do: "Keep the size scale to its ten steps",
-    dont: "Write text-[13px] or reach for Tailwind's own steps — a test fails on both",
+    dont: "Write text-[13px] or reach for Tailwind's own steps. A test fails on both",
   },
   {
     do: "Decide what a justify-between row does when its two halves stop fitting",
-    dont: "Answer 'it fits' — .bento-card clips, so overflow looks like missing data",
+    dont: "Answer 'it fits'. .bento-card clips, so overflow looks like missing data",
   },
 ]
