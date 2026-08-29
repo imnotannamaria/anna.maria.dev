@@ -320,7 +320,7 @@ export function TodayActivityCardLoading({ className }: { className?: string }) 
     <Panel className={className}>
       <Header status="loading" statusColor={"var(--fg-muted)"} />
       <div
-        className="wk-activity-grid"
+        className="wk-activity-grid wk-activity-body"
         style={{
           flex: 1,
           marginTop: 12,
@@ -369,7 +369,7 @@ export function TodayActivityCardEmpty({ className }: { className?: string }) {
     <Panel className={className}>
       <Header status="empty" statusColor={"var(--fg-muted)"} />
       <div
-        className="wk-activity-grid"
+        className="wk-activity-grid wk-activity-body"
         style={{
           flex: 1,
           marginTop: 12,
@@ -416,9 +416,13 @@ export function TodayActivityCardError({ className }: { className?: string }) {
     <Panel className={className}>
       <Header status="error" statusColor={colors.danger} />
       <div
+        className="wk-activity-body"
         style={{
           flex: 1,
           marginTop: 12,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
           color: "var(--fg-muted)",
           fontSize: "var(--text-mono-md)",
           lineHeight: 1.5,
@@ -449,7 +453,7 @@ export function TodayActivityCardStale({
     <Panel className={className}>
       <Header status="stale" statusColor={colors.warn} />
       <div
-        className="wk-activity-grid"
+        className="wk-activity-grid wk-activity-body"
         style={{
           flex: 1,
           marginTop: 12,
@@ -534,7 +538,7 @@ export function TodayActivityCardOk({ data, className }: { data: TodayData; clas
     <Panel className={className}>
       <Header status="synced" statusColor={colors.exercise} live />
       <div
-        className="wk-activity-grid"
+        className="wk-activity-grid wk-activity-body"
         style={{
           flex: 1,
           marginTop: 12,

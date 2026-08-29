@@ -141,19 +141,33 @@ const Column = memo(function Column({
 })
 
 /**
- * The grid before the fetch lands: 53 columns of 7, at the same `MIN_COL` floor and the same
- * `GAP` the real one uses, under an empty month-label row and over the same legend line.
+ * The grid's geometry, with nothing in it.
  *
- * It is the highest-fidelity skeleton on the site almost by accident — a contribution grid is
- * already a field of identical squares, so tracing it is just drawing the squares without a
- * colour. The shimmer walks the columns rather than firing all 371 cells at once, which is what
- * makes it read as a sweep across a year instead of a flickering wall.
+ * Every state that has no data to draw goes through here — loading, empty and error — so the
+ * card is exactly as tall in all four states at every container width. That could not be done
+ * with a number: a cell is `aspect-ratio: 1` over a column that is `1fr` of whatever width there
+ * is, so the grid's height is a function of the card's width and there is no pixel value that is
+ * right at more than one size. Rendering the real 53 × 7 and leaving it blank is the only thing
+ * that agrees everywhere.
+ *
+ * It was a `<p>` with one line in it for empty and error, which is why those two states were a
+ * third the height of the working card.
  */
-function CalendarSkeleton() {
+function GridFrame({
+  tone,
+  overlay,
+  footer,
+}: {
+  /** What the cells are filled with. Grey while loading, invisible when there is nothing. */
+  tone: string
+  /** Centred over the grid — the sweep while loading, a sentence when there is nothing. */
+  overlay?: React.ReactNode
+  footer: React.ReactNode
+}) {
   return (
     <div className="relative" aria-hidden>
       {/* The same padded, negatively-margined, horizontally scrolling box the real grid sits
-          in, so the card is exactly as wide and as tall before the fetch as after it. */}
+          in, so the card is the same width as well as the same height. */}
       <div
         className="overflow-x-auto"
         style={{ padding: RING + 1, margin: -(RING + 1), paddingBottom: RING + 5 }}
@@ -175,30 +189,81 @@ function CalendarSkeleton() {
                   <span
                     key={di}
                     className="relative block w-full"
-                    style={{
-                      aspectRatio: "1 / 1",
-                      borderRadius: 2,
-                      background: "var(--bg-surface-elevated)",
-                    }}
+                    style={{ aspectRatio: "1 / 1", borderRadius: 2, background: tone }}
                   />
                 ))}
               </div>
             ))}
 
-            <span className="skeleton-sweep" />
+            {overlay}
           </div>
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-3">
-        <Skeleton style={{ width: 128, height: 9, borderRadius: 3 }} />
-        <Skeleton delay={0.2} style={{ width: 96, height: 9, borderRadius: 3 }} />
-      </div>
+      <div className="mt-3 flex items-center justify-between gap-3">{footer}</div>
+    </div>
+  )
+}
 
+/**
+ * The grid before the fetch lands: 53 columns of 7, at the same `MIN_COL` floor and the same
+ * `GAP` the real one uses.
+ *
+ * It is the highest-fidelity skeleton on the site almost by accident — a contribution grid is
+ * already a field of identical squares, so tracing it is just drawing the squares without a
+ * colour. One `.skeleton-sweep` overlay travels across them rather than 371 elements each
+ * animating a gradient, which is the per-frame repaint CLAUDE.md warns about, 371 times over.
+ */
+function CalendarSkeleton() {
+  return (
+    <>
+      <GridFrame
+        tone="var(--bg-surface-elevated)"
+        overlay={<span className="skeleton-sweep" />}
+        footer={
+          <>
+            <Skeleton style={{ width: 128, height: 9, borderRadius: 3 }} />
+            <Skeleton delay={0.2} style={{ width: 96, height: 9, borderRadius: 3 }} />
+          </>
+        }
+      />
       <span className="sr-only" role="status">
         Loading contributions
       </span>
-    </div>
+    </>
+  )
+}
+
+/**
+ * Nothing to draw, and the difference between the two reasons stated in words.
+ *
+ * The cells are drawn at a tenth of the border colour rather than not at all: an empty year is
+ * still a year, and a card with a blank rectangle where the grid goes reads as broken rather
+ * than as quiet.
+ */
+function CalendarBlank({ message }: { message: string }) {
+  return (
+    <>
+      <GridFrame
+        tone="color-mix(in srgb, var(--border-subtle) 45%, transparent)"
+        overlay={
+          <div className="pointer-events-none absolute inset-0 grid place-items-center">
+            <span
+              className="text-mono-sm rounded-[var(--radius-sm)] px-3 py-1.5 font-mono"
+              style={{
+                color: "var(--fg-secondary)",
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-subtle)",
+              }}
+            >
+              {message}
+            </span>
+          </div>
+        }
+        footer={<span />}
+      />
+      <span className="sr-only">{message}</span>
+    </>
   )
 }
 
@@ -289,11 +354,13 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
 
   if (!data) {
     return (
-      <p className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
-        {state.kind === "empty"
-          ? "no public contributions in the last 12 months"
-          : "couldn't reach github"}
-      </p>
+      <CalendarBlank
+        message={
+          state.kind === "empty"
+            ? "no public contributions in the last 12 months"
+            : "couldn't reach github"
+        }
+      />
     )
   }
 
