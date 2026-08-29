@@ -67,7 +67,7 @@ export function flatten(layers: Rgba[]): Rgba {
 }
 
 /** WCAG 2.x relative luminance. The 0.03928 threshold and 2.4 exponent are from the spec. */
-export function luminance({ r, g, b }: Rgba): number {
+function luminance({ r, g, b }: Rgba): number {
   const lin = (c: number) => {
     const s = c / 255
     return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4

@@ -30,15 +30,16 @@ import { cn } from "@/lib/utils"
  * The sleeve is square and the disc is a circle behind it; they only line up at a known ratio,
  * so these are fixed and the text column takes what is left.
  *
- * `COVER` is exported because the loading and error frames next door stand in for this exact
- * box — a skeleton at a different size is a card that resizes the moment its data lands, which
- * is the one thing a skeleton exists to prevent.
+ * The other frames in this file stand in for this exact box. A skeleton at a different size is a
+ * card that resizes the moment its data lands, which is the one thing a skeleton exists to
+ * prevent. `COVER` used to be exported for a widget next door that needed it; those frames moved
+ * in here, and nothing outside this file has referenced it since.
  */
-export const COVER = 92
+const COVER = 92
 const OUT_PLAYING = 52
 const OUT_STOPPED = 20
 
-export function formatMs(ms: number): string {
+function formatMs(ms: number): string {
   const total = Math.floor(ms / 1000)
   return `${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, "0")}`
 }
@@ -56,7 +57,7 @@ export function formatMs(ms: number): string {
  * prefers-reduced-motion reset stops it without this component asking, the same deal the
  * loading dots and the old equaliser bars had.
  */
-export function Disc({ size, running }: { size: number; running: boolean }) {
+function Disc({ size, running }: { size: number; running: boolean }) {
   const label = Math.round(size * 0.34)
   const hole = Math.max(4, Math.round(size * 0.04))
 
@@ -101,7 +102,7 @@ export function Disc({ size, running }: { size: number; running: boolean }) {
 
 /** Shown when Spotify's CDN doesn't hand over the art. A record label, so the sleeve still
  *  reads as a sleeve rather than as a grey square. */
-export function CoverFallback() {
+function CoverFallback() {
   return (
     <div
       className="relative flex h-full w-full items-center justify-center"

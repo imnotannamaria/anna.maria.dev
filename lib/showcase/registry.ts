@@ -125,9 +125,6 @@ export type ShowcaseSlug = keyof typeof SHOWCASE
 
 export const SHOWCASE_LIST: readonly ShowcaseEntry[] = Object.values(SHOWCASE)
 
-/** Only the ones with a doc page of their own — `generateStaticParams` reads this. */
-export const SHOWCASE_DOCUMENTED = SHOWCASE_LIST.filter((e) => !e.external)
-
 export const GROUP_LABEL: Record<ShowcaseEntry["group"], string> = {
   home: "home/",
   about: "about/",

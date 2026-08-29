@@ -46,7 +46,7 @@ const makeStackFlow = () =>
  * because the content is a chunk that may not have arrived — a pane that grows when React Flow
  * lands would shift everything below it on /about.
  */
-export function GraphPane({ children }: { children: React.ReactNode }) {
+function GraphPane({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="relative overflow-hidden rounded-[var(--radius-lg)] border"
@@ -190,7 +190,7 @@ export function StackGraphError({ onRetry }: { onRetry?: () => void }) {
  * Flow to render a canvas nobody can usefully pan — and the same information is on the page as
  * a badge list. So it says that, in the same voice the rest of the card uses.
  */
-export function StackGraphNarrow() {
+function StackGraphNarrow() {
   return (
     <GraphPane>
       <div className="flex h-full flex-col items-center justify-center gap-2 px-6 text-center">

@@ -74,7 +74,7 @@ const noop = () => {}
 /** One height for all three tree frames — see the note beside them. */
 const TREE_H = "h-[420px]"
 
-export const DEMOS: DemoMap = {
+const DEMOS: DemoMap = {
   tree: {
     // The card's own skeleton, which is what `WhoamiRowFallback` in `app/(home)/page.tsx`
     // renders too. One copy, so the demo cannot show a frame the home page doesn't.

@@ -26,7 +26,7 @@ import type { CardStateKind } from "@/lib/showcase/state"
  * What each state means, as a colour — always beside its own word, never instead of it. The
  * review checklist's colour-independence item: no information carried by hue alone.
  */
-export const STATE_TONE: Record<CardStateKind, string> = {
+const STATE_TONE: Record<CardStateKind, string> = {
   loading: "var(--status-info-fg)",
   empty: "var(--fg-muted)",
   error: "var(--status-error-fg)",
@@ -112,6 +112,33 @@ export function StateList({
 }
 
 /**
+ * The box each component's stage reserves: its *tallest* state, not its average.
+ *
+ * One number per component rather than one per state, because the point is that all of a
+ * component's states occupy the same box. A stage sized to each would move the page under the
+ * cursor clicking through them. Whatever is shorter gets centred.
+ *
+ * It lives here rather than at the call site, and that is a fix rather than tidying. It was a
+ * table in `showcase-feed.tsx` passed in as a prop, so the index got the tuned height and the
+ * doc pages, which never passed one, fell back to the 240px default. The same component had two
+ * different stages depending on which page you were on, and on the doc page its states jumped —
+ * exactly what the numbers exist to prevent. A `DemoStage` knows its own slug; it can look this
+ * up itself.
+ *
+ * Measured by eye and the one thing here no test can check. A state that outgrows its number
+ * pushes the stage taller, which is visible immediately, and the number is what is wrong.
+ */
+const STAGE_HEIGHT: Record<string, number> = {
+  tree: 480,
+  stack: 360,
+  playlist: 260,
+  piano: 280,
+  contributions: 320,
+  "stack-graph": 480,
+  wristkit: 470,
+}
+
+/**
  * The demo itself, on its stage.
  *
  * Nothing is mounted until the stage has been near the viewport: two of these are the heaviest
@@ -121,26 +148,17 @@ export function DemoStage({
   slug,
   name,
   active,
-  minHeight = 240,
+  minHeight,
   className,
 }: {
   slug: string
   name: string
   active: CardStateKind
-  /**
-   * The box every state of this component gets, tuned to its tallest.
-   *
-   * It is a floor and the demo is centred in it, which is what stops switching states from
-   * jumping: `me, as a playlist` in `ok` is a whole card and in `error` it is a shorter one, and
-   * a stage that shrank to fit each would move the page under the cursor that is clicking
-   * through them. Centring also reads better than a short frame pinned to the top of a tall box.
-   *
-   * A state taller than this still grows the stage rather than being clipped — the number is a
-   * reservation, not a cage. If one state pushes past it, the number is wrong, not the state.
-   */
+  /** Overrides `STAGE_HEIGHT` where a caller genuinely knows better. Nothing does yet. */
   minHeight?: number
   className?: string
 }) {
+  const reserved = minHeight ?? STAGE_HEIGHT[slug] ?? 260
   const [near, setNear] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const reduce = useReducedMotion() ?? false
@@ -166,7 +184,7 @@ export function DemoStage({
     <figure
       ref={ref}
       className={cn("flex flex-col justify-center", className)}
-      style={{ ...STAGE, margin: 0, minHeight }}
+      style={{ ...STAGE, margin: 0, minHeight: reserved }}
     >
       {/* The inset the specimen sits in, and the last of four nested paddings before the
           component's own — so it is halved on a phone rather than kept for symmetry. */}
@@ -191,7 +209,7 @@ export function DemoStage({
           // Not a card, and not this component's own skeleton either: nothing has been
           // requested yet, so there is nothing to be a skeleton *of*. One shimmering block
           // holding the stage's height until the observer fires.
-          <Skeleton style={{ height: minHeight - 32, borderRadius: "var(--radius-md)" }} />
+          <Skeleton style={{ height: reserved - 32, borderRadius: "var(--radius-md)" }} />
         )}
       </div>
 
