@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { EASE_OUT } from "@/components/ui/reveal"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
+import { cn } from "@/lib/utils"
 import { renderDemo } from "./demos"
 import type { CardStateKind } from "@/lib/showcase/state"
 
@@ -126,7 +127,17 @@ export function DemoStage({
   slug: string
   name: string
   active: CardStateKind
-  /** Reserved while the demo is out of view and between states, so nothing below it shifts. */
+  /**
+   * The box every state of this component gets, tuned to its tallest.
+   *
+   * It is a floor and the demo is centred in it, which is what stops switching states from
+   * jumping: `me, as a playlist` in `ok` is a whole card and in `error` it is a shorter one, and
+   * a stage that shrank to fit each would move the page under the cursor that is clicking
+   * through them. Centring also reads better than a short frame pinned to the top of a tall box.
+   *
+   * A state taller than this still grows the stage rather than being clipped — the number is a
+   * reservation, not a cage. If one state pushes past it, the number is wrong, not the state.
+   */
   minHeight?: number
   className?: string
 }) {
@@ -152,8 +163,12 @@ export function DemoStage({
   }, [])
 
   return (
-    <figure ref={ref} className={className} style={{ ...STAGE, margin: 0, minHeight }}>
-      <div className="p-4">
+    <figure
+      ref={ref}
+      className={cn("flex flex-col justify-center", className)}
+      style={{ ...STAGE, margin: 0, minHeight }}
+    >
+      <div className="w-full p-4">
         {near ? (
           <AnimatePresence mode="wait" initial={false}>
             {/* Keyed on the state, so switching crossfades rather than snapping. Not an

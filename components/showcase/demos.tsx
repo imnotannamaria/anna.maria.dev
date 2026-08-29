@@ -71,13 +71,23 @@ const StackGraphError = dynamic(
 /** The playlist card takes callbacks; on a documentation page they do nothing. */
 const noop = () => {}
 
+/** One height for all three tree frames — see the note beside them. */
+const TREE_H = "h-[420px]"
+
 export const DEMOS: DemoMap = {
   tree: {
     // The card's own skeleton, which is what `WhoamiRowFallback` in `app/(home)/page.tsx`
     // renders too. One copy, so the demo cannot show a frame the home page doesn't.
-    loading: () => <TreeCardSkeleton routeCount={siteTreeRouteCount()} />,
-    empty: () => <TreeCard items={TREE_FIXTURE_EMPTY} routeCount={siteTreeRouteCount()} />,
-    ok: () => <TreeCard items={TREE_FIXTURE} routeCount={siteTreeRouteCount()} />,
+    // All three capped at the same height. The tree is the one card whose height its own
+    // content decides — the home page caps it too, at `max-h-130` — so without this the `ok`
+    // state was a foot taller than its own skeleton and the stage grew when you switched.
+    loading: () => <TreeCardSkeleton routeCount={siteTreeRouteCount()} className={TREE_H} />,
+    empty: () => (
+      <TreeCard items={TREE_FIXTURE_EMPTY} routeCount={siteTreeRouteCount()} className={TREE_H} />
+    ),
+    ok: () => (
+      <TreeCard items={TREE_FIXTURE} routeCount={siteTreeRouteCount()} className={TREE_H} />
+    ),
   },
 
   stack: {

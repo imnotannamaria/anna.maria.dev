@@ -28,15 +28,16 @@ import {
 type Page = { href: string; name: string; hint: string; icon: Icon }
 
 const PAGES: Page[] = [
+  // Same order as the titlebar and the sidebar — see the note in `titlebar.tsx`.
   { href: "/", name: "home.tsx", hint: "~", icon: HouseLineIcon },
   { href: "/about", name: "about.md", hint: "~/about", icon: UserSquareIcon },
   { href: "/blog", name: "posts/", hint: "~/blog", icon: FileMdIcon },
   { href: "/projects", name: "projects/", hint: "~/projects", icon: TerminalWindowIcon },
+  { href: "/roadmap", name: "roadmap.md", hint: "~/roadmap", icon: ListChecksIcon },
   { href: "/contact", name: "contact.tsx", hint: "~/contact", icon: ChatsCircleIcon },
+  { href: "/components", name: "components/", hint: "~/components", icon: SwatchesIcon },
   { href: "/log", name: "log.tsx", hint: "~/log", icon: SquaresFourIcon },
   { href: "/piano", name: "piano.tsx", hint: "~/piano", icon: PianoKeysIcon },
-  { href: "/roadmap", name: "roadmap.md", hint: "~/roadmap", icon: ListChecksIcon },
-  { href: "/components", name: "components/", hint: "~/components", icon: SwatchesIcon },
 ]
 
 /**

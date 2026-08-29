@@ -34,16 +34,24 @@ function showEasterEgg() {
   })
 }
 
+/**
+ * Tab order, and it is the same list in the same order in three places — here, the sidebar and
+ * the command palette. Work first, then the four Anna named: contact, components, log, piano.
+ *
+ * Piano is last on purpose and stays last. It is the one page that is a toy rather than a
+ * claim, so it reads as the thing at the end of the row rather than something competing with
+ * the work above it.
+ */
 const NAV_TABS: Tab[] = [
   { href: "/", name: "home.tsx", icon: HouseLineIcon },
   { href: "/about", name: "about.md", icon: UserSquareIcon },
   { href: "/blog", name: "posts/", icon: FileMdIcon },
   { href: "/projects", name: "projects/", icon: TerminalWindowIcon },
+  { href: "/roadmap", name: "roadmap.md", icon: ListChecksIcon },
   { href: "/contact", name: "contact.tsx", icon: ChatsCircleIcon },
+  { href: "/components", name: "components/", icon: SwatchesIcon },
   { href: "/log", name: "log.tsx", icon: SquaresFourIcon },
   { href: "/piano", name: "piano.tsx", icon: PianoKeysIcon },
-  { href: "/roadmap", name: "roadmap.md", icon: ListChecksIcon },
-  { href: "/components", name: "components/", icon: SwatchesIcon },
 ]
 
 /**
@@ -131,17 +139,18 @@ export function Titlebar() {
         })}
         label="Pages"
         layoutId="titlebar-active-tab"
-      >
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label="Open command palette"
-          title="Open command palette (⌘K)"
-          className="focus-ring text-mono-md flex shrink-0 cursor-pointer items-center px-3 font-mono text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
-        >
-          +
-        </button>
-      </TabStrip>
+        after={
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label="Open command palette"
+            title="Open command palette (⌘K)"
+            className="focus-ring text-mono-md flex shrink-0 cursor-pointer items-center px-3 font-mono text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
+          >
+            +
+          </button>
+        }
+      />
 
       {/* Right meta */}
       <div className="text-mono-sm hidden shrink-0 items-center gap-4 px-4 font-mono text-[var(--fg-muted)] md:flex">

@@ -355,7 +355,10 @@ export function TokensSection({ themeCount }: { themeCount: number }) {
  */
 export function RulesSection() {
   return (
-    <section id="tokens-rules" style={{ scrollMarginTop: 24 }} className="mt-12">
+    /* No top margin. It had `mt-12` from when this sat under the token groups in one long
+       column; alone in its own tab panel that was 48px of nothing above the first heading,
+       stacked on the panel's own `py-8`. The panel owns the spacing now. */
+    <section id="tokens-rules" style={{ scrollMarginTop: 24 }}>
       <div
         className="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b pb-2"
         style={{ borderColor: "var(--border-subtle)" }}

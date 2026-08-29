@@ -63,7 +63,7 @@ export function PageOutline({
   /** The two-or-three line block under the rule. The one part that is genuinely per page. */
   footer?: React.ReactNode
 }) {
-  const [active, setActive] = useState(items[0]?.id)
+  const [clicked, setClicked] = useState<string | undefined>(undefined)
   const reduce = useReducedMotion() ?? false
 
   /**
@@ -93,6 +93,16 @@ export function PageOutline({
    */
   const key = items.map((i) => i.id).join("|")
 
+  /**
+   * Which row is current, derived rather than stored.
+   *
+   * The state used to be seeded from `items[0]` at mount and never revisited, so after
+   * `/components` swapped its outline for another tab's the highlight was still pointing at an
+   * id that no longer existed — no row lit up until you scrolled. Falling back whenever the
+   * remembered id is not in the current set fixes that with no effect to keep in sync.
+   */
+  const active = items.some((i) => i.id === clicked) ? clicked : items[0]?.id
+
   useEffect(() => {
     const sections = items
       .map((i) => document.getElementById(i.id))
@@ -116,7 +126,7 @@ export function PageOutline({
         const topmost = innermost.reduce((a, b) =>
           a.getBoundingClientRect().top < b.getBoundingClientRect().top ? a : b,
         )
-        setActive(topmost.id)
+        setClicked(topmost.id)
       },
       { rootMargin: "-12% 0px -70% 0px", threshold: 0 },
     )
@@ -135,7 +145,7 @@ export function PageOutline({
     const top =
       el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 24
     main.scrollTo({ top, behavior: "smooth" })
-    setActive(id)
+    setClicked(id)
   }
 
   /**
@@ -161,6 +171,20 @@ export function PageOutline({
 
   return (
     <motion.nav
+      /*
+       * Keyed on the row set, and this is a bug fix rather than a hint to React.
+       *
+       * The entrance is `whileInView` with `once`, on this container, reaching the rows through
+       * variants. Once it has fired it is done — so when `/components` switched tabs and handed
+       * this a different set of `items`, the new `motion.li`s mounted under a trigger that had
+       * already spent itself, resolved `initial="hidden"`, and were never told to show. A rail
+       * of invisible links, exactly as reported, and only when changing tabs.
+       *
+       * Re-mounting on a new set gives the entrance back. The rail also replays its stagger,
+       * which is right: it is showing a different list, and the whole point of the animation is
+       * that a list arriving is visible.
+       */
+      key={key}
       aria-label="Page outline"
       className={RAIL}
       style={RAIL_BORDER}

@@ -45,15 +45,25 @@ const GROUP_ICON: Record<(typeof SHOWCASE_GROUPS)[number], Icon> = {
   shared: ShareNetworkIcon,
 }
 
-/** Roughly how tall each demo ends up, so the stage reserves the right box before it mounts. */
+/**
+ * The box each component's stage reserves — its *tallest* state, not its average.
+ *
+ * One number per component rather than one per state, because the point is that all of a
+ * component's states occupy the same box: a stage sized to each would move the page under the
+ * cursor clicking through them. The stage centres whatever is shorter.
+ *
+ * These are measured by eye against the tallest frame and are the one thing here that no test
+ * can check. A state that outgrows its number pushes the stage taller — visible immediately,
+ * and the fix is the number.
+ */
 const MIN_HEIGHT: Record<string, number> = {
-  tree: 440,
+  tree: 480,
   stack: 360,
   playlist: 260,
   piano: 280,
-  contributions: 260,
+  contributions: 320,
   "stack-graph": 480,
-  wristkit: 460,
+  wristkit: 470,
 }
 
 function Specimen({ entry }: { entry: ShowcaseEntry }) {

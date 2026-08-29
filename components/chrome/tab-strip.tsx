@@ -60,6 +60,7 @@ export function TabStrip({
   className,
   onKeyDown,
   activeSurface = "var(--bg-surface)",
+  after,
   children,
 }: {
   tabs: StripTab[]
@@ -80,7 +81,19 @@ export function TabStrip({
    * `globals.css` is explicit that zinc-900 across a large area reads as a field of grey.
    */
   activeSurface?: string
-  /** Anything pinned to the right of the row — the palette button, a count. */
+  /**
+   * Sits immediately after the last tab, outside the scroller — the titlebar's `+`.
+   *
+   * Outside, because inside it scrolls away with the tabs and gets eaten by the fade mask,
+   * which is how a trailing label once read "DO'S AND DON'". Immediately after, because it
+   * belongs to the row of tabs: `+` means "another tab", and pushed to the far edge it would
+   * read as a second, unrelated control.
+   */
+  after?: React.ReactNode
+  /**
+   * Pushed to the far end of the row — `/components`' count. `ml-auto` rather than a growing
+   * scroller, so the tabs stay content-width and whatever `after` holds stays beside them.
+   */
   children?: React.ReactNode
 }) {
   const reduce = useReducedMotion() ?? false
@@ -113,14 +126,23 @@ export function TabStrip({
   const fadeMask = `linear-gradient(to right, transparent 0, #000 ${fadeLeft}, #000 calc(100% - ${fadeRight}), transparent 100%)`
 
   return (
-    <div className={cn("flex min-h-10 items-stretch", className)}>
+    /*
+     * `flex-1` on the row, and deliberately NOT on the scroller inside it.
+     *
+     * The row grows to fill whatever its parent gives it, which is what puts the titlebar's
+     * `main` badge back on the right edge — it is a `shrink-0` sibling, so the row taking the
+     * slack is the only thing pushing it there. The scroller stays content-width so `after`
+     * lands next to the last tab rather than at the far end; `min-w-0` is what still lets it
+     * shrink and scroll when the tabs outgrow the row.
+     */
+    <div className={cn("flex min-h-10 min-w-0 flex-1 items-stretch", className)}>
       <div
         ref={scrollerRef}
         role={role}
         aria-label={label}
         onKeyDown={onKeyDown}
         className={cn(
-          "flex flex-1 items-stretch overflow-x-auto",
+          "flex min-w-0 items-stretch overflow-x-auto",
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         )}
         style={{ maskImage: fadeMask, WebkitMaskImage: fadeMask }}
@@ -221,9 +243,10 @@ export function TabStrip({
         })}
       </div>
 
-      {/* Pinned, outside the scroller: it must not scroll away with the tabs, and it must not
-          be clipped by the fade mask. */}
-      {children}
+      {/* Both outside the scroller: neither may scroll away with the tabs or be clipped by the
+          fade mask. `after` stays beside them; `children` goes to the far edge. */}
+      {after}
+      {children && <div className="ml-auto flex shrink-0 items-stretch">{children}</div>}
     </div>
   )
 }

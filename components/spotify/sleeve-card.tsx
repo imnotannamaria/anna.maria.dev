@@ -392,11 +392,42 @@ export function SleeveCard({
  * This is the pure half of the card, so a frame that takes no props and no store belongs in it.
  * The widget picks between them; the showcase renders them directly; neither owns a copy.
  */
-function StateCard({ className, children }: { className?: string; children: React.ReactNode }) {
+/**
+ * The shell all three carry, and it is `SleeveCard`'s own shape rather than a simpler one.
+ *
+ * They used to be a head over a single row — no footer, no progress rail — so the empty and
+ * error frames stood ~70px shorter than the working card. In a bento grid that resizes the row
+ * they sit in; on `/components` it made switching states jump. A card's states have to occupy
+ * the same box, and the cheapest way to guarantee that is for them to be built out of the same
+ * pieces.
+ */
+function SleeveShell({
+  meta,
+  comment,
+  controls,
+  className,
+  children,
+}: {
+  meta?: React.ReactNode
+  comment: string
+  controls?: React.ReactNode
+  className?: string
+  children: React.ReactNode
+}) {
   return (
-    <div className={cn("bento-card", className)}>
-      <CardHead label="me, as a playlist" />
+    <div className={cn("bento-card relative", className)}>
+      <CardHead label="me, as a playlist" meta={meta} />
       <div className="flex items-center gap-4">{children}</div>
+      <CardFoot comment={comment}>{controls}</CardFoot>
+
+      {/* The rail keeps its 2px in every frame so the card is exactly as tall as it will be.
+          No brand fill on it here: there is no position to report, and a bar sitting at zero
+          would be a claim rather than a placeholder. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0"
+        style={{ height: 2, background: "var(--border-subtle)" }}
+      />
     </div>
   )
 }
@@ -404,87 +435,71 @@ function StateCard({ className, children }: { className?: string; children: Reac
 /**
  * The card before the playlist answers.
  *
- * It traces the whole card, not the top third of it: the head with its `spotify` link slot, the
- * sleeve at `COVER + OUT_STOPPED` so the disc's parked edge is already accounted for, the serif
- * title and the artist line, the elapsed/total clock, the footer comment, three control buttons
- * at their real 26px, and the 2px progress rail on the card's bottom edge. The previous version
- * was a square and two bars, which is every card on the site.
+ * It traces the whole card: the head with its `spotify` link slot, the sleeve at
+ * `COVER + OUT_STOPPED` so the disc's parked edge is already accounted for, the serif title and
+ * the artist line, the clock, and three control buttons at their real 28px.
  *
  * The disc is drawn for real rather than greyed. It is not data — it is the object the card is,
  * it costs one gradient, and a turntable with nothing on it is what the *empty* frame means.
  */
 export function SleeveLoading({ className }: { className?: string }) {
   return (
-    <div className={cn("bento-card relative", className)}>
-      <CardHead
-        label="me, as a playlist"
-        meta={<Skeleton style={{ width: 46, height: 9, borderRadius: 3 }} />}
-      />
-
-      <div className="flex items-center gap-4" aria-hidden>
-        <div className="relative shrink-0" style={{ width: COVER + OUT_STOPPED, height: COVER }}>
-          <div
-            className="absolute top-0 left-0 opacity-60"
-            style={{ transform: `translateX(${OUT_STOPPED}px)` }}
-          >
-            <Disc size={COVER} running={false} />
-          </div>
-          <Skeleton
-            className="absolute top-0 left-0 rounded-sm"
-            style={{
-              width: COVER,
-              height: COVER,
-              border: "1px solid var(--border-subtle)",
-              boxShadow: "2px 0 10px rgba(0,0,0,.45)",
-            }}
-          />
-        </div>
-
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <Skeleton delay={0.06} style={{ width: "72%", height: 20, borderRadius: 4 }} />
-          <Skeleton delay={0.12} style={{ width: "48%", height: 10, borderRadius: 3 }} />
-          <Skeleton delay={0.18} style={{ width: 62, height: 8, borderRadius: 3 }} />
-        </div>
-      </div>
-
-      <CardFoot comment="reading the playlist">
+    <SleeveShell
+      className={className}
+      meta={<Skeleton style={{ width: 46, height: 9, borderRadius: 3 }} />}
+      comment="reading the playlist"
+      controls={
         <div className="flex items-center gap-1" aria-hidden>
           {[0, 1, 2].map((i) => (
             <Skeleton
               key={i}
               delay={0.24 + i * 0.06}
-              // h-7 w-7 rounded-full, exactly what `ControlButton` is.
               variant="circle"
               style={{ width: 28, height: 28 }}
             />
           ))}
         </div>
-      </CardFoot>
+      }
+    >
+      <div className="relative shrink-0" style={{ width: COVER + OUT_STOPPED, height: COVER }}>
+        <div
+          className="absolute top-0 left-0 opacity-60"
+          style={{ transform: `translateX(${OUT_STOPPED}px)` }}
+        >
+          <Disc size={COVER} running={false} />
+        </div>
+        <Skeleton
+          className="absolute top-0 left-0 rounded-sm"
+          style={{
+            width: COVER,
+            height: COVER,
+            border: "1px solid var(--border-subtle)",
+            boxShadow: "2px 0 10px rgba(0,0,0,.45)",
+          }}
+        />
+      </div>
 
-      {/* The rail keeps its 2px so the card is exactly as tall as it will be, with no brand
-          fill on it — there is no position to report yet, and a bar sitting at zero would be
-          a claim rather than a placeholder. */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 bottom-0"
-        style={{ height: 2, background: "var(--border-subtle)" }}
-      />
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <Skeleton delay={0.06} style={{ width: "72%", height: 20, borderRadius: 4 }} />
+        <Skeleton delay={0.12} style={{ width: "48%", height: 10, borderRadius: 3 }} />
+        <Skeleton delay={0.18} style={{ width: 62, height: 8, borderRadius: 3 }} />
+      </div>
 
       <span className="sr-only" role="status">
         Loading me, as a playlist
       </span>
-    </div>
+    </SleeveShell>
   )
 }
 
 /**
- * Empty used to `return null`, which took the card out of the bento grid and left a hole in
- * the row — the page silently reflowed around a component that had decided not to exist. An
- * empty playlist is a fact, not an absence, and it says so with the record still on the deck.
+ * Empty used to `return null`, which took the card out of the bento grid and left a hole in the
+ * row — the page silently reflowed around a component that had decided not to exist. An empty
+ * playlist is a fact, not an absence, and it says so with the record still on the deck.
  */
 export function SleeveEmpty({ className }: { className?: string }) {
   return (
-    <StateCard className={className}>
+    <SleeveShell className={className} comment="nothing to play">
       <div className="shrink-0 opacity-40">
         <Disc size={COVER} running={false} />
       </div>
@@ -496,7 +511,7 @@ export function SleeveEmpty({ className }: { className?: string }) {
           {"// the playlist came back empty"}
         </div>
       </div>
-    </StateCard>
+    </SleeveShell>
   )
 }
 
@@ -505,9 +520,29 @@ export function SleeveEmpty({ className }: { className?: string }) {
  * with nothing behind it to re-run, and a retry button that does nothing is a worse lie than
  * no button.
  */
+/**
+ * `onRetry` is optional because the showcase renders this frame with nothing behind it to
+ * re-run, and a retry button that reloads nothing is a worse lie than no button. It lives in
+ * the footer rather than in the body, which is where the working card keeps its controls.
+ */
 export function SleeveError({ onRetry, className }: { onRetry?: () => void; className?: string }) {
   return (
-    <StateCard className={className}>
+    <SleeveShell
+      className={className}
+      comment="spotify api didn't respond"
+      controls={
+        onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="text-mono-sm cursor-pointer font-mono transition-colors"
+            style={{ color: "var(--fg-brand)" }}
+          >
+            retry →
+          </button>
+        )
+      }
+    >
       <div
         className="text-heading-lg flex shrink-0 items-center justify-center rounded-sm border border-dashed"
         style={{
@@ -529,28 +564,9 @@ export function SleeveError({ onRetry, className }: { onRetry?: () => void; clas
           playlist unavailable
         </div>
         <div className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
-          {"// spotify api didn't respond"}
+          {"// couldn't reach the api"}
         </div>
-        {onRetry && (
-          <div className="mt-3 flex items-center gap-2.5">
-            <span
-              className="text-mono-sm font-mono"
-              style={{ color: "var(--zinc-600)" }}
-              aria-hidden
-            >
-              $
-            </span>
-            <button
-              type="button"
-              onClick={onRetry}
-              className="text-mono-sm cursor-pointer font-mono transition-colors"
-              style={{ color: "var(--fg-brand)" }}
-            >
-              retry →
-            </button>
-          </div>
-        )}
       </div>
-    </StateCard>
+    </SleeveShell>
   )
 }
