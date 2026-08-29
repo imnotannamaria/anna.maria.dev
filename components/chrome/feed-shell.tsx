@@ -22,6 +22,7 @@
 import { useMemo } from "react"
 import { PageOutline, type OutlineItem } from "./page-outline"
 import { FilterPill } from "@/components/ui/url-filter"
+import { cn } from "@/lib/utils"
 
 /** One `<section>` in the feed, one row in the outline. */
 export type FeedGroup<T> = {
@@ -30,6 +31,18 @@ export type FeedGroup<T> = {
   /** The section's heading, and the outline row's label: `2026`, `albums`. */
   label: string
   items: T[]
+  /**
+   * A second grouping level within this section — /projects nests year under kind, so the
+   * outline keeps the year breakdown /blog has even though the section itself is now "Open
+   * source" / "Demos" rather than a year. Optional and unused by /blog and /log, which have
+   * only one axis to group by.
+   *
+   * A subgroup only gets its own `<h3>` in the grid when there's more than one — right now
+   * every project is dated 2026, so each kind has exactly one subgroup and the grid stays a
+   * single flat run. The outline still lists it; the visual split shows up on its own the day
+   * a second year exists.
+   */
+  subgroups?: { id: string; label: string; items: T[] }[]
 }
 
 export type FeedPill = { key: string; label: string; count: number }
@@ -105,12 +118,15 @@ export function FeedShell<T>({
   const outline: OutlineItem[] = useMemo(
     () => [
       { id: root.id, label: root.label, level: 1 },
-      ...groups.map((group) => ({
-        id: group.id,
-        label: group.label,
-        level: 2 as const,
-        count: group.items.length,
-      })),
+      ...groups.flatMap((group) => [
+        { id: group.id, label: group.label, level: 2 as const, count: group.items.length },
+        ...(group.subgroups ?? []).map((sub) => ({
+          id: sub.id,
+          label: sub.label,
+          level: 3 as const,
+          count: sub.items.length,
+        })),
+      ]),
     ],
     [root.id, root.label, groups],
   )
@@ -175,11 +191,38 @@ export function FeedShell<T>({
                   </span>
                 </div>
 
-                <div className={listClassName}>
-                  {/* The stagger belongs to the first group only. Past it every card would be
-                      waiting out a delay for an entrance the reader scrolled to deliberately. */}
-                  {group.items.map((item, i) => renderItem(item, gi === 0 ? i : 0))}
-                </div>
+                {group.subgroups ? (
+                  group.subgroups.map((sub, si) => (
+                    <div key={sub.id} id={sub.id} style={{ scrollMarginTop: 24 }}>
+                      {/* Only earns its own heading once there's more than one — see the note
+                          on `subgroups` above. `si > 0` for the top margin, not `first:mt-0`:
+                          every subgroup is the first child of its own wrapper div, so
+                          `:first-child` matched all of them and the gap between the first
+                          and second year never rendered. */}
+                      {group.subgroups!.length > 1 && (
+                        <h3
+                          className={cn(
+                            "text-mono-sm mb-3 font-mono tracking-[0.08em] uppercase",
+                            si > 0 && "mt-6",
+                          )}
+                          style={{ color: "var(--fg-muted)" }}
+                        >
+                          {sub.label}
+                        </h3>
+                      )}
+                      <div className={listClassName}>
+                        {/* The stagger belongs to the very first run only. */}
+                        {sub.items.map((item, i) => renderItem(item, gi === 0 && si === 0 ? i : 0))}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className={listClassName}>
+                    {/* The stagger belongs to the first group only. Past it every card would be
+                        waiting out a delay for an entrance the reader scrolled to deliberately. */}
+                    {group.items.map((item, i) => renderItem(item, gi === 0 ? i : 0))}
+                  </div>
+                )}
               </section>
             ))
           )}

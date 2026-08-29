@@ -29,12 +29,14 @@ import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
 import { GeneratedCover } from "@/components/ui/generated-cover"
 import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { KIND_LABEL, type ProjectKind } from "@/lib/projects"
 
 export type ProjectItem = {
   slug: string
   title: string
   description: string
   tags: string[]
+  kind: ProjectKind
   github?: string
   live?: string
   date: string
@@ -100,7 +102,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
         )}
       </div>
 
-      <CardHead label="project" meta={project.year} />
+      <CardHead label={KIND_LABEL[project.kind]} meta={project.year} />
 
       <h3
         className="relative m-0 transition-colors group-hover/arrow:text-(--fg-brand)"

@@ -32,6 +32,15 @@ const projects = defineCollection({
     description: s.string(),
     date: s.isodate(),
     tags: s.array(s.string()),
+    /**
+     * `library`: something another person installs and consumes — a CLI, a copy-paste
+     * component set, a versioned surface (entrepta, wristkit). `demo`: a reference build
+     * that demonstrates entering an unfamiliar domain and shipping something working, not
+     * something anyone installs (mailroom-stable, capacity-crew). Grouped as two sections
+     * on /projects rather than one, so a demo built to get a specific job interview doesn't
+     * read as the same kind of artifact as a maintained library.
+     */
+    kind: s.enum(["library", "demo"]).default("library"),
     github: s.string().url().optional(),
     live: s.string().url().optional(),
     /**
