@@ -1,29 +1,13 @@
 /** Same reason as the list: the edit page reads the item before it can render the form. */
+import { PageLoading } from "@/components/chrome/page-loading"
+
 export default function EditRoadmapItemLoading() {
   return (
-    <>
-      <h1
-        className="text-display-md mb-1 font-serif leading-none font-normal tracking-[-0.02em]"
-        style={{ color: "var(--fg-primary)" }}
-      >
-        Edit
-      </h1>
-      <p className="text-mono-sm mb-6 font-mono" style={{ color: "var(--fg-muted)" }}>
-        {"// loading…"}
-      </p>
-
-      <div aria-hidden className="flex flex-col gap-6">
-        {Array.from({ length: 5 }, (_, i) => (
-          <div key={i} className="flex flex-col gap-1.5">
-            <span className="h-2.5 w-16 rounded bg-(--bg-surface-elevated)" />
-            <span className="h-10 w-full rounded-md bg-(--bg-surface-elevated)" />
-          </div>
-        ))}
-      </div>
-
-      <span className="sr-only" role="status">
-        Loading item
-      </span>
-    </>
+    <PageLoading
+      command="roadmap --edit"
+      crumb="admin / roadmap / edit"
+      label="the item"
+      steps={["checking the allowlist", "reading the item"]}
+    />
   )
 }

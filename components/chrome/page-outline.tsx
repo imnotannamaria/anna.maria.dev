@@ -33,10 +33,13 @@ export type OutlineItem = {
 const PREFIX: Record<1 | 2 | 3, string> = { 1: "#", 2: "##", 3: "###" }
 
 /**
- * The rail's own box, shared with `OutlineSkeleton` below. Constants rather than two copies
- * of the class string: a `loading.tsx` that traces these by hand is a rail that drifts from
- * the real one the first time either is touched, and the drift shows up as the layout moving
- * the moment the data lands — which is the one thing the skeleton exists to prevent.
+ * The rail's own box, as constants rather than one long class string inline.
+ *
+ * They used to be shared with an `OutlineSkeleton` that stood in for this panel in
+ * `app/log/loading.tsx`. That approach is gone — `loading.tsx` is one centred prompt now
+ * rather than a grey tracing of the page — so there is no second copy of the rail left to
+ * keep in step. They stay split out because the alternative is a 90-character `className`
+ * in the middle of the JSX.
  */
 const RAIL = "sticky top-0 hidden self-start px-4 py-12 min-[1100px]:block"
 const RAIL_BORDER = { borderRight: "1px solid var(--border-subtle)" } as const
@@ -224,38 +227,5 @@ export function PageOutline({
         </motion.div>
       )}
     </motion.nav>
-  )
-}
-
-/**
- * The rail as it looks before the data arrives, for a `loading.tsx` beside a page that reads
- * Postgres.
- *
- * It lives in this file, not in the route it serves, so it takes the box, the heading and the
- * file chip from the same constants the real panel does. `app/log/loading.tsx` used to spell
- * all of that out again, which meant a change to the rail was two edits with nothing to fail
- * if only one of them happened.
- *
- * No rows to spy on and nothing to navigate, so it is `aria-hidden` and not a `<nav>` — the
- * page's real status message does the announcing.
- */
-export function OutlineSkeleton({ file, rows = 3 }: { file: string; rows?: number }) {
-  return (
-    <div aria-hidden className={RAIL} style={RAIL_BORDER}>
-      <div className={RAIL_HEADING} style={RAIL_HEADING_STYLE}>
-        outline
-      </div>
-
-      <div className={FILE_CHIP} style={FILE_CHIP_STYLE}>
-        <Diamond />
-        {file}
-      </div>
-
-      <div className="flex flex-col gap-2">
-        {Array.from({ length: rows }, (_, i) => (
-          <span key={i} className="h-3 w-24 rounded bg-(--bg-surface-elevated)" />
-        ))}
-      </div>
-    </div>
   )
 }

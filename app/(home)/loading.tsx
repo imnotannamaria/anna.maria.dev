@@ -1,82 +1,35 @@
 /**
- * What the home page shows before the shell itself is ready — which is now a much smaller job
- * than it was.
+ * What the home page shows before the shell itself is ready — which is a much smaller job than
+ * it was, and a different one from what each card does.
  *
  * This used to cover everything: `Home()` awaited one `Promise.all` of three queries, so a slow
  * log query held the whole page here, including the featured project, the stack card and the
  * piano, none of which touch a database. Every card that reads something now sits behind its
- * own `<Suspense>` with its own skeleton, so the shell paints immediately and each card
- * fills in on its own clock. This file is what is left: the frame around a page whose slow
- * parts announce themselves individually.
+ * own `<Suspense>` with its own skeleton, so the shell paints immediately and each card fills in
+ * on its own clock. This file is what is left: the frame around a page whose slow parts announce
+ * themselves individually.
  *
- * The page is still force-dynamic — the wristkit rings and the log shelf are supposed to read
- * as live — and streaming does not change that.
+ * That split is also why this is a sentence and not a skeleton. A skeleton works when it stands
+ * in for one known box and can trace it exactly — `ProfileCardSkeleton` knows there is a 96px
+ * avatar and a four-cell stats rail. This stands in for the whole page before any of those
+ * exist, and a grey rectangle per card is a caricature of a layout rather than a picture of one.
  *
- * It lives in a `(home)` route group, and that is not cosmetic. As `app/loading.tsx` it was
- * the Suspense boundary for **every** route in the app, so `notFound()` anywhere underneath
- * was thrown after the response had started streaming: the status line said 200 and only the
- * body said 404. Every missing post, project and mistyped URL on the site became a soft 404,
- * which search engines keep in the index rather than dropping. Measured: with the file at the
- * root, a bogus `/projects/x` answered 200; inside the group it answers 404 and the home page
- * still gets its loading state.
- *
- * This does not draw the page in grey, and that is now a decision about *scope* rather than
- * about skeletons. Each card has one — `ProfileCardSkeleton`, `TreeCardSkeleton`,
- * `LogCardSkeleton`, the calendar's grid, wristkit's rings — because each of those stands in
- * for one known box and can trace it exactly. This file stands in for the whole page before
- * any of them exist, and a grey rectangle per card is a caricature of a layout rather than a
- * picture of one: it is the version that reads as broken.
- *
- * So it says what is happening, in the voice the rest of the site already uses: the real
- * section prompt, then a `$` line underneath. That line is this file's alone — no component
- * prints it any more. `60vh` keeps the status bar from jumping up to meet it and back down
- * again.
- *
- * The line is plain text, not `TypeIn`. `TypeIn` fades its characters in on `whileInView`,
- * which needs the client to hydrate and an `IntersectionObserver` to fire before anything
- * shows — its `initial` state renders as `opacity: 0` in the SSR HTML. A page title can
- * afford that beat, it sits on a page that stays put. A loading state can't: it exists only
- * until the real data lands, and on a cold load that can happen before hydration finishes,
- * so the line stayed invisible for the state's entire time on screen while the dots, plain
- * CSS with no JS to wait on, animated the whole time regardless. The text needs to be there
- * on first paint, not after a round trip to the client. The dots are still CSS, and they
- * still loop: once the line has landed, one thing should still be moving, and an ellipsis
- * says "still working" where a caret only says "cursor".
+ * It lives in a `(home)` route group, and that is not cosmetic. As `app/loading.tsx` it was the
+ * Suspense boundary for **every** route in the app, so `notFound()` anywhere underneath was
+ * thrown after the response had started streaming: the status line said 200 and only the body
+ * said 404. Every missing post, project and mistyped URL on the site became a soft 404, which
+ * search engines keep in the index rather than dropping. Measured: with the file at the root, a
+ * bogus `/projects/x` answered 200; inside the group it answers 404 and the home page still gets
+ * its loading state.
  */
+import { PageLoading } from "@/components/chrome/page-loading"
 
 export default function HomeLoading() {
   return (
-    <div
-      className="mx-auto flex flex-col px-4 py-6 sm:px-6 md:px-8 lg:px-12 lg:py-8"
-      style={{ maxWidth: 1280, minHeight: "60vh" }}
-    >
-      {/* The same head the section renders for real, so this line does not move when the
-          page lands — it is the one piece of the home page that is known without a query. */}
-      <div
-        className="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-dashed pb-3"
-        style={{ borderColor: "var(--border-subtle)" }}
-      >
-        <span className="text-mono-sm font-mono tracking-[0.08em] uppercase">
-          <span style={{ color: "var(--fg-brand)" }}>$</span>{" "}
-          <span style={{ color: "var(--fg-muted)" }}>whoami</span>
-        </span>
-      </div>
-
-      {/* The whole visible line is aria-hidden — the `role="status"` below is the one
-          announcement a screen reader gets, so the mono `$`, the text and the dots are all
-          decoration. Exposing the text here as well would announce the same fact twice. */}
-      <p aria-hidden className="text-mono-md m-0 font-mono" style={{ color: "var(--fg-muted)" }}>
-        <span style={{ color: "var(--fg-brand)" }}>$</span> loading page
-        <span>
-          <span className="load-dot load-dot-1">.</span>
-          <span className="load-dot load-dot-2">.</span>
-          <span className="load-dot load-dot-3">.</span>
-        </span>
-      </p>
-
-      <span className="sr-only" role="status">
-        Loading the page
-      </span>
-    </div>
+    <PageLoading
+      command="whoami"
+      label="the page"
+      steps={["connecting to postgres", "reading the log", "counting posts and projects"]}
+    />
   )
 }

@@ -678,6 +678,100 @@ button:focus-visible,
    Paced to a loading state, not to a hero: the whole line lands in about half a
    second and the ellipsis cycles just under one. Slower reads as the page being
    stuck, which is the one thing a loading state must not say. */
+/* ── The typed terminal loading screen ──────────────────────────────────────
+ *
+ * All of this is CSS, and that is not a preference — it is the one constraint a loading
+ * state has that nothing else on the site does.
+ *
+ * `app/(home)/loading.tsx` already learned this the expensive way with `TypeIn`: anything
+ * animated through JS cannot show until React has hydrated, and a loading state's whole job
+ * happens *before* that. On a cold load the real data can land before hydration finishes, so
+ * a JS-typed line stays invisible for the state's entire time on screen. The dots beside it,
+ * plain CSS, animated the whole time.
+ *
+ * So the text is in the DOM from the first byte and CSS clips it. `--type-chars` is the
+ * character count and `steps()` is what makes it advance one glyph at a time instead of
+ * sliding; both work in a server component with zero JavaScript shipped.
+ *
+ * `ch` is exact here because every one of these lines is JetBrains Mono. In a proportional
+ * font `1ch` is the width of a zero and nothing else, and the clip would land mid-character.
+ */
+@keyframes type-in {
+  from {
+    width: 0;
+  }
+  to {
+    width: calc(var(--type-chars) * 1ch);
+  }
+}
+
+.type-line {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+  width: 0;
+  animation: type-in var(--type-dur, 0.7s) steps(var(--type-chars)) var(--type-delay, 0s) forwards;
+}
+
+@keyframes type-fade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.type-fade {
+  opacity: 0;
+  animation: type-fade 0.26s var(--ease-out) var(--type-delay, 0s) forwards;
+}
+
+/* The block caret. It waits out its delay invisible (`backwards` holds the 0% frame), then
+ * blinks for as long as the page is still loading — which is the one honest thing a loading
+ * screen can say after it has finished saying everything else. */
+.type-caret {
+  display: inline-block;
+  width: 0.55ch;
+  height: 1.05em;
+  vertical-align: text-bottom;
+  background: var(--fg-brand);
+  animation: cursor-blink 1s step-end var(--type-delay, 0s) infinite backwards;
+}
+
+/* The same fade, with one difference that is the whole point of a second class: its delay is
+ * *information*, not choreography.
+ *
+ * These are the lines that only show up when the wait runs long. The delay is not there to
+ * stagger anything — it is the measurement. A page that answers in 300ms never renders them at
+ * all, and that is the feature: the screen says more the longer you are made to wait, and
+ * nothing extra when you are not. Which means the reduced-motion block below must NOT zero it,
+ * or every load would show a "this is taking a while" list. */
+.type-late {
+  opacity: 0;
+  animation: type-fade 0.26s var(--ease-out) var(--type-delay, 0s) forwards;
+}
+
+/* The global reduced-motion reset zeroes durations but not delays, so without this the prompt
+ * would still arrive a line at a time — just instantly each. Everything at once is the point,
+ * for the prompt. `.type-late` is deliberately absent: see above. */
+@media (prefers-reduced-motion: reduce) {
+  .type-line,
+  .type-fade,
+  .type-caret {
+    animation-delay: 0s !important;
+  }
+  .type-line {
+    width: auto !important;
+  }
+  .type-fade {
+    opacity: 1 !important;
+  }
+}
+
 @keyframes load-dot {
   0%,
   70%,
