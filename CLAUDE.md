@@ -482,6 +482,7 @@ Everything except Resend and the base URL is optional. Without a database the wr
 {
   "dev": "infisical run -- run-p dev:velite dev:next",
   "dev:local": "run-p dev:velite dev:next",
+  "dev:clean": "rm -rf .next && npm run dev",
   "build": "velite build && next build",
   "postbuild": "next-sitemap",
   "lint": "eslint . && prettier --check .",
@@ -499,6 +500,18 @@ brings up its own throwaway Postgres and exports what it needs.
 
 For a one-off that wants the real secrets (`npm run seed:log` against production, say), put
 Infisical on the outside: `infisical run -- npm run seed:log`.
+
+**When `npm run dev` pins the CPU, it is the Turbopack cache — run `npm run dev:clean`.**
+Measured: a dev server sitting with no browser attached and nothing to do, burning ~850% CPU
+(eight cores) indefinitely, with RSS climbing past 3.7 GB, and one 648-byte chunk-list file in
+`.next/dev/static` being rewritten with byte-identical content several times a second. Deleting
+`.next` and starting again: idle CPU flat at zero, RSS steady, and still flat after compiling
+four routes.
+
+The tell is the size. `.next/dev/cache` is Turbopack's persistent cache, and at 945 MB it had
+gone bad; a healthy one for this project is tens of megabytes. Check it with `du -sh .next`
+before assuming the problem is anything in the repo — velite, Infisical and the browser were all
+idle the whole time, and it reproduces with a bare `npx next dev` and nothing connected.
 
 ---
 
