@@ -8,12 +8,12 @@
  * Rows fade rather than slide — transforms do not apply to `display: table-row`.
  */
 
-import { useOptimistic, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
 import { PencilSimpleIcon } from "@phosphor-icons/react"
 import { toast } from "@/app/components/entrepta/toast"
+import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
 import { STATUS_LABEL, type RoadmapItem, type RoadmapStatus } from "@/lib/roadmap/validation"
@@ -28,34 +28,33 @@ const STATUS_COLOR: Record<RoadmapStatus, string> = {
 
 export function RoadmapItemRows({ items }: { items: RoadmapItem[] }) {
   const router = useRouter()
-  const [, startTransition] = useTransition()
   const reduce = useReducedMotion() ?? false
 
-  const [optimistic, removeOptimistic] = useOptimistic(items, (state, id: string) =>
-    state.filter((i) => i.id !== id),
-  )
+  const { visible, hide, restore } = useOptimisticRemoval(items)
 
-  function remove(id: string, title: string) {
-    startTransition(async () => {
-      removeOptimistic(id)
-      try {
-        const res = await fetch(`/api/v1/admin/roadmap/${id}`, { method: "DELETE" })
-        if (!res.ok) {
-          toast(`could not delete (${res.status})`)
-          return
-        }
-        toast(`deleted "${title}"`)
-        router.refresh()
-      } catch {
-        toast("network error — nothing was deleted")
+  /** Hide first, then ask. Every failure path puts the row back explicitly — see
+   *  `useOptimisticRemoval` for why nothing does that for us any more. */
+  async function remove(id: string, title: string) {
+    hide(id)
+    try {
+      const res = await fetch(`/api/v1/admin/roadmap/${id}`, { method: "DELETE" })
+      if (!res.ok) {
+        restore(id)
+        toast(`could not delete (${res.status})`)
+        return
       }
-    })
+      toast(`deleted "${title}"`)
+      router.refresh()
+    } catch {
+      restore(id)
+      toast("network error — nothing was deleted")
+    }
   }
 
   const body: Variants = {
     hidden: {},
     show: {
-      transition: { staggerChildren: reduce || optimistic.length > STAGGER_LIMIT ? 0 : 0.04 },
+      transition: { staggerChildren: reduce || visible.length > STAGGER_LIMIT ? 0 : 0.04 },
     },
   }
 
@@ -68,7 +67,7 @@ export function RoadmapItemRows({ items }: { items: RoadmapItem[] }) {
   return (
     <motion.tbody initial="hidden" whileInView="show" viewport={revealViewport} variants={body}>
       <AnimatePresence initial={false}>
-        {optimistic.map((item) => (
+        {visible.map((item) => (
           <motion.tr
             key={item.id}
             variants={row}

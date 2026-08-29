@@ -8,7 +8,8 @@
  * wholesale. What has to be on the client is the optimistic list: a delete used to fire, toast,
  * and then sit there until `router.refresh()` came back from the server, at which point the row
  * vanished in one frame. Now it leaves the moment you confirm and comes back if the request
- * fails, which is what `useOptimistic` reverting on transition end does for free.
+ * fails — see `useOptimisticRemoval` for why that is a set of ids rather than `useOptimistic`,
+ * which reverted a beat too early and flashed the row back on every delete.
  *
  * **Rows fade, they do not slide.** CSS transforms do not apply to `display: table-row`, so
  * Motion's `layout` prop and any `x`/`y` on a `<tr>` are inert — animating a row's height is no
@@ -17,12 +18,12 @@
  * the row and looks exactly like that.
  */
 
-import { useOptimistic, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
 import { PencilSimpleIcon } from "@phosphor-icons/react"
 import { toast } from "@/app/components/entrepta/toast"
+import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
 import { StarRating } from "@/components/log/star-rating"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
@@ -31,39 +32,33 @@ import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
 
 export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
   const router = useRouter()
-  const [, startTransition] = useTransition()
   const reduce = useReducedMotion() ?? false
 
-  const [optimistic, removeOptimistic] = useOptimistic(entries, (state, id: string) =>
-    state.filter((e) => e.id !== id),
-  )
+  const { visible, hide, restore } = useOptimisticRemoval(entries)
 
-  /**
-   * The optimistic removal has to happen *inside* the transition, or React has nothing to
-   * revert it against. On a failure we simply do not refresh: the transition ends, the
-   * optimistic state is discarded, and the row reappears where it was.
-   */
-  function remove(id: string, title: string) {
-    startTransition(async () => {
-      removeOptimistic(id)
-      try {
-        const res = await fetch(`/api/v1/admin/log/${id}`, { method: "DELETE" })
-        if (!res.ok) {
-          toast(`could not delete (${res.status})`)
-          return
-        }
-        toast(`deleted "${title}"`)
-        router.refresh()
-      } catch {
-        toast("network error — nothing was deleted")
+  /** Hide first, then ask. Every failure path puts the row back explicitly — there is no
+   *  transition boundary doing it for us, and that is the point. */
+  async function remove(id: string, title: string) {
+    hide(id)
+    try {
+      const res = await fetch(`/api/v1/admin/log/${id}`, { method: "DELETE" })
+      if (!res.ok) {
+        restore(id)
+        toast(`could not delete (${res.status})`)
+        return
       }
-    })
+      toast(`deleted "${title}"`)
+      router.refresh()
+    } catch {
+      restore(id)
+      toast("network error — nothing was deleted")
+    }
   }
 
   const body: Variants = {
     hidden: {},
     show: {
-      transition: { staggerChildren: reduce || optimistic.length > STAGGER_LIMIT ? 0 : 0.04 },
+      transition: { staggerChildren: reduce || visible.length > STAGGER_LIMIT ? 0 : 0.04 },
     },
   }
 
@@ -76,7 +71,7 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
   return (
     <motion.tbody initial="hidden" whileInView="show" viewport={revealViewport} variants={body}>
       <AnimatePresence initial={false}>
-        {optimistic.map((entry) => (
+        {visible.map((entry) => (
           <motion.tr
             key={entry.id}
             variants={row}

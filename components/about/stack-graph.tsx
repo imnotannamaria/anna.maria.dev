@@ -22,16 +22,24 @@
  * component does not actually wear. There is one copy of each now and both callers render it.
  */
 
+import { useState } from "react"
 import dynamic from "next/dynamic"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { ChunkBoundary } from "@/components/ui/chunk-boundary"
 import { useMediaQuery } from "@/hooks/use-media-query"
 
-const StackFlow = dynamic(() => import("./stack-flow").then((m) => m.StackFlow), {
-  ssr: false,
-  // Already inside a `GraphPane` here, so it gets the body rather than the framed version.
-  loading: () => <GraphSkeletonBody />,
-})
+/**
+ * Built per attempt rather than once at module scope, which is what makes the retry below work
+ * at all: `next/dynamic` wraps `React.lazy`, and `lazy` records the rejection on its payload,
+ * so re-rendering the same component object re-throws without calling the loader. A new one
+ * has nothing cached and the import goes back out.
+ */
+const makeStackFlow = () =>
+  dynamic(() => import("./stack-flow").then((m) => m.StackFlow), {
+    ssr: false,
+    // Already inside a `GraphPane` here, so it gets the body rather than the framed version.
+    loading: () => <GraphSkeletonBody />,
+  })
 
 /**
  * The bordered box the canvas lives in. Its height is fixed here rather than by the content,
@@ -184,8 +192,20 @@ export function StackGraph() {
         logTag="[stack-graph] chunk failed"
         fallback={(retry) => <StackGraphError onRetry={retry} />}
       >
-        <StackFlow />
+        {(attempt) => <StackFlowAttempt key={attempt} />}
       </ChunkBoundary>
     </GraphPane>
   )
+}
+
+/**
+ * One lazy component per attempt, made by remounting rather than by a dependency array.
+ *
+ * The boundary owns the attempt number, so it is passed as a `key`: a new key is a new
+ * instance, a new instance runs the `useState` initialiser again, and that is a `dynamic()`
+ * React has never seen reject.
+ */
+function StackFlowAttempt() {
+  const [StackFlow] = useState(makeStackFlow)
+  return <StackFlow />
 }

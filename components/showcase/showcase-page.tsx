@@ -63,8 +63,19 @@ const TABS: {
   { id: "rules", label: "rules.md", icon: ListChecksIcon, meta: () => "do's and don'ts" },
 ]
 
-/** The rail lists whatever the open tab actually contains — there is nothing else to point at. */
-function outlineFor(view: View, entries: ShowcaseEntry[]): OutlineItem[] {
+/**
+ * The rail lists whatever the open tab actually contains — there is nothing else to point at.
+ *
+ * `where` is the components tab's page filter, and the rail has to honour it: the filter hides
+ * whole groups, so a rail built from the unfiltered list offered `home/` and `shared/` rows on
+ * `/components?where=about` whose anchors were no longer in the document. They never
+ * highlighted and clicking them did nothing.
+ */
+function outlineFor(
+  view: View,
+  entries: ShowcaseEntry[],
+  where: (typeof SHOWCASE_GROUPS)[number] | null,
+): OutlineItem[] {
   if (view === "tokens") {
     return [
       { id: "panel-tokens", label: "tokens", level: 1 },
@@ -74,13 +85,14 @@ function outlineFor(view: View, entries: ShowcaseEntry[]): OutlineItem[] {
   if (view === "rules") {
     return [{ id: "panel-rules", label: "rules", level: 1 }]
   }
+  const shown = where ? entries.filter((e) => e.group === where) : entries
   return [
     { id: "panel-components", label: "components", level: 1 },
-    ...SHOWCASE_GROUPS.filter((g) => entries.some((e) => e.group === g)).map((g) => ({
+    ...SHOWCASE_GROUPS.filter((g) => shown.some((e) => e.group === g)).map((g) => ({
       id: `group-${g}`,
       label: GROUP_LABEL[g],
       level: 2 as const,
-      count: entries.filter((e) => e.group === g).length,
+      count: shown.filter((e) => e.group === g).length,
     })),
   ]
 }
@@ -88,6 +100,15 @@ function outlineFor(view: View, entries: ShowcaseEntry[]): OutlineItem[] {
 export function ShowcasePage({ themeCount }: { themeCount: number }) {
   const [param, setParam] = useUrlFilter("view", VIEWS, "/components")
   const view: View = param ?? "components"
+
+  /**
+   * The same filter `ShowcaseFeed` owns, read a second time rather than lifted.
+   *
+   * `useUrlFilter` is a `useSyncExternalStore` over the URL, so two readers of one param are
+   * one source of truth — they cannot disagree. Threading it down as a prop would mean the
+   * feed no longer owns its own filter, for a rail that only needs to read it.
+   */
+  const [where] = useUrlFilter("where", SHOWCASE_GROUPS, "/components")
   const tablistId = useId()
 
   // Both memoised, and the outline one is not a micro-optimisation: `PageOutline` keys its
@@ -97,7 +118,7 @@ export function ShowcasePage({ themeCount }: { themeCount: number }) {
   // is a rail of invisible links. `PageOutline` now guards against this itself; memoising here
   // is the other half.
   const entries = useMemo(() => [...SHOWCASE_LIST], [])
-  const outline = useMemo(() => outlineFor(view, entries), [view, entries])
+  const outline = useMemo(() => outlineFor(view, entries, where), [view, entries, where])
   const meta = TABS.find((t) => t.id === view)?.meta(entries)
 
   const select = (id: View) => setParam(id === "components" ? null : (id as (typeof VIEWS)[number]))

@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * An error boundary for a lazily-loaded chunk.
+ * An error boundary for a lazily-loaded chunk, and a retry that actually retries.
  *
  * `next/dynamic` has a `loading` state and no error state. When the chunk request fails — a
  * dropped connection mid-navigation, a stale hashed filename after a deploy, a captive portal
@@ -12,25 +12,37 @@
  * A class component, because `componentDidCatch` has no hook equivalent — this is the one
  * remaining thing React has no function-component API for.
  *
- * `reset` bumps a key rather than re-importing: a failed dynamic import is cached by the
- * bundler's module registry, so retrying the same import returns the same rejected promise.
- * Remounting the subtree is what actually gives it another go.
+ * **`children` is a function of the attempt number, and that is the whole fix.** This used to
+ * remount a keyed subtree and blame the bundler's module registry for the retry not working.
+ * The registry is not the problem: webpack drops a failed chunk from `installedChunks`, so a
+ * fresh `import()` really does go back to the network. The problem is one level up —
+ * `next/dynamic` builds its `React.lazy` payload once at module scope, and `lazy` writes
+ * `_status = 2` onto that payload when the loader rejects. Remounting hands React the same
+ * settled payload, which re-throws instantly without calling the loader again. The button was
+ * inert.
+ *
+ * So the consumer is handed `attempt` and rebuilds the lazy component from it. A new `lazy`
+ * has no cached rejection, calls the loader, and the request goes out.
  */
 
-import { Component, Fragment, type ReactNode } from "react"
+import { Component, type ReactNode } from "react"
 
 type Props = {
-  children: ReactNode
+  /**
+   * Rendered with the current attempt number. Build the `dynamic()`/`lazy()` component inside a
+   * `useMemo` keyed on it — reusing one from module scope is what made the retry a no-op.
+   */
+  children: (attempt: number) => ReactNode
   /** Given a retry callback, renders whatever the failure should look like. */
   fallback: (retry: () => void) => ReactNode
   /** Prefixes the console.error so failures stay distinguishable in the logs. */
   logTag: string
 }
 
-type State = { failed: boolean; key: number }
+type State = { failed: boolean; attempt: number }
 
 export class ChunkBoundary extends Component<Props, State> {
-  state: State = { failed: false, key: 0 }
+  state: State = { failed: false, attempt: 0 }
 
   static getDerivedStateFromError(): Partial<State> {
     return { failed: true }
@@ -42,10 +54,10 @@ export class ChunkBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.failed) {
-      return this.props.fallback(() => this.setState((s) => ({ failed: false, key: s.key + 1 })))
+      return this.props.fallback(() =>
+        this.setState((s) => ({ failed: false, attempt: s.attempt + 1 })),
+      )
     }
-    // A keyed Fragment, not a keyed div: the graph fills its container absolutely, and an
-    // extra wrapper here would silently change what it is positioned against.
-    return <Fragment key={this.state.key}>{this.props.children}</Fragment>
+    return this.props.children(this.state.attempt)
   }
 }

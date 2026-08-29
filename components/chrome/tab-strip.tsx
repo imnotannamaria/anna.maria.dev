@@ -98,6 +98,7 @@ export function TabStrip({
 }) {
   const reduce = useReducedMotion() ?? false
   const scrollerRef = useRef<HTMLDivElement>(null)
+  const Scroller = role ? "div" : "nav"
   const [edges, setEdges] = useState({ start: false, end: false })
 
   // Fade the scroll edges only when the tabs actually overflow that side — on a wide screen
@@ -136,7 +137,16 @@ export function TabStrip({
      * shrink and scroll when the tabs outgrow the row.
      */
     <div className={cn("flex min-h-10 min-w-0 flex-1 items-stretch", className)}>
-      <div
+      {/*
+       * `<nav>` for a row of routes, a `<div role="tablist">` for a row of panels.
+       *
+       * The titlebar's tabs were a `<nav aria-label="Pages">` before this component existed,
+       * and extracting it quietly turned them into a roleless `<div>` carrying an `aria-label`
+       * — which assistive tech ignores, so the site's primary navigation stopped being a
+       * landmark. A label needs a role to hang off; `role="tablist"` gave `/components` one and
+       * the titlebar had nothing.
+       */}
+      <Scroller
         ref={scrollerRef}
         role={role}
         aria-label={label}
@@ -241,7 +251,7 @@ export function TabStrip({
             </div>
           )
         })}
-      </div>
+      </Scroller>
 
       {/* Both outside the scroller: neither may scroll away with the tabs or be clipped by the
           fade mask. `after` stays beside them; `children` goes to the far edge. */}

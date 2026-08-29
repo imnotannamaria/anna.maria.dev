@@ -29,13 +29,21 @@ export function DocSpecimen({
   return (
     <div className="grid grid-cols-1 gap-x-5 gap-y-3 min-[720px]:grid-cols-[minmax(0,150px)_minmax(0,1fr)]">
       <div className="min-w-0">
-        <span
-          className="text-mono-xs mb-2 block font-mono tracking-[0.08em] uppercase"
-          style={{ color: "var(--fg-muted)" }}
-        >
-          states
-        </span>
-        <StateList states={states} active={active} onSelect={setActive} label={name} />
+        {/* The heading is gated on the same condition `StateList` is: it bails below two states,
+            because one state is not a choice — and the label was rendering anyway, so
+            `/components/stack` and `/components/piano` carried a "STATES" heading with nothing
+            under it. */}
+        {states.length > 1 && (
+          <>
+            <span
+              className="text-mono-xs mb-2 block font-mono tracking-[0.08em] uppercase"
+              style={{ color: "var(--fg-muted)" }}
+            >
+              states
+            </span>
+            <StateList states={states} active={active} onSelect={setActive} label={name} />
+          </>
+        )}
       </div>
 
       <DemoStage slug={slug} name={name} active={active} className="min-w-0" />

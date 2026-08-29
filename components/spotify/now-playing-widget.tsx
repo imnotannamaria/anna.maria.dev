@@ -35,12 +35,27 @@ export function NowPlayingWidget({ className }: { className?: string }) {
    */
   const [audio, setAudio] = useState<{ index: number; elapsed: number; total: number } | null>(null)
 
+  /**
+   * Whether the element is *actually* producing sound, reported by the element.
+   *
+   * This used to be inferred — `previewUrl && armed`, i.e. "there is a clip and someone pressed
+   * a button" — which is intent, not playback. `el.play()` is a promise that browsers reject
+   * routinely: sound blocked for the site, a policy that wanted a more direct gesture, a source
+   * that failed to load. On a rejection the clip never starts, so no `timeupdate` ever arrives
+   * — and the inferred flag had already switched the simulated clock off. The result was a card
+   * whose record kept turning while the timer, the progress bar and the auto-advance were
+   * frozen for good, with nothing on screen saying why.
+   *
+   * Reading it from `onPlay`/`onPause` instead means a refusal simply leaves this false and the
+   * simulated clock keeps running, which is what the card does when there is no preview at all.
+   */
+  const [sounding, setSounding] = useState(false)
+
   useEffect(() => {
     load()
   }, [load])
 
   const track = tracks[currentIndex]
-  const live = Boolean(track?.previewUrl) && armed
 
   /**
    * The simulated clock is the fallback, not the default. When a real clip is playing the
@@ -48,17 +63,18 @@ export function NowPlayingWidget({ className }: { className?: string }) {
    * apart within seconds, and the one actually making sound wins.
    */
   useEffect(() => {
-    if (status !== "playing" || live) return
+    if (status !== "playing" || sounding) return
     const id = setInterval(() => tick(), 1000)
     return () => clearInterval(id)
-  }, [status, live, tick])
+  }, [status, sounding, tick])
 
   useEffect(() => {
     const el = audioRef.current
     if (!el || !track?.previewUrl || !armed) return
     if (running) {
-      // Rejected when the gesture didn't count as one. The record keeps turning either way.
-      el.play().catch(() => {})
+      // Rejected when the gesture didn't count as one, or when the site is muted. The record
+      // keeps turning either way, and `sounding` stays false so the simulated clock covers it.
+      el.play().catch(() => setSounding(false))
     } else {
       el.pause()
     }
@@ -74,7 +90,7 @@ export function NowPlayingWidget({ className }: { className?: string }) {
   }
 
   /** A clip reading that belongs to the track on screen right now. */
-  const fresh = live && audio !== null && audio.index === currentIndex
+  const fresh = sounding && audio !== null && audio.index === currentIndex
 
   return (
     <>
@@ -84,6 +100,11 @@ export function NowPlayingWidget({ className }: { className?: string }) {
           src={track.previewUrl}
           preload="none"
           className="hidden"
+          onPlay={() => setSounding(true)}
+          onPause={() => setSounding(false)}
+          // A source that 404s or decodes badly is the same situation as a refused play: hand
+          // the clock back to the simulation rather than leaving it stopped.
+          onError={() => setSounding(false)}
           onTimeUpdate={(e) => {
             const el = e.currentTarget
             setAudio({
@@ -92,7 +113,10 @@ export function NowPlayingWidget({ className }: { className?: string }) {
               total: Number.isFinite(el.duration) ? el.duration * 1000 : 30_000,
             })
           }}
-          onEnded={next}
+          onEnded={() => {
+            setSounding(false)
+            next()
+          }}
         />
       )}
       <SleeveCard
