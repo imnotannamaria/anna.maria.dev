@@ -28,27 +28,32 @@ import { Diamond } from "@/components/ui/diamond"
  * Assigning the token to a real colour property forces the engine to resolve it, and hand back
  * `rgb(r g b / a)` — which is also the more useful thing to print under a swatch.
  */
-let probe: HTMLSpanElement | null = null
-
 /**
- * A single reusable off-screen element, created once and kept. Making one per read would be a
- * DOM mutation per token per render, which is not something to do during rendering.
+ * A single reusable off-screen element, made when this module is evaluated.
+ *
+ * At module scope rather than lazily inside the reader, because that reader runs during render
+ * and `appendChild` is a DOM mutation — something React does not permit in the render phase and
+ * concurrent rendering may interrupt halfway. A module-level cache made it idempotent enough to
+ * work, which is exactly why it went unnoticed. A client module is evaluated during hydration,
+ * before anything renders, so this happens once and never again.
+ *
+ * `document.body` is guarded rather than assumed: Next defers this script to the end of the
+ * document so the body is there, but a null here would be a blank page rather than a blank
+ * swatch, and that is not a trade worth making for one `?.`.
  */
-function getProbe(): HTMLSpanElement {
-  if (!probe) {
-    probe = document.createElement("span")
-    probe.setAttribute("aria-hidden", "true")
-    probe.style.cssText = "position:absolute;opacity:0;pointer-events:none;width:0;height:0"
-    document.body.appendChild(probe)
-  }
-  return probe
-}
+const probe: HTMLSpanElement | null = (() => {
+  if (typeof document === "undefined" || !document.body) return null
+  const el = document.createElement("span")
+  el.setAttribute("aria-hidden", "true")
+  el.style.cssText = "position:absolute;opacity:0;pointer-events:none;width:0;height:0"
+  document.body.appendChild(el)
+  return el
+})()
 
 function resolveToken(token: string): string {
-  if (typeof document === "undefined") return ""
-  const el = getProbe()
-  el.style.color = `var(${token})`
-  return getComputedStyle(el).color.trim()
+  if (!probe) return ""
+  probe.style.color = `var(${token})`
+  return getComputedStyle(probe).color.trim()
 }
 
 /** Non-colour tokens are plain values — those `getPropertyValue` handles fine. */
@@ -89,8 +94,24 @@ function useThemeKey(): string {
 }
 
 /**
- * Takes the token list as a `|`-joined string rather than an array, because an array literal
- * is a new identity on every render and could not be a dependency without recomputing forever.
+ * Every token in a group, resolved, re-read whenever the theme or mode changes — and only then.
+ *
+ * `theme` is in the dependency list, so the `getComputedStyle` calls happen once per theme or
+ * mode change rather than once per render. That matters because each one forces a style
+ * recalculation, and a group is a dozen of them.
+ *
+ * An effect would be the textbook home for a DOM read, and it is the wrong one here: writing the
+ * result to state from an effect is what `react-hooks/set-state-in-effect` exists to stop, and
+ * the rule is right — the reads have no external event to be driven by, they are a pure function
+ * of the theme key this already subscribes to. The mutation that genuinely did not belong in
+ * render is the probe's `appendChild`, and that moved to module scope above.
+ *
+ * The first frame shows `—` where a value goes, which was already true: `useThemeKey`'s server
+ * snapshot is empty, so nothing resolves during prerender either. Token names and their notes
+ * are server-rendered, which is the half worth having in the HTML.
+ *
+ * Takes the token list as a `|`-joined string rather than an array, because an array literal is
+ * a new identity on every render and could not be a dependency without looping.
  */
 function useTokenValues(tokenKey: string, colour: boolean): Record<string, string> {
   const theme = useThemeKey()

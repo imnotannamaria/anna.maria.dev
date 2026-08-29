@@ -20,7 +20,7 @@
 
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
+import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { PencilSimpleIcon } from "@phosphor-icons/react"
 import { toast } from "@/app/components/entrepta/toast"
 import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
@@ -55,27 +55,44 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
     }
   }
 
-  const body: Variants = {
-    hidden: {},
-    show: {
-      transition: { staggerChildren: reduce || visible.length > STAGGER_LIMIT ? 0 : 0.04 },
-    },
-  }
-
-  const row: Variants = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { duration: reduce ? 0 : 0.32, ease: EASE_OUT } },
-    exit: { opacity: 0, transition: { duration: reduce ? 0 : 0.18, ease: EASE_OUT } },
-  }
+  /**
+   * The entrance lives on the row, not on the `<tbody>` orchestrating it through variants.
+   *
+   * It used to: `initial="hidden" whileInView="show"` on the tbody, rows as variant children.
+   * That is the arrangement that left `PageOutline` with a rail of invisible links — a
+   * container's `whileInView` with `once` is spent after it fires, so a child mounting later
+   * resolves `hidden` and is never told to show. In a table that is a row at `opacity: 0`,
+   * which reads as missing data rather than as a broken animation. Rare here (creating an entry
+   * arrives by navigation, and a delete only ever removes rows) and reachable through an edit
+   * that reorders, or a refresh picking up a row written elsewhere.
+   *
+   * Keying the tbody would have fixed it and broken something better: a new key on every
+   * removal means `AnimatePresence` never sees the row leave, and the fade on delete — the
+   * whole point of the optimistic list — would not play.
+   *
+   * The stagger moves onto the row's own transition, which the Cards and motion rules warn
+   * about: a delay left on a transition is re-applied by every later interaction. Safe here
+   * because a row has exactly two states and the other one, `exit`, carries its own.
+   */
+  const stagger = reduce || visible.length > STAGGER_LIMIT ? 0 : 0.04
+  const enter = (index: number) => ({
+    opacity: 1,
+    transition: { duration: reduce ? 0 : 0.32, ease: EASE_OUT, delay: index * stagger },
+  })
+  const leave = { opacity: 0, transition: { duration: reduce ? 0 : 0.18, ease: EASE_OUT } }
 
   return (
-    <motion.tbody initial="hidden" whileInView="show" viewport={revealViewport} variants={body}>
-      <AnimatePresence initial={false}>
-        {visible.map((entry) => (
+    <tbody>
+      {/* No `initial={false}`: the rows own their entrance now, so suppressing it on the first
+          pass would mean the table never animates in at all. */}
+      <AnimatePresence>
+        {visible.map((entry, i) => (
           <motion.tr
             key={entry.id}
-            variants={row}
-            exit="exit"
+            initial={{ opacity: 0 }}
+            whileInView={enter(i)}
+            viewport={revealViewport}
+            exit={leave}
             style={{ borderBottom: "1px solid var(--border-subtle)" }}
           >
             <td className="px-2 py-3">
@@ -168,6 +185,6 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
           </motion.tr>
         ))}
       </AnimatePresence>
-    </motion.tbody>
+    </tbody>
   )
 }
