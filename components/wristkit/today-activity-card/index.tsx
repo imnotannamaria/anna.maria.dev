@@ -1,6 +1,5 @@
 import type * as React from "react"
 import type { TodayState } from "./load"
-import { loadTodayActivity } from "./load"
 import {
   TodayActivityCardEmpty,
   TodayActivityCardError,
@@ -9,7 +8,14 @@ import {
   TodayActivityCardStale,
 } from "./states"
 
-export { loadTodayActivity }
+/**
+ * The loader is deliberately *not* re-exported here.
+ *
+ * `load.ts` imports the Postgres client, so anything that re-exports it drags a server-only
+ * module into every importer's graph. This file is the pure card, and the showcase renders it
+ * from a fixture in a client component — which broke the build the moment the two were reachable
+ * through one entry point. Callers that need the query import `./load` directly.
+ */
 export type { TodayData, TodayState } from "./load"
 
 export function TodayActivityCard({

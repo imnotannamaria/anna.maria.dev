@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { motion, useReducedMotion } from "motion/react"
+import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { ArrowLink } from "@/components/ui/arrow-link"
 import { StarRating } from "@/components/log/star-rating"
 import { RollingNumber, useRollOnHover } from "@/components/ui/rolling-number"
@@ -383,5 +384,112 @@ function StatTile({
         style={{ background: "var(--fg-brand)" }}
       />
     </motion.div>
+  )
+}
+
+// ─── Loading ──────────────────────────────────────────────────────────────────
+
+/**
+ * The log shelf while the query runs.
+ *
+ * The shelf is the one card here a skeleton was always going to suit, because it *is* a
+ * repeating shape: a poster, a strip of smaller posters, four counters and a bar chart. Every
+ * box below is the real box — `aspect-2/3` at `w-24 sm:w-28` for the hero, 48px for the thumbs,
+ * the same `grid-cols-2 sm:grid-cols-4` for the tiles, the same 10px bar track — so the only
+ * thing that changes when the rows land is what is inside them.
+ */
+export function LogCardSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={cn("bento-card", className)}>
+      <CardHead label="log" meta={<Skeleton style={{ width: 78, height: 9, borderRadius: 3 }} />} />
+
+      <p
+        className="text-heading-md font-serif leading-none"
+        style={{ color: "var(--fg-primary)", margin: 0 }}
+      >
+        A few{" "}
+        <em className="italic" style={{ color: "var(--fg-brand)" }}>
+          favourites
+        </em>
+      </p>
+
+      <div className="flex flex-1 flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-8" aria-hidden>
+        <div className="flex min-w-0 flex-col gap-4 lg:w-[46%]">
+          <div className="flex gap-4">
+            <Skeleton
+              className="aspect-2/3 w-24 shrink-0 sm:w-28"
+              style={{ borderRadius: "var(--radius-lg)" }}
+            />
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <Skeleton delay={0.06} style={{ width: 52, height: 8, borderRadius: 3 }} />
+              <Skeleton delay={0.12} style={{ width: "84%", height: 18, borderRadius: 4 }} />
+              <Skeleton delay={0.18} style={{ width: "62%", height: 10, borderRadius: 3 }} />
+              <Skeleton delay={0.24} style={{ width: 74, height: 10, borderRadius: 3 }} />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Skeleton
+                key={i}
+                delay={0.3 + i * 0.05}
+                className="aspect-2/3 w-12"
+                style={{ borderRadius: 7, margin: 2 }}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-5">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="flex flex-col gap-2 rounded-lg border px-3 py-2.5"
+                style={{ borderColor: "var(--border-subtle)" }}
+              >
+                <Skeleton
+                  delay={0.36 + i * 0.06}
+                  style={{ width: 44, height: 8, borderRadius: 3 }}
+                />
+                <Skeleton
+                  delay={0.36 + i * 0.06}
+                  style={{ width: 30, height: 22, borderRadius: 4 }}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-1 flex-col justify-center gap-2.5">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton
+                  delay={0.5 + i * 0.07}
+                  style={{ width: 56, height: 8, borderRadius: 3 }}
+                />
+                <span
+                  className="relative h-2.5 flex-1 overflow-hidden rounded-full"
+                  style={{ background: "var(--border-subtle)" }}
+                >
+                  <Skeleton
+                    delay={0.5 + i * 0.07}
+                    className="absolute inset-y-0 left-0 rounded-full"
+                    style={{ width: `${72 - i * 22}%` }}
+                  />
+                </span>
+                <Skeleton
+                  delay={0.5 + i * 0.07}
+                  style={{ width: 46, height: 8, borderRadius: 3 }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <span className="sr-only" role="status">
+        Loading the log
+      </span>
+    </div>
   )
 }

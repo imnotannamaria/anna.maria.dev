@@ -12,19 +12,22 @@ import {
   PianoKeysIcon,
   SquaresFourIcon,
   ListChecksIcon,
+  SwatchesIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { EASE_OUT } from "@/components/ui/reveal"
 
 const NAV_ITEMS = [
+  // Same order as the titlebar and the palette — see the note in `titlebar.tsx`.
   { href: "/", icon: HouseLineIcon, label: "Home" },
   { href: "/about", icon: UserSquareIcon, label: "About" },
   { href: "/blog", icon: FileMdIcon, label: "Blog" },
   { href: "/projects", icon: TerminalWindowIcon, label: "Projects" },
+  { href: "/roadmap", icon: ListChecksIcon, label: "Roadmap" },
   { href: "/contact", icon: ChatsCircleIcon, label: "Contact" },
+  { href: "/components", icon: SwatchesIcon, label: "Components" },
   { href: "/log", icon: SquaresFourIcon, label: "Log" },
   { href: "/piano", icon: PianoKeysIcon, label: "Piano" },
-  { href: "/roadmap", icon: ListChecksIcon, label: "Roadmap" },
 ]
 
 function isNavActive(href: string, pathname: string): boolean {

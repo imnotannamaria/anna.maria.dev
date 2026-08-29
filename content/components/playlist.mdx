@@ -1,0 +1,100 @@
+---
+title: "me, as a playlist"
+description: "A record half out of its sleeve, turning while it plays, with states for every way Spotify can let you down."
+entry: "playlist"
+source: "components/spotify/sleeve-card.tsx"
+deps: ["motion", "@phosphor-icons/react", "zustand"]
+---
+
+A card that reads a Spotify playlist and shows one track at a time, drawn as a vinyl record
+being pulled halfway out of its sleeve. The disc turns while a track plays and stops when you
+pause it.
+
+It is two files on purpose. `sleeve-card.tsx` takes everything as props and knows nothing about
+where the data came from. `now-playing-widget.tsx` subscribes to the store, owns the audio
+element, and picks which of the four frames to render.
+
+That split is what lets the card be shown here in states it is not currently in. You cannot ask
+a healthy API to fail.
+
+## The disc
+
+Grooves are a single `repeating-radial-gradient`, which matters more than it sounds. A static
+background means turning the disc is a `transform` on the compositor, not a repaint. So a
+card-sized element can spin at 60fps without starving whatever else is animating.
+
+```css
+background:
+  repeating-radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.055) 0 1px,
+    transparent 1px 3px
+  ),
+  radial-gradient(circle at 50% 50%, /* label */ 0 16px, #0c0c10 16px, #16161b 74%, #08080b 100%);
+```
+
+The sheen is a second layer that deliberately does **not** turn. On a real record the light
+source stays put while the disc moves under it. Pinning it is also the only reason the
+rotation is visible at all, because a uniform black circle spinning looks exactly like a black
+circle.
+
+## Two decisions about the animation
+
+**It is CSS, not Motion.** The global `prefers-reduced-motion` block in `globals.css` zeroes CSS
+animations. So a keyframe stops for people who asked for that, and the component never has to
+call `useReducedMotion()`. Anything driven through JavaScript walks straight past that block and
+has to ask.
+
+**Pausing is `animation-play-state`, never removing the animation.** Removing it snaps the
+element back to `0deg`, so every pause would jump the record to its starting angle. `paused`
+freezes it exactly where it was, which is the only version that behaves like an object.
+
+```css
+.vinyl-disc {
+  animation: vinyl-spin 3.2s linear infinite;
+}
+.vinyl-disc[data-running="false"] {
+  animation-play-state: paused;
+}
+```
+
+3.2s is not 33⅓rpm. That would be 1.8s. At this size a record turning at the real speed reads
+as a blur, and the thing being drawn is rotation, not accuracy.
+
+## The bubble
+
+Hovering the sleeve floats a label above it with the album and the year. Not the track title:
+that is already rendered four centimetres away, and a tooltip repeating what is next to it is
+decoration. An album and a year are what a real sleeve prints and what the card does not
+otherwise say.
+
+It is `aria-hidden`, and the same sentence is rendered `sr-only` in the text column. A tooltip
+that exists only on hover is information a screen reader can never reach. The fix is to put the
+text in the document, not to make the tooltip announce itself. The sleeve is also a real
+`<button>`, so the affordance appears on `focus-visible` too.
+
+## Sound, if there is any
+
+The clock used to be a simulation with nothing behind it. The playlist query now asks for
+`preview_url` and the play button drives a real 30-second clip when Spotify returns one.
+
+That is a real "when". Spotify stopped returning `preview_url` for applications registered after
+November 2024. Whether it is populated depends on how old your credentials are, not on the track.
+
+The card handles both. With a preview, the position comes from the `<audio>` element and the
+clock counts to the clip's length rather than the track's. Without one, the button turns the
+record and advances the playlist, and the footer says so instead of promising sound.
+
+Audio also waits for intent. The disc turns on arrival, because a still object in a bento grid
+reads as broken, but nothing plays until a control has been pressed. Sound that starts on its
+own is what every autoplay policy exists to stop.
+
+## Copying it
+
+You need `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and `SPOTIFY_PLAYLIST_ID`. The token
+flow is Client Credentials, which needs no user login and no refresh token, because the
+playlist is public and nothing here reads a private listening history.
+
+Take `lib/spotify.ts`, `store/nowPlayingStore.ts` and both component files. The pieces the card
+leans on (`.bento-card`, `CardHead`, `CardFoot`, `useReveal`, `useSpotlight`) are all in this
+repo too, and the card degrades to a plain div if you drop them.

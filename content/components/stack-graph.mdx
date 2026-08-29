@@ -1,0 +1,66 @@
+---
+title: "The stack graph"
+description: "The same stack as a React Flow canvas, gated twice so it is only ever built at the width it is meant for."
+entry: "stack-graph"
+source: "components/about/stack-graph.tsx"
+deps: ["@xyflow/react"]
+---
+
+The stack as a node graph you can pan and click through, on `/about`. React Flow is the largest
+dependency in this repo, which makes this component mostly a story about not loading it.
+
+## Two gates, and neither is redundant
+
+```tsx
+const StackFlow = dynamic(() => import("./stack-flow").then((m) => m.StackFlow), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+})
+
+const wide = useMediaQuery("(min-width: 768px)")
+```
+
+`ssr: false` because the pane measures the DOM before it can place a node. A server render
+produces an empty canvas, so this states that rather than paying for it.
+
+The media query is the one people skip, and it is not the same as the `hidden md:block` on the
+page. **CSS hides pixels; React still mounts the component**, and a mounted `next/dynamic`
+fetches its chunk. Phones were downloading 180 KB of React Flow to render a `display: none` box.
+
+Nothing is lost below `md`: the badge list on the page is `md:sr-only`, so it stays in the DOM
+and in the accessibility tree at every width. Below the breakpoint the graph is not a failure,
+it is a different presentation of the same information.
+
+**And it has to say so.** The narrow branch used to render the loading skeleton, a frame that
+would sit there forever, because nothing is coming. On `/about` nobody ever saw it, since the
+page is `hidden md:block` there, which is exactly why it lasted. On `/components` the stage is
+not hidden, so choosing the `ok` state on a phone showed a loading frame under the word "ok". A
+loading state that cannot resolve is the one lie a set of states must not tell, and this page
+exists to catch that. It says `// not built below 768px` now, and points at the badges.
+
+## A chunk that never arrives
+
+`next/dynamic` gives you a loading state and no error state. There are plenty of ways for a chunk
+request to fail: a dropped connection mid-navigation, a stale hashed filename after a deploy, a
+captive portal. When it does, the component never resolves. The pane sits blank forever, with
+nothing admitting anything went wrong and no way to ask again.
+
+`ChunkBoundary` is a small error boundary that catches it and offers a retry. It has to be a
+class component, because `componentDidCatch` still has no hook equivalent.
+
+The retry has to build a **new** lazy component. The first version bumped a key and remounted
+the subtree, which looks like it should work and does nothing.
+
+```tsx
+{
+  ;(attempt) => <StackFlowAttempt key={attempt} />
+}
+```
+
+The reason sits one level below the bundler. Webpack drops a failed chunk from
+`installedChunks`, so a fresh `import()` really does go back to the network. But `next/dynamic`
+wraps `React.lazy`, and `lazy` writes the rejection onto its payload. Remounting hands React the
+same settled payload and it re-throws, without ever calling the loader.
+
+So the boundary passes the attempt number down and the consumer builds a `dynamic()` from it.
+A new one has nothing cached.

@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react"
 import Image from "next/image"
+import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ArrowUpRightIcon, CaretDownIcon } from "@phosphor-icons/react"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
@@ -172,6 +173,17 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
  */
 function Poster({ entry }: { entry: LogEntry }) {
   const [failed, setFailed] = useState(false)
+  /**
+   * The card had a failed state and no loading one, so between paint and the poster arriving
+   * the box was an empty rectangle — indistinguishable from an entry with no art at all, on a
+   * page that is a grid of exactly those two things. The poster is a network hop through the
+   * proxy route, so that gap is real rather than theoretical.
+   *
+   * CSS-only shimmer via the entrepta `Skeleton`, which means the reduced-motion reset reaches
+   * it for free, and it sits *under* the image rather than switching with it: no second
+   * render, and nothing to get wrong about which one is mounted.
+   */
+  const [loaded, setLoaded] = useState(false)
   const showImage = Boolean(entry.posterUrl) && !failed
 
   return (
@@ -179,6 +191,7 @@ function Poster({ entry }: { entry: LogEntry }) {
       className="relative aspect-[2/3] w-[92px] shrink-0 overflow-hidden rounded-[7px] border"
       style={{ borderColor: "var(--border-subtle)", background: "var(--bg-canvas)" }}
     >
+      {showImage && !loaded && <Skeleton className="absolute inset-0 h-full w-full" />}
       {showImage ? (
         // next/image, via the proxy — and the proxy is what makes that possible without
         // giving anything up. `posterSrc` returns a local path, so no poster host has to
@@ -196,6 +209,7 @@ function Poster({ entry }: { entry: LogEntry }) {
           fill
           sizes="92px"
           className="object-cover"
+          onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
         />
       ) : (

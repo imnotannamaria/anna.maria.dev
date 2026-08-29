@@ -1,46 +1,13 @@
-/**
- * The list is force-dynamic and hits Postgres, so navigating here shows nothing until the
- * query returns. Skeleton rows rather than a spinner: the header is known ahead of time,
- * and matching the table's shape keeps the layout from jumping when the data lands.
- */
+/** Same as the log list: force-dynamic, and Postgres before anything can render. */
+import { PageLoading } from "@/components/chrome/page-loading"
+
 export default function AdminRoadmapLoading() {
   return (
-    <>
-      <div className="mb-6">
-        <div
-          className="text-mono-sm mb-2 font-mono tracking-[0.08em] uppercase"
-          style={{ color: "var(--fg-muted)" }}
-        >
-          <span style={{ color: "var(--fg-brand)" }}>$</span> roadmap --admin
-        </div>
-        <h1
-          className="text-display-md font-serif leading-none font-normal tracking-[-0.02em]"
-          style={{ color: "var(--fg-primary)" }}
-        >
-          Roadmap
-        </h1>
-        <p className="text-mono-sm mt-2 font-mono" style={{ color: "var(--fg-muted)" }}>
-          {"// loading…"}
-        </p>
-      </div>
-
-      <div aria-hidden className="flex flex-col">
-        {Array.from({ length: 6 }, (_, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 py-3"
-            style={{ borderBottom: "1px solid var(--border-subtle)" }}
-          >
-            <span className="h-5 w-16 shrink-0 rounded-[5px] bg-(--bg-surface-elevated)" />
-            <span className="h-3.5 flex-1 rounded bg-(--bg-surface-elevated)" />
-            <span className="hidden h-3.5 w-20 rounded bg-(--bg-surface-elevated) sm:block" />
-          </div>
-        ))}
-      </div>
-
-      <span className="sr-only" role="status">
-        Loading roadmap items
-      </span>
-    </>
+    <PageLoading
+      command="roadmap --admin"
+      crumb="admin / roadmap"
+      label="roadmap items"
+      steps={["checking the allowlist", "reading roadmap_items", "including raw"]}
+    />
   )
 }

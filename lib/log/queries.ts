@@ -1,3 +1,4 @@
+import { cache } from "react"
 import { desc, eq, sql } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
 import { logEntries } from "./schema"
@@ -48,7 +49,17 @@ function db() {
  */
 const TYPE_ORDER: LogType[] = ["music"]
 
-export async function getPublishedEntries(): Promise<LogEntry[]> {
+/**
+ * Wrapped in React's `cache` because the home page reads it from four places — the log shelf,
+ * the tree's entry count, the `logged` stat and the null-vs-empty distinction — and each of
+ * those now sits behind its own Suspense boundary. Without this, splitting the page into
+ * per-card boundaries would turn one query per request into four.
+ *
+ * This is request-scoped memoisation, not caching in the `revalidate` sense: it dedupes within
+ * a single render pass and does not survive the request. The pages that read this stay
+ * `force-dynamic` and stay live — the argument in Conventions is untouched.
+ */
+export const getPublishedEntries = cache(async function getPublishedEntries(): Promise<LogEntry[]> {
   const conn = db()
   if (!conn) return []
 
@@ -70,7 +81,7 @@ export async function getPublishedEntries(): Promise<LogEntry[]> {
     )
 
   return rows.map(toEntry)
-}
+})
 
 /** The admin list. Includes drafts — that is the whole point of it. */
 export async function getAllEntries(): Promise<LogEntry[]> {

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
-import { blog, projects } from "@/.velite"
+import { blog, projects, componentDocs } from "@/.velite"
 import { slugify, countWords, estimateReadingTime } from "@/lib/utils"
 
 function stripPrefix(slug: string) {
@@ -10,7 +10,7 @@ function stripPrefix(slug: string) {
 export type TocItem = { id: string; label: string; level: 2 | 3 }
 
 /** Read a document's raw MDX from a content dir, minus frontmatter. "" if missing. */
-function readRaw(dir: "blog" | "projects", slug: string): string {
+function readRaw(dir: "blog" | "projects" | "components", slug: string): string {
   try {
     const raw = readFileSync(join(process.cwd(), "content", dir, `${slug}.mdx`), "utf-8")
     return raw.replace(/^---\n[\s\S]*?\n---/, "")
@@ -116,4 +116,24 @@ export function getProjectBySlug(slug: string) {
     .filter((project) => project.published)
     .map((project) => ({ ...project, slug: stripPrefix(project.slug) }))
     .find((project) => project.slug === slug)
+}
+
+// ─── Component docs ────────────────────────────────────────────────────────────
+//
+// The showcase's prose half. Same shape as the two collections above, and the same helpers:
+// there is nothing special about a component doc except what its frontmatter points at, and
+// that is checked at build time by the refinements in velite.config.ts.
+
+export function getComponentDocs() {
+  return componentDocs
+    .filter((doc) => doc.published)
+    .map((doc) => ({ ...doc, slug: stripPrefix(doc.slug) }))
+}
+
+export function getComponentDocBySlug(slug: string) {
+  return getComponentDocs().find((doc) => doc.slug === slug)
+}
+
+export function getComponentDocToc(slug: string): TocItem[] {
+  return extractToc(readRaw("components", slug))
 }

@@ -1,6 +1,11 @@
 import { LogEntryForm } from "@/components/admin/log-entry-form"
+import { requireAdmin } from "@/lib/auth/require-admin"
 
-export default function NewLogEntryPage() {
+export default async function NewLogEntryPage() {
+  // Nothing here reads the database, but the rule is unconditional for a reason: the next
+  // person to add a query to this page should not also have to remember the guard.
+  await requireAdmin()
+
   return (
     <>
       <h1

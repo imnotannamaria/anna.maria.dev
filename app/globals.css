@@ -383,6 +383,26 @@
   }
 }
 
+/* Every state's body reserves the same box, so the card is one height in all five.
+ *
+ * Four of them hold the 144px ring block beside three metric rows and size themselves; the
+ * error state holds two lines of prose and was collapsing to about a third of the card. A floor
+ * is enough — nothing here needs to be told a height, only to be stopped from being shorter.
+ *
+ * Two numbers because the body has two layouts. Wide, the rings and the metrics sit side by
+ * side and the taller of the two wins: the rings, at 144. Narrow, they stack — 144 + the 20px
+ * gap + three rows of `text-heading-lg` (24/1.3 ≈ 31 each) separated by two 21px dividers.
+ * The query has to live on a descendant of the panel: `container-type` establishes a container
+ * for children, never for the element that declares it. */
+.wk-activity-body {
+  min-height: 144px;
+}
+@container (max-width: 360px) {
+  .wk-activity-body {
+    min-height: 300px;
+  }
+}
+
 /* form fields, buttons, and menu items manage their own focus state */
 input:focus,
 input:focus-visible,
@@ -678,6 +698,100 @@ button:focus-visible,
    Paced to a loading state, not to a hero: the whole line lands in about half a
    second and the ellipsis cycles just under one. Slower reads as the page being
    stuck, which is the one thing a loading state must not say. */
+/* ── The typed terminal loading screen ──────────────────────────────────────
+ *
+ * All of this is CSS, and that is not a preference — it is the one constraint a loading
+ * state has that nothing else on the site does.
+ *
+ * `app/(home)/loading.tsx` already learned this the expensive way with `TypeIn`: anything
+ * animated through JS cannot show until React has hydrated, and a loading state's whole job
+ * happens *before* that. On a cold load the real data can land before hydration finishes, so
+ * a JS-typed line stays invisible for the state's entire time on screen. The dots beside it,
+ * plain CSS, animated the whole time.
+ *
+ * So the text is in the DOM from the first byte and CSS clips it. `--type-chars` is the
+ * character count and `steps()` is what makes it advance one glyph at a time instead of
+ * sliding; both work in a server component with zero JavaScript shipped.
+ *
+ * `ch` is exact here because every one of these lines is JetBrains Mono. In a proportional
+ * font `1ch` is the width of a zero and nothing else, and the clip would land mid-character.
+ */
+@keyframes type-in {
+  from {
+    width: 0;
+  }
+  to {
+    width: calc(var(--type-chars) * 1ch);
+  }
+}
+
+.type-line {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+  width: 0;
+  animation: type-in var(--type-dur, 0.7s) steps(var(--type-chars)) var(--type-delay, 0s) forwards;
+}
+
+@keyframes type-fade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.type-fade {
+  opacity: 0;
+  animation: type-fade 0.26s var(--ease-out) var(--type-delay, 0s) forwards;
+}
+
+/* The block caret. It waits out its delay invisible (`backwards` holds the 0% frame), then
+ * blinks for as long as the page is still loading — which is the one honest thing a loading
+ * screen can say after it has finished saying everything else. */
+.type-caret {
+  display: inline-block;
+  width: 0.55ch;
+  height: 1.05em;
+  vertical-align: text-bottom;
+  background: var(--fg-brand);
+  animation: cursor-blink 1s step-end var(--type-delay, 0s) infinite backwards;
+}
+
+/* The same fade, with one difference that is the whole point of a second class: its delay is
+ * *information*, not choreography.
+ *
+ * These are the lines that only show up when the wait runs long. The delay is not there to
+ * stagger anything — it is the measurement. A page that answers in 300ms never renders them at
+ * all, and that is the feature: the screen says more the longer you are made to wait, and
+ * nothing extra when you are not. Which means the reduced-motion block below must NOT zero it,
+ * or every load would show a "this is taking a while" list. */
+.type-late {
+  opacity: 0;
+  animation: type-fade 0.26s var(--ease-out) var(--type-delay, 0s) forwards;
+}
+
+/* The global reduced-motion reset zeroes durations but not delays, so without this the prompt
+ * would still arrive a line at a time — just instantly each. Everything at once is the point,
+ * for the prompt. `.type-late` is deliberately absent: see above. */
+@media (prefers-reduced-motion: reduce) {
+  .type-line,
+  .type-fade,
+  .type-caret {
+    animation-delay: 0s !important;
+  }
+  .type-line {
+    width: auto !important;
+  }
+  .type-fade {
+    opacity: 1 !important;
+  }
+}
+
 @keyframes load-dot {
   0%,
   70%,
@@ -710,52 +824,72 @@ button:focus-visible,
   }
 }
 
-@keyframes npw-eq-1 {
-  0%,
+/* One band of light travelling across a field of skeleton pieces.
+ *
+ * The contributions grid is 371 squares. Giving each one its own `shimmer` means 371
+ * elements repainting a gradient every frame, which is exactly the "card-sized repaint at
+ * 60fps starves whatever else is animating" trap in CLAUDE.md — only 371 times over. So the
+ * squares hold still and one overlay moves, on a transform, which the compositor handles
+ * without touching paint.
+ *
+ * `-45%` to `145%` rather than `-100%` to `100%`: the band is 60% of the container wide, and
+ * those are the two positions where it is exactly off each edge. */
+@keyframes skeleton-sweep {
+  0% {
+    transform: translateX(-45%);
+  }
   100% {
-    height: 30%;
-  }
-  50% {
-    height: 90%;
-  }
-}
-@keyframes npw-eq-2 {
-  0%,
-  100% {
-    height: 70%;
-  }
-  50% {
-    height: 25%;
-  }
-}
-@keyframes npw-eq-3 {
-  0%,
-  100% {
-    height: 45%;
-  }
-  50% {
-    height: 100%;
+    transform: translateX(145%);
   }
 }
 
-.npw-eq-bar {
-  display: block;
-  width: 3px;
-  border-radius: 1px;
-  background: var(--fg-brand);
-  transform-origin: bottom;
-  align-self: flex-end;
+.skeleton-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
-.npw-eq-1 {
-  animation: npw-eq-1 0.9s ease-in-out infinite;
+
+.skeleton-sweep::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 60%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--fg-primary) 7%, transparent) 50%,
+    transparent 100%
+  );
+  animation: skeleton-sweep 1.9s linear infinite;
 }
-.npw-eq-2 {
-  animation: npw-eq-2 0.9s ease-in-out infinite;
-  animation-delay: 0.15s;
+
+/* The record turning.
+ *
+ * CSS rather than Motion, the same deal as the equaliser bars below: the global
+ * prefers-reduced-motion reset zeroes CSS animations, so this stops without the
+ * component having to ask useReducedMotion() itself.
+ *
+ * Pausing is `animation-play-state`, never toggling the animation off. Removing the
+ * animation snaps the disc back to 0deg, so every pause would jump the record to its
+ * starting angle; `paused` freezes it exactly where the needle left it, which is the
+ * only version that behaves like an object.
+ *
+ * 3.2s is not 33⅓rpm (that would be 1.8s). A real LP turning at speed reads as a blur
+ * at this size; slower is legible as rotation, which is the thing being drawn. */
+@keyframes vinyl-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
-.npw-eq-3 {
-  animation: npw-eq-3 0.9s ease-in-out infinite;
-  animation-delay: 0.3s;
+
+.vinyl-disc {
+  animation: vinyl-spin 3.2s linear infinite;
+}
+
+.vinyl-disc[data-running="false"] {
+  animation-play-state: paused;
 }
 
 @keyframes pulse-ok {

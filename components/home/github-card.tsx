@@ -7,6 +7,7 @@ import { useReveal } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { GithubCalendar } from "@/components/about/github-calendar"
 import type { ContributionYear } from "@/lib/github/contributions"
+import type { CardState } from "@/lib/showcase/state"
 
 /**
  * The frame around the calendar. It used to be `.bento-card` copied out by
@@ -22,10 +23,10 @@ import type { ContributionYear } from "@/lib/github/contributions"
  */
 export function GithubCard({
   username,
-  data,
+  state,
 }: {
   username: string
-  data: ContributionYear | null
+  state: CardState<ContributionYear>
 }) {
   const { onMouseMove, spotlight } = useSpotlight(700)
   const reveal = useReveal()
@@ -36,7 +37,7 @@ export function GithubCard({
 
       <CardHead label="contributions" as="h3" meta={username} />
 
-      <GithubCalendar data={data} />
+      <GithubCalendar state={state} />
 
       {/* Same dashed rule the tree and oss footers use — spelled with the token,
           not Tailwind's default border colour, which is a different grey. */}

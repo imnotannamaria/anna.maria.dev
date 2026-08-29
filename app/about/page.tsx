@@ -514,7 +514,7 @@ export default async function AboutPage() {
                 around the same calendar — head, footer, spotlight and entrance
                 all come with it. */}
             <div className="mt-8">
-              <GithubCard username={siteConfig.githubUser} data={contributions} />
+              <GithubCard username={siteConfig.githubUser} state={contributions} />
             </div>
           </Section>
         </div>

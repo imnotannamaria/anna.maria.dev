@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { motion } from "motion/react"
+import { useReveal } from "@/components/ui/reveal"
 import { useRouter } from "next/navigation"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -36,6 +38,7 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
   const router = useRouter()
   const editing = Boolean(entry)
   const [submitting, setSubmitting] = useState(false)
+  const reveal = useReveal()
 
   const {
     register,
@@ -78,7 +81,7 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+    <motion.form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6" {...reveal}>
       <div className="grid gap-5 sm:grid-cols-2">
         <Field id="type" label="type" required error={errors.type?.message}>
           <Controller
@@ -255,7 +258,7 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
           cancel
         </Button>
       </div>
-    </form>
+    </motion.form>
   )
 }
 

@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import Link from "next/link"
 import {
   getFeaturedPosts,
@@ -12,12 +13,14 @@ import { FeaturedPostCard } from "@/components/home/featured-post-card"
 import { OssCard } from "@/components/home/oss-card"
 import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
-import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
+import { TodayActivityCard } from "@/components/wristkit/today-activity-card"
+import { loadTodayActivity } from "@/components/wristkit/today-activity-card/load"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
 import { LatestLogCard } from "@/components/home/latest-log-card"
-import { ProfileCard } from "@/components/home/profile-card"
-import { TreeCard } from "@/components/home/tree-card"
+import { LogCardSkeleton } from "@/components/home/log-card-view"
+import { ProfileCard, ProfileCardSkeleton } from "@/components/home/profile-card"
+import { TreeCard, TreeCardSkeleton } from "@/components/home/tree-card"
 import { buildSiteTree, siteTreeRouteCount } from "@/lib/site-tree"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { createMetadata } from "@/lib/metadata"
@@ -85,22 +88,126 @@ function SectHead({
   )
 }
 
+// ─── Streaming slots ───────────────────────────────────────────────────────────
+//
+// Everything that reads Postgres or GitHub lives in one of these, behind its own Suspense
+// boundary. `Home()` below awaits nothing, so the shell — the section heads, the featured
+// project, the stack, the piano, all of which come from MDX already in the bundle — paints
+// immediately and each card fills in when its query lands.
+//
+// It used to be one `Promise.all` at the top of the page, which meant a slow log query held
+// the entire home page behind `loading.tsx`, including everything that needed no database at
+// all. `force-dynamic` stays: streaming and dynamic rendering are not in tension.
+//
+// The log is read from three of these slots and `getPublishedEntries` is wrapped in React's
+// `cache`, so that is still one query per request, not three.
+
+/** Row 1 of `$ whoami`: the profile card and the tree, which share the log count. */
+async function WhoamiRow() {
+  // A database blip should cost the home page one card, not the whole page. /log has an error
+  // boundary instead, because there the log IS the page.
+  //
+  // null, not []: an unreachable database and an empty log are different facts, and collapsing
+  // them means the counters can't tell "I don't know" from "none yet". A genuine 0 is true and
+  // gets shown; a failed query shows nothing at all.
+  const logEntries = await getPublishedEntries().catch(() => null)
+  const posts = getPublishedPosts()
+  const projects = getPublishedProjects()
+
+  // Counts come off lists this page already has in memory, so the tree costs no extra query.
+  // A null count renders the row without a number, which is what an unreachable database
+  // deserves — asserting zero would be a claim.
+  const siteTree = buildSiteTree({ posts, projects, logCount: logEntries?.length ?? null })
+
+  return (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
+      {/* The profile card. It carries the page h1, so the name stays the
+          one top-level heading on the home page. */}
+      <ProfileCard
+        stats={{
+          years: calcYearsOfExp(),
+          projects: projects.length,
+          posts: posts.length,
+          logged: logEntries?.length ?? null,
+        }}
+      />
+
+      {/* The tree — replaces the experience card. That one restated the hero
+          paragraph's "N years shipping" beside a row of dots that did nothing; this
+          gives the same slot to something you can actually browse.
+
+          Two nested wrappers, both earning their place. This is the one card whose
+          height the visitor controls, and a grid row is sized by its tallest item's
+          content — so left alone, opening every folder made the tree the tallest
+          thing in the row and stretched the profile card to match, while a collapsed
+          tree left it short. The outer div is the grid item and takes the row height
+          from the profile card. The inner div is what goes absolute, so the card is
+          pulled out of the row's height calculation and simply fills what it's given.
+
+          The inner div exists because `.bento-card` sets `position: relative` outside
+          any @layer, and unlayered CSS beats Tailwind's layered utilities — putting
+          `md:absolute` on the card itself silently lost that fight. A plain div has no
+          such rule to argue with.
+
+          Below md there is no row to share, so it's a normal block with a cap. */}
+      <div className="relative md:min-h-0">
+        <div className="md:absolute md:inset-0">
+          <TreeCard
+            items={siteTree}
+            routeCount={siteTreeRouteCount()}
+            className="h-full max-h-130 md:max-h-none"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * The same grid, in grey, so nothing below it moves when the row lands.
+ *
+ * Both halves are the cards' own skeletons rather than a generic pair of boxes — the profile
+ * card's avatar frame and stats rail, the tree's real rows at their real indents. A skeleton
+ * that could belong to any card tells you a card is coming and nothing else; one you recognise
+ * tells you *which* card is coming, which is the only thing worth knowing while you wait.
+ */
+function WhoamiRowFallback() {
+  return (
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
+      <ProfileCardSkeleton />
+      <TreeCardSkeleton routeCount={siteTreeRouteCount()} className="max-h-130 md:max-h-none" />
+    </div>
+  )
+}
+
+async function WristkitSlot() {
+  const state = await loadTodayActivity({ tz: "America/Sao_Paulo" })
+  return (
+    <Link
+      href="https://wristkit-web.vercel.app/"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="View wristkit"
+      className="md:row-span-2 md:h-full"
+    >
+      <TodayActivityCard state={state} className="h-full" />
+    </Link>
+  )
+}
+
+async function LogShelfSlot() {
+  const entries = await getPublishedEntries().catch(() => null)
+  return <LatestLogCard entries={entries ?? []} />
+}
+
+async function GithubSlot() {
+  const state = await getContributions(siteConfig.githubUser)
+  return <GithubCard username={siteConfig.githubUser} state={state} />
+}
+
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
-export default async function Home() {
-  const [activityState, logEntries, contributions] = await Promise.all([
-    loadTodayActivity({ tz: "America/Sao_Paulo" }),
-    // A database blip should cost the home page one card, not the whole page. /log has an
-    // error boundary instead, because there the log IS the page.
-    //
-    // null, not []: an unreachable database and an empty log are different facts, and
-    // collapsing them means the counters can't tell "I don't know" from "none yet". A
-    // genuine 0 is true and gets shown; a failed query shows nothing at all.
-    getPublishedEntries().catch(() => null),
-    getContributions(siteConfig.githubUser),
-  ])
-  const logList = logEntries ?? []
-  const posts = getPublishedPosts()
+export default function Home() {
   const projects = getPublishedProjects()
   const featuredProject = getFeaturedProjects()[0]
   const featuredPost = getFeaturedPosts()[0]
@@ -109,15 +216,6 @@ export default async function Home() {
   const ossGoal = 6
   const yrShort = currentYear.toString().slice(2)
   const yearsOfExp = calcYearsOfExp()
-
-  // Counts come off lists this page already has in memory, so the tree costs no
-  // extra query. A null count renders the row without a number, which is what
-  // an unreachable database deserves — asserting zero would be a claim.
-  const siteTree = buildSiteTree({
-    posts,
-    projects,
-    logCount: logEntries?.length ?? null,
-  })
 
   return (
     <div
@@ -132,47 +230,10 @@ export default async function Home() {
           cmd="whoami"
           meta={`uptime · ${yearsWord(yearsOfExp)} years`}
         />
-        {/* Row 1: profile + tree */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
-          {/* The profile card. It carries the page h1, so the name stays the
-              one top-level heading on the home page. */}
-          <ProfileCard
-            stats={{
-              years: yearsOfExp,
-              projects: projects.length,
-              posts: posts.length,
-              logged: logEntries?.length ?? null,
-            }}
-          />
-
-          {/* The tree — replaces the experience card. That one restated the hero
-              paragraph's "N years shipping" beside a row of dots that did nothing; this
-              gives the same slot to something you can actually browse.
-
-              Two nested wrappers, both earning their place. This is the one card whose
-              height the visitor controls, and a grid row is sized by its tallest item's
-              content — so left alone, opening every folder made the tree the tallest
-              thing in the row and stretched the profile card to match, while a collapsed
-              tree left it short. The outer div is the grid item and takes the row height
-              from the profile card. The inner div is what goes absolute, so the card is
-              pulled out of the row's height calculation and simply fills what it's given.
-
-              The inner div exists because `.bento-card` sets `position: relative` outside
-              any @layer, and unlayered CSS beats Tailwind's layered utilities — putting
-              `md:absolute` on the card itself silently lost that fight. A plain div has no
-              such rule to argue with.
-
-              Below md there is no row to share, so it's a normal block with a cap. */}
-          <div className="relative md:min-h-0">
-            <div className="md:absolute md:inset-0">
-              <TreeCard
-                items={siteTree}
-                routeCount={siteTreeRouteCount()}
-                className="h-full max-h-130 md:max-h-none"
-              />
-            </div>
-          </div>
-        </div>
+        {/* Row 1: profile + tree. Both need the log count, so they stream together. */}
+        <Suspense fallback={<WhoamiRowFallback />}>
+          <WhoamiRow />
+        </Suspense>
 
         {/* Row 2: Stack — full width */}
         <div className="mt-6">
@@ -242,28 +303,34 @@ export default async function Home() {
             a ~450px hole under now-playing, since wristkit is about 2.5x its height. */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <NowPlayingWidget />
-          <Link
-            href="https://wristkit-web.vercel.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="View wristkit"
-            className="md:row-span-2 md:h-full"
+          <Suspense
+            fallback={
+              <div className="md:row-span-2 md:h-full">
+                <TodayActivityCard state={{ kind: "loading" }} className="h-full" />
+              </div>
+            }
           >
-            <TodayActivityCard state={activityState} className="h-full" />
-          </Link>
+            <WristkitSlot />
+          </Suspense>
           <MiniPianoCard />
         </div>
 
         {/* The log gets the full width underneath, laid out as a shelf. */}
         <div className="mt-6">
-          <LatestLogCard entries={logList} />
+          <Suspense fallback={<LogCardSkeleton />}>
+            <LogShelfSlot />
+          </Suspense>
         </div>
       </section>
 
       {/* ═══════════════ GITHUB ═══════════════ */}
       <section aria-labelledby="sec-github">
         <SectHead id="sec-github" cmd="git log --contributions" meta="github.com/imnotannamaria" />
-        <GithubCard username={siteConfig.githubUser} data={contributions} />
+        <Suspense
+          fallback={<GithubCard username={siteConfig.githubUser} state={{ kind: "loading" }} />}
+        >
+          <GithubSlot />
+        </Suspense>
       </section>
     </div>
   )

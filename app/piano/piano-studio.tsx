@@ -318,6 +318,7 @@ export function PianoStudio() {
   const [sustain, setSustain] = useState(false)
   const [activeNotes, setActiveNotes] = useState<Set<string>>(new Set())
   const [nowNote, setNowNote] = useState<{ note: string; id: number } | null>(null)
+  const [audioState, setAudioState] = useState<"ready" | "unsupported" | "blocked">("ready")
 
   const [currentSong, setCurrentSong] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
@@ -329,10 +330,26 @@ export function PianoStudio() {
 
   /* ── audio engine ──────────────────────────────── */
 
+  /**
+   * Returns the context, or null when there isn't one to be had.
+   *
+   * It used to throw. A throw from here lands in a click handler, which React error boundaries
+   * do not catch — so the key went down, no sound came out, an uncaught error went to the
+   * console, and the page said nothing at all. Silence is the one failure an instrument cannot
+   * afford to leave unexplained, because it is indistinguishable from the instrument working
+   * and the volume being off.
+   *
+   * Two ways it fails, and they are different sentences. `unsupported` is a browser with no
+   * AudioContext constructor. `blocked` is one that has it but keeps the context suspended —
+   * an autoplay policy that did not accept the gesture, or a Safari setting.
+   */
   const ensureCtx = useCallback(() => {
     if (!ctxRef.current) {
       const AC = window.AudioContext || (window as WebkitWindow).webkitAudioContext
-      if (!AC) throw new Error("AudioContext is not supported in this browser")
+      if (!AC) {
+        setAudioState("unsupported")
+        return null
+      }
       const ctx = new AC()
       const master = ctx.createGain()
       master.gain.value = volumeRef.current
@@ -341,13 +358,21 @@ export function PianoStudio() {
       masterRef.current = master
     }
     const ctx = ctxRef.current
-    if (ctx.state === "suspended") void ctx.resume()
+    if (ctx.state === "suspended") {
+      // resume() returns a promise and can reject. Ignoring it is how a silently suspended
+      // context looks exactly like a working one.
+      ctx.resume().then(
+        () => setAudioState("ready"),
+        () => setAudioState("blocked"),
+      )
+    }
     return ctx
   }, [])
 
   const playNote = useCallback(
     (note: string) => {
       const ctx = ensureCtx()
+      if (!ctx) return
       const master = masterRef.current
       const freq = FREQ[note]
       if (!master || !freq) return
@@ -778,7 +803,17 @@ export function PianoStudio() {
               background: "var(--piano-hint)",
             }}
           >
-            {"// "}click keys or use your keyboard · press <Kbd>space</Kbd> to stop a song
+            {audioState === "ready" ? (
+              <>
+                {"// "}click keys or use your keyboard · press <Kbd>space</Kbd> to stop a song
+              </>
+            ) : (
+              <span style={{ color: "var(--status-warning-fg)" }}>
+                {audioState === "unsupported"
+                  ? "// this browser has no Web Audio — the keys still light up, they just can't sound"
+                  : "// your browser is holding audio back. click a key again, or check its sound settings"}
+              </span>
+            )}
           </div>
         </div>
       </Section>

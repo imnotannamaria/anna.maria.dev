@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
+import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
@@ -180,5 +181,80 @@ export function TreeCard({
         </CardFoot>
       </motion.div>
     </motion.div>
+  )
+}
+
+// ─── Loading ──────────────────────────────────────────────────────────────────
+
+/**
+ * The tree while the log count is still in Postgres.
+ *
+ * It traces the real card rather than standing in for it: the same `.bento-card`, the same
+ * `CardHead` with the same meta — `routeCount` is arithmetic over a hand-written constant, so
+ * it is known before any query — the same 32px rows at the same indents, and the same footer.
+ * The only grey is where the words go.
+ *
+ * That is the point of the exercise. The generic two-bars-in-a-box skeleton this replaced could
+ * have belonged to any card on the site, so it told you a card was coming and nothing about
+ * which one; a skeleton earns its keep by being recognisable before it has any data.
+ */
+const SKELETON_ROWS: { depth: number; width: number; count?: number }[] = [
+  { depth: 0, width: 58 },
+  { depth: 1, width: 74, count: 22 },
+  { depth: 1, width: 66, count: 30 },
+  { depth: 0, width: 52 },
+  { depth: 1, width: 88 },
+  { depth: 1, width: 70 },
+  { depth: 1, width: 61 },
+  { depth: 0, width: 46 },
+  { depth: 0, width: 64 },
+]
+
+export function TreeCardSkeleton({
+  routeCount,
+  className,
+}: {
+  routeCount: number
+  className?: string
+}) {
+  return (
+    <div className={cn("bento-card relative flex flex-col overflow-hidden", className)}>
+      <CardHead label="tree" meta={`${routeCount} routes`} />
+
+      <div className="-mx-2 min-h-0 flex-1 overflow-hidden pb-1" aria-hidden>
+        {SKELETON_ROWS.map((row, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-2"
+            // `.tree-row`'s own metrics: 32px tall, 8px of side padding, 8px between the
+            // caret, the glyph and the name. A row that is 30px here and 32px there is the
+            // shift the skeleton exists to prevent.
+            style={{ minHeight: 32, paddingLeft: 8 + row.depth * 22, paddingRight: 8 }}
+          >
+            <Skeleton delay={i * 0.06} style={{ width: 10, height: 10, borderRadius: 2 }} />
+            <Skeleton delay={i * 0.06} style={{ width: 14, height: 14, borderRadius: 3 }} />
+            <Skeleton delay={i * 0.06} style={{ width: row.width, height: 9, borderRadius: 3 }} />
+            {row.count != null && (
+              <Skeleton
+                delay={i * 0.06}
+                className="ml-auto"
+                style={{ width: 14, height: 9, borderRadius: 3 }}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+
+      <CardFoot
+        comment="reading the tree"
+        className="border-t border-dashed border-(--border-subtle) pt-3"
+      >
+        <Skeleton style={{ width: 52, height: 9, borderRadius: 3 }} />
+      </CardFoot>
+
+      <span className="sr-only" role="status">
+        Loading the tree
+      </span>
+    </div>
   )
 }

@@ -22,6 +22,7 @@
 
 import type React from "react"
 import { Reveal } from "@/components/ui/reveal"
+import { cn } from "@/lib/utils"
 
 export function Strong({ children }: { children: React.ReactNode }) {
   return <strong style={{ color: "var(--fg-primary)", fontWeight: 500 }}>{children}</strong>
@@ -138,19 +139,42 @@ export function Section({
  */
 export function MetaGrid({ children }: { children: React.ReactNode }) {
   return (
-    <dl className="bento-card bento-card-sm !grid grid-cols-2 !gap-3 sm:grid-cols-4">{children}</dl>
+    // Container queries, not viewport ones. On a case study this sits in a 760px column and
+    // four columns is right; on a component doc one of the cells is a repo path, and at a wide
+    // viewport the four-column rule fired anyway and broke `tree-card.tsx` across two lines
+    // mid-word. Asking the box is the question that was always meant.
+    // The `@container` is the outer div, never the grid itself: `container-type` establishes a
+    // query container for an element's *descendants*, so `@sm:` on the same node would resolve
+    // against an ancestor container instead — i.e. against nothing.
+    <div className="@container">
+      <dl className="bento-card bento-card-sm !grid grid-cols-1 !gap-3 @sm:grid-cols-2 @2xl:grid-cols-4">
+        {children}
+      </dl>
+    </div>
   )
 }
 
-export function MetaCol({ label, value }: { label: string; value: string }) {
+export function MetaCol({
+  label,
+  value,
+  span,
+}: {
+  label: string
+  value: React.ReactNode
+  /** Takes the full row. For a value that is long and unbreakable, like a file path. */
+  span?: boolean
+}) {
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className={cn("flex min-w-0 flex-col gap-0.5", span && "@sm:col-span-2 @2xl:col-span-4")}>
       <dt
         className="text-mono-xs font-mono tracking-[0.08em] uppercase"
         style={{ color: "var(--fg-muted)" }}
       >
         {label}
       </dt>
+      {/* ReactNode rather than string: a case study passes a date, a component doc passes a
+          row of badges. A string is still a ReactNode, so every existing call site is
+          unchanged. */}
       <dd className="text-mono-md font-mono" style={{ color: "var(--fg-primary)", margin: 0 }}>
         {value}
       </dd>

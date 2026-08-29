@@ -5,6 +5,19 @@ export type SimplifiedTrack = {
   coverUrl: string
   durationMs: number
   spotifyUrl: string
+  /** The album this pressing came from, and its year — what a real sleeve prints. */
+  album: string
+  year: string | null
+  /**
+   * A 30-second MP3, or null.
+   *
+   * Null is the common case and not an error: Spotify stopped returning `preview_url` for
+   * apps registered after November 2024, so whether this is populated depends on how old the
+   * credentials are, not on the track. The card has to work either way — with it, the play
+   * button plays; without it, the button turns the record and advances the playlist, and says
+   * so. Never render a control that promises audio this may not have.
+   */
+  previewUrl: string | null
 }
 
 type TokenCache = {
@@ -58,7 +71,7 @@ export async function getPlaylistTracks(playlistId: string): Promise<SimplifiedT
   const token = await getAccessToken()
 
   const res = await fetch(
-    `https://api.spotify.com/v1/playlists/${playlistId}/tracks?fields=items(track(id,name,duration_ms,artists,album(images),external_urls))&limit=50`,
+    `https://api.spotify.com/v1/playlists/${playlistId}/tracks?fields=items(track(id,name,duration_ms,preview_url,artists,album(name,release_date,images),external_urls))&limit=50`,
     {
       headers: { Authorization: `Bearer ${token}` },
     },
@@ -81,6 +94,11 @@ export async function getPlaylistTracks(playlistId: string): Promise<SimplifiedT
         coverUrl: pickCover(track.album.images),
         durationMs: track.duration_ms,
         spotifyUrl: track.external_urls.spotify,
+        album: track.album.name,
+        // `release_date` is "1979", "1979-12" or "1979-12-14" depending on how precise the
+        // label was. The first four characters are the year in all three.
+        year: track.album.release_date?.slice(0, 4) ?? null,
+        previewUrl: track.preview_url ?? null,
       }
     })
 }
@@ -101,7 +119,12 @@ type SpotifyTrack = {
   id: string
   name: string
   duration_ms: number
+  preview_url: string | null
   artists: Array<{ name: string }>
-  album: { images: Array<{ url: string; width?: number; height?: number }> }
+  album: {
+    name: string
+    release_date?: string
+    images: Array<{ url: string; width?: number; height?: number }>
+  }
   external_urls: { spotify: string }
 }

@@ -33,10 +33,13 @@ export type OutlineItem = {
 const PREFIX: Record<1 | 2 | 3, string> = { 1: "#", 2: "##", 3: "###" }
 
 /**
- * The rail's own box, shared with `OutlineSkeleton` below. Constants rather than two copies
- * of the class string: a `loading.tsx` that traces these by hand is a rail that drifts from
- * the real one the first time either is touched, and the drift shows up as the layout moving
- * the moment the data lands — which is the one thing the skeleton exists to prevent.
+ * The rail's own box, as constants rather than one long class string inline.
+ *
+ * They used to be shared with an `OutlineSkeleton` that stood in for this panel in
+ * `app/log/loading.tsx`. That approach is gone — `loading.tsx` is one centred prompt now
+ * rather than a grey tracing of the page — so there is no second copy of the rail left to
+ * keep in step. They stay split out because the alternative is a 90-character `className`
+ * in the middle of the JSX.
  */
 const RAIL = "sticky top-0 hidden self-start px-4 py-12 min-[1100px]:block"
 const RAIL_BORDER = { borderRight: "1px solid var(--border-subtle)" } as const
@@ -60,7 +63,7 @@ export function PageOutline({
   /** The two-or-three line block under the rule. The one part that is genuinely per page. */
   footer?: React.ReactNode
 }) {
-  const [active, setActive] = useState(items[0]?.id)
+  const [clicked, setClicked] = useState<string | undefined>(undefined)
   const reduce = useReducedMotion() ?? false
 
   /**
@@ -77,6 +80,29 @@ export function PageOutline({
    * *changed*, so reducing over `entries` compares whichever sections happened to cross the
    * band in that tick. Visibility is kept in a map and the answer is computed from all of it.
    */
+  /**
+   * A stable key for "the same set of rows", so the effect below does not depend on the array
+   * itself.
+   *
+   * `items` is built inline by every caller, which makes it a new identity on every render. An
+   * IntersectionObserver invokes its callback the moment you `observe()` an element that is
+   * already on screen — so keying the effect on the array gave: observe → setActive → render →
+   * new array → tear down → observe → … forever. On `/components` that left every row frozen on
+   * its `initial` variant, i.e. a rail of invisible links. Callers should memoise anyway, but
+   * this is what stops the failure being silent when one forgets.
+   */
+  const key = items.map((i) => i.id).join("|")
+
+  /**
+   * Which row is current, derived rather than stored.
+   *
+   * The state used to be seeded from `items[0]` at mount and never revisited, so after
+   * `/components` swapped its outline for another tab's the highlight was still pointing at an
+   * id that no longer existed — no row lit up until you scrolled. Falling back whenever the
+   * remembered id is not in the current set fixes that with no effect to keep in sync.
+   */
+  const active = items.some((i) => i.id === clicked) ? clicked : items[0]?.id
+
   useEffect(() => {
     const sections = items
       .map((i) => document.getElementById(i.id))
@@ -100,14 +126,16 @@ export function PageOutline({
         const topmost = innermost.reduce((a, b) =>
           a.getBoundingClientRect().top < b.getBoundingClientRect().top ? a : b,
         )
-        setActive(topmost.id)
+        setClicked(topmost.id)
       },
       { rootMargin: "-12% 0px -70% 0px", threshold: 0 },
     )
 
     sections.forEach((s) => observer.observe(s))
     return () => observer.disconnect()
-  }, [items])
+    // `key`, not `items` — see above. eslint cannot see that one stands in for the other.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key])
 
   const jump = (e: React.MouseEvent, id: string) => {
     e.preventDefault()
@@ -117,7 +145,7 @@ export function PageOutline({
     const top =
       el.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop - 24
     main.scrollTo({ top, behavior: "smooth" })
-    setActive(id)
+    setClicked(id)
   }
 
   /**
@@ -143,6 +171,20 @@ export function PageOutline({
 
   return (
     <motion.nav
+      /*
+       * Keyed on the row set, and this is a bug fix rather than a hint to React.
+       *
+       * The entrance is `whileInView` with `once`, on this container, reaching the rows through
+       * variants. Once it has fired it is done — so when `/components` switched tabs and handed
+       * this a different set of `items`, the new `motion.li`s mounted under a trigger that had
+       * already spent itself, resolved `initial="hidden"`, and were never told to show. A rail
+       * of invisible links, exactly as reported, and only when changing tabs.
+       *
+       * Re-mounting on a new set gives the entrance back. The rail also replays its stagger,
+       * which is right: it is showing a different list, and the whole point of the animation is
+       * that a list arriving is visible.
+       */
+      key={key}
       aria-label="Page outline"
       className={RAIL}
       style={RAIL_BORDER}
@@ -209,38 +251,5 @@ export function PageOutline({
         </motion.div>
       )}
     </motion.nav>
-  )
-}
-
-/**
- * The rail as it looks before the data arrives, for a `loading.tsx` beside a page that reads
- * Postgres.
- *
- * It lives in this file, not in the route it serves, so it takes the box, the heading and the
- * file chip from the same constants the real panel does. `app/log/loading.tsx` used to spell
- * all of that out again, which meant a change to the rail was two edits with nothing to fail
- * if only one of them happened.
- *
- * No rows to spy on and nothing to navigate, so it is `aria-hidden` and not a `<nav>` — the
- * page's real status message does the announcing.
- */
-export function OutlineSkeleton({ file, rows = 3 }: { file: string; rows?: number }) {
-  return (
-    <div aria-hidden className={RAIL} style={RAIL_BORDER}>
-      <div className={RAIL_HEADING} style={RAIL_HEADING_STYLE}>
-        outline
-      </div>
-
-      <div className={FILE_CHIP} style={FILE_CHIP_STYLE}>
-        <Diamond />
-        {file}
-      </div>
-
-      <div className="flex flex-col gap-2">
-        {Array.from({ length: rows }, (_, i) => (
-          <span key={i} className="h-3 w-24 rounded bg-(--bg-surface-elevated)" />
-        ))}
-      </div>
-    </div>
   )
 }

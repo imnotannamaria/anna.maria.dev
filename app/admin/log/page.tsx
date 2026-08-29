@@ -2,12 +2,17 @@ import Link from "next/link"
 import { PlusIcon } from "@phosphor-icons/react/dist/ssr"
 import { Button } from "@/app/components/entrepta/button"
 import { LogEntryTable } from "@/components/admin/log-entry-table"
+import { requireAdmin } from "@/lib/auth/require-admin"
 import { getAllEntries } from "@/lib/log/queries"
 
 /** Drafts included — seeing them is the point of this screen. */
 export const dynamic = "force-dynamic"
 
 export default async function AdminLogPage() {
+  // The layout guards this too. Both, deliberately: a layout can be removed in a refactor and
+  // the page would keep rendering — and Next renders a layout and its page concurrently, so
+  // without this the queries below run before the layout's guard has resolved.
+  await requireAdmin()
   const entries = await getAllEntries()
 
   return (

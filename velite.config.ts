@@ -2,6 +2,12 @@ import { existsSync } from "node:fs"
 import { join } from "node:path"
 import { defineConfig, defineCollection, s } from "velite"
 import rehypePrettyCode from "rehype-pretty-code"
+// Relative, not "@/lib/…". Every other import in this file is a bare package or a node:
+// builtin — there is no path-alias precedent here, velite bundles its config with esbuild, and
+// whether tsconfig `paths` resolve in that pass is version-dependent. A relative path always
+// works. It also means `lib/showcase/registry.ts` must stay free of React and of anything with
+// a "use client" in its import graph, because this runs in plain Node before `next build`.
+import { SHOWCASE } from "./lib/showcase/registry"
 
 const blog = defineCollection({
   name: "Post",
@@ -74,6 +80,33 @@ const projects = defineCollection({
   }),
 })
 
+/**
+ * One doc per showcased component.
+ *
+ * Both pointers out of this file are checked at build time, and neither check is theoretical.
+ * `entry` has to name a real registry key, or the index renders a card with no demo behind it.
+ * `source` has to be a file that exists, or the doc page links to a GitHub 404 — and component
+ * files get renamed every other refactor. It is the same refinement `cover` carries above, for
+ * the same reason: the `wirstkit.mdx` typo deleted every project from `/projects` and the page
+ * said "nothing published yet" rather than failing the build.
+ */
+const componentDocs = defineCollection({
+  name: "ComponentDoc",
+  pattern: "components/**/*.mdx",
+  schema: s.object({
+    title: s.string(),
+    description: s.string(),
+    entry: s.string().refine((key) => key in SHOWCASE, "no showcase entry with that key"),
+    source: s
+      .string()
+      .refine((p) => existsSync(join(process.cwd(), p)), "source file not found in the repo"),
+    deps: s.array(s.string()).default([]),
+    published: s.boolean().default(true),
+    slug: s.path(),
+    body: s.mdx(),
+  }),
+})
+
 export default defineConfig({
   root: "content",
   output: {
@@ -83,7 +116,7 @@ export default defineConfig({
     name: "[name]-[hash:8].[ext]",
     clean: true,
   },
-  collections: { blog, projects },
+  collections: { blog, projects, componentDocs },
   mdx: {
     outputFormat: "function-body",
     rehypePlugins: [

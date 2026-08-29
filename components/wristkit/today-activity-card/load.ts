@@ -1,5 +1,6 @@
 import { dbUrl } from "@/lib/db/client"
 import { getTodayActivity } from "@/lib/wristkit/queries"
+import type { CardState } from "@/lib/showcase/state"
 
 export type Goals = {
   kcal: number
@@ -25,12 +26,12 @@ export type TodayData = {
   hoursSinceSync: number
 }
 
-export type TodayState =
-  | { kind: "loading" }
-  | { kind: "empty" }
-  | { kind: "error"; message?: string }
-  | { kind: "stale"; data: TodayData }
-  | { kind: "ok"; data: TodayData }
+/**
+ * This union used to be spelled out here, and it is where the shared one came from — every
+ * other card on the site now speaks it too. `stale` is still only ever produced here, which is
+ * why the shared type carries a member nobody else returns.
+ */
+export type TodayState = CardState<TodayData>
 
 export type LoadOptions = {
   tz?: string

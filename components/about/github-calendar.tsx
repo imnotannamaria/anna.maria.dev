@@ -3,8 +3,10 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
+import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { EASE_OUT } from "@/components/ui/reveal"
 import type { ContributionWeek, ContributionYear } from "@/lib/github/contributions"
+import type { CardState } from "@/lib/showcase/state"
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -138,7 +140,135 @@ const Column = memo(function Column({
   )
 })
 
-export function GithubCalendar({ data }: { data: ContributionYear | null }) {
+/**
+ * The grid's geometry, with nothing in it.
+ *
+ * Every state that has no data to draw goes through here — loading, empty and error — so the
+ * card is exactly as tall in all four states at every container width. That could not be done
+ * with a number: a cell is `aspect-ratio: 1` over a column that is `1fr` of whatever width there
+ * is, so the grid's height is a function of the card's width and there is no pixel value that is
+ * right at more than one size. Rendering the real 53 × 7 and leaving it blank is the only thing
+ * that agrees everywhere.
+ *
+ * It was a `<p>` with one line in it for empty and error, which is why those two states were a
+ * third the height of the working card.
+ */
+function GridFrame({
+  tone,
+  overlay,
+  footer,
+}: {
+  /** What the cells are filled with. Grey while loading, invisible when there is nothing. */
+  tone: string
+  /** Centred over the grid — the sweep while loading, a sentence when there is nothing. */
+  overlay?: React.ReactNode
+  footer: React.ReactNode
+}) {
+  return (
+    <div className="relative" aria-hidden>
+      {/* The same padded, negatively-margined, horizontally scrolling box the real grid sits
+          in, so the card is the same width as well as the same height. */}
+      <div
+        className="overflow-x-auto"
+        style={{ padding: RING + 1, margin: -(RING + 1), paddingBottom: RING + 5 }}
+      >
+        <div className="relative" style={{ minWidth: 53 * MIN_COL + 52 * GAP }}>
+          {/* The month row is left empty rather than greyed: it is thin text on a transparent
+              background, and a bar there would be the one piece claiming more ink than the
+              thing it stands in for. It still reserves its 14px. */}
+          <div className="h-3.5" />
+
+          <div className="relative flex" style={{ gap: GAP }}>
+            {Array.from({ length: 53 }, (_, wi) => (
+              <div
+                key={wi}
+                className="flex flex-col"
+                style={{ flex: "1 1 0", minWidth: MIN_COL, gap: GAP }}
+              >
+                {Array.from({ length: 7 }, (_, di) => (
+                  <span
+                    key={di}
+                    className="relative block w-full"
+                    style={{ aspectRatio: "1 / 1", borderRadius: 2, background: tone }}
+                  />
+                ))}
+              </div>
+            ))}
+
+            {overlay}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-3">{footer}</div>
+    </div>
+  )
+}
+
+/**
+ * The grid before the fetch lands: 53 columns of 7, at the same `MIN_COL` floor and the same
+ * `GAP` the real one uses.
+ *
+ * It is the highest-fidelity skeleton on the site almost by accident — a contribution grid is
+ * already a field of identical squares, so tracing it is just drawing the squares without a
+ * colour. One `.skeleton-sweep` overlay travels across them rather than 371 elements each
+ * animating a gradient, which is the per-frame repaint CLAUDE.md warns about, 371 times over.
+ */
+function CalendarSkeleton() {
+  return (
+    <>
+      <GridFrame
+        tone="var(--bg-surface-elevated)"
+        overlay={<span className="skeleton-sweep" />}
+        footer={
+          <>
+            <Skeleton style={{ width: 128, height: 9, borderRadius: 3 }} />
+            <Skeleton delay={0.2} style={{ width: 96, height: 9, borderRadius: 3 }} />
+          </>
+        }
+      />
+      <span className="sr-only" role="status">
+        Loading contributions
+      </span>
+    </>
+  )
+}
+
+/**
+ * Nothing to draw, and the difference between the two reasons stated in words.
+ *
+ * The cells are drawn at a tenth of the border colour rather than not at all: an empty year is
+ * still a year, and a card with a blank rectangle where the grid goes reads as broken rather
+ * than as quiet.
+ */
+function CalendarBlank({ message }: { message: string }) {
+  return (
+    <>
+      <GridFrame
+        tone="color-mix(in srgb, var(--border-subtle) 45%, transparent)"
+        overlay={
+          <div className="pointer-events-none absolute inset-0 grid place-items-center">
+            <span
+              className="text-mono-sm rounded-[var(--radius-sm)] px-3 py-1.5 font-mono"
+              style={{
+                color: "var(--fg-secondary)",
+                background: "var(--bg-surface)",
+                border: "1px solid var(--border-subtle)",
+              }}
+            >
+              {message}
+            </span>
+          </div>
+        }
+        footer={<span />}
+      />
+      <span className="sr-only">{message}</span>
+    </>
+  )
+}
+
+export function GithubCalendar({ state }: { state: CardState<ContributionYear> }) {
+  const data = state.kind === "ok" || state.kind === "stale" ? state.data : null
   const reduce = useReducedMotion() ?? false
   const [hover, setHover] = useState<Hover>(null)
 
@@ -215,11 +345,22 @@ export function GithubCalendar({ data }: { data: ContributionYear | null }) {
   const hoveredDay = hover ? (weeks[hover.week]?.[hover.day] ?? null) : null
   const active = hoveredDay?.date ? hoveredDay : null
 
+  // Three branches now, and the third is the one the card was missing. This used to be a
+  // single `if (!data)` that printed "contributions unavailable" whether GitHub was
+  // unreachable or the account genuinely had a quiet year — the first is about this server
+  // and the second is about the account, and only one of them is the visitor's business.
+  // `loading` is neither: it is the grid, in grey, at the size the real grid will be.
+  if (state.kind === "loading") return <CalendarSkeleton />
+
   if (!data) {
     return (
-      <p className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
-        contributions unavailable
-      </p>
+      <CalendarBlank
+        message={
+          state.kind === "empty"
+            ? "no public contributions in the last 12 months"
+            : "couldn't reach github"
+        }
+      />
     )
   }
 
