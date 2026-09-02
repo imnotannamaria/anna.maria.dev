@@ -1757,3 +1757,101 @@ button:focus-visible,
 .rm-log-drawer-gutter[data-live="true"] {
   --rm-log-rule: var(--fg-brand);
 }
+
+/* ============================================================
+   LOG RAIL  — one type's entries as a row rather than a grid
+   ============================================================ */
+
+/*
+ * The scroller is the flex row itself, so a card's `flex-basis: min(320px, 100%)` resolves
+ * against a box with a definite width — one card fills a phone and three fit a desktop
+ * column, from one declaration and with no measuring.
+ *
+ * The mask does the fading; `overflow-x` does the clipping. Padding on both axes is
+ * clearance rather than spacing: `.bento-card` cards carry a 2px focus ring at 2px offset,
+ * and a scroller clips at its padding box — with none, tabbing to the first card drew the
+ * ring straight into the clip. The negative margins hand the room back to the layout.
+ */
+.log-rail-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 4px;
+  padding: 6px 4px;
+  margin: -6px -4px;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.log-rail-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* `min(320px, 100%)` and not a fixed track: 320px inside a 287px column is a card wider
+   than the phone it is on, which is the failure mode the grid's `min(300px, 100%)` was
+   already avoiding. */
+.log-rail-track > * {
+  flex: 0 0 min(320px, 100%);
+  scroll-snap-align: start;
+}
+
+/* The trigger. One pixel wide and out of the flow's way — it exists to be watched, not to
+   be seen, and giving it any width would put a gap after the last card. */
+.log-rail-track > .log-rail-sentinel {
+  flex: 0 0 1px;
+  align-self: stretch;
+  scroll-snap-align: none;
+}
+
+.log-rail-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  translate: 0 -50%;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  color: var(--fg-secondary);
+  cursor: pointer;
+  transition:
+    opacity 180ms var(--ease-out),
+    border-color 180ms var(--ease-out),
+    color 180ms var(--ease-out);
+}
+.log-rail-arrow[data-dir="prev"] {
+  left: -6px;
+}
+.log-rail-arrow[data-dir="next"] {
+  right: -6px;
+}
+.log-rail-arrow:hover:not(:disabled) {
+  border-color: var(--border-brand-strong);
+  color: var(--fg-brand);
+}
+/* Kept in the tab order and kept in place: a control that disappears at the end of the row
+   moves the other one, and a row of arrows that shuffles under the cursor is worse than one
+   that greys out. */
+.log-rail-arrow:disabled {
+  opacity: 0;
+  pointer-events: none;
+}

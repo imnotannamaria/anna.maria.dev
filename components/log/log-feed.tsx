@@ -22,6 +22,7 @@ import { FeedShell, groupInOrder, type FeedGroup } from "@/components/chrome/fee
 import { useUrlFilter } from "@/components/ui/url-filter"
 import { LOG_TYPES, TYPE_PLURAL, type LogEntry, type LogType } from "@/lib/log/validation"
 import { LogCard } from "./log-card"
+import { LogRail } from "./log-rail"
 
 type Counts = Record<string, number>
 
@@ -87,9 +88,15 @@ export function LogFeed({
         all: "// nothing logged yet. when I finish something, it shows up here.",
         filtered: "// nothing logged in this category yet.",
       }}
-      /* min(300px, 100%) so a 375px viewport gets one column rather than a track wider than
-         the screen. */
-      listClassName="grid grid-cols-[repeat(auto-fill,minmax(min(300px,100%),1fr))] gap-3.5"
+      /* A rail per type rather than a grid that grows downwards. A type with forty entries
+         used to be forty cards tall and pushed every other type off the page; now the page's
+         height follows how many *types* there are, and the rail reveals the rest of a type as
+         you scroll towards its end. See components/log/log-rail.tsx. */
+      list={{
+        render: (items, renderItem, label) => (
+          <LogRail items={items} label={label} renderItem={renderItem} />
+        ),
+      }}
       renderItem={(entry, index) => <LogCard key={entry.id} entry={entry} index={index} />}
     >
       {children}
