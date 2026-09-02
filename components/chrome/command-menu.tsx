@@ -33,9 +33,9 @@ const PAGES: Page[] = [
   { href: "/about", name: "about.md", hint: "~/about", icon: UserSquareIcon },
   { href: "/blog", name: "posts/", hint: "~/blog", icon: FileMdIcon },
   { href: "/projects", name: "projects/", hint: "~/projects", icon: TerminalWindowIcon },
-  { href: "/roadmap", name: "roadmap.md", hint: "~/roadmap", icon: ListChecksIcon },
   { href: "/contact", name: "contact.tsx", hint: "~/contact", icon: ChatsCircleIcon },
   { href: "/components", name: "components/", hint: "~/components", icon: SwatchesIcon },
+  { href: "/roadmap", name: "roadmap.md", hint: "~/roadmap", icon: ListChecksIcon },
   { href: "/log", name: "log.tsx", hint: "~/log", icon: SquaresFourIcon },
   { href: "/piano", name: "piano.tsx", hint: "~/piano", icon: PianoKeysIcon },
 ]

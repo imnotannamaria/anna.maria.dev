@@ -23,9 +23,9 @@ const NAV_ITEMS = [
   { href: "/about", icon: UserSquareIcon, label: "About" },
   { href: "/blog", icon: FileMdIcon, label: "Blog" },
   { href: "/projects", icon: TerminalWindowIcon, label: "Projects" },
-  { href: "/roadmap", icon: ListChecksIcon, label: "Roadmap" },
   { href: "/contact", icon: ChatsCircleIcon, label: "Contact" },
   { href: "/components", icon: SwatchesIcon, label: "Components" },
+  { href: "/roadmap", icon: ListChecksIcon, label: "Roadmap" },
   { href: "/log", icon: SquaresFourIcon, label: "Log" },
   { href: "/piano", icon: PianoKeysIcon, label: "Piano" },
 ]
