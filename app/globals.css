@@ -1776,28 +1776,55 @@ button:focus-visible,
   display: flex;
   gap: 14px;
   overflow-x: auto;
+  /*
+   * `clip`, not the `visible` it would otherwise be. A box with one axis scrollable computes
+   * the other from `visible` to `auto`, so this was a vertical scroll container too — and it
+   * had somewhere to go, because every card enters from `y: 14`. The rail could be nudged
+   * down a few pixels with a wheel, and focusing a card scrolled it there on its own, which
+   * cut the top off whatever you had just tabbed to.
+   *
+   * `clip` is the one value that stops the axis being scrollable at all rather than merely
+   * hiding it, and `overflow-clip-margin` is what then lets the entrance and the 2px focus
+   * ring paint outside the box without any of it becoming scrollable. Where that property is
+   * unsupported this clips at the padding box, which the padding below is already sized for.
+   */
+  overflow-y: clip;
+  overflow-clip-margin: 12px;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
   scroll-padding-inline: 4px;
   padding: 6px 4px;
   margin: -6px -4px;
   scrollbar-width: none;
+  /* Both ends start square. `overflow-x` is what clips the rail; the mask only ever says
+     "there is more that way", so a side with nothing beyond it gets no gradient — a fade
+     over the first card's edge when it is already at the start dissolves the card instead
+     of suggesting depth, which is what it looked like. The two lengths are driven by the
+     same measurement the arrows use, so the two can never disagree. */
+  --rail-fade-start: 0px;
+  --rail-fade-end: 0px;
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 28px,
-    #000 calc(100% - 28px),
+    #000 var(--rail-fade-start),
+    #000 calc(100% - var(--rail-fade-end)),
     transparent 100%
   );
   mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 28px,
-    #000 calc(100% - 28px),
+    #000 var(--rail-fade-start),
+    #000 calc(100% - var(--rail-fade-end)),
     transparent 100%
   );
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
+}
+.log-rail-track[data-more~="start"] {
+  --rail-fade-start: 36px;
+}
+.log-rail-track[data-more~="end"] {
+  --rail-fade-end: 36px;
 }
 .log-rail-track::-webkit-scrollbar {
   display: none;
@@ -1838,11 +1865,29 @@ button:focus-visible,
     border-color 180ms var(--ease-out),
     color 180ms var(--ease-out);
 }
+/* Mostly in the page's gutter rather than on top of a card. -18px against the narrowest
+   page padding on the site (20px) means they never push the column wide enough to give
+   `<main>` a horizontal scrollbar, while leaving only ~10px sitting over the card's faded
+   edge — which is where a control that means "there is more that way" belongs. */
 .log-rail-arrow[data-dir="prev"] {
-  left: -6px;
+  left: -18px;
 }
 .log-rail-arrow[data-dir="next"] {
-  right: -6px;
+  right: -18px;
+}
+
+/*
+ * Gone on touch. These exist for one reason — a vertical wheel does nothing to a horizontal
+ * scroller — and a finger has never had that problem. On a phone the card fills the column,
+ * so the only place left for them is on top of the poster.
+ *
+ * Nothing is lost by removing them: the rail swipes, and it keeps `tabindex` so a keyboard
+ * on a tablet still reaches it and scrolls it with the arrow keys.
+ */
+@media (hover: none), (pointer: coarse) {
+  .log-rail-arrow {
+    display: none;
+  }
 }
 .log-rail-arrow:hover:not(:disabled) {
   border-color: var(--border-brand-strong);

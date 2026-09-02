@@ -106,12 +106,23 @@ export function LogRail<T>({
 
   const scrollable = edges !== null && !(edges.start && edges.end)
 
+  /**
+   * Which sides are hiding something. The fade is the same measurement the arrows are, so it
+   * can only ever say what they say — and at rest it says nothing, which is the point: a
+   * gradient over the first card's edge when there is nothing to its left does not read as
+   * depth, it reads as a card that failed to finish drawing.
+   */
+  const more = edges
+    ? [!edges.start && "start", !edges.end && "end"].filter(Boolean).join(" ")
+    : undefined
+
   return (
     <div className="log-rail relative">
       <div
         ref={scroller}
         onScroll={measure}
         className="log-rail-track"
+        data-more={more}
         // A scrollable region with no focusable child would be unreachable by keyboard, and
         // some cards have neither a link nor a note. `group` rather than `region` so nine
         // types do not become nine landmarks.
