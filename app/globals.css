@@ -1576,3 +1576,165 @@ button:focus-visible,
 .rm-dot[data-muted="true"] {
   background: var(--border-strong);
 }
+
+/* ============================================================
+   LOG SHELF  — the two drifting cover rows on the home page
+   ============================================================ */
+
+/*
+ * Two strips translating forever, which is the one thing a compositor does for free.
+ * Everything visual here is CSS on purpose: the card holds React state for the caption
+ * only, because a caption is data, while the pause, the dim and the lift are what `:hover`
+ * and `:focus-within` are for. The contributions card spent months re-rendering on every
+ * pointer enter to do exactly this, and that is the mistake being avoided.
+ *
+ * Each strip holds its row twice, so translating it by half its width lands on a frame
+ * identical to the first and the loop has no seam. That duplication is also what makes the
+ * global prefers-reduced-motion reset safe here: it collapses the animation to one 0.01ms
+ * iteration, which parks the strip on its `to` frame — and the `to` frame is
+ * indistinguishable from the `from` frame, so a reduced-motion visitor gets a still row
+ * rather than a row that has jumped half a screen sideways.
+ */
+/* The cover size lives on the card root, not on the rows, because the empty frame and the
+   skeleton are sized from it too and neither of them is a row. */
+.log-shelf {
+  --log-cover-w: 62px;
+  --log-cover-h: 93px;
+}
+@media (min-width: 640px) {
+  .log-shelf {
+    --log-cover-w: 84px;
+    --log-cover-h: 126px;
+  }
+}
+
+/*
+ * The strip clips once, here, and it clips with the mask rather than with `overflow`.
+ *
+ * Each row used to be `overflow: hidden` at exactly one cover's height, which cut the top
+ * off every cover the moment it lifted — clip plus lift equals a cut-off border, and the
+ * fix for that is clearance, not spacing. A row cannot have both, because per-row clearance
+ * can never exceed the gap between the rows without changing their rhythm.
+ *
+ * So the rows stop clipping and the strip takes the job: `mask-repeat: no-repeat` means
+ * everything outside this box is masked to nothing, which is the same containment
+ * `overflow: hidden` gave — while `padding-block` adds room *inside* the mask for a cover
+ * to rise into. `overflow-y: visible` was not an option: a box with one axis `hidden`
+ * computes the other to `auto`, so it would have scrolled instead.
+ */
+.log-drift {
+  --log-lift-room: 12px;
+  padding-block: var(--log-lift-room);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 40px,
+    #000 calc(100% - 40px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 40px,
+    #000 calc(100% - 40px),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Holds one cover's height so the layout is unchanged; the track inside is free to run
+   wider than it and to lift out of it. */
+.log-drift-row {
+  position: relative;
+  height: var(--log-cover-h);
+}
+
+@keyframes log-drift-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@keyframes log-drift-right {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.log-drift-track {
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.log-drift-track[data-dir="left"] {
+  animation-name: log-drift-left;
+}
+.log-drift-track[data-dir="right"] {
+  animation-name: log-drift-right;
+}
+
+/* Entering the strip stops it. Focus does the same, so a keyboard reaches a still row. */
+.log-drift:hover .log-drift-track,
+.log-drift:focus-within .log-drift-track {
+  animation-play-state: paused;
+}
+
+.log-drift-item {
+  width: var(--log-cover-w);
+  height: var(--log-cover-h);
+  transition:
+    transform 220ms var(--ease-out),
+    opacity 220ms var(--ease-out);
+}
+.log-drift:hover .log-drift-item,
+.log-drift:focus-within .log-drift-item {
+  opacity: 0.34;
+}
+.log-drift .log-drift-item:hover,
+.log-drift .log-drift-item:focus-visible {
+  opacity: 1;
+  /* Lift only — the hit area is the same element, so it must not move far enough to slip
+     out from under the cursor and start a lift/un-hover/drop loop. 6px against a 93px
+     cover does not reach the edge. */
+  transform: translateY(-6px) scale(1.06);
+}
+
+/* ============================================================
+   ROADMAP LOG  — the home page's changelog card
+   ============================================================ */
+
+.rm-log-row {
+  transition:
+    background 160ms var(--ease-out),
+    color 160ms var(--ease-out);
+}
+.rm-log-row[data-open="true"],
+.rm-log-row:hover:not(:disabled),
+.rm-log-row:focus-visible {
+  /* The measured pair: brand ink on the brand tint is --fg-brand-on-tint, never --fg-brand,
+     which fails contrast on eight of the twelve theme × mode combinations. */
+  background: var(--bg-surface-brand);
+}
+.rm-log-row[data-open="true"] .rm-log-title,
+.rm-log-row:hover:not(:disabled) .rm-log-title,
+.rm-log-row:focus-visible .rm-log-title {
+  color: var(--fg-brand-on-tint);
+}
+
+/* `0fr → 1fr` animates a height nobody has to measure. `max-height` guesses, and a guess
+   that is too small clips the blurb while a guess that is too large makes the open slower
+   than the close. */
+.rm-log-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 260ms var(--ease-out);
+}
+.rm-log-drawer[data-open="true"] {
+  grid-template-rows: 1fr;
+}
