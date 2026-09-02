@@ -1738,3 +1738,22 @@ button:focus-visible,
 .rm-log-drawer[data-open="true"] {
   grid-template-rows: 1fr;
 }
+
+/* The graph line, continued through an open row. `1ch` is one monospace advance and the
+   rule is painted at its centre, which is exactly where the `│` above puts its stroke —
+   so the two are one line without a magic number to keep in step with the font. */
+.rm-log-drawer-gutter {
+  --rm-log-rule: var(--border-strong);
+  flex: 0 0 1ch;
+  align-self: stretch;
+  background: linear-gradient(
+    to right,
+    transparent calc(50% - 0.5px),
+    var(--rm-log-rule) calc(50% - 0.5px),
+    var(--rm-log-rule) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+}
+.rm-log-drawer-gutter[data-live="true"] {
+  --rm-log-rule: var(--fg-brand);
+}

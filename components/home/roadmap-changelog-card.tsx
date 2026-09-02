@@ -235,16 +235,27 @@ function Row({
       {expandable && (
         <div className="rm-log-drawer" data-open={open} id={drawerId} aria-hidden={!open}>
           <div className="overflow-hidden">
-            <p
-              className="text-body-md m-0 ml-1.5 py-1.5 pr-2 pl-3 leading-relaxed"
-              style={{
-                fontFamily: "var(--font-sans)",
-                color: "var(--fg-muted)",
-                borderLeft: "1px solid var(--border-brand)",
-              }}
-            >
-              {item.blurb}
-            </p>
+            {/* The same three columns the row above has, so the blurb lines up under the
+                title and the graph line runs straight through the opening.
+
+                It used to be a `border-left` on the paragraph, which drew a second vertical
+                rule at a different x than the `│` glyph — a monospace character centres its
+                stroke in its advance width, and a border sits at the very edge of the box.
+                They were ~4px apart and the graph visibly broke wherever a row opened.
+                A 1ch column with the rule painted dead-centre is the same line by
+                construction rather than by a number someone tuned once. */}
+            <div className="text-mono-md flex gap-2 px-1.5 pb-2 font-mono">
+              <span className="rm-log-drawer-gutter" data-live={live} aria-hidden />
+              {/* The mark's own column, `[x]` being three characters wide. Empty, so the
+                  blurb starts exactly where the title does. */}
+              <span className="shrink-0" style={{ width: "3ch" }} aria-hidden />
+              <p
+                className="text-body-md m-0 min-w-0 flex-1 leading-relaxed"
+                style={{ fontFamily: "var(--font-sans)", color: "var(--fg-muted)" }}
+              >
+                {item.blurb}
+              </p>
+            </div>
           </div>
         </div>
       )}
