@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { memo, useCallback, useState } from "react"
 import Image from "next/image"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
@@ -67,6 +67,15 @@ export function LogShelfCard({
    */
   const [pinned, setPinned] = useState<LogEntry | null>(null)
   const active = hovered ?? pinned
+
+  /**
+   * Stable, and `Drift` is memoised, so moving the pointer across the strip re-renders the
+   * caption and nothing else. Without both, every cover crossed re-rendered all forty-eight
+   * buttons to change one line of text underneath them.
+   */
+  const pin = useCallback((entry: LogEntry) => {
+    setPinned((current) => (current?.id === entry.id ? null : entry))
+  }, [])
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(760)
   const reveal = useReveal()
@@ -116,13 +125,7 @@ export function LogShelfCard({
       {state.kind === "loading" ? (
         <DriftSkeleton />
       ) : entries && entries.length > 0 ? (
-        <Drift
-          entries={entries}
-          active={active}
-          pinned={pinned}
-          onHover={setHovered}
-          onPin={(entry) => setPinned((p) => (p?.id === entry.id ? null : entry))}
-        />
+        <Drift entries={entries} pinned={pinned} onHover={setHovered} onPin={pin} />
       ) : (
         <Blank
           message={
@@ -146,15 +149,13 @@ export function LogShelfCard({
 
 // ─── The rows ─────────────────────────────────────────────────────────────────
 
-function Drift({
+const Drift = memo(function Drift({
   entries,
-  active,
   pinned,
   onHover,
   onPin,
 }: {
   entries: LogEntry[]
-  active: LogEntry | null
   pinned: LogEntry | null
   onHover: (entry: LogEntry | null) => void
   onPin: (entry: LogEntry) => void
@@ -184,7 +185,7 @@ function Drift({
       ))}
     </div>
   )
-}
+})
 
 function Row({
   row,
