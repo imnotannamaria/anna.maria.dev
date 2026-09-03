@@ -35,6 +35,16 @@ import { cn } from "@/lib/utils"
 /** Below this many covers a strip is narrower than the card and the loop shows a gap. */
 const MIN_PER_STRIP = 8
 
+/**
+ * How many entries the strip carries, whatever the log holds.
+ *
+ * Each row renders its covers twice — that is what makes the loop seamless — so an uncapped
+ * strip puts `2 × entries.length` images on the home page, which at two hundred entries is
+ * four hundred of them on the route that owns the LCP. This card is a highlight; `/log` is
+ * the list, and the count beside the heading still tells the truth about how many there are.
+ */
+const SHELF_MAX = 24
+
 /** Seconds per cover. Constant speed whatever the shelf's length. */
 const SECONDS_PER_COVER = 3.4
 
@@ -45,7 +55,18 @@ export function LogShelfCard({
   state: CardState<LogEntry[]>
   className?: string
 }) {
-  const [active, setActive] = useState<LogEntry | null>(null)
+  const [hovered, setHovered] = useState<LogEntry | null>(null)
+  /**
+   * Clicking a cover pins its caption, so it survives the pointer leaving.
+   *
+   * Without it these were buttons that announced as buttons and did nothing when pressed —
+   * they only answered `pointerenter` and `focus`, which is a hover target wearing a
+   * control's semantics. Pinning is a real action, it is visible (`aria-pressed`, and the
+   * cover stays lit), and it is the one thing you actually want from a row that is moving:
+   * a way to stop and read.
+   */
+  const [pinned, setPinned] = useState<LogEntry | null>(null)
+  const active = hovered ?? pinned
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(760)
   const reveal = useReveal()
@@ -95,7 +116,13 @@ export function LogShelfCard({
       {state.kind === "loading" ? (
         <DriftSkeleton />
       ) : entries && entries.length > 0 ? (
-        <Drift entries={entries} onActive={setActive} />
+        <Drift
+          entries={entries}
+          active={active}
+          pinned={pinned}
+          onHover={setHovered}
+          onPin={(entry) => setPinned((p) => (p?.id === entry.id ? null : entry))}
+        />
       ) : (
         <Blank
           message={
@@ -121,14 +148,21 @@ export function LogShelfCard({
 
 function Drift({
   entries,
-  onActive,
+  active,
+  pinned,
+  onHover,
+  onPin,
 }: {
   entries: LogEntry[]
-  onActive: (entry: LogEntry | null) => void
+  active: LogEntry | null
+  pinned: LogEntry | null
+  onHover: (entry: LogEntry | null) => void
+  onPin: (entry: LogEntry) => void
 }) {
   // Split rather than repeated, so the two rows never show the same cover side by side.
-  const half = Math.ceil(entries.length / 2)
-  const rows = [entries.slice(0, half), entries.slice(half)].filter((r) => r.length > 0)
+  const shown = entries.slice(0, SHELF_MAX)
+  const half = Math.ceil(shown.length / 2)
+  const rows = [shown.slice(0, half), shown.slice(half)].filter((r) => r.length > 0)
 
   return (
     <div
@@ -136,10 +170,17 @@ function Drift({
       // Cleared on leaving the whole strip, not on leaving a cover: the gaps between
       // covers are 10px, and clearing there would blank the caption every time the
       // pointer crossed a seam.
-      onPointerLeave={() => onActive(null)}
+      onPointerLeave={() => onHover(null)}
     >
       {rows.map((row, r) => (
-        <Row key={r} row={row} dir={r === 0 ? "left" : "right"} onActive={onActive} />
+        <Row
+          key={r}
+          row={row}
+          dir={r === 0 ? "left" : "right"}
+          pinned={pinned}
+          onHover={onHover}
+          onPin={onPin}
+        />
       ))}
     </div>
   )
@@ -148,11 +189,15 @@ function Drift({
 function Row({
   row,
   dir,
-  onActive,
+  pinned,
+  onHover,
+  onPin,
 }: {
   row: LogEntry[]
   dir: "left" | "right"
-  onActive: (entry: LogEntry) => void
+  pinned: LogEntry | null
+  onHover: (entry: LogEntry) => void
+  onPin: (entry: LogEntry) => void
 }) {
   // One copy, padded out to at least MIN_PER_STRIP so it is wider than the card, then the
   // whole copy twice. Translating by exactly half the track lands on an identical frame.
@@ -163,7 +208,12 @@ function Row({
   return (
     <div className="log-drift-row">
       <div
-        className="log-drift-track flex h-full w-max items-center gap-2.5"
+        // No `gap` here, and that is arithmetic rather than taste: a flex track of `2m`
+        // items with a 10px gap measures `2m·W + (2m−1)·10`, and half of that is 5px short
+        // of one copy's advance `m·(W + 10)` — so the loop jumped 5px sideways every time it
+        // came round. The spacing lives on the item instead (`.log-drift-item`), which makes
+        // the track exactly `2m·(W + 10)` and `-50%` exactly one copy.
+        className="log-drift-track flex h-full w-max items-center"
         data-dir={dir}
         style={{ animationDuration: `${copy.length * SECONDS_PER_COVER}s` }}
       >
@@ -179,31 +229,33 @@ function Row({
               type="button"
               aria-hidden={!original}
               tabIndex={original ? 0 : -1}
+              aria-pressed={pinned?.id === entry.id}
+              data-pinned={pinned?.id === entry.id}
               // `pointerenter`, not `mouseenter`: a tap reports as a pointer event with
               // `pointerType: "touch"`, so touch gets the caption too.
-              onPointerEnter={() => onActive(entry)}
-              onFocus={() => onActive(entry)}
-              className="log-drift-item relative shrink-0 cursor-pointer rounded-[9px] outline-none"
+              onPointerEnter={() => onHover(entry)}
+              onFocus={() => onHover(entry)}
+              onClick={() => onPin(entry)}
+              className="log-drift-item focus-ring relative shrink-0 cursor-pointer rounded-[9px]"
             >
-              {/* The title is the button's accessible name and it is in the served HTML —
-                  the shelf is text to a crawler, not a row of unlabelled images. */}
-              <span className="sr-only">{entry.title}</span>
+              {/* The button's whole accessible name, and it is in the served HTML — the
+                  shelf is text to a crawler, not a row of unlabelled images. Everything the
+                  caption shows is here rather than only there, so the caption can stay
+                  decoration instead of becoming a live region that repeats it. */}
+              <span className="sr-only">{coverLabel(entry)}</span>
               <Poster entry={entry} />
               {entry.favorite && (
-                <>
-                  <span
-                    aria-hidden
-                    className="absolute top-1 right-1 leading-none"
-                    style={{
-                      color: "var(--fg-brand)",
-                      fontSize: 11,
-                      textShadow: "0 1px 3px rgba(0,0,0,0.7)",
-                    }}
-                  >
-                    ♥
-                  </span>
-                  {original && <span className="sr-only">favourite</span>}
-                </>
+                <span
+                  aria-hidden
+                  className="absolute top-1 right-1 leading-none"
+                  style={{
+                    color: "var(--fg-brand)",
+                    fontSize: 11,
+                    textShadow: "0 1px 3px rgba(0,0,0,0.7)",
+                  }}
+                >
+                  ♥
+                </span>
               )}
             </button>
           )
@@ -211,6 +263,14 @@ function Row({
       </div>
     </div>
   )
+}
+
+/** Everything the caption says, as one string, so the caption never has to be announced. */
+function coverLabel(entry: LogEntry): string {
+  const meta = [entry.creator, entry.year].filter(Boolean).join(", ")
+  return [TYPE_LABEL[entry.type], entry.title, meta, entry.favorite ? "favourite" : null]
+    .filter(Boolean)
+    .join(" — ")
 }
 
 /**
@@ -274,7 +334,10 @@ function Caption({
   return (
     // A fixed two-line box. Without it the card grows by a line the first time a long
     // title arrives, and in a grid row that drags its neighbour with it.
-    <div className="relative mt-auto grid" style={{ minHeight: 40 }}>
+    //
+    // `aria-hidden`: every word of it is already the accessible name of the cover that put
+    // it there, so announcing it again would say each entry twice.
+    <div className="relative mt-auto grid" aria-hidden style={{ minHeight: 40 }}>
       <AnimatePresence initial={false}>
         <motion.div
           key={entry?.id ?? "idle"}
@@ -347,31 +410,35 @@ function Blank({ message }: { message: string }) {
  */
 function DriftSkeleton() {
   return (
-    <div className="log-drift relative flex flex-col gap-2.5" aria-hidden>
-      {[0, 1].map((r) => (
-        <div key={r} className="log-drift-row">
-          <div className="flex h-full w-max items-center gap-2.5">
-            {Array.from({ length: 12 }, (_, i) => (
-              <Skeleton
-                key={i}
-                delay={r * 0.08 + i * 0.04}
-                className="shrink-0"
-                // The real box, from the same two custom properties the covers use — not
-                // `.log-drift-item`, which dims on container hover and a loading state
-                // should not answer a pointer.
-                style={{
-                  width: "var(--log-cover-w)",
-                  height: "var(--log-cover-h)",
-                  borderRadius: 9,
-                }}
-              />
-            ))}
+    <>
+      <div className="log-drift relative flex flex-col gap-2.5" aria-hidden>
+        {[0, 1].map((r) => (
+          <div key={r} className="log-drift-row">
+            <div className="flex h-full w-max items-center gap-2.5">
+              {Array.from({ length: 12 }, (_, i) => (
+                <Skeleton
+                  key={i}
+                  delay={r * 0.08 + i * 0.04}
+                  className="shrink-0"
+                  // The real box, from the same two custom properties the covers use — not
+                  // `.log-drift-item`, which dims on container hover and a loading state
+                  // should not answer a pointer.
+                  style={{
+                    width: "var(--log-cover-w)",
+                    height: "var(--log-cover-h)",
+                    borderRadius: 9,
+                  }}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
+      {/* Outside the `aria-hidden` box, not inside it: a `role="status"` under a hidden
+          ancestor is hidden too, so the announcement never happened. */}
       <span className="sr-only" role="status">
         Loading the log
       </span>
-    </div>
+    </>
   )
 }

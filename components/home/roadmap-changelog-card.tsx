@@ -177,10 +177,15 @@ function Row({
 
       {/* The overflow contract: the title truncates. `.bento-card` clips with no ellipsis,
           so a title left to overflow reads as missing data rather than as a long title. */}
+      {/* The colour is a class, not an inline style. It used to be inline, which outranks a
+          stylesheet — so the hover and open rules in globals.css, including the measured
+          `--fg-brand-on-tint` pairing that exists precisely to keep this legible on the
+          brand tint, never applied to a single row. `data-live` is what the base colour
+          keys off instead. */}
       <span
         className="rm-log-title min-w-0 flex-1 truncate"
+        data-live={live}
         style={{
-          color: live ? "var(--fg-primary)" : "var(--fg-secondary)",
           textDecoration: item.status === "done" ? "line-through" : undefined,
           textDecorationColor: "var(--border-strong)",
         }}
@@ -285,25 +290,29 @@ function Blank({ message }: { message: string }) {
  */
 function RowsSkeleton() {
   return (
-    <div className="relative flex flex-col gap-[9px]" aria-hidden>
-      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="flex items-center gap-2 px-1.5">
-          <Skeleton delay={i * 0.05} style={{ width: 6, height: 12, borderRadius: 2 }} />
-          <Skeleton delay={i * 0.05} style={{ width: 22, height: 10, borderRadius: 3 }} />
-          <Skeleton
-            delay={i * 0.05}
-            style={{ width: `${58 - (i % 3) * 12}%`, height: 10, borderRadius: 3 }}
-          />
-          <Skeleton
-            delay={i * 0.05}
-            className="ml-auto hidden sm:block"
-            style={{ width: 34, height: 10, borderRadius: 3 }}
-          />
-        </div>
-      ))}
+    <>
+      <div className="relative flex flex-col gap-[9px]" aria-hidden>
+        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="flex items-center gap-2 px-1.5">
+            <Skeleton delay={i * 0.05} style={{ width: 6, height: 12, borderRadius: 2 }} />
+            <Skeleton delay={i * 0.05} style={{ width: 22, height: 10, borderRadius: 3 }} />
+            <Skeleton
+              delay={i * 0.05}
+              style={{ width: `${58 - (i % 3) * 12}%`, height: 10, borderRadius: 3 }}
+            />
+            <Skeleton
+              delay={i * 0.05}
+              className="ml-auto hidden sm:block"
+              style={{ width: 34, height: 10, borderRadius: 3 }}
+            />
+          </div>
+        ))}
+      </div>
+      {/* Outside the `aria-hidden` box, not inside it: a `role="status"` under a hidden
+          ancestor is hidden too, so the announcement never happened. */}
       <span className="sr-only" role="status">
         Loading the roadmap
       </span>
-    </div>
+    </>
   )
 }

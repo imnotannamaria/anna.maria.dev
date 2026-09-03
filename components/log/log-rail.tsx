@@ -176,7 +176,11 @@ function RailButton({
       onClick={() => onClick(dir)}
       disabled={disabled}
       aria-label={label}
-      className="log-rail-arrow"
+      // `.focus-ring`, the utility globals.css keeps for exactly this: the site resets
+      // `button:focus-visible { outline: none !important }`, so a focus indicator here has
+      // to be a box-shadow or it does not exist. Without it these were the only reachable
+      // controls on the page with nothing to show for being focused.
+      className="log-rail-arrow focus-ring"
       data-dir={dir === -1 ? "prev" : "next"}
     >
       <Icon size={14} weight="bold" aria-hidden />

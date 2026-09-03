@@ -1688,6 +1688,10 @@ button:focus-visible,
 .log-drift-item {
   width: var(--log-cover-w);
   height: var(--log-cover-h);
+  /* The gap, as a margin. On the track it made half the track 5px short of one copy's
+     advance and the loop snapped sideways once a lap; here every item measures `W + 10`,
+     so `-50%` of `2m` of them is exactly `m` of them. */
+  margin-inline-end: 10px;
   transition:
     transform 220ms var(--ease-out),
     opacity 220ms var(--ease-out);
@@ -1695,6 +1699,15 @@ button:focus-visible,
 .log-drift:hover .log-drift-item,
 .log-drift:focus-within .log-drift-item {
   opacity: 0.34;
+}
+/* Pressed. `aria-pressed` needs something to look like, and holding the cover out of the
+   row is the same gesture the hover already means — so a pinned caption reads as a cover
+   someone pulled forward rather than as a state only a screen reader knows about. Transform
+   rather than a ring, because `.focus-ring` owns `box-shadow` on this element and is
+   declared earlier in the file, so a ring here would outrank the focus indicator. */
+.log-drift .log-drift-item[data-pinned="true"] {
+  opacity: 1;
+  transform: translateY(-6px);
 }
 .log-drift .log-drift-item:hover,
 .log-drift .log-drift-item:focus-visible {
@@ -1715,14 +1728,23 @@ button:focus-visible,
     color 160ms var(--ease-out);
 }
 .rm-log-row[data-open="true"],
-.rm-log-row:hover:not(:disabled),
+.rm-log-row:hover,
 .rm-log-row:focus-visible {
   /* The measured pair: brand ink on the brand tint is --fg-brand-on-tint, never --fg-brand,
      which fails contrast on eight of the twelve theme × mode combinations. */
   background: var(--bg-surface-brand);
 }
+/* The base colours, which used to be written inline on the element and therefore beat
+   everything below. Equal specificity to the rules that follow, so source order decides —
+   these first, the states after. */
+.rm-log-title {
+  color: var(--fg-secondary);
+}
+.rm-log-title[data-live="true"] {
+  color: var(--fg-primary);
+}
 .rm-log-row[data-open="true"] .rm-log-title,
-.rm-log-row:hover:not(:disabled) .rm-log-title,
+.rm-log-row:hover .rm-log-title,
 .rm-log-row:focus-visible .rm-log-title {
   color: var(--fg-brand-on-tint);
 }
@@ -1893,9 +1915,11 @@ button:focus-visible,
   border-color: var(--border-brand-strong);
   color: var(--fg-brand);
 }
-/* Kept in the tab order and kept in place: a control that disappears at the end of the row
-   moves the other one, and a row of arrows that shuffles under the cursor is worse than one
-   that greys out. */
+/* Kept in place, not in the tab order. An arrow that unmounted at the end of the row would
+   move the other one, and a pair that shuffles under the cursor is worse than one that fades
+   — so it stays in the layout. It is genuinely `disabled` though, which means it also leaves
+   the tab order, and reaching an end while focused on it drops focus to the body. That is
+   the lesser cost: the alternative is an invisible control that still takes a Tab. */
 .log-rail-arrow:disabled {
   opacity: 0;
   pointer-events: none;
