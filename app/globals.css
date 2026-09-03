@@ -1576,3 +1576,394 @@ button:focus-visible,
 .rm-dot[data-muted="true"] {
   background: var(--border-strong);
 }
+
+/* ============================================================
+   LOG SHELF  — the two drifting cover rows on the home page
+   ============================================================ */
+
+/*
+ * Two strips translating forever, which is the one thing a compositor does for free.
+ * Everything visual here is CSS on purpose: the card holds React state for the caption
+ * only, because a caption is data, while the pause, the dim and the lift are what `:hover`
+ * and `:focus-within` are for. The contributions card spent months re-rendering on every
+ * pointer enter to do exactly this, and that is the mistake being avoided.
+ *
+ * Each strip holds its row twice, so translating it by half its width lands on a frame
+ * identical to the first and the loop has no seam. That duplication is also what makes the
+ * global prefers-reduced-motion reset safe here: it collapses the animation to one 0.01ms
+ * iteration, which parks the strip on its `to` frame — and the `to` frame is
+ * indistinguishable from the `from` frame, so a reduced-motion visitor gets a still row
+ * rather than a row that has jumped half a screen sideways.
+ */
+/* The cover size lives on the card root, not on the rows, because the empty frame and the
+   skeleton are sized from it too and neither of them is a row. */
+.log-shelf {
+  --log-cover-w: 62px;
+  --log-cover-h: 93px;
+}
+@media (min-width: 640px) {
+  .log-shelf {
+    --log-cover-w: 84px;
+    --log-cover-h: 126px;
+  }
+}
+
+/*
+ * The strip clips once, here, and it clips with the mask rather than with `overflow`.
+ *
+ * Each row used to be `overflow: hidden` at exactly one cover's height, which cut the top
+ * off every cover the moment it lifted — clip plus lift equals a cut-off border, and the
+ * fix for that is clearance, not spacing. A row cannot have both, because per-row clearance
+ * can never exceed the gap between the rows without changing their rhythm.
+ *
+ * So the rows stop clipping and the strip takes the job: `mask-repeat: no-repeat` means
+ * everything outside this box is masked to nothing, which is the same containment
+ * `overflow: hidden` gave — while `padding-block` adds room *inside* the mask for a cover
+ * to rise into. `overflow-y: visible` was not an option: a box with one axis `hidden`
+ * computes the other to `auto`, so it would have scrolled instead.
+ */
+.log-drift {
+  --log-lift-room: 12px;
+  padding-block: var(--log-lift-room);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 40px,
+    #000 calc(100% - 40px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 40px,
+    #000 calc(100% - 40px),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Holds one cover's height so the layout is unchanged; the track inside is free to run
+   wider than it and to lift out of it. */
+.log-drift-row {
+  position: relative;
+  height: var(--log-cover-h);
+}
+
+@keyframes log-drift-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@keyframes log-drift-right {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.log-drift-track {
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.log-drift-track[data-dir="left"] {
+  animation-name: log-drift-left;
+}
+.log-drift-track[data-dir="right"] {
+  animation-name: log-drift-right;
+}
+
+/* Entering the strip stops it. Focus does the same, so a keyboard reaches a still row. */
+.log-drift:hover .log-drift-track,
+.log-drift:focus-within .log-drift-track {
+  animation-play-state: paused;
+}
+
+.log-drift-item {
+  width: var(--log-cover-w);
+  height: var(--log-cover-h);
+  /* The gap, as a margin. On the track it made half the track 5px short of one copy's
+     advance and the loop snapped sideways once a lap; here every item measures `W + 10`,
+     so `-50%` of `2m` of them is exactly `m` of them. */
+  margin-inline-end: 10px;
+  transition:
+    transform 220ms var(--ease-out),
+    opacity 220ms var(--ease-out);
+}
+.log-drift:hover .log-drift-item,
+.log-drift:focus-within .log-drift-item {
+  opacity: 0.34;
+}
+/* Pressed. `aria-pressed` needs something to look like, and holding the cover out of the
+   row is the same gesture the hover already means — so a pinned caption reads as a cover
+   someone pulled forward rather than as a state only a screen reader knows about. Transform
+   rather than a ring, because `.focus-ring` owns `box-shadow` on this element and is
+   declared earlier in the file, so a ring here would outrank the focus indicator. */
+.log-drift .log-drift-item[data-pinned="true"] {
+  opacity: 1;
+  transform: translateY(-6px);
+}
+.log-drift .log-drift-item:hover,
+.log-drift .log-drift-item:focus-visible {
+  opacity: 1;
+  /* Lift only — the hit area is the same element, so it must not move far enough to slip
+     out from under the cursor and start a lift/un-hover/drop loop. 6px against a 93px
+     cover does not reach the edge. */
+  transform: translateY(-6px) scale(1.06);
+}
+
+/* ============================================================
+   ROADMAP LOG  — the home page's changelog card
+   ============================================================ */
+
+.rm-log-row {
+  transition:
+    background 160ms var(--ease-out),
+    color 160ms var(--ease-out);
+}
+.rm-log-row[data-open="true"],
+.rm-log-row:hover,
+.rm-log-row:focus-visible {
+  /* The measured pair: brand ink on the brand tint is --fg-brand-on-tint, never --fg-brand,
+     which fails contrast on eight of the twelve theme × mode combinations. */
+  background: var(--bg-surface-brand);
+}
+/* The base colours, which used to be written inline on the element and therefore beat
+   everything below. Equal specificity to the rules that follow, so source order decides —
+   these first, the states after. */
+.rm-log-title {
+  color: var(--fg-secondary);
+}
+.rm-log-title[data-live="true"] {
+  color: var(--fg-primary);
+}
+.rm-log-row[data-open="true"] .rm-log-title,
+.rm-log-row:hover .rm-log-title,
+.rm-log-row:focus-visible .rm-log-title {
+  color: var(--fg-brand-on-tint);
+}
+
+/* `0fr → 1fr` animates a height nobody has to measure. `max-height` guesses, and a guess
+   that is too small clips the blurb while a guess that is too large makes the open slower
+   than the close. */
+.rm-log-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 260ms var(--ease-out);
+}
+.rm-log-drawer[data-open="true"] {
+  grid-template-rows: 1fr;
+}
+
+/* The graph line, continued through an open row. `1ch` is one monospace advance and the
+   rule is painted at its centre, which is exactly where the `│` above puts its stroke —
+   so the two are one line without a magic number to keep in step with the font. */
+.rm-log-drawer-gutter {
+  --rm-log-rule: var(--border-strong);
+  flex: 0 0 1ch;
+  align-self: stretch;
+  background: linear-gradient(
+    to right,
+    transparent calc(50% - 0.5px),
+    var(--rm-log-rule) calc(50% - 0.5px),
+    var(--rm-log-rule) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+}
+.rm-log-drawer-gutter[data-live="true"] {
+  --rm-log-rule: var(--fg-brand);
+}
+
+/* ============================================================
+   LOG RAIL  — one type's entries as a row rather than a grid
+   ============================================================ */
+
+/*
+ * The scroller is the flex row itself, so a card's `flex-basis: min(320px, 100%)` resolves
+ * against a box with a definite width — one card fills a phone and three fit a desktop
+ * column, from one declaration and with no measuring.
+ *
+ * The mask does the fading; `overflow-x` does the clipping. Padding on both axes is
+ * clearance rather than spacing: `.bento-card` cards carry a 2px focus ring at 2px offset,
+ * and a scroller clips at its padding box — with none, tabbing to the first card drew the
+ * ring straight into the clip. The negative margins hand the room back to the layout.
+ */
+.log-rail-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  /*
+   * `clip`, not the `visible` it would otherwise be. A box with one axis scrollable computes
+   * the other from `visible` to `auto`, so this was a vertical scroll container too — and it
+   * had somewhere to go, because every card enters from `y: 14`. The rail could be nudged
+   * down a few pixels with a wheel, and focusing a card scrolled it there on its own, which
+   * cut the top off whatever you had just tabbed to.
+   *
+   * `clip` is the one value that stops the axis being scrollable at all rather than merely
+   * hiding it, and `overflow-clip-margin` is what then lets the entrance and the 2px focus
+   * ring paint outside the box without any of it becoming scrollable. Where that property is
+   * unsupported this clips at the padding box, which the padding below is already sized for.
+   */
+  overflow-y: clip;
+  overflow-clip-margin: 12px;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 4px;
+  padding: 6px 4px;
+  margin: -6px -4px;
+  scrollbar-width: none;
+  /* Both ends start square. `overflow-x` is what clips the rail; the mask only ever says
+     "there is more that way", so a side with nothing beyond it gets no gradient — a fade
+     over the first card's edge when it is already at the start dissolves the card instead
+     of suggesting depth, which is what it looked like. The two lengths are driven by the
+     same measurement the arrows use, so the two can never disagree. */
+  --rail-fade-start: 0px;
+  --rail-fade-end: 0px;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--rail-fade-start),
+    #000 calc(100% - var(--rail-fade-end)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--rail-fade-start),
+    #000 calc(100% - var(--rail-fade-end)),
+    transparent 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.log-rail-track[data-more~="start"] {
+  --rail-fade-start: 36px;
+}
+.log-rail-track[data-more~="end"] {
+  --rail-fade-end: 36px;
+}
+.log-rail-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* `min(320px, 100%)` and not a fixed track: 320px inside a 287px column is a card wider
+   than the phone it is on, which is the failure mode the grid's `min(300px, 100%)` was
+   already avoiding. */
+.log-rail-track > * {
+  flex: 0 0 min(320px, 100%);
+  scroll-snap-align: start;
+}
+
+/* The trigger. One pixel wide and out of the flow's way — it exists to be watched, not to
+   be seen, and giving it any width would put a gap after the last card. */
+.log-rail-track > .log-rail-sentinel {
+  flex: 0 0 1px;
+  align-self: stretch;
+  scroll-snap-align: none;
+}
+
+.log-rail-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  translate: 0 -50%;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  background: var(--bg-surface);
+  color: var(--fg-secondary);
+  cursor: pointer;
+  transition:
+    opacity 180ms var(--ease-out),
+    border-color 180ms var(--ease-out),
+    color 180ms var(--ease-out);
+}
+/* Mostly in the page's gutter rather than on top of a card. -18px against the narrowest
+   page padding on the site (20px) means they never push the column wide enough to give
+   `<main>` a horizontal scrollbar, while leaving only ~10px sitting over the card's faded
+   edge — which is where a control that means "there is more that way" belongs. */
+.log-rail-arrow[data-dir="prev"] {
+  left: -18px;
+}
+.log-rail-arrow[data-dir="next"] {
+  right: -18px;
+}
+
+/*
+ * Gone on touch. These exist for one reason — a vertical wheel does nothing to a horizontal
+ * scroller — and a finger has never had that problem. On a phone the card fills the column,
+ * so the only place left for them is on top of the poster.
+ *
+ * Nothing is lost by removing them: the rail swipes, and it keeps `tabindex` so a keyboard
+ * on a tablet still reaches it and scrolls it with the arrow keys.
+ */
+@media (hover: none), (pointer: coarse) {
+  .log-rail-arrow {
+    display: none;
+  }
+}
+.log-rail-arrow:hover:not(:disabled) {
+  border-color: var(--border-brand-strong);
+  color: var(--fg-brand);
+}
+/* Kept in place, not in the tab order. An arrow that unmounted at the end of the row would
+   move the other one, and a pair that shuffles under the cursor is worse than one that fades
+   — so it stays in the layout. It is genuinely `disabled` though, which means it also leaves
+   the tab order, and reaching an end while focused on it drops focus to the body. That is
+   the lesser cost: the alternative is an invisible control that still takes a Tab. */
+.log-rail-arrow:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
+   AUTOFILL  — the one place the browser paints over the theme
+   ============================================================ */
+
+/*
+ * Chrome fills an autocompleted field with a near-white background and near-black text, and
+ * neither is something a `background-color` can win: the UA paints them in a layer above the
+ * cascade. Two properties do outrank it — an inset shadow large enough to fill the box, and
+ * `-webkit-text-fill-color`, which beats `color` for the same reason — so those are what the
+ * theme has to be restated in.
+ *
+ * `--bg-surface` is exactly what the wrapper behind the input is painted with, so the fill is
+ * invisible rather than merely darker, and it follows light and dark like everything else.
+ * The input sits inside the wrapper's horizontal padding, so a rectangular fill never reaches
+ * the rounded corners.
+ *
+ * Firefox implements the standard `:autofill` and only forces a `background-image`, which is
+ * one declaration and needs the `!important` because the UA sheet uses one.
+ *
+ * This lives here rather than in `entrepta/input.tsx` because it is a correction to browser
+ * behaviour, not a style: it has to reach every field on the site — the contact form, the
+ * admin forms, the ⌘K palette — including any written without that component.
+ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill {
+  -webkit-box-shadow: inset 0 0 0 1000px var(--bg-surface);
+  box-shadow: inset 0 0 0 1000px var(--bg-surface);
+  -webkit-text-fill-color: var(--fg-primary);
+  caret-color: var(--fg-primary);
+}
+
+input:autofill,
+textarea:autofill,
+select:autofill {
+  background-image: none !important;
+}

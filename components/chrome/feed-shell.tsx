@@ -12,7 +12,8 @@
  * skeleton in `app/log/loading.tsx` was quietly the fourth.
  *
  * What is left at each call site is the part that genuinely differs: what the thing is called,
- * what it groups by, what a group's tally says, and what a card looks like.
+ * what it groups by, what a group's tally says, what a card looks like, and — since /log became
+ * a rail rather than a grid — what the cards sit in.
  *
  * Two things stay outside on purpose. The filter state, because `useUrlFilter` needs the param
  * and the base path and those belong to the route; and the page header, which is server-rendered
@@ -79,7 +80,7 @@ export function FeedShell<T>({
   groups,
   groupMeta,
   empty,
-  listClassName,
+  list,
   renderItem,
   children,
 }: {
@@ -103,8 +104,27 @@ export function FeedShell<T>({
   /** Two different facts, and they must not be one sentence: nothing published at all, versus
    *  nothing under the filter someone just applied. */
   empty: { all: string; filtered: string }
-  /** What the cards sit in — a column on /blog, a grid on the other two. */
-  listClassName: string
+  /**
+   * What the cards sit in. Exactly one of these two, and the union is the enforcement:
+   * `className` for a plain wrapper — a column on /blog, a grid on /projects — or `render`
+   * when the layout is a component with state of its own, which is what /log's rail is. A
+   * page passing both would be describing two layouts.
+   */
+  list:
+    | { className: string; render?: never }
+    | {
+        className?: never
+        /**
+         * Gets the group's items, the shell's own per-item renderer, and the group's label —
+         * the last one so a layout needing an accessible name has the same string the
+         * heading and the outline row use, instead of reaching into `items[0]` for it.
+         */
+        render: (
+          items: T[],
+          renderItem: (item: T, index: number) => React.ReactNode,
+          label: string,
+        ) => React.ReactNode
+      }
   /** Must return a keyed element. `index` is already the staggered one. */
   renderItem: (item: T, index: number) => React.ReactNode
   /** The server-rendered page header. */
@@ -210,18 +230,23 @@ export function FeedShell<T>({
                           {sub.label}
                         </h3>
                       )}
-                      <div className={listClassName}>
-                        {/* The stagger belongs to the very first run only. */}
-                        {sub.items.map((item, i) => renderItem(item, gi === 0 && si === 0 ? i : 0))}
-                      </div>
+                      <List
+                        list={list}
+                        items={sub.items}
+                        label={sub.label}
+                        render={renderItem}
+                        stagger={gi === 0 && si === 0}
+                      />
                     </div>
                   ))
                 ) : (
-                  <div className={listClassName}>
-                    {/* The stagger belongs to the first group only. Past it every card would be
-                        waiting out a delay for an entrance the reader scrolled to deliberately. */}
-                    {group.items.map((item, i) => renderItem(item, gi === 0 ? i : 0))}
-                  </div>
+                  <List
+                    list={list}
+                    items={group.items}
+                    label={group.label}
+                    render={renderItem}
+                    stagger={gi === 0}
+                  />
                 )}
               </section>
             ))
@@ -230,4 +255,30 @@ export function FeedShell<T>({
       </div>
     </div>
   )
+}
+
+/**
+ * The one place a run of cards is drawn, whichever layout the page chose.
+ *
+ * `stagger` is the entrance's, and it belongs to the first run on the page only — past it
+ * every card would be sitting out a delay before an entrance the reader scrolled to on
+ * purpose.
+ */
+function List<T>({
+  list,
+  items,
+  label,
+  render,
+  stagger,
+}: {
+  list: React.ComponentProps<typeof FeedShell<T>>["list"]
+  items: T[]
+  label: string
+  render: (item: T, index: number) => React.ReactNode
+  stagger: boolean
+}) {
+  const withIndex = (item: T, i: number) => render(item, stagger ? i : 0)
+
+  if (list.render) return <>{list.render(items, withIndex, label)}</>
+  return <div className={list.className}>{items.map(withIndex)}</div>
 }

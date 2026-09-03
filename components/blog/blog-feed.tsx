@@ -83,7 +83,7 @@ export function BlogFeed({
         all: "// no posts yet. when I publish something, it shows up here first.",
         filtered: "// nothing tagged that way yet.",
       }}
-      listClassName="flex flex-col gap-4"
+      list={{ className: "flex flex-col gap-4" }}
       renderItem={(post, index) => <PostCard key={post.slug} post={post} index={index} />}
     >
       {children}

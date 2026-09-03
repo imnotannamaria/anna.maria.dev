@@ -9,7 +9,7 @@ import { getPublicItems } from "@/lib/roadmap/queries"
 export const metadata = createMetadata({
   title: "Roadmap",
   description:
-    "Loose ideas for what comes next on this site, and what already shipped: to do, in progress, done.",
+    "Everything I'm working on in open source: this site, entrepta, and the projects that are still one sentence. To do, in progress, shipped.",
   path: "/roadmap",
 })
 
@@ -61,13 +61,13 @@ export default async function RoadmapPage() {
           className="text-body-lg mt-4 max-w-[58ch] font-sans leading-relaxed"
           style={{ color: "var(--fg-secondary)" }}
         >
-          Hi. You&apos;re probably wondering why a portfolio has a roadmap. The honest answer is
-          that I&apos;ve been having too much fun building things for this site. At some point it
-          stopped being a portfolio and turned into{" "}
+          Everything I&apos;m working on in{" "}
           <em className="font-serif italic" style={{ color: "var(--fg-brand)" }}>
-            me, as a website
-          </em>
-          . It is also the best proof I have of what I can build.
+            open source
+          </em>{" "}
+          right now, on one board. Some of it is this site. Some of it is entrepta, the design
+          system it&apos;s drawn with. The rest is projects that don&apos;t exist yet beyond a
+          sentence I didn&apos;t want to lose.
         </p>
 
         <p

@@ -8,6 +8,7 @@ import {
 } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/utils"
 import { CardHead } from "@/components/ui/card-parts"
+import { SectHead } from "@/components/home/section-head"
 import { FeaturedProjectCard } from "@/components/home/featured-project-card"
 import { FeaturedPostCard } from "@/components/home/featured-post-card"
 import { OssCard } from "@/components/home/oss-card"
@@ -17,16 +18,18 @@ import { TodayActivityCard } from "@/components/wristkit/today-activity-card"
 import { loadTodayActivity } from "@/components/wristkit/today-activity-card/load"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
-import { LatestLogCard } from "@/components/home/latest-log-card"
-import { LogCardSkeleton } from "@/components/home/log-card-view"
+import { LogShelfCard } from "@/components/home/log-shelf-card"
+import { RoadmapChangelogCard } from "@/components/home/roadmap-changelog-card"
 import { ProfileCard, ProfileCardSkeleton } from "@/components/home/profile-card"
 import { TreeCard, TreeCardSkeleton } from "@/components/home/tree-card"
 import { buildSiteTree, siteTreeRouteCount } from "@/lib/site-tree"
 import { getPublishedEntries } from "@/lib/log/queries"
+import { getPublicItems } from "@/lib/roadmap/queries"
 import { createMetadata } from "@/lib/metadata"
 import { calcYearsOfExp, yearsWord } from "@/lib/experience"
 import { getContributions } from "@/lib/github/contributions"
 import { siteConfig } from "@/lib/site-config"
+import type { CardState } from "@/lib/showcase/state"
 
 /**
  * Rendered per request. Two cards here read live data — wristkit's activity rings and the
@@ -42,51 +45,6 @@ export const metadata = createMetadata({
   path: "/",
   titleAbsolute: true,
 })
-
-// ─── Helpers ───────────────────────────────────────────────────────────────────
-
-function SectHead({
-  id,
-  cmd,
-  meta,
-  as = "h2",
-}: {
-  id: string
-  cmd: string
-  meta?: React.ReactNode
-  as?: "h2" | "span"
-}) {
-  const Label = as
-  return (
-    <div
-      className="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-dashed pb-3"
-      style={{ borderColor: "var(--border-subtle)" }}
-    >
-      <Label
-        id={id}
-        className="text-mono-sm font-mono font-normal"
-        style={
-          as === "h2"
-            ? { margin: 0, color: "var(--fg-secondary)" }
-            : { color: "var(--fg-secondary)" }
-        }
-      >
-        <span aria-hidden="true" style={{ color: "var(--fg-brand)" }}>
-          ${" "}
-        </span>
-        {cmd}
-      </Label>
-      {meta && (
-        <span
-          className="text-mono-sm font-mono tracking-[0.08em] uppercase"
-          style={{ color: "var(--fg-muted)" }}
-        >
-          {meta}
-        </span>
-      )}
-    </div>
-  )
-}
 
 // ─── Streaming slots ───────────────────────────────────────────────────────────
 //
@@ -195,9 +153,32 @@ async function WristkitSlot() {
   )
 }
 
+/**
+ * The two cards in the bottom row of `$ cat ./off-the-clock`.
+ *
+ * Both hand the card a `CardState` rather than a bare array, because a failed query and an
+ * empty table are different facts and a card that collapses them tells the visitor "nothing
+ * yet" when the truth is "I can't reach the database". `.catch(() => null)` is the
+ * distinction: null is the failure, `[]` is the genuine empty.
+ *
+ * A blip costs the home page one card, not the page — `/log` and `/roadmap` carry their own
+ * `error.tsx` instead, because there the data IS the page.
+ */
 async function LogShelfSlot() {
   const entries = await getPublishedEntries().catch(() => null)
-  return <LatestLogCard entries={entries ?? []} />
+  return <LogShelfCard state={toState(entries)} className="h-full" />
+}
+
+async function RoadmapSlot() {
+  const items = await getPublicItems().catch(() => null)
+  return <RoadmapChangelogCard state={toState(items)} className="h-full" />
+}
+
+/** null → error, [] → empty, rows → ok. One place, so the two slots cannot drift. */
+function toState<T>(rows: T[] | null): CardState<T[]> {
+  if (rows === null) return { kind: "error" }
+  if (rows.length === 0) return { kind: "empty" }
+  return { kind: "ok", data: rows }
 }
 
 async function GithubSlot() {
@@ -296,11 +277,18 @@ export default function Home() {
 
       {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
       <section aria-labelledby="sec-offclock">
-        <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym · log" />
-        {/* Back to the arrangement that worked: now-playing and the piano stacked beside a
-            full-height wristkit. Those three balance because the stack of two roughly
-            matches the tall one — putting them in three equal columns instead would leave
-            a ~450px hole under now-playing, since wristkit is about 2.5x its height. */}
+        <SectHead id="sec-offclock" cmd="cat ./off-the-clock" meta="music · gym · log · roadmap" />
+        {/* Now-playing and the piano stacked beside a full-height wristkit — those three
+            balance because the stack of two roughly matches the tall one, and three equal
+            columns would leave a ~450px hole under now-playing since wristkit is about 2.5x
+            its height.
+
+            The log and the roadmap are a third row of the same grid rather than a block of
+            their own underneath. wristkit spans rows one and two, so auto-placement drops
+            these two straight into the row below it, and they end up sharing a row height
+            the way every other pair on this page does. Both cards take `h-full` for that
+            reason: the taller one sets the row and the shorter one fills it, instead of
+            leaving a gap under whichever has less to say today. */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <NowPlayingWidget />
           <Suspense
@@ -313,12 +301,14 @@ export default function Home() {
             <WristkitSlot />
           </Suspense>
           <MiniPianoCard />
-        </div>
 
-        {/* The log gets the full width underneath, laid out as a shelf. */}
-        <div className="mt-6">
-          <Suspense fallback={<LogCardSkeleton />}>
+          <Suspense fallback={<LogShelfCard state={{ kind: "loading" }} className="h-full" />}>
             <LogShelfSlot />
+          </Suspense>
+          <Suspense
+            fallback={<RoadmapChangelogCard state={{ kind: "loading" }} className="h-full" />}
+          >
+            <RoadmapSlot />
           </Suspense>
         </div>
       </section>

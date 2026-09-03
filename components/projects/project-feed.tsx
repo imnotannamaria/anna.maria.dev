@@ -99,7 +99,7 @@ export function ProjectFeed({
       }}
       /* min(280px, 100%) so a 375px viewport gets one column rather than a track wider than
          the screen — the same rule /log's grid uses. */
-      listClassName="grid grid-cols-[repeat(auto-fill,minmax(min(280px,100%),1fr))] gap-4"
+      list={{ className: "grid grid-cols-[repeat(auto-fill,minmax(min(280px,100%),1fr))] gap-4" }}
       renderItem={(project, index) => (
         <ProjectCard key={project.slug} project={project} index={index} />
       )}

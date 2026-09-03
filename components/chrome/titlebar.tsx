@@ -36,7 +36,9 @@ function showEasterEgg() {
 
 /**
  * Tab order, and it is the same list in the same order in three places — here, the sidebar and
- * the command palette. Work first, then the four Anna named: contact, components, log, piano.
+ * the command palette. Work first — home, about, posts, projects — then contact, then the three
+ * that are about the site itself: components, roadmap, log. Contact sits ahead of them because
+ * it is the one tab with something to ask of a visitor, and it was behind the roadmap.
  *
  * Piano is last on purpose and stays last. It is the one page that is a toy rather than a
  * claim, so it reads as the thing at the end of the row rather than something competing with
@@ -47,9 +49,9 @@ const NAV_TABS: Tab[] = [
   { href: "/about", name: "about.md", icon: UserSquareIcon },
   { href: "/blog", name: "posts/", icon: FileMdIcon },
   { href: "/projects", name: "projects/", icon: TerminalWindowIcon },
-  { href: "/roadmap", name: "roadmap.md", icon: ListChecksIcon },
   { href: "/contact", name: "contact.tsx", icon: ChatsCircleIcon },
   { href: "/components", name: "components/", icon: SwatchesIcon },
+  { href: "/roadmap", name: "roadmap.md", icon: ListChecksIcon },
   { href: "/log", name: "log.tsx", icon: SquaresFourIcon },
   { href: "/piano", name: "piano.tsx", icon: PianoKeysIcon },
 ]

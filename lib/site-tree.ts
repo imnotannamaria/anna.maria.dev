@@ -5,6 +5,12 @@
 // order the branches go in, what blog/[slug] becomes. Every one of those is a
 // choice, so they live here as data instead of being inferred and then overridden.
 //
+// The order is the nav's, minus the home page — which is the root here rather than a
+// row in it. It had drifted into an order of its own, so the site gave two answers to
+// "where does the roadmap sit", and this card is a picture of the site's shape. The four
+// lists that answer that question are the titlebar's NAV_TABS, the sidebar's NAV_ITEMS,
+// the palette's PAGES, and this one; reorder any of them and reorder all four.
+//
 // This file stays free of velite and database imports. The shape is static, the
 // numbers arrive at render — see `buildSiteTree`, which the home page calls with
 // data it has already fetched for other cards.
@@ -60,17 +66,17 @@ const SITE_TREE: TreeNode[] = [
         countNoun: "projects",
         childSource: "projects",
       },
-      { name: "log.tsx", kind: "file", href: "/log", countKey: "log", countNoun: "entries" },
-      { name: "piano.tsx", kind: "file", href: "/piano" },
-      /* No count, unlike log.tsx. The counts here come off lists the home page already has
-         in memory, and it has no reason to fetch roadmap items — a number in this row would
-         cost a query for a row that is one word wide. */
-      { name: "roadmap.md", kind: "file", href: "/roadmap" },
+      { name: "contact.tsx", kind: "file", href: "/contact" },
       /* No count here for the same reason roadmap.md has none: the counts in this tree come
          off lists the home page already holds, and the showcase registry is not one of them.
          A number would mean importing it for a row one word wide. */
       { name: "components/", kind: "folder", href: "/components" },
-      { name: "contact.tsx", kind: "file", href: "/contact" },
+      /* No count, unlike log.tsx. The counts here come off lists the home page already has
+         in memory, and it has no reason to fetch roadmap items — a number in this row would
+         cost a query for a row that is one word wide. */
+      { name: "roadmap.md", kind: "file", href: "/roadmap" },
+      { name: "log.tsx", kind: "file", href: "/log", countKey: "log", countNoun: "entries" },
+      { name: "piano.tsx", kind: "file", href: "/piano" },
     ],
   },
 ]
