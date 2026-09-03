@@ -9,8 +9,8 @@
  * Two rules here are not optional.
  *
  * **No `new Date()`.** A fixture computed from the current date renders one string on the
- * server and another on the client the moment a render straddles midnight — the trap
- * `components/home/latest-log-card.tsx` documents for the log strip. Every date is a literal.
+ * server and another on the client the moment a render straddles midnight — the trap the log
+ * strip on the home page was split server/client to avoid. Every date is a literal.
  *
  * **No `Math.random()`.** The contributions grid is 53 × 7 and checking in 371 objects would be
  * unreadable, so it is generated — with a seeded PRNG, because `Math.random()` produces a
