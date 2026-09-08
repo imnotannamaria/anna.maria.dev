@@ -13,16 +13,15 @@ import { Badge, CardHead } from "@/components/ui/card-parts"
  * why the track is taller than the segments and aligned to the bottom — the
  * growth needs somewhere to go, and growing upward is what makes it read as a
  * chart instead of a loading bar.
+ *
+ * Past the goal the bar keeps going rather than capping. It used to draw exactly
+ * `goal` segments, so the seventh project of a six-project year had nowhere to
+ * land: the bar looked identical at 6/6 and at 7/6, and the only thing on the
+ * card that knew was a badge reading "-1 to go". The extra segments carry
+ * `--fg-brand-hover` and a double gap at the boundary, so where the goal was is
+ * still legible in a bar that has passed it.
  */
-function ProgressBar({
-  filled,
-  total,
-  reduce,
-}: {
-  filled: number
-  total: number
-  reduce: boolean
-}) {
+function ProgressBar({ count, goal, reduce }: { count: number; goal: number; reduce: boolean }) {
   const track: Variants = {
     hidden: {},
     show: { transition: { staggerChildren: reduce ? 0 : 0.06, delayChildren: reduce ? 0 : 0.15 } },
@@ -49,20 +48,30 @@ function ProgressBar({
       variants={track}
       aria-hidden
     >
-      {Array.from({ length: total }, (_, i) => (
-        <motion.span
-          key={i}
-          variants={i < filled ? on : off}
-          style={{
-            flex: 1,
-            height: 6,
-            borderRadius: 2,
-            originX: 0,
-            originY: 1,
-            background: i < filled ? "var(--fg-brand)" : "var(--border-subtle)",
-          }}
-        />
-      ))}
+      {Array.from({ length: Math.max(count, goal) }, (_, i) => {
+        const past = i >= goal
+        return (
+          <motion.span
+            key={i}
+            variants={i < count ? on : off}
+            style={{
+              flex: 1,
+              height: 6,
+              borderRadius: 2,
+              originX: 0,
+              originY: 1,
+              background: past
+                ? "var(--fg-brand-hover)"
+                : i < count
+                  ? "var(--fg-brand)"
+                  : "var(--border-subtle)",
+              // Double the 3px gap where the goal used to end, so the overshoot
+              // reads as past a line rather than as a longer bar.
+              marginLeft: i === goal ? 3 : undefined,
+            }}
+          />
+        )
+      })}
     </motion.div>
   )
 }
@@ -78,6 +87,16 @@ export function OssCard({
 }) {
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(340)
+
+  /**
+   * The badge was `goal - count` printed raw, which is a countdown that runs off the
+   * bottom: the seventh project of a six-project year rendered "-1 to go". A goal you
+   * have passed is the good outcome, so it gets said as one. Every string here is at
+   * most eight characters, the same as the "-1 to go" it replaces, which is what keeps
+   * it inside `CardHead`'s nowrap meta half in a card that clips.
+   */
+  const over = count - goal
+  const status = over > 0 ? `+${over} over` : over === 0 ? "goal met" : `${-over} to go`
 
   return (
     <motion.div
@@ -101,15 +120,21 @@ export function OssCard({
             {/* Same pulse as the tree card's "live" dot — a count that is still
                 moving should read as still moving. `live-pulse` is a CSS
                 keyframe, so the global prefers-reduced-motion block already
-                stops it without anything needed here. */}
+                stops it without anything needed here.
+
+                It stops once the goal is met, though: the pulse belongs to the
+                countdown, where there is something outstanding. "goal met" is a
+                result, and a dot still resolving beside it would suggest the
+                number hasn't landed yet. The dot stays, so the badge still reads
+                as live data. */}
             <span
               className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
               style={{
                 background: "currentColor",
-                animation: "live-pulse 2s ease-in-out infinite",
+                animation: over >= 0 ? undefined : "live-pulse 2s ease-in-out infinite",
               }}
             />
-            {goal - count} to go
+            {status}
           </Badge>
         }
       />
@@ -148,7 +173,7 @@ export function OssCard({
         </span>
       </div>
 
-      <ProgressBar filled={count} total={goal} reduce={reduce} />
+      <ProgressBar count={count} goal={goal} reduce={reduce} />
     </motion.div>
   )
 }
