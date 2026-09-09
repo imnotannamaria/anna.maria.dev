@@ -31,7 +31,7 @@ const PAGES: Page[] = [
   // Same order as the titlebar and the sidebar — see the note in `titlebar.tsx`.
   { href: "/", name: "home.tsx", hint: "~", icon: HouseLineIcon },
   { href: "/about", name: "about.md", hint: "~/about", icon: UserSquareIcon },
-  { href: "/blog", name: "posts/", hint: "~/blog", icon: FileMdIcon },
+  { href: "/blog", name: "blog/", hint: "~/blog", icon: FileMdIcon },
   { href: "/projects", name: "projects/", hint: "~/projects", icon: TerminalWindowIcon },
   { href: "/contact", name: "contact.tsx", hint: "~/contact", icon: ChatsCircleIcon },
   { href: "/components", name: "components/", hint: "~/components", icon: SwatchesIcon },

@@ -57,8 +57,11 @@ export function BlogFeed({
 
   return (
     <FeedShell
-      file="posts/"
-      root={{ id: "posts", label: "posts" }}
+      /* `blog/`, not `posts/` — the place is named after the route it lives at, the way every
+         other entry in the titlebar and the palette is. The items in it are still posts, which
+         is why the footer tally and `groupMeta` below keep that noun. */
+      file="blog/"
+      root={{ id: "blog", label: "blog" }}
       footer={
         <>
           <div className="flex justify-between">

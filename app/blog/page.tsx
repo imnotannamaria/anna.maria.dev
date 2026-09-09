@@ -52,11 +52,11 @@ export default function BlogPage() {
         <span aria-hidden style={{ opacity: 0.5, margin: "0 6px" }}>
           /
         </span>
-        <span style={{ color: "var(--fg-primary)" }}>posts</span>
+        <span style={{ color: "var(--fg-primary)" }}>blog</span>
       </nav>
 
-      <div id="posts" style={{ scrollMarginTop: 24 }}>
-        <DocLabel level="#">ls ./posts --sort=date</DocLabel>
+      <div id="blog" style={{ scrollMarginTop: 24 }}>
+        <DocLabel level="#">ls ./blog --sort=date</DocLabel>
 
         <TypeIn
           as="h1"

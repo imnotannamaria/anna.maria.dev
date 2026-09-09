@@ -20,10 +20,14 @@
  * and arrives as `children` — the whole reason the feeds take children rather than a `title`.
  */
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
+import { CaretDown, CaretRight } from "@phosphor-icons/react"
 import { PageOutline, type OutlineItem } from "./page-outline"
 import { FilterPill } from "@/components/ui/url-filter"
+import { splitPills, type FeedPill } from "@/lib/feed-filter"
 import { cn } from "@/lib/utils"
+
+export type { FeedPill }
 
 /** One `<section>` in the feed, one row in the outline. */
 export type FeedGroup<T> = {
@@ -45,8 +49,6 @@ export type FeedGroup<T> = {
    */
   subgroups?: { id: string; label: string; items: T[] }[]
 }
-
-export type FeedPill = { key: string; label: string; count: number }
 
 /**
  * Buckets in **first-appearance** order, which is what keeps a query's ordering through the
@@ -84,7 +86,7 @@ export function FeedShell<T>({
   renderItem,
   children,
 }: {
-  /** The name in the outline chip: `posts/`, `projects/`, `log.tsx`. */
+  /** The name in the outline chip: `blog/`, `projects/`, `log.tsx`. */
   file: string
   /** The level-1 outline row. Its `id` is the one the page header carries. */
   root: { id: string; label: string }
@@ -159,23 +161,13 @@ export function FeedShell<T>({
         <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
           {children}
 
-          <div role="group" aria-label={filterLabel} className="mt-8 flex flex-wrap gap-2">
-            <FilterPill
-              label="all"
-              count={totalCount}
-              active={!active}
-              onClick={() => onFilter(null)}
-            />
-            {pills.map((pill) => (
-              <FilterPill
-                key={pill.key}
-                label={pill.label}
-                count={pill.count}
-                active={active === pill.key}
-                onClick={() => onFilter(active === pill.key ? null : pill.key)}
-              />
-            ))}
-          </div>
+          <FilterRow
+            label={filterLabel}
+            pills={pills}
+            totalCount={totalCount}
+            active={active}
+            onFilter={onFilter}
+          />
 
           {groups.length === 0 ? (
             <p className="text-mono-md mt-12 font-mono" style={{ color: "var(--fg-muted)" }}>
@@ -253,6 +245,90 @@ export function FeedShell<T>({
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * The filter row, with the long tail folded behind a toggle.
+ *
+ * /projects drew 38 pills over seven rows and grew a little with every project. The split is
+ * by what a pill *does*: 26 of those 38 selected exactly one project, and a filter that
+ * returns one result is a link to that result wearing the costume of a filter. So the row at
+ * rest holds the tags that group more than one item — capped, because `count > 1` bounds
+ * nothing on its own — and the rest is one click away.
+ *
+ * Two things this has to get right, and both fail quietly:
+ *
+ * **The active tag can be in the folded half.** Someone opening /projects?tag=rust would see
+ * a filtered page whose control was hidden, with no visible way back to everything. So a
+ * folded tag that is active is hoisted into the visible row instead of expanding the whole
+ * tail — the bound survives, and the pill you are filtering by is always on screen. It comes
+ * back after hydration rather than in the server HTML, which is the same deal `useUrlFilter`
+ * already makes for the filter itself.
+ *
+ * **The toggle must not move when you press it.** It sits before the folded pills, not after
+ * them, so expanding does not push it down seven rows away from the cursor that just clicked
+ * it and leave you hunting for the way back.
+ */
+function FilterRow({
+  label,
+  pills,
+  totalCount,
+  active,
+  onFilter,
+}: {
+  label: string
+  pills: FeedPill[]
+  totalCount: number
+  active: string | null
+  onFilter: (next: string | null) => void
+}) {
+  const [open, setOpen] = useState(false)
+
+  const { visible, folded } = useMemo(() => splitPills(pills), [pills])
+
+  const pill = (item: FeedPill) => (
+    <FilterPill
+      key={item.key}
+      label={item.label}
+      count={item.count}
+      active={active === item.key}
+      onClick={() => onFilter(active === item.key ? null : item.key)}
+    />
+  )
+
+  const hoisted = !open && folded.find((item) => item.key === active)
+
+  return (
+    <div role="group" aria-label={label} className="mt-8 flex flex-wrap gap-2">
+      <FilterPill label="all" count={totalCount} active={!active} onClick={() => onFilter(null)} />
+      {visible.map(pill)}
+      {hoisted && pill(hoisted)}
+
+      {folded.length > 0 && (
+        <>
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            /* `aria-expanded` and no `aria-controls`. The folded pills have to stay direct
+               children of this flex container or they wrap as one block instead of flowing,
+               so there is no element that *is* the revealed region — the only id to point at
+               is the whole row, which contains this button. Naming your own ancestor is a
+               worse claim about the page than making no claim. */
+            aria-expanded={open}
+            /* Dashed, and with no count chip, because it is not a filter — it is the control
+               that reveals the rest of them. Related to the pills beside it, deliberately not
+               one of them. */
+            className="text-mono-sm inline-flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-dashed px-3 font-mono whitespace-nowrap transition-colors duration-120 hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-primary)]"
+            style={{ borderColor: "var(--border-strong)", color: "var(--fg-secondary)" }}
+          >
+            {open ? <CaretDown size={12} aria-hidden /> : <CaretRight size={12} aria-hidden />}
+            {open ? "fewer" : `+${folded.length} more`}
+          </button>
+          {open && folded.map(pill)}
+        </>
+      )}
     </div>
   )
 }
