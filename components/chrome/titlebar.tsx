@@ -47,7 +47,7 @@ function showEasterEgg() {
 const NAV_TABS: Tab[] = [
   { href: "/", name: "home.tsx", icon: HouseLineIcon },
   { href: "/about", name: "about.md", icon: UserSquareIcon },
-  { href: "/blog", name: "posts/", icon: FileMdIcon },
+  { href: "/blog", name: "blog/", icon: FileMdIcon },
   { href: "/projects", name: "projects/", icon: TerminalWindowIcon },
   { href: "/contact", name: "contact.tsx", icon: ChatsCircleIcon },
   { href: "/components", name: "components/", icon: SwatchesIcon },

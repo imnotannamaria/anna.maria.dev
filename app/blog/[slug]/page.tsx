@@ -160,7 +160,7 @@ export default async function BlogPostPage({ params }: Props) {
                 <span aria-hidden style={{ color: "var(--fg-brand)" }}>
                   ←
                 </span>
-                back to posts/
+                back to blog/
               </Link>
             </div>
           </article>

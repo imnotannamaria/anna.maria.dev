@@ -55,7 +55,7 @@ export default function BlogPage() {
         <span style={{ color: "var(--fg-primary)" }}>posts</span>
       </nav>
 
-      <div id="posts" style={{ scrollMarginTop: 24 }}>
+      <div id="blog" style={{ scrollMarginTop: 24 }}>
         <DocLabel level="#">ls ./posts --sort=date</DocLabel>
 
         <TypeIn
