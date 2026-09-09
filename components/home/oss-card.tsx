@@ -5,6 +5,9 @@ import { EASE_OUT } from "@/components/ui/reveal"
 import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { Badge, CardHead } from "@/components/ui/card-parts"
 
+/** The gap between segments, and — doubled — the width of the goal boundary. */
+const SEGMENT_GAP = 3
+
 /**
  * The same segmented bar the card has always had, given something to do.
  *
@@ -13,16 +16,30 @@ import { Badge, CardHead } from "@/components/ui/card-parts"
  * why the track is taller than the segments and aligned to the bottom — the
  * growth needs somewhere to go, and growing upward is what makes it read as a
  * chart instead of a loading bar.
+ *
+ * Past the goal the bar keeps going rather than capping. It used to draw exactly
+ * `goal` segments, so the seventh project of a six-project year had nowhere to
+ * land: the bar looked identical at 6/6 and at 7/6, and the only thing on the
+ * card that knew was a badge reading "-1 to go". The extra segments sit past a
+ * doubled gap, in the brand mixed halfway into the card, so where the goal was
+ * is still legible in a bar that has gone beyond it.
+ *
+ * That colour is derived rather than borrowed, and the first attempt is why.
+ * `--fg-brand-hover` looked like the obvious dimmer sibling and is not one: it
+ * is defined as the LIGHTER shade (globals.css), which holds in dark mode and
+ * inverts in light, and entrepta light is the one pair of twelve where it lands
+ * darker than `--fg-brand` instead of lighter. So the overshoot changed meaning
+ * with the mode on the default theme. It was also invisible — ΔE76 between the
+ * two tokens is under 10 in eight of the twelve theme × mode pairs, on 6px bars,
+ * which put the bar back to not showing the overshoot at all.
+ *
+ * Mixing into `--bg-card` recedes toward whatever the card is, so it reads the
+ * same way in both modes, and it is the `color-mix()` derivation the conventions
+ * ask for. 55% is roughly equidistant from both neighbours — worst-case ΔE 30.8
+ * from a filled segment and 33.3 from an empty one — so it reads as its own
+ * third thing rather than drifting into either.
  */
-function ProgressBar({
-  filled,
-  total,
-  reduce,
-}: {
-  filled: number
-  total: number
-  reduce: boolean
-}) {
+function ProgressBar({ count, goal, reduce }: { count: number; goal: number; reduce: boolean }) {
   const track: Variants = {
     hidden: {},
     show: { transition: { staggerChildren: reduce ? 0 : 0.06, delayChildren: reduce ? 0 : 0.15 } },
@@ -44,25 +61,37 @@ function ProgressBar({
 
   return (
     <motion.div
-      className="relative mt-auto flex items-end gap-[3px]"
-      style={{ height: 16 }}
+      className="relative mt-auto flex items-end"
+      style={{ height: 16, gap: SEGMENT_GAP }}
       variants={track}
       aria-hidden
     >
-      {Array.from({ length: total }, (_, i) => (
-        <motion.span
-          key={i}
-          variants={i < filled ? on : off}
-          style={{
-            flex: 1,
-            height: 6,
-            borderRadius: 2,
-            originX: 0,
-            originY: 1,
-            background: i < filled ? "var(--fg-brand)" : "var(--border-subtle)",
-          }}
-        />
-      ))}
+      {Array.from({ length: Math.max(count, goal) }, (_, i) => {
+        const past = i >= goal
+        return (
+          <motion.span
+            key={i}
+            variants={i < count ? on : off}
+            style={{
+              flex: 1,
+              height: 6,
+              borderRadius: 2,
+              originX: 0,
+              originY: 1,
+              // `past` already implies the segment is filled — those indices only
+              // exist when count ran beyond goal — so it is the first branch.
+              background: past
+                ? "color-mix(in srgb, var(--fg-brand) 55%, var(--bg-card))"
+                : i < count
+                  ? "var(--fg-brand)"
+                  : "var(--border-subtle)",
+              // Double the gap where the goal used to end, so the overshoot reads
+              // as past a line rather than as a longer bar.
+              marginLeft: i === goal ? SEGMENT_GAP : undefined,
+            }}
+          />
+        )
+      })}
     </motion.div>
   )
 }
@@ -78,6 +107,16 @@ export function OssCard({
 }) {
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(340)
+
+  /**
+   * The badge was `goal - count` printed raw, which is a countdown that runs off the
+   * bottom: the seventh project of a six-project year rendered "-1 to go". A goal you
+   * have passed is the good outcome, so it gets said as one. Every string here is at
+   * most eight characters, the same as the "-1 to go" it replaces, which is what keeps
+   * it inside `CardHead`'s nowrap meta half in a card that clips.
+   */
+  const over = count - goal
+  const status = over > 0 ? `+${over} over` : over === 0 ? "goal met" : `${-over} to go`
 
   return (
     <motion.div
@@ -101,15 +140,21 @@ export function OssCard({
             {/* Same pulse as the tree card's "live" dot — a count that is still
                 moving should read as still moving. `live-pulse` is a CSS
                 keyframe, so the global prefers-reduced-motion block already
-                stops it without anything needed here. */}
+                stops it without anything needed here.
+
+                It stops once the goal is met, though: the pulse belongs to the
+                countdown, where there is something outstanding. "goal met" is a
+                result, and a dot still resolving beside it would suggest the
+                number hasn't landed yet. The dot stays, so the badge still reads
+                as live data. */}
             <span
               className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
               style={{
                 background: "currentColor",
-                animation: "live-pulse 2s ease-in-out infinite",
+                animation: over >= 0 ? undefined : "live-pulse 2s ease-in-out infinite",
               }}
             />
-            {goal - count} to go
+            {status}
           </Badge>
         }
       />
@@ -148,7 +193,7 @@ export function OssCard({
         </span>
       </div>
 
-      <ProgressBar filled={count} total={goal} reduce={reduce} />
+      <ProgressBar count={count} goal={goal} reduce={reduce} />
     </motion.div>
   )
 }

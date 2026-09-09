@@ -1,0 +1,222 @@
+---
+title: "nomatch"
+description: "One question: why didn't this document show up in my search? Runs entirely in the browser, on turbopuffer's own tokenizer compiled to WebAssembly."
+date: "2026-09-08"
+tags:
+  [
+    "nextjs",
+    "typescript",
+    "tailwindcss",
+    "webassembly",
+    "rust",
+    "web-workers",
+    "full-text-search",
+    "bm25",
+    "vitest",
+    "playwright",
+    "reference-implementation",
+  ]
+kind: "demo"
+github: "https://github.com/imnotannamaria/no-match"
+live: "https://no-match.vercel.app/"
+cover: "/projects/no-match.png"
+featured: false
+published: true
+---
+
+## Overview
+
+Paste some text, type a search, and see which documents come back under two tokenizer
+configurations at once. For the ones that did not come back, nomatch names the stage of the
+analysis pipeline that dropped them, and the single option that brings them back.
+
+It runs on [alyze](https://github.com/turbopuffer/alyze), the tokenization library
+[turbopuffer](https://turbopuffer.com) runs in production behind their `word_v4` tokenizer,
+compiled to WebAssembly and hosted in a Web Worker. No server, no account, no network call to
+anyone's product. Nothing you paste leaves the tab.
+
+There is no turbopuffer account behind this and it is not affiliated with them. The analysis
+engine is the real alyze, MIT licensed, compiled from commit `1de437c`. The BM25 ranking is
+mine, written for this project. It follows the documented meaning of `k1`, `b` and `k3`, but it
+is not their code and it is not a reference for how their production ranking behaves.
+
+I built it to understand how a search engine decides what comes back, at the level where I
+could rebuild the deciding part myself. Shipping a Next app is not the test. The retrieval
+layer underneath it is.
+
+## The problem it solves
+
+A search engine does not store your text. It cuts the text into pieces called tokens and stores
+the pieces. When you search, it cuts your search the same way and compares piece to piece. A
+match happens only when two tokens are exactly equal.
+
+Stored document: `O café da manhã estava ótimo`. Your search: `cafe`.
+
+With `ascii_folding` off, which is the default, the document holds `café`, the search becomes
+`cafe`, and nothing comes back. The document is there. The word is there.
+
+Today you find that out by paying for an account, uploading your data, searching, finding
+nothing, and then guessing which of five options was the culprit, one at a time.
+
+In English this almost never happens, because English has no accents. It shows up the moment
+you index Portuguese, French, German or Spanish. That is why I built it, and it is why the
+default corpus is in Portuguese.
+
+## The stage ladder
+
+alyze returns the final result of the analysis, not the steps it took. To find which step
+killed a match, nomatch runs the analyzer several times with the options turning on in cascade,
+then diffs the outputs.
+
+```
+S0  tokenize only            case_sensitive: true
+S1  + lowercase              case_sensitive: false
+S2  + remove stopwords       remove_stopwords: true
+S3  + stemming               stemming: true
+S4  + ascii folding          ascii_folding: true
+```
+
+Stemming and stopword removal only appear from S1 on, because both require
+`case_sensitive: false`.
+
+For one search word against one document word, the ladder tracks two indices: the first stage
+where both sides are alive and textually equal, and the first stage where the document word
+goes from alive to dropped. The first is structurally always before the second, because a
+dropped token can never equal anything. That gives three verdicts, and no fourth:
+
+- **converged** at some stage, so the match needs that stage's option on
+- **disappeared** at some stage, so that stage dropped it, and for a stopword the interface
+  names the word
+- **never**, meaning different words, not a configuration problem
+
+`max_token_length` sits outside the ladder. It is checked in bytes and reported on its own,
+because a document can simultaneously have no word anywhere near the search and, separately, a
+search term too long to ever become a token.
+
+## What it proves
+
+The ladder is the product. The rest exists to make it possible, and each piece has a specific
+failure it is there to prevent:
+
+- **The recommendation names the narrowest option that works, not the stage the cascade lands
+  on.** The cascade is cumulative, so it can only report which prefix of the pipeline makes two
+  words equal. With `language: portuguese` the Snowball stemmer strips the final vowel from both
+  `cafe` and `café`, so the cascade converges at stemming, one stage before folding. The ladder
+  was telling the truth and giving bad advice: stemming collapses whole families of words across
+  a corpus, `ascii_folding` only touches accents. It now asks the analyzer which single options
+  actually close the gap, and prefers the narrowest.
+- **A document removed by exact phrase gets its own answer, decided outside the ladder.** A
+  document can hold every word of the query and still be absent, because phrase order removed
+  it. The ladder cannot see that, and left alone it reports five stages of match on a document
+  listed as missing. Only the matcher holds both results on the same tokens, so it flags the
+  case rather than letting the ladder guess.
+- **A query that analyzes down to zero tokens is caught before any of this runs.** Searching
+  `da` with `remove_stopwords` on and `language: portuguese` is not "no documents matched", it
+  is nothing to compare against anything, and it says so by name.
+- **Ranking never reaches the analyzer.** Measured in the browser by counting
+  `postMessage`: a search over the example corpus costs five calls, one for the query and one
+  per document. Moving `k1`, `b` or `k3` afterwards costs zero, and the order still changes on
+  screen.
+- **Positions keep their holes.** Every word spends a position even when a filter throws it
+  away, which is what keeps phrase distance correct. The token view renders the gaps instead of
+  hiding them, and phrase matching compares position deltas rather than array indices, so a
+  stopword dropped identically from both sides does not break a phrase but a real word sitting
+  between the terms does.
+
+## A finding I left alone
+
+Searching `manha` against a document holding `manhã`, in Portuguese, is classified **never**.
+
+The stemmer strips the final vowel from `manha` but leaves `manhã` untouched, because the accent
+means it no longer matches the same suffix rule. `ascii_folding` runs after stemming, so by the
+time `manhã` folds to `manha`, the query has already been stemmed down to `manh`. They never
+converge.
+
+Two forms of what a person would call the same word, ending up unreachable because of pipeline
+order rather than because anything is wrong. The ladder is reporting the pipeline honestly, so
+it stays. The stemming test case uses `correr` and `correu` instead of an accented pair,
+specifically to keep that test from tripping over this.
+
+## Reproducing the miss
+
+The page opens with a corpus loaded and a search already run, so the contrast is on screen
+before you touch anything. Column A is the real defaults and finds one document. Column B has
+`ascii_folding` on and finds three. The two extra ones spell `café` with the accent.
+
+Click any document under **missing** to open the ladder for it, and the button at the bottom of
+the panel applies the fix to the _other_ column and closes the drawer. This is a comparison
+tool, so the button's job is to build the comparison that proves the fix, not to mutate the
+thing you were reading. The `0` that showed the problem stays on screen next to the count that
+proves the fix.
+
+Switch the corpus to English and the same failure is close to invisible, which is the point of
+having it. What breaks there is a plural: `cafes` does not find `cafe` until stemming is on. So
+each corpus carries its own search and its own fix, and both open on the same contrast for
+different reasons.
+
+## On the ranking
+
+BM25 decides the order of the documents that already matched, and never decides whether a
+document comes back. `k1` defaults to 1.2, `b` to 0.75, `k3` to 8.0, matching turbopuffer's
+documented defaults, and all three are adjustable per column.
+
+Two calls worth naming:
+
+- **The IDF is the smoothed form**, `ln(1 + (N - n + 0.5) / (n + 0.5))`. The textbook form puts
+  the 1 outside the log and goes negative as soon as a term appears in more than half the
+  documents. On corpora of five pasted sentences that is not an edge case, it is Tuesday, and a
+  negative score on screen costs more trust than the precision buys.
+- **Document length is the tokens that survived analysis**, not the positions spent. A document
+  is not longer, in any sense ranking cares about, because it happened to contain stopwords that
+  were removed before indexing. The holes still matter and still exist, they just do not feed
+  the average.
+
+## Stack
+
+- Next.js and TypeScript, Tailwind v4, entrepta on the `bosco` theme
+- alyze compiled to WASM with `wasm-pack --target web`, committed under `public/wasm/` and
+  served by URL rather than through the bundler
+- An ES module Web Worker hosting the module, because running the ladder over a corpus on the
+  main thread blocks it
+- BM25 in TypeScript, over the tokens the analyzer returns
+
+The full build ships all 18 stemming languages at 392 KB uncompressed, so there was nothing to
+trade off by cutting any. The language picker offers Portuguese and English, and that is a
+restriction in the interface, not in what got compiled.
+
+## Running locally
+
+There's a live demo at the link above. To run it locally instead:
+
+```bash
+npm install
+npm run dev
+```
+
+Opens at `localhost:3000`. The compiled WASM artifact is committed, so you do not need Rust to
+run the app. Building it from source is a separate job, documented in `CLAUDE.md`.
+
+## Tests
+
+Vitest covers what breaks quietly: the ladder against known cases (an accent, a Portuguese
+stopword, a stemming root, a token over the byte limit), byte count against character count in
+accented text, BM25 against numbers worked out by hand before the code existed, and invalid
+option combinations blocked before they reach the analyzer.
+
+The end-to-end path, WASM to worker to match, is covered by a Playwright smoke test against the
+running app rather than by the unit suite. Vitest tests the logic; the smoke test proves the
+pipeline is actually wired together, in dev and in a real production build. The build is half
+the test, because the worker and the WASM module break exactly on the crossing between the two.
+
+Every claim the interface makes has a test behind it, and the tests fail when the claim stops
+being true.
+
+## License
+
+MIT. alyze is MIT too, and its copyright stays with turbopuffer.
+
+## Links
+
+https://no-match.vercel.app/
+
+https://github.com/imnotannamaria/no-match
