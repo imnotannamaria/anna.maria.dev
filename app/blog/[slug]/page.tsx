@@ -94,7 +94,7 @@ export default async function BlogPostPage({ params }: Props) {
                 /
               </span>
               <Link href="/blog" className="transition-colors hover:text-[color:var(--fg-primary)]">
-                posts
+                blog
               </Link>
               <span aria-hidden style={{ opacity: 0.5, margin: "0 6px" }}>
                 /

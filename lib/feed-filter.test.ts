@@ -59,6 +59,29 @@ describe("splitPills", () => {
     expect(visible.at(-1)!.count).toBe(40 - (MAX_VISIBLE - 1))
   })
 
+  /**
+   * The peak the comment on `splitPills` describes, pinned so the claim cannot drift from the
+   * code again — it already did once, in a commit message that said the row never passed 14.
+   * `MIN_FOLD` is measured against the tail, so a run of tags that all group and leave no tail
+   * renders in full, and the row is at its longest one tag before the fold kicks in.
+   */
+  it("peaks at MAX_VISIBLE + MIN_FOLD - 1 before the fold takes over", () => {
+    const allGrouping = (n: number) =>
+      pills(
+        Object.fromEntries(
+          Array.from({ length: n }, (_, i) => [`t${String(i).padStart(2, "0")}`, 2]),
+        ),
+      )
+
+    const peak = MAX_VISIBLE + MIN_FOLD - 1
+    expect(splitPills(allGrouping(peak)).visible).toHaveLength(peak)
+    expect(splitPills(allGrouping(peak)).folded).toHaveLength(0)
+
+    // One more, and the row drops back to the capped twelve rather than growing.
+    expect(splitPills(allGrouping(peak + 1)).visible).toHaveLength(MAX_VISIBLE)
+    expect(splitPills(allGrouping(peak + 1)).folded).toHaveLength(MIN_FOLD)
+  })
+
   it("folds nothing when there is nothing to filter by", () => {
     expect(splitPills([])).toEqual({ visible: [], folded: [] })
   })

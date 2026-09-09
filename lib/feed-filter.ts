@@ -16,12 +16,12 @@
 export type FeedPill = { key: string; label: string; count: number }
 
 /**
- * The most pills the row draws at rest, before `all` and the toggle.
+ * How many pills the row draws once it folds — not a hard cap on the row. See below.
  *
- * This is the number that actually bounds the row. The `count > 1` rule is about which pills
- * deserve to be there and bounds nothing on its own — a blog with fifty posts can have forty
- * tags used twice over. Twelve plus `all` plus the toggle is two rows in the 880px column,
- * which is what /projects already had at the head of its list.
+ * The `count > 1` rule is about which pills deserve to be there and bounds nothing on its own:
+ * a blog with fifty posts can have forty tags used twice over. Twelve is what /projects
+ * already had at the head of its list, and twelve plus `all` plus the toggle is two rows in
+ * the 880px column.
  */
 export const MAX_VISIBLE = 12
 
@@ -37,6 +37,18 @@ export const MIN_FOLD = 5
 /**
  * `pills` must arrive sorted by count descending — every caller sorts by `count` then name —
  * so the slice takes the most used rather than an arbitrary twelve.
+ *
+ * **The row at rest peaks at `MAX_VISIBLE + MIN_FOLD - 1` = 16 pills, not 12.** `MIN_FOLD` is
+ * measured against the tail, not against the row the fold would leave behind, so between 13
+ * and 16 tags that all group there is no tail worth folding and every one of them renders.
+ * The 17th then folds the row back down to 12 — it gets *shorter* as the data grows, which is
+ * a discontinuity no one would predict from reading the two constants.
+ *
+ * Left alone deliberately. Removing it means either folding a tail of one — a toggle that
+ * hides a single pill, which is worse than the pill — or a third constant. It needs 13 to 16
+ * tags that group with almost no single-use ones, and real content is the opposite shape:
+ * /projects has 12 grouping tags against a tail of 26. `feed-filter.test.ts` pins the peak so
+ * this stays a known shape rather than a surprise.
  */
 export function splitPills(pills: FeedPill[]): { visible: FeedPill[]; folded: FeedPill[] } {
   const grouping = pills.filter((pill) => pill.count > 1).slice(0, MAX_VISIBLE)

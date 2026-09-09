@@ -20,7 +20,7 @@
  * and arrives as `children` — the whole reason the feeds take children rather than a `title`.
  */
 
-import { useId, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { CaretDown, CaretRight } from "@phosphor-icons/react"
 import { PageOutline, type OutlineItem } from "./page-outline"
 import { FilterPill } from "@/components/ui/url-filter"
@@ -285,7 +285,6 @@ function FilterRow({
   onFilter: (next: string | null) => void
 }) {
   const [open, setOpen] = useState(false)
-  const rowId = useId()
 
   const { visible, folded } = useMemo(() => splitPills(pills), [pills])
 
@@ -302,7 +301,7 @@ function FilterRow({
   const hoisted = !open && folded.find((item) => item.key === active)
 
   return (
-    <div role="group" aria-label={label} id={rowId} className="mt-8 flex flex-wrap gap-2">
+    <div role="group" aria-label={label} className="mt-8 flex flex-wrap gap-2">
       <FilterPill label="all" count={totalCount} active={!active} onClick={() => onFilter(null)} />
       {visible.map(pill)}
       {hoisted && pill(hoisted)}
@@ -312,8 +311,12 @@ function FilterRow({
           <button
             type="button"
             onClick={() => setOpen(!open)}
+            /* `aria-expanded` and no `aria-controls`. The folded pills have to stay direct
+               children of this flex container or they wrap as one block instead of flowing,
+               so there is no element that *is* the revealed region — the only id to point at
+               is the whole row, which contains this button. Naming your own ancestor is a
+               worse claim about the page than making no claim. */
             aria-expanded={open}
-            aria-controls={rowId}
             /* Dashed, and with no count chip, because it is not a filter — it is the control
                that reveals the rest of them. Related to the pills beside it, deliberately not
                one of them. */
