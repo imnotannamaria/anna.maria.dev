@@ -1,0 +1,143 @@
+---
+title: "from anna"
+description: "Handwritten letters, photographed and published at a link meant for one person, with a transcription anyone can read. The highlighting half is an npm package."
+date: "2026-09-10"
+tags:
+  [
+    "nextjs",
+    "typescript",
+    "tailwindcss",
+    "unified",
+    "remark",
+    "markdown",
+    "rehype-sanitize",
+    "postgres",
+    "drizzle",
+    "vercel-blob",
+    "openrouter",
+    "vision-models",
+    "clerk",
+    "accessibility",
+    "npm-package",
+    "vitest",
+  ]
+kind: "library"
+github: "https://github.com/imnotannamaria/from-anna"
+live: "https://from-anna.vercel.app/annamariaapp-as-a-letter"
+cover: "/projects/from-anna.png"
+featured: false
+published: true
+---
+
+**Read one:** [annamaria.app, as a letter](https://from-anna.vercel.app/annamariaapp-as-a-letter).
+My portfolio, written by hand on one sheet, photographed, and published here. (lol)
+
+## Overview
+
+I write a letter by hand, take a photo of each page, and upload them. A vision model reads the
+handwriting and sends back markdown. I correct it against the photo, mark what I want read first,
+and publish it at a link meant for one person.
+
+The photo is what you see. The transcription is what you can actually read, and it is the
+letter's content, not a caption. A picture of handwriting is invisible to a screen reader.
+
+The highlighting half is published on its own as
+[remark-scanned-page](https://www.npmjs.com/package/remark-scanned-page). The rest is an app with
+one user and no sign up. The code is MIT, so the way to have your own is to clone it.
+
+## The problem it solves
+
+- **A photo of a letter is not a letter on the web.** It can't be read aloud, searched or copied
+  from. A transcription behind a "show text" button makes the readable version the optional one.
+- **Highlights stored as character offsets break the first time you fix a comma**, and a
+  handwritten transcription gets corrected constantly.
+- **A letter you send either gets opened or it doesn't, and you never find out which.** Nor
+  whether someone stopped at the first paragraph.
+
+## Highlights inside the markdown
+
+```md
+Inline: :mark[text worth reading first]{c=important}
+
+:::theme{label="a name for the block"}
+A group of paragraphs, drawn as a bracket with the name beside it.
+:::
+```
+
+The `.md` file carries everything. No join, no sync, and a correction moves the highlight with the
+text, because the highlight is the text. The package defines no vocabulary, only the mechanism and
+three colour slots. The transcription is model output, so it goes through a sanitize schema that
+restricts `href` to `https:` and `mailto:` and blocks scripts, iframes and every `on*` handler.
+
+## What it proves
+
+- **The transcription ships in the server HTML.** On a phone the photo and the text toggle, and
+  which one shows is a CSS decision, never a mount decision.
+- **Colour never carries meaning alone.** Every tag has its own underline, solid, dotted or wavy.
+  Contrast is measured against the highlight fill, not the page, by a test that reads the
+  stylesheet.
+- **Unpublishing takes the photo down too.** The Blob store is private and every photo goes
+  through a route that checks the letter's status. A public URL would outlive the letter.
+- **A wrong link, a draft, an expired letter and someone else's get the same 404**, status and
+  body.
+- **Signed in is not allowed in.** An allowlist decides, and an empty one denies everyone.
+- **Two marks, not one.** A view when the letter opens, recorded after the response, and a second
+  when the end scrolls into view. The desk shows opened, read to the end and left partway. One row
+  per session, link previews filtered out, no IP stored.
+
+## The transcription
+
+All pages go to the model in one call, separated by `---`, and the response is split back per
+page. If the count disagrees, the whole text is saved to page 1: losing the split is recoverable,
+losing the transcription is not. Anything unreadable comes back as `[?]` instead of a guess, and
+the editor jumps from one to the next. The raw output is kept apart from the edited text.
+
+## A finding I left alone
+
+A letter written in block capitals comes back in block capitals. That is correct: the model is
+transcribing. Fixing the case in the prompt would make the raw something other than a record of
+the page. So there is a "Normalise capitals" button that runs on the edited text only, and says
+every time that it can't tell which words are names.
+
+## Stack
+
+- Next.js 16, TypeScript, Tailwind v4, entrepta in light mode
+- unified, remark-directive and rehype-sanitize, through the package
+- Postgres on Neon with Drizzle, private Vercel Blob
+- A vision model through OpenRouter, Clerk for the one door in
+- Photos resized in the browser to 2400px and 1200px, HEIC converted on the way
+
+## Running locally
+
+```bash
+git clone https://github.com/imnotannamaria/from-anna
+cd from-anna
+npm install
+cp .env.example .env.local
+npm run db:migrate
+npm run dev
+```
+
+You'll need Postgres, a **private** Vercel Blob store, an OpenRouter key and a Clerk app. Restrict
+OpenRouter to providers that don't train on your data before the first call.
+
+## Tests
+
+Vitest covers what breaks quietly: contrast of every tag against its fill, the sanitize schema,
+the page splitter, the admin gate, the bot filter, and the editor helpers. The release workflow
+installs the package tarball in an empty directory and runs it before publishing.
+
+What the tests could not see: the Google Fonts import was dropped by the build, and the site was
+in Times New Roman until I opened the inspector. The fonts come from `next/font` now.
+
+## License
+
+MIT, the app and the package.
+
+## Links
+
+https://from-anna.vercel.app/annamariaapp-as-a-letter
+
+https://github.com/imnotannamaria/from-anna
+
+https://www.npmjs.com/package/remark-scanned-page
