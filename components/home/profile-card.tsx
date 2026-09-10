@@ -376,7 +376,11 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
           className="mx-1 hidden h-6 w-px @min-[285px]:block"
           style={{ background: "var(--border-subtle)" }}
         />
-        <Link href="/contact" className={cn(buttonVariants({ variant: "primary" }), "group/cta")}>
+        <Link
+          href="/contact"
+          data-sound="click"
+          className={cn(buttonVariants({ variant: "primary" }), "group/cta")}
+        >
           <PaperPlaneTiltIcon
             size={15}
             weight="fill"

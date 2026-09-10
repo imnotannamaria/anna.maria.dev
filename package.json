@@ -16,6 +16,7 @@
     "email:dev": "email dev --dir emails",
     "seed:log": "tsx scripts/seed-log.ts",
     "seed:roadmap": "tsx scripts/seed-roadmap.ts",
+    "generate:sounds": "tsx scripts/generate-elevenlabs-sounds.ts",
     "test": "vitest run --project unit",
     "test:watch": "vitest --project unit",
     "test:integration": "vitest run --project integration",

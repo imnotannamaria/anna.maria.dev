@@ -47,6 +47,7 @@ export function Sidebar() {
       <Link
         href="/"
         aria-label="Home"
+        data-sound="click"
         className="mb-2 block h-8 w-8 shrink-0 transition-opacity hover:opacity-80"
       >
         <svg viewBox="0 0 100 100" width={32} height={32} aria-hidden style={{ display: "block" }}>
@@ -86,6 +87,7 @@ export function Sidebar() {
               key={href}
               href={href}
               aria-label={label}
+              data-sound="click"
               aria-current={active ? "page" : undefined}
               title={label}
               className={cn(

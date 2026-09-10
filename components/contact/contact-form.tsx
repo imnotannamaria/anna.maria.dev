@@ -12,6 +12,7 @@ import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
 import { contactSchema, type ContactFieldErrors } from "@/lib/contact-schema"
 import { cn } from "@/lib/utils"
 import { Diamond } from "@/components/ui/diamond"
+import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 type FormState = "idle" | "loading" | "success" | "error"
 
@@ -139,6 +140,7 @@ export function ContactForm({ email }: { email: string }) {
 
       if (res.ok) {
         setState("success")
+        playSoundEffect("success")
         return
       }
 
@@ -152,9 +154,11 @@ export function ContactForm({ email }: { email: string }) {
       }
       setErrorMessage(json.error ?? "Something went wrong. Please try again.")
       setState("error")
+      playSoundEffect("error")
     } catch {
       setErrorMessage("Network error. Please check your connection and try again.")
       setState("error")
+      playSoundEffect("error")
     }
   }
 
@@ -334,6 +338,7 @@ export function ContactForm({ email }: { email: string }) {
           </Button>
           <a
             href={`mailto:${email}`}
+            data-sound="click"
             className={cn(buttonVariants({ variant: "command" }), "w-full sm:w-auto")}
           >
             open in mail app

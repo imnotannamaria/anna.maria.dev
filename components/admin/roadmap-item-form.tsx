@@ -18,6 +18,7 @@ import {
   type RoadmapItemInput,
 } from "@/lib/roadmap/validation"
 import { StatusPicker } from "./status-picker"
+import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 function toDefaults(item?: RoadmapItem): RoadmapItemInput {
   return {
@@ -66,16 +67,19 @@ export function RoadmapItemForm({ item }: { item?: RoadmapItem }) {
       if (!res.ok) {
         const body = await res.json().catch(() => null)
         toast(body?.error ?? `request failed (${res.status})`)
+        playSoundEffect("error")
         return
       }
 
       toast(editing ? "item updated" : "item created")
+      playSoundEffect("success")
       router.push("/admin/roadmap")
       router.refresh()
     } catch {
       // A rejection came back with a status; this did not come back at all. Saying so is
       // the difference between "fix your input" and "try again".
       toast("network error — nothing was saved")
+      playSoundEffect("error")
     } finally {
       setSubmitting(false)
     }

@@ -7,6 +7,7 @@ import { StatusBar, StatusBarItem, StatusBarSeparator } from "@/app/components/e
 import { ThemeScript } from "@/app/components/entrepta/theme-switcher"
 import { ThemeSwitcher } from "@/app/components/entrepta/theme-switcher"
 import { Toaster } from "@/app/components/entrepta/toast"
+import { ButtonSoundFeedback } from "@/components/ui/sound-feedback"
 import { THEMES } from "@/lib/site-config"
 import { calcYearsOfExp } from "@/lib/experience"
 import "./globals.css"
@@ -144,6 +145,7 @@ export default function RootLayout({
         <ThemeSwitcher themes={THEMES} defaultTheme="entrepta" position="bottom-right" />
 
         <Toaster position="top-center" />
+        <ButtonSoundFeedback />
 
         {/* Vercel-only — the insights script 404s (and floods the console) off-platform */}
         {process.env.VERCEL && <Analytics />}

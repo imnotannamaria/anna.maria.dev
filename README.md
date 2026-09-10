@@ -201,6 +201,23 @@ to: ["you@yourdomain.com"],
 
 The widget uses the Client Credentials flow, server to server, so the secret never reaches the browser.
 
+## Generating UI sound effects with ElevenLabs (optional)
+
+A short click plays on every button and nav control site-wide, and success/error confirmations
+play on form submissions, admin CRUD and deletes, and the code-block copy button. The sound files
+are generated once and committed as static assets; visitors never make a request to ElevenLabs
+and never receive an API key or client SDK.
+
+1. Add `ELEVENLABS_API_KEY` to `.env.local`, or add it to the project's Infisical secrets.
+2. Run `npm run generate:sounds` for `.env.local`, or `infisical run -- npm run generate:sounds`
+   for the managed secret, to create the small palette in `public/sounds/`.
+3. Listen to the files, adjust the prompts in `lib/sound-effects.ts` if needed, then rerun with
+   `npm run generate:sounds -- success --force` to replace only `success.mp3` (or omit `success`
+   to replace the whole palette).
+
+The generator uses ElevenLabs' [Sound Effects API](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert)
+with a 22.05 kHz / 32 kbps MP3 output so these short UI cues stay lightweight.
+
 ## Configuring wristkit (optional)
 
 The Apple Watch activity card reads from your own Postgres database. See [wristkit](https://wristkit-web.vercel.app/) for the full setup: the SQL migration, the iOS Shortcut, and the sync endpoint at `/api/v1/wristkit/sync`.

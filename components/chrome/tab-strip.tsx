@@ -213,6 +213,7 @@ export function TabStrip({
                   title={tab.name}
                   aria-label={tab.name}
                   aria-current={active ? "page" : undefined}
+                  data-sound="click"
                   className={innerClass}
                 >
                   {inner}

@@ -81,7 +81,11 @@ export default async function RoadmapPage() {
           {/* A link wearing the button's clothes, the way the home page CTA does. A <Button>
               inside a <Link> is a <button> inside an <a>: invalid markup, and two tab stops
               for one destination. */}
-          <Link href="/contact" className={buttonVariants({ variant: "secondary" })}>
+          <Link
+            href="/contact"
+            data-sound="click"
+            className={buttonVariants({ variant: "secondary" })}
+          >
             <ChatsCircleIcon size={14} aria-hidden />
             tell me what to build next
           </Link>

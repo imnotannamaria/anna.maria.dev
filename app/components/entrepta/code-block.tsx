@@ -3,6 +3,7 @@
 import { Check, Copy } from "lucide-react"
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 interface CodeBlockProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   /** Raw code copied to clipboard. Required for the copy button. */
@@ -48,14 +49,17 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
 
     const handleCopy = React.useCallback(async () => {
       try {
-        if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(code)
+        if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+          throw new Error("Clipboard unavailable")
         }
+        await navigator.clipboard.writeText(code)
         setCopied(true)
+        playSoundEffect("success")
         if (timerRef.current) clearTimeout(timerRef.current)
         timerRef.current = setTimeout(() => setCopied(false), copyTimeout)
       } catch {
         // clipboard may be unavailable (insecure context, denied permission, etc.)
+        playSoundEffect("error")
       }
     }, [code, copyTimeout])
 
