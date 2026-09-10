@@ -39,7 +39,7 @@ export default async function AdminRoadmapPage() {
 
         {/* buttonVariants, not <Button> inside <Link>: that renders a <button> nested in an
             <a>, which is invalid and gives one destination two tab stops. */}
-        <Link href="/admin/roadmap/new" className={buttonVariants()}>
+        <Link href="/admin/roadmap/new" data-sound="click" className={buttonVariants()}>
           <PlusIcon size={14} weight="bold" aria-hidden />
           new item
         </Link>

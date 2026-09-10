@@ -9,6 +9,7 @@ import { Button } from "@/app/components/entrepta/button"
 import { Input } from "@/app/components/entrepta/input"
 import { toast } from "@/app/components/entrepta/toast"
 import { Diamond } from "@/components/ui/diamond"
+import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 /**
  * One field, because this is what has to replace typing a line into ROADMAP.md.
@@ -39,14 +40,17 @@ export function RoadmapQuickAdd() {
       if (!res.ok) {
         const body = await res.json().catch(() => null)
         toast(body?.error ?? `request failed (${res.status})`)
+        playSoundEffect("error")
         return
       }
 
       setTitle("")
       toast("captured")
+      playSoundEffect("success")
       router.refresh()
     } catch {
       toast("network error — nothing was saved")
+      playSoundEffect("error")
     } finally {
       setSaving(false)
     }

@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { Button } from "@/app/components/entrepta/button"
 import { ChromeMessage } from "./chrome-message"
+import { SoundEffectOnMount } from "./sound-feedback"
 
 /**
  * The client half of an `error.tsx`. Every error boundary on the site is the same thing: log
@@ -37,23 +38,26 @@ export function ChromeError({
   }, [logTag, error])
 
   return (
-    <ChromeMessage
-      accent="error"
-      command={command}
-      title={title}
-      note={note}
-      className={className}
-      action={
-        <Button onClick={reset} variant="secondary">
-          try again
-        </Button>
-      }
-    >
-      {showDigest && error.digest && (
-        <p className="text-mono-sm mt-1 font-mono" style={{ color: "var(--fg-muted)" }}>
-          {`// digest: ${error.digest}`}
-        </p>
-      )}
-    </ChromeMessage>
+    <>
+      <SoundEffectOnMount effect="error" />
+      <ChromeMessage
+        accent="error"
+        command={command}
+        title={title}
+        note={note}
+        className={className}
+        action={
+          <Button onClick={reset} variant="secondary">
+            try again
+          </Button>
+        }
+      >
+        {showDigest && error.digest && (
+          <p className="text-mono-sm mt-1 font-mono" style={{ color: "var(--fg-muted)" }}>
+            {`// digest: ${error.digest}`}
+          </p>
+        )}
+      </ChromeMessage>
+    </>
   )
 }

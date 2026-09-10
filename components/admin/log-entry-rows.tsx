@@ -29,6 +29,7 @@ import { StarRating } from "@/components/log/star-rating"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
 import { formatLoggedAt } from "@/lib/log/date"
 import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
+import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
   const router = useRouter()
@@ -45,13 +46,16 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
       if (!res.ok) {
         restore(id)
         toast(`could not delete (${res.status})`)
+        playSoundEffect("error")
         return
       }
       toast(`deleted "${title}"`)
+      playSoundEffect("success")
       router.refresh()
     } catch {
       restore(id)
       toast("network error — nothing was deleted")
+      playSoundEffect("error")
     }
   }
 

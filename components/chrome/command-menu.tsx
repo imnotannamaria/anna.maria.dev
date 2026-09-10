@@ -24,6 +24,7 @@ import {
   CommandItem,
   CommandFoot,
 } from "@/app/components/entrepta/command-palette"
+import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 type Page = { href: string; name: string; hint: string; icon: Icon }
 
@@ -64,6 +65,7 @@ export function CommandMenu({
   const router = useRouter()
 
   const go = (href: string) => {
+    playSoundEffect("click")
     onOpenChange(false)
     router.push(href)
   }

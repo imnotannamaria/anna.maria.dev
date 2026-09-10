@@ -554,7 +554,7 @@ export function PianoStudio() {
   const WHITE_COUNT = WHITE_NOTES.length
 
   return (
-    <>
+    <div data-sound="off">
       {/* ══════════ KEYBOARD ══════════ */}
       <Section id="keyboard">
         <DocLabel level="##">keyboard</DocLabel>
@@ -960,6 +960,6 @@ export function PianoStudio() {
           </div>
         )}
       </Section>
-    </>
+    </div>
   )
 }

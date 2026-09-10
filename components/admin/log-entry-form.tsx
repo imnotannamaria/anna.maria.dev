@@ -16,6 +16,7 @@ import { slugify } from "@/lib/slug"
 import { logEntryInputSchema, type LogEntry, type LogEntryInput } from "@/lib/log/validation"
 import { RatingInput } from "./rating-input"
 import { TypePicker } from "./type-picker"
+import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 function toDefaults(entry?: LogEntry): LogEntryInput {
   return {
@@ -67,14 +68,17 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
       if (!res.ok) {
         const body = await res.json().catch(() => null)
         toast(body?.error ?? `request failed (${res.status})`)
+        playSoundEffect("error")
         return
       }
 
       toast(editing ? "entry updated" : "entry created")
+      playSoundEffect("success")
       router.push("/admin/log")
       router.refresh()
     } catch {
       toast("network error — nothing was saved")
+      playSoundEffect("error")
     } finally {
       setSubmitting(false)
     }

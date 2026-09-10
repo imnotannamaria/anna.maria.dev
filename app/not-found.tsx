@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
 import { ChromeMessage } from "@/components/ui/chrome-message"
+import { SoundEffectOnMount } from "@/components/ui/sound-feedback"
 
 export const metadata: Metadata = { title: "Page not found" }
 
@@ -20,18 +21,21 @@ export const metadata: Metadata = { title: "Page not found" }
  */
 export default function NotFound() {
   return (
-    <ChromeMessage
-      command="cat ./page"
-      output="cat: ./page: No such file or directory"
-      title="Page not found"
-      note="// check the url, or head back."
-      action={
-        // buttonVariants, not <Button asChild>: Button always wraps its children in a span,
-        // which breaks the Radix Slot single-child contract that would need.
-        <Link href="/" className={buttonVariants({ variant: "secondary" })}>
-          cd ~
-        </Link>
-      }
-    />
+    <>
+      <SoundEffectOnMount effect="error" />
+      <ChromeMessage
+        command="cat ./page"
+        output="cat: ./page: No such file or directory"
+        title="Page not found"
+        note="// check the url, or head back."
+        action={
+          // buttonVariants, not <Button asChild>: Button always wraps its children in a span,
+          // which breaks the Radix Slot single-child contract that would need.
+          <Link href="/" data-sound="click" className={buttonVariants({ variant: "secondary" })}>
+            cd ~
+          </Link>
+        }
+      />
+    </>
   )
 }

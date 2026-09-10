@@ -17,6 +17,7 @@ import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
 import { STATUS_LABEL, type RoadmapItem, type RoadmapStatus } from "@/lib/roadmap/validation"
+import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 /** Muted for raw, brand for anything public, success for shipped. */
 const STATUS_COLOR: Record<RoadmapStatus, string> = {
@@ -41,13 +42,16 @@ export function RoadmapItemRows({ items }: { items: RoadmapItem[] }) {
       if (!res.ok) {
         restore(id)
         toast(`could not delete (${res.status})`)
+        playSoundEffect("error")
         return
       }
       toast(`deleted "${title}"`)
+      playSoundEffect("success")
       router.refresh()
     } catch {
       restore(id)
       toast("network error — nothing was deleted")
+      playSoundEffect("error")
     }
   }
 
