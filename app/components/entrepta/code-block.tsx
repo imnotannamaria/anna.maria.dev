@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, Copy } from "lucide-react"
+import { AlertTriangle, Check, Copy } from "lucide-react"
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
@@ -38,7 +38,7 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
     },
     ref,
   ) => {
-    const [copied, setCopied] = React.useState(false)
+    const [copyState, setCopyState] = React.useState<"idle" | "copied" | "error">("idle")
     const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
     React.useEffect(() => {
@@ -53,13 +53,16 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
           throw new Error("Clipboard unavailable")
         }
         await navigator.clipboard.writeText(code)
-        setCopied(true)
+        setCopyState("copied")
         playSoundEffect("success")
-        if (timerRef.current) clearTimeout(timerRef.current)
-        timerRef.current = setTimeout(() => setCopied(false), copyTimeout)
       } catch {
-        // clipboard may be unavailable (insecure context, denied permission, etc.)
+        // clipboard may be unavailable (insecure context, denied permission, etc.) — sound is
+        // supplementary, so a failed copy needs a visible state too, not just an error tone.
+        setCopyState("error")
         playSoundEffect("error")
+      } finally {
+        if (timerRef.current) clearTimeout(timerRef.current)
+        timerRef.current = setTimeout(() => setCopyState("idle"), copyTimeout)
       }
     }, [code, copyTimeout])
 
@@ -102,8 +105,14 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                 <button
                   type="button"
                   onClick={handleCopy}
-                  aria-label={copied ? "Copied" : "Copy code"}
-                  data-state={copied ? "copied" : "idle"}
+                  aria-label={
+                    copyState === "copied"
+                      ? "Copied"
+                      : copyState === "error"
+                        ? "Copy failed"
+                        : "Copy code"
+                  }
+                  data-state={copyState}
                   className={cn(
                     "inline-flex items-center gap-1.5 px-1.5 py-1",
                     "text-mono-xs rounded-[var(--radius-sm)] tracking-[0.08em] uppercase",
@@ -113,7 +122,7 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                     "focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:outline-none",
                   )}
                 >
-                  {copied ? (
+                  {copyState === "copied" ? (
                     <>
                       <Check
                         aria-hidden
@@ -121,6 +130,15 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                         className="text-[var(--status-success)]"
                       />
                       <span>copied</span>
+                    </>
+                  ) : copyState === "error" ? (
+                    <>
+                      <AlertTriangle
+                        aria-hidden
+                        style={{ width: 11, height: 11, strokeWidth: 1.8 }}
+                        className="text-[var(--status-error)]"
+                      />
+                      <span>copy failed</span>
                     </>
                   ) : (
                     <>
