@@ -20,6 +20,7 @@ tags:
     "accessibility",
     "npm-package",
     "vitest",
+    "web-animations",
   ]
 kind: "library"
 github: "https://github.com/imnotannamaria/from-anna"
@@ -33,6 +34,9 @@ published: true
 My portfolio, written by hand on one sheet, photographed, and published here. (lol)
 
 ## Overview
+
+A letter arrives closed, in an addressed envelope. Opening it tears the seal and unfolds the
+sheets.
 
 I write a letter by hand, take a photo of each page, and upload them. A vision model reads the
 handwriting and sends back markdown. I correct it against the photo, mark what I want read first,
@@ -69,10 +73,17 @@ text, because the highlight is the text. The package defines no vocabulary, only
 three colour slots. The transcription is model output, so it goes through a sanitize schema that
 restricts `href` to `https:` and `mailto:` and blocks scripts, iframes and every `on*` handler.
 
+Writing one happens in a three-step desk: photographs, write & mark, share. Highlights can be
+added straight on the rendered words: the package annotates the preview with source positions
+after sanitizing, so a repeated word maps to its exact place in the markdown instead of the first
+match.
+
 ## What it proves
 
-- **The transcription ships in the server HTML.** On a phone the photo and the text toggle, and
-  which one shows is a CSS decision, never a mount decision.
+- **The transcription ships in the server HTML.** A letter arrives in an envelope and opens into
+  a deck of sheets, with the photograph on the back of each one. Which face shows is a CSS
+  decision, never a mount decision, and with no JavaScript the envelope is just a header with
+  every sheet readable below it.
 - **Colour never carries meaning alone.** Every tag has its own underline, solid, dotted or wavy.
   Contrast is measured against the highlight fill, not the page, by a test that reads the
   stylesheet.
@@ -96,8 +107,8 @@ the editor jumps from one to the next. The raw output is kept apart from the edi
 
 A letter written in block capitals comes back in block capitals. That is correct: the model is
 transcribing. Fixing the case in the prompt would make the raw something other than a record of
-the page. So there is a "Normalise capitals" button that runs on the edited text only, and says
-every time that it can't tell which words are names.
+the page. So there is a "Convert ALL CAPS to sentence case" button that runs on the edited text
+only, and says every time that it can't tell which words are names.
 
 ## Stack
 
@@ -106,6 +117,7 @@ every time that it can't tell which words are names.
 - Postgres on Neon with Drizzle, private Vercel Blob
 - A vision model through OpenRouter, Clerk for the one door in
 - Photos resized in the browser to 2400px and 1200px, HEIC converted on the way
+- Paper sounds generated offline, with no API call at runtime
 
 ## Running locally
 
@@ -130,9 +142,15 @@ installs the package tarball in an empty directory and runs it before publishing
 What the tests could not see: the Google Fonts import was dropped by the build, and the site was
 in Times New Roman until I opened the inspector. The fonts come from `next/font` now.
 
+The deck's first version recorded a full read for a reader who never left sheet one: the coda was
+laid out behind the envelope, so the observer fired on arrival. Nothing errored, and the table
+filled with plausible rows. It was found in a real browser, against the database, not by reading
+the diff.
+
 ## License
 
-MIT, the app and the package.
+MIT, the app and the package. The two paper sounds are the exception: generated with
+elevenlabs.io on the free plan, so they are credited and kept out of the MIT grant.
 
 ## Links
 
