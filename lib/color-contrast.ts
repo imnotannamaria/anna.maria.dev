@@ -1,7 +1,7 @@
 /**
  * WCAG contrast, computed rather than remembered.
  *
- * `app/globals.css` carries a hand-measured twelve-row table for `--fg-brand-on-tint`. That was
+ * `app/globals.css` carries a hand-measured twelve-row table for `--fg-brand-text`. That was
  * real work and it stays where it is — what must not happen is a second copy of those numbers
  * pasted onto a page, because a copied measurement goes stale the day a theme's brand hex moves
  * and nothing fails to tell you. So the tokens section computes its own, live, for whichever
@@ -48,7 +48,7 @@ export function parseRgb(value: string): Rgba | null {
  * Straight-alpha compositing: what a translucent colour actually looks like over what is
  * behind it.
  *
- * This is the part a naive contrast check gets wrong. `--fg-brand-on-tint` is ink on a
+ * This is the part a naive contrast check gets wrong. `--fg-brand-text` is ink on a
  * `--bg-surface-brand` fill, and that fill is the brand at 8–15% *over the canvas* — a third
  * colour that is neither of them. Measuring the ink against the raw canvas gives a number that
  * contradicts the measured table in `globals.css`, which says in as many words that it was

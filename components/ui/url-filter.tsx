@@ -109,9 +109,9 @@ export function FilterPill({
               borderColor: "var(--fg-brand)",
               // The border can stay --fg-brand; the label cannot. Brand ink on the brand
               // tint is 4.43:1 at 12px in the default theme, and worse in five others —
-              // eight of the twelve theme×mode combinations fail. See --fg-brand-on-tint
+              // eight of the twelve theme×mode combinations fail. See --fg-brand-text
               // in globals.css for the measured table.
-              color: "var(--fg-brand-on-tint)",
+              color: "var(--fg-brand-text)",
               background: "var(--bg-surface-brand)",
             }
           : {

@@ -197,9 +197,9 @@ function ControlButton({
       title={label}
       className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
       style={{
-        // --fg-brand-on-tint, not --fg-brand: brand ink on the brand tint fails contrast in
+        // --fg-brand-text, not --fg-brand: brand ink on the brand tint fails contrast in
         // eight of the twelve theme×mode combinations. See the token's note in globals.css.
-        color: primary ? "var(--fg-brand-on-tint)" : "var(--fg-muted)",
+        color: primary ? "var(--fg-brand-text)" : "var(--fg-muted)",
         background: primary ? "var(--bg-surface-brand)" : "transparent",
       }}
     >

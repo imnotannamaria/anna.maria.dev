@@ -179,7 +179,7 @@ function Row({
           so a title left to overflow reads as missing data rather than as a long title. */}
       {/* The colour is a class, not an inline style. It used to be inline, which outranks a
           stylesheet — so the hover and open rules in globals.css, including the measured
-          `--fg-brand-on-tint` pairing that exists precisely to keep this legible on the
+          `--fg-brand-text` pairing that exists precisely to keep this legible on the
           brand tint, never applied to a single row. `data-live` is what the base colour
           keys off instead. */}
       <span

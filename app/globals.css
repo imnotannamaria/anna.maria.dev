@@ -277,9 +277,9 @@
    that color, so a row using it would vanish exactly when you hover it. */
 .tree-row:hover {
   background: var(--bg-surface-brand);
-  /* --fg-brand-on-tint, not --fg-brand: brand ink on the brand tint fails contrast in eight
+  /* --fg-brand-text, not --fg-brand: brand ink on the brand tint fails contrast in eight
      of the twelve theme×mode combinations. See the token's note above the theme blocks. */
-  color: var(--fg-brand-on-tint);
+  color: var(--fg-brand-text);
 }
 
 .tree-row:focus-visible {
@@ -341,29 +341,6 @@
 
 .vinyl-disc[data-running="false"] {
   animation-play-state: paused;
-}
-
-@keyframes pulse-ok {
-  0% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
-  }
-  70% {
-    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* ============================================================
@@ -687,7 +664,7 @@
 .rm-launcher[aria-current="page"] {
   background: var(--bg-surface-brand);
   /* See .tree-row:hover — same pairing, same reason. */
-  color: var(--fg-brand-on-tint);
+  color: var(--fg-brand-text);
 }
 .rm-launcher:focus-visible {
   outline: 2px solid var(--fg-brand);
@@ -904,7 +881,7 @@
 .rm-log-row[data-open="true"],
 .rm-log-row:hover,
 .rm-log-row:focus-visible {
-  /* The measured pair: brand ink on the brand tint is --fg-brand-on-tint, never --fg-brand,
+  /* The measured pair: brand ink on the brand tint is --fg-brand-text, never --fg-brand,
      which fails contrast on eight of the twelve theme × mode combinations. */
   background: var(--bg-surface-brand);
 }
@@ -920,7 +897,7 @@
 .rm-log-row[data-open="true"] .rm-log-title,
 .rm-log-row:hover .rm-log-title,
 .rm-log-row:focus-visible .rm-log-title {
-  color: var(--fg-brand-on-tint);
+  color: var(--fg-brand-text);
 }
 
 /* `0fr → 1fr` animates a height nobody has to measure. `max-height` guesses, and a guess

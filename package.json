@@ -79,6 +79,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@entrepta/registry": "2.0.0",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",

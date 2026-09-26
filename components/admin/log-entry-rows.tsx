@@ -104,7 +104,7 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
                 className="text-mono-xs inline-flex h-5 items-center rounded-[5px] px-2 font-mono uppercase"
                 style={{
                   background: "var(--bg-surface-brand)",
-                  color: "var(--fg-brand-on-tint)",
+                  color: "var(--fg-brand-text)",
                 }}
               >
                 {TYPE_LABEL[entry.type]}

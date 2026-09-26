@@ -12,5 +12,6 @@
     "lib": "@/lib",
     "utils": "@/lib/utils",
     "hooks": "@/hooks"
-  }
+  },
+  "themes": "all"
 }

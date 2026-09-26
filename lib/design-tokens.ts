@@ -79,7 +79,7 @@ export const TOKEN_GROUPS: TokenGroup[] = [
         on: ["--fg-brand"],
       },
       {
-        token: "--fg-brand-on-tint",
+        token: "--fg-brand-text",
         note: "brand text on the brand tint. --fg-brand itself fails 8 of the 12",
         on: ["--bg-surface-brand", "--bg-canvas"],
       },

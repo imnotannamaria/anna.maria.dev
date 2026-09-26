@@ -44,12 +44,11 @@ function brandFor(selector: string): string | null {
 /**
  * Where a theme's colours live.
  *
- * The default one has no `[data-theme]` at all — it is what `:root` already says, and
- * `ThemeSwitcher` sets the attribute only when you pick something else. So entrepta is read off
- * `:root` and the rest off their own blocks.
+ * entrepta v2 writes every theme under `:root[data-theme="<id>"]`, the default included — the
+ * default also sits on bare `:root` in the same selector list, for pages rendered before
+ * `ThemeScript` sets the attribute. Reading the attribute form covers all six the same way.
  */
-const DEFAULT_THEME = "entrepta"
-const darkSelector = (id: string) => (id === DEFAULT_THEME ? ":root" : `[data-theme="${id}"]`)
+const darkSelector = (id: string) => `:root[data-theme="${id}"]`
 const lightSelector = (id: string) => `${darkSelector(id)}[data-mode="light"]`
 
 describe("theme colours", () => {

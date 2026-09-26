@@ -43,7 +43,7 @@ describe("compositing", () => {
   })
 
   /**
-   * The case the whole helper exists for. `--fg-brand-on-tint` sits on `--bg-surface-brand`,
+   * The case the whole helper exists for. `--fg-brand-text` sits on `--bg-surface-brand`,
    * which is the brand at 15% over `--bg-canvas` — a third colour that is neither. Measured
    * against the raw canvas the ink reads 4.44 and fails; against the composited tint it reads
    * the 6.33 the table in globals.css records.
@@ -51,7 +51,7 @@ describe("compositing", () => {
   it("matches the measured entrepta-dark row once the tint is flattened", () => {
     const canvas = rgb(9, 9, 11) // --bg-canvas
     const tint = rgb(124, 107, 255, 0.15) // --bg-surface-brand
-    const ink = rgb(155, 142, 255) // --fg-brand-on-tint
+    const ink = rgb(155, 142, 255) // --fg-brand-text
 
     const pill = flatten([tint, canvas])
     const onTint = contrastRatio(ink, pill)

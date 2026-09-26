@@ -250,7 +250,7 @@ function ValueRow({ entry, value }: { entry: TokenEntry; value: string }) {
     >
       <span
         className="text-mono-sm w-44 shrink-0 font-mono"
-        style={{ color: "var(--fg-brand-on-tint)" }}
+        style={{ color: "var(--fg-brand-text)" }}
       >
         {entry.token}
       </span>
