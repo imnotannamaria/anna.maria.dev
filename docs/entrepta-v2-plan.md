@@ -14,6 +14,28 @@ a local copy, with dozens of call sites pointing at it.
 
 ---
 
+## Outcome
+
+Implemented on the `entrepta-v2` branch, one commit per phase. Where the work departed from the
+plan below, this is why:
+
+- **Open decision 1, the CodeBlock sounds, did not apply.** Nothing on the site rendered the
+  CodeBlock (posts use rehype-pretty-code), so no sound was lost, and the unused component went.
+- **Open decision 2, the easter egg, survived.** entrepta's window dots carry
+  `data-window-dots`, so the titlebar catches a click on them and still shows the toast.
+- **Open decision 3, spotlight on cards that glow, is left for the visual pass.** Every card
+  kept its spotlight; dropping it on a given card is a one-line change.
+- **Cards kept their elements.** `cardVariants()` goes on the `motion.div`, `article`, `button`
+  or `dl` each card already was, instead of wrapping them in `<Card>`.
+- **`PageOutline` got a thin client binding** in `components/chrome/page-outline.tsx`, because
+  its `scrollContainer` is a function and most pages rendering it are server components.
+- **`/piano`'s 36px headings became 40px** (`display-md`), since 36 was never on the scale.
+- **`/components` lost its tab strip** rather than moving to Radix tabs: with the tokens and rules
+  tabs gone there was one tab left. `lib/color-contrast.ts` went with the tokens tab, its only user.
+- **The status bar's `<kbd>` stayed hand-rolled.** It sits on the brand fill, and entrepta's
+  `Kbd` has no variant for that surface.
+- **No native checkbox existed**, so `Checkbox` was not added.
+
 ## What we decided
 
 | Question              | Decision                                                                                                                |

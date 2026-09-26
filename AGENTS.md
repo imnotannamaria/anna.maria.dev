@@ -14,7 +14,7 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 | Framework        | Next.js 16 (App Router)                                            |
 | Language         | TypeScript (strict)                                                |
 | Styling          | Tailwind CSS v4 + entrepta tokens                                  |
-| Design system    | entrepta, components copied in, no SDK, dark first                 |
+| Design system    | entrepta 2.0, copied in by its CLI, no SDK, dark first             |
 | Content          | MDX via Velite                                                     |
 | State            | Zustand                                                            |
 | Animation        | Motion v12                                                         |
@@ -38,16 +38,41 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 
 ## Design system: entrepta
 
-The site uses entrepta for design. It is not an installed dependency, the components are copied into the project (`app/components/entrepta/`) and owned as regular code. Edit them directly when a component needs a change, don't fight the copy.
+The site runs on [entrepta](https://entrepta.vercel.app) 2.0. This site is where most of v2 was
+built; now it consumes it. entrepta is not a runtime dependency: its CLI copies source in, and three
+places are entrepta's rather than the site's:
+
+- `app/components/entrepta/`, written by `npx @entrepta/cli add <name> --overwrite`
+- `app/entrepta.css`, the tokens, themes, reset, focus and loading classes
+- `lib/utils.ts` (`cn()`), `lib/motion.ts`, `lib/icon.tsx`, `lib/overlay.ts`, and the hooks
+  `use-theme`, `use-mode`, `use-command-palette`, `use-url-filter`
+
+A change to any of them belongs in entrepta, then comes back with `add --overwrite`. A local edit
+is lost on the next update. What only this site knows stays out of those files: its CSS lives in
+`app/globals.css`, its helpers in `lib/format.ts`, and `components/chrome/` binds entrepta's
+Sidebar, PageOutline and TabNav to the site's routes.
+
+**Never run `entrepta init --overwrite` here.** It rewrites `app/globals.css` whole, which is where
+the site's own ~1,100 lines of CSS live, and it brings a Google Fonts `@import` that fights
+`next/font`. The migration guide says to run it; for this repo it is wrong.
+
+**Updating entrepta** is: bump the pinned `@entrepta/registry` devDependency, run
+`lib/entrepta-sync.test.ts`, and copy into `app/entrepta.css` what it reports (the output of
+`init --themes=all` in a scratch project, minus the fonts). Then `add … --overwrite` the components
+in use, commit before it, and read the diff after. The plan behind all this is
+[docs/entrepta-v2-plan.md](docs/entrepta-v2-plan.md).
 
 ### Tokens
 
-Defined in `app/globals.css`. Primitive colors (zinc, violet, indigo, etc) feed semantic tokens:
+Defined in `app/entrepta.css`. Primitive colors (zinc, violet, indigo, etc) feed semantic tokens:
 
 ```css
 :root {
   --bg-canvas: #09090b; /* zinc-950, global background */
-  --bg-surface: #18181b; /* zinc-900, cards and panels */
+  --bg-card: #0b0b0e; /* cards: a hair above the canvas, defined by the border */
+  --bg-surface: #18181b; /* zinc-900, what sits above a card: menus, tooltips */
+  --bg-overlay: #0e0e10; /* dialogs and the palette */
+  --bg-field: var(--bg-overlay); /* inputs */
   --bg-surface-elevated: rgba(39, 39, 42, 0.6);
 
   --fg-primary: #fafafa; /* zinc-50 */
@@ -63,9 +88,14 @@ Defined in `app/globals.css`. Primitive colors (zinc, violet, indigo, etc) feed 
 
 Brand-derived accents (`--border-brand`, `--shadow-brand`, `--fg-brand-glow`) are built with `color-mix()` against `--fg-brand`, so they follow whatever theme is active. Never hardcode the violet hex for a brand accent, always derive it from `--fg-brand` so it reacts to theme changes.
 
+Two inks come with every theme, because neither can be derived from the brand: `--fg-on-brand`
+for text on a `--fg-brand` fill, and `--fg-brand-text` for brand-colored text below 24px on the
+canvas, a card or the brand tint. `--fg-brand` as body text fails AA in four of the twelve theme ×
+mode pairs; it stays for fills, borders, glyphs and text of 24px and up.
+
 ### Themes
 
-Only `--fg-brand` and `--fg-brand-hover` change between themes. Applied via `data-theme` on `<html>` (see `THEMES` in `app/layout.tsx`).
+Only the brand changes between themes: `--fg-brand`, `--fg-brand-hover`, the two inks above, the tint and the ring. Applied via `data-theme` on `<html>` (see `THEMES` in `app/layout.tsx`).
 
 | Theme              | Color            |
 | ------------------ | ---------------- |
@@ -96,7 +126,7 @@ Mono is the default, not sans. Sans only shows up in long running text.
 
 #### The size scale
 
-Every size comes from `@theme` in `globals.css`. There are ten steps and no eleventh:
+Every size comes from `@theme static` in `app/entrepta.css`. There are ten steps and no eleventh:
 
 | Token             | Size / leading | The role it was cut for                              |
 | ----------------- | -------------- | ---------------------------------------------------- |
@@ -121,10 +151,11 @@ Rules, each one paid for:
 - **No `text-[Npx]`, and no Tailwind default steps.** `text-xs` is the same 12px as
   `text-mono-sm` and `text-sm` the same 14px as `text-mono-md`; two spellings for one size is
   the ambiguity the scale removes. `lib/type-scale.test.ts` fails on either.
-- **A new step has to be registered in `TYPE_SCALE` in `lib/utils.ts`.** tailwind-merge cannot
+- **A new step belongs in entrepta, registered in its `TYPE_SCALE`.** tailwind-merge cannot
   tell that `text-mono-sm` is a font size, so an unregistered step gets filed as a text colour
-  and silently deleted by any arbitrary colour class in the same `cn()` — see the comment
-  there, and `lib/utils.test.ts`. (Write such a class out in full when you mention it in a doc:
+  and silently deleted by any arbitrary colour class in the same `cn()` — see the comment in
+  `lib/utils.ts`, and `lib/utils.test.ts`. That file is entrepta's, so the step goes upstream
+  and comes back with the sync. (Write such a class out in full when you mention it in a doc:
   Tailwind v4 scans Markdown too, so a wildcard inside the brackets compiles to invalid CSS.)
 - **No adjacent pair closer than ~25%.** That is why there is no 20 between 18 and 24, and no
   48 between 40 and 64. If two steps are 9% apart, they are one step with two names, and the
@@ -152,8 +183,8 @@ Rules, each one paid for:
 └─────────────────────────────────────────────────────────┘
 ```
 
-- Titlebar: decorative traffic lights + file tabs + meta on the right, with a brand underline that travels to the active tab (`components/chrome/titlebar.tsx`)
-- Sidebar: logo `a` in serif italic + nav icons + a `◆` that travels to the active item (`components/chrome/sidebar.tsx`)
+- Titlebar: entrepta's `TabNav` with `variant="window"` — traffic lights, file tabs, meta on the right, a brand underline that travels to the active tab. `components/chrome/titlebar.tsx` knows the pages and the palette; the dots still say hi through a delegated click
+- Sidebar: entrepta's `Sidebar` — logo `a` in serif italic + nav icons + a `◆` that travels to the active item. `components/chrome/sidebar.tsx` holds the pages and the route matching
 - Status bar: entrepta `StatusBar`, brand color, page context on the right
 - Recurring glyphs: `◆` as the brand mark, `//` for comments, `$` for section prompts
 
@@ -172,7 +203,7 @@ app/
   log/                      public feed of everything I finish
   roadmap/                  the board: to do, in progress, shipped
   admin/                    log + roadmap CRUD, behind AuthKit + the allowlist
-  components/entrepta/     entrepta design system components (button, card, dialog, etc)
+  components/entrepta/     entrepta 2.0 components, written by its CLI — don't edit here
   api/
     contact/route.ts        email via Resend
     og/route.tsx             dynamic OG images
@@ -181,7 +212,8 @@ app/
     v1/[[...route]]/        the Hono app — wristkit ingest + admin CRUD
     wristkit-sync/route.ts  legacy path, forwards into Hono (delete once the Shortcut moves)
   layout.tsx                root layout, editor chrome + fonts + theme setup
-  globals.css                tokens, typography scale, theme overrides
+  entrepta.css               entrepta's tokens, scale and themes, synced from @entrepta/registry
+  globals.css                the site's own CSS, imports entrepta.css
 
 proxy.ts                    AuthKit proxy (Next 16's name for middleware), /admin only
 
@@ -190,7 +222,7 @@ content/
   projects/*.mdx
 
 components/
-  chrome/                   titlebar, sidebar, command palette, page outline
+  chrome/                   titlebar, sidebar, page outline (site bindings over entrepta), palette, feed shell
   home/                     bento grid cards (stack, mini piano, GitHub, log)
   log/                      feed, catalog card, star rating
   roadmap/                  board, item card, progress card, status mark
@@ -203,7 +235,7 @@ components/
   contact/                  contact form, channels card
   piano/                    keymap card
   brand/                    logo mark
-  ui/                       shared card + motion primitives (see below), generated cover, icons, blur-fade
+  ui/                       chrome error, sound feedback, generated cover, meta grid, icons
 
 emails/
   contact-email.tsx         React Email template
@@ -221,16 +253,17 @@ lib/
   experience.ts              career start date, years of experience
   spotify.ts                 token + playlist fetch
   wristkit/                  DB client (Drizzle), schema, validation
-  utils.ts                   cn(), formatDate(), estimateReadingTime()
+  utils.ts                   entrepta's cn(); motion.ts, icon.tsx and overlay.ts are entrepta's too
+  format.ts                  formatDate(), slugify() for headings, isUuid(), reading time
   metadata.ts                createMetadata() helper
   contact-schema.ts          zod schema for the contact form
 
 store/
   nowPlayingStore.ts         Zustand, Spotify widget timer state
 
-hooks/
-  use-command-palette.ts
-  use-theme.ts
+hooks/                      entrepta's: use-theme, use-mode, use-command-palette, use-url-filter
+  use-media-query.ts
+  use-optimistic-removal.ts
 ```
 
 ---
@@ -247,7 +280,7 @@ Two columns: photo + long bio. Career timeline (vertical brand line, circular do
 
 ### `/blog`
 
-The shelf. One post per row, `.bento-card` like everything else, and the text taking the full
+The shelf. One post per row, entrepta's Card like everything else, and the text taking the full
 width. It briefly had a generated cover on the left and lost it: a poster earns its place when it
 is the thing you scan for, and a post is scanned by its title — a rectangle beside every row was
 decoration competing with the sentence doing the work. `/projects` keeps covers, because a project
@@ -297,10 +330,10 @@ A two-octave Web Audio piano, and the one page where the instrument is deliberat
 The wooden cabinet is skeuomorphic on purpose; wrapping it would be a frame inside a frame.
 
 Everything around it is the shared surface, though. The key mapping was one hand-written box
-painted `--bg-surface` — the token for what sits _above_ a card — and is four `.bento-card` now, one
+painted `--bg-surface` — the token for what sits _above_ a card — and is four Cards now, one
 per octave group. The six song buttons hand-rolled the same surface six times and are
-`.bento-card` + `.bento-card-sm` with `!grid`, since the class sets flex-column and those rows are
-three columns. They are the one card on the site with **no spotlight**: they are controls whose
+`cardVariants({ size: "sm" })` with `grid`, which `cn()` swaps in for the card's flex-column since
+those rows are three columns. They are the one card on the site with **no spotlight**: they are controls whose
 playing state already lights the whole surface brand, and a glow following the cursor across six of
 them would compete with the one that means something.
 
@@ -316,9 +349,8 @@ the form entirely, and a page-owned card would have nested a card inside a card 
 hit send. entrepta `Input` + `Button`, loading state, inline field errors, a network failure told
 apart from a rejection, honeypot on the backend.
 
-`app/components/entrepta/card.tsx` is gone. It was a second card vocabulary with exactly one
-consumer — this form's success state — while seventeen other files spoke `.bento-card` +
-`components/ui/card-parts`.
+Both states are entrepta's Card, like every other card on the site. The site's own `.bento-card`
+became entrepta v2's Card, so there is one card vocabulary again.
 
 ### `/log`
 
@@ -333,9 +365,9 @@ inside each section.
 Filter pills mirror into `?type=` through `useUrlFilter`, read with `useSyncExternalStore` rather
 than `useSearchParams` so every card lands in the server HTML.
 
-The card is `.bento-card` + `.bento-card-sm`. It used to draw its own `rounded-[14px] border p-3.5`
-and was the one card on the site that didn't hover like the rest; `-sm` exists because 24px of
-padding on a 320px tile in a poster grid is most of the tile, and a density modifier is cheaper than
+The card is entrepta's Card at `size="sm"`. It used to draw its own `rounded-[14px] border p-3.5`
+and was the one card on the site that didn't hover like the rest; `sm` exists because 24px of
+padding on a 320px tile in a poster grid is most of the tile, and a density step is cheaper than
 a second card.
 
 Posters go through `next/image` pointed at **`/api/v1/poster/<base64url>`** — a local path, so
@@ -358,7 +390,7 @@ Every entry has a slug, but there is no `/log/[slug]` page and there shouldn't b
 ### `/roadmap`
 
 Three columns, to do, in progress and shipped, of what this site is going to become, over a
-progress card whose stepper walks the same three stages. Every item is a `.bento-card` with
+progress card whose stepper walks the same three stages. Every item is entrepta's Card with
 the status mark, a serif title, the blurb and a `Badge`; shipped ones are struck through.
 Hovering a card runs a light around its border, and the in-progress ones rest dimly lit.
 
@@ -519,7 +551,7 @@ idle the whole time, and it reproduces with a bare `npx next dev` and nothing co
 
 - Brand accents always derive from `--fg-brand` via `color-mix()`, never a hardcoded hex, so every theme stays reactive.
 - Mono is the default UI font. Reach for Inter only in long prose blocks.
-- entrepta components in `app/components/entrepta/` are owned code, edit them directly rather than wrapping or overriding from outside.
+- entrepta components in `app/components/entrepta/` are entrepta's. Change them upstream and bring them back with `add --overwrite`; don't wrap or override them from outside. See Design system above.
 - Chrome mobile won't resize below about 550px in DevTools. For real narrow viewports (375px), use the device toolbar, not window resize.
 - New API routes go in the Hono app under `lib/api/routes/`, mounted at `/api/v1`. The older handlers (`/api/contact`, `/api/og`, `/api/now-playing`) stay where they are — they work, and moving them buys nothing.
 - Anything under `/admin` calls `requireAdmin()` (pages) or `requireAdminApi` (routes). The `proxy.ts` matcher is not the gate; a matcher can be edited wrong.
@@ -536,24 +568,26 @@ looking at the screen. They are the questions to ask _while_ writing, not after.
   `@theme` namespace gets filed under whatever group its shape resembles — `text-mono-sm` was
   read as a text _colour_ — and then a real colour class in the same call silently deletes it,
   or is deleted by it. Registering the namespace in `lib/utils.ts` is what makes the merge
-  correct; `lib/utils.test.ts` is what keeps it that way. **If you add a custom utility, add it
-  there in the same commit.**
+  correct; `lib/utils.test.ts` is what keeps it that way. That file is entrepta's now, so **a
+  custom utility gets registered upstream, in the same change that adds it.**
 - **A row with two children and `justify-between` has no overflow contract until you write
   one.** "It fits" is not a contract: the card heads fit at 11px and broke the day the scale
   moved them to 12px, because `uppercase` plus `tracking-[0.08em]` widens every character.
   Decide out loud what happens when the two stop fitting — the row wraps and the halves don't
-  (`CardHead`), or one half truncates. And remember `.bento-card` sets `overflow: hidden`, so
+  (`CardHeader`), or one half truncates. And remember the Card sets `overflow: hidden`, so
   a `whitespace-nowrap` child that overflows is _clipped with no ellipsis_, which looks like
   missing data rather than a layout bug.
 - **Text on a `--fg-brand` fill uses `--fg-on-brand`.** Never a fixed near-white or near-black:
   a hardcoded `zinc-50` fails WCAG AA on 7 of the 12 theme × mode combinations, including the
-  default theme in dark mode at 3.72:1. The measured table is above `--fg-on-brand` in
-  `globals.css`. Same for a border on that fill — `color-mix()` from the token, not white at
-  30%.
+  default theme in dark mode at 3.72:1. The values live in each entrepta theme, and entrepta's
+  contrast test measures all twelve. Same for a border on that fill — `color-mix()` from the
+  token, not white at 30%. And brand-colored text below 24px uses `--fg-brand-text`, not
+  `--fg-brand`.
 - **Don't override a component from its only caller.** The status bar hardcoded
   `fixed right-0 bottom-0 left-0 z-40` and `app/layout.tsx` undid all five with inline styles.
-  entrepta is owned code: change the component. If a second consumer ever wants the other
-  behaviour, that is a variant, not an override.
+  Change the component — upstream, in entrepta, which is how `StatusBar` got
+  `position="static"`. If a second consumer ever wants the other behaviour, that is a variant,
+  not an override.
 - **A glyph is not a type role.** `◆`, `♥`, `■`, the mini piano's key labels: they are matched
   optically to the text beside them and keep a numeric inline size, all 18px and under. Use
   `<Diamond />` for the brand mark rather than an inline span — that one reached eleven copies,
@@ -603,20 +637,20 @@ original text if it is ever needed.
 
 ## Cards and motion
 
-Every card on the site is built from the same pieces. Reaching for raw markup instead is how the home page ended up with eight cards that each invented their own header, and how the contributions card spent months re-implementing `.bento-card` in inline styles with a React state hook driving its hover.
+Every card on the site is built from the same pieces, all of them entrepta's (`app/components/entrepta/`). Reaching for raw markup instead is how the home page ended up with eight cards that each invented their own header, and how the contributions card spent months re-implementing the card surface in inline styles with a React state hook driving its hover.
 
 ### The pieces
 
-| Piece                             | What it is                                                   |
-| --------------------------------- | ------------------------------------------------------------ |
-| `.bento-card` (globals.css)       | The card surface: padding, radius, border, hover             |
-| `.bento-card-sm` / `-xl`          | The same card, denser or roomier. A modifier, not a new card |
-| `CardHead` / `CardFoot` / `Badge` | `components/ui/card-parts` — the chrome inside a card        |
-| `ArrowLink` / `ArrowAffordance`   | A link with a travelling arrow and a rule that wipes in      |
-| `useSpotlight` + `Spotlight`      | The glow that trails the cursor across a card                |
-| `useReveal` + `Reveal`            | The entrance every card shares                               |
-| `RollingNumber`                   | An odometer for any number worth watching land               |
-| `TypeIn`                          | Text that assembles itself a piece at a time                 |
+| Piece                                                                          | What it is                                                                                                               |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `Card` / `cardVariants()`                                                      | The card surface: padding, radius, border, hover. `cardVariants()` puts it on a `motion.div`, an `article` or a `button` |
+| `size="sm"` / `"xl"`                                                           | The same card, denser or roomier. A size, not a new card                                                                 |
+| `CardHeader` + `CardLabel` + `CardMeta`, `CardFooter` + `CardComment`, `Badge` | The chrome inside a card                                                                                                 |
+| `ArrowLink` / `ArrowAffordance`                                                | A link with a travelling arrow and a rule that wipes in                                                                  |
+| `useSpotlight` + `Spotlight`                                                   | The glow that trails the cursor across a card                                                                            |
+| `useReveal` + `Reveal`                                                         | The entrance every card shares                                                                                           |
+| `RollingNumber`                                                                | An odometer for any number worth watching land                                                                           |
+| `TypeIn`                                                                       | Text that assembles itself a piece at a time                                                                             |
 
 Card shape is fixed: `◆ name` on the left of the head, muted meta on the right, no border and no fill on the head itself. The foot is a `//` comment on the left and an accent on the right. If a card needs something the pieces don't do, change the piece.
 
@@ -649,10 +683,10 @@ The checks below are the ones this codebase has actually been bitten by. Read th
 - **Security** — auth on every admin surface (layout AND route, never just the proxy matcher), input validation on the server, URL fields restricted to `https://` before they become an `href`, no secrets or stack traces in responses, middleware ordered so unauthenticated requests never reach a body parse.
 - **Backend (Hono)** — new routes live under `lib/api/routes/` behind the right middleware, and errors return JSON through `onError` rather than a leaked stack. Where a route or page sits on the caching decisions in Conventions, check it agrees with them; if it has a reason not to, the reason belongs in the diff.
 - **Loading and error states** — a page that hits the database needs a `loading.tsx`; where the data IS the page it needs an `error.tsx`, because an empty state when the DB is down is a lie. Forms need a submitting state and need to tell a network failure apart from a rejection.
-- **Reuse before invention** — this is the one worth reading the diff twice for. A new card that hand-rolls a header, a hover, or a surface is re-implementing something in `components/ui`; see Cards and motion. The tell is inline styles that add up to `.bento-card`, or a `useState` doing what `:hover` does.
+- **Reuse before invention** — this is the one worth reading the diff twice for. A new card that hand-rolls a header, a hover, or a surface is re-implementing something entrepta already ships; see Cards and motion. The tell is inline styles that add up to the Card, or a `useState` doing what `:hover` does.
 - **Standardization** — reuse asks "does this already exist?". This asks the harder question: **does this page look like it belongs to the same site as the home page?** Two failures, and the second is the one that gets missed.
 
-  _Divergence_ — a page that solves a solved problem its own way. Every page is the editor metaphor: outline panel, `$ command` or `## label` section heads, `.bento-card` for collections, prose for narrative, mono as the default and Inter only in long text. A section that invents its own header rhythm, its own footer rule, or its own surface is a page drifting, even when every line of it is fine on its own.
+  _Divergence_ — a page that solves a solved problem its own way. Every page is the editor metaphor: outline panel, `$ command` or `## label` section heads, entrepta's Card for collections, prose for narrative, mono as the default and Inter only in long text. A section that invents its own header rhythm, its own footer rule, or its own surface is a page drifting, even when every line of it is fine on its own.
 
   _Duplication_ — the same component living in more than one place. `about-outline` / `contact-outline` / `piano-outline` were three files whose diff was a comment, a function name, a string and a footer; they only got folded together when a change had to be applied to all three at once. The rule now: **the second copy is a warning, the third is a bug.** When a diff adds copy number two, say so in the review even if extracting is out of scope — that note is what makes the extraction obvious later instead of expensive.
 
@@ -666,7 +700,7 @@ The checks below are the ones this codebase has actually been bitten by. Read th
 - **Responsive** — reason about 375px minus the 56px sidebar; wide tables scroll rather than reflow; grid tracks use `min(Npx, 100%)`. Code-level checks only: hand the visual pass to Anna, never drive a browser.
 - **Bugs** — timezone traps around `new Date("YYYY-MM-DD")`; anything date-dependent computed on both sides of the server/client boundary, which is a hydration mismatch waiting for a render that straddles midnight; pages that would fail `next build` with the database unreachable.
 - **Class merging** — any class the diff invents outside Tailwind's own vocabulary: is its namespace registered in `TYPE_SCALE` / `extendTailwindMerge` in `lib/utils.ts`? An unregistered one is misfiled by twMerge and then deleted, or deletes a colour, and nothing fails. Read `cn()` calls as the merged string, not as the arguments: `cn(base, className)` with a caller-supplied class is where a component's own styling gets silently dropped, in either direction.
-- **Overflow contracts** — for every row the diff adds or touches with two children and `justify-between`: what happens when they stop fitting? If the answer is "they fit", that is not an answer. Especially inside `.bento-card`, which clips.
+- **Overflow contracts** — for every row the diff adds or touches with two children and `justify-between`: what happens when they stop fitting? If the answer is "they fit", that is not an answer. Especially inside a Card, which clips.
 - **Overriding a component from its caller** — inline styles or classes in a consumer that undo what the component sets. The fix is almost always in the component, since entrepta is owned code and most of them have one consumer.
 - **Type scale** — sizes come from the ten `@theme` steps; no `text-[Npx]`, no Tailwind default step, no numeric inline `fontSize` above glyph size. `lib/type-scale.test.ts` enforces all three, so a diff that needs an exception has to argue for it in the diff.
 
