@@ -1,6 +1,6 @@
 import { createMetadata } from "@/lib/metadata"
 import { getPublishedPosts, getPostReadingStats } from "@/lib/velite"
-import { formatDate } from "@/lib/utils"
+import { formatDate } from "@/lib/format"
 import { BlogFeed, type TagCount } from "@/components/blog/blog-feed"
 import { type PostItem } from "@/components/blog/post-card"
 import { DocLabel, Em } from "@/components/chrome/page-parts"

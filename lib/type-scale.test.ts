@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process"
 import { describe, expect, it } from "vitest"
 
 /**
- * The scale in `app/globals.css` was defined once and then ignored: ten named roles with
+ * The scale in `app/entrepta.css` was defined once and then ignored: ten named roles with
  * zero consumers, while 185 call-sites across 16 distinct sizes wrote `text-[11px]` by
  * hand — including `12` next to `12.5` and `13` next to `13.5`, pairs nobody can tell
  * apart. Nothing failed, which is the point: a scale that is optional is a scale that

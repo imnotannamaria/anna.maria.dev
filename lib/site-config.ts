@@ -25,7 +25,7 @@ export type SiteConfig = typeof siteConfig
  * than the constant living with the rest of the site's identity.
  *
  * Only `--fg-brand` and its derivatives change between them — see the theme blocks at the
- * bottom of `app/globals.css`. A new theme needs a `--fg-on-brand` and a `--fg-brand-on-tint`
+ * bottom of `app/entrepta.css`. A new theme needs a `--fg-on-brand` and a `--fg-brand-on-tint`
  * measured alongside it, because neither can be derived.
  */
 export const THEMES = [

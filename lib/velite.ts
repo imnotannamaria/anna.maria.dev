@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { blog, projects, componentDocs } from "@/.velite"
-import { slugify, countWords, estimateReadingTime } from "@/lib/utils"
+import { slugify, countWords, estimateReadingTime } from "@/lib/format"
 
 function stripPrefix(slug: string) {
   return slug.split("/").slice(1).join("/")

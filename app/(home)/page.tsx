@@ -6,7 +6,7 @@ import {
   getPublishedPosts,
   getPublishedProjects,
 } from "@/lib/velite"
-import { formatDate, estimateReadingTime } from "@/lib/utils"
+import { formatDate, estimateReadingTime } from "@/lib/format"
 import { CardHead } from "@/components/ui/card-parts"
 import { SectHead } from "@/components/home/section-head"
 import { FeaturedProjectCard } from "@/components/home/featured-project-card"

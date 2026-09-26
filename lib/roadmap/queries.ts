@@ -1,6 +1,6 @@
 import { asc, desc, ne, eq } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
-import { isUuid } from "@/lib/utils"
+import { isUuid } from "@/lib/format"
 import { roadmapItems } from "./schema"
 import type { RoadmapItem, RoadmapStatus } from "./validation"
 

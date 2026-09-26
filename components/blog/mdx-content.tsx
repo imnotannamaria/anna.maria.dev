@@ -1,7 +1,7 @@
 import * as runtime from "react/jsx-runtime"
 import Image from "next/image"
 import { InfoIcon } from "@phosphor-icons/react/dist/ssr"
-import { slugify } from "@/lib/utils"
+import { slugify } from "@/lib/format"
 import { Diamond } from "@/components/ui/diamond"
 
 /** Derive a stable slug id from heading children so the outline/TOC can anchor to it. */
