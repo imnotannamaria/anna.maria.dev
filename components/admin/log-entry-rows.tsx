@@ -26,7 +26,7 @@ import { toast } from "@/app/components/entrepta/toast"
 import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
 import { StarRating } from "@/components/log/star-rating"
-import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
+import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
 import { formatLoggedAt } from "@/lib/log/date"
 import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
@@ -104,7 +104,7 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
                 className="text-mono-xs inline-flex h-5 items-center rounded-[5px] px-2 font-mono uppercase"
                 style={{
                   background: "var(--bg-surface-brand)",
-                  color: "var(--fg-brand-on-tint)",
+                  color: "var(--fg-brand-text)",
                 }}
               >
                 {TYPE_LABEL[entry.type]}

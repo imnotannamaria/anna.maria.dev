@@ -1,12 +1,20 @@
 "use client"
 
+import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react"
 import type { Variants } from "motion/react"
-import { ArrowLink } from "@/components/ui/arrow-link"
-import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
-import { EASE_OUT } from "@/components/ui/reveal"
-import { TypeIn } from "@/components/ui/type-in"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
+import {
+  cardVariants,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { Badge } from "@/app/components/entrepta/badge"
+import { EASE_OUT } from "@/lib/motion"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export type FeaturedProject = {
   slug: string
@@ -25,9 +33,9 @@ export type FeaturedProject = {
  * noise — so the card stays still until you reach for it, which also means it
  * never wears out on the tenth visit.
  *
- * The lift and the brand shadow stay in `.featured-card` rather than moving into
- * Motion: that shadow is built from `var(--shadow-brand)`, and Motion can't
- * interpolate a colour hiding inside a custom property. CSS can.
+ * The surface, the lift and the brand shadow are entrepta's `featured` Card, in CSS
+ * rather than Motion: that shadow is built from `var(--shadow-brand)`, and Motion
+ * can't interpolate a colour hiding inside a custom property. CSS can.
  */
 export function FeaturedProjectCard({
   project,
@@ -61,13 +69,11 @@ export function FeaturedProjectCard({
 
   return (
     <motion.div
-      className="featured-card group/featured relative flex flex-col gap-4 overflow-hidden p-6 sm:p-8"
-      style={{
-        background: "var(--bg-surface-brand)",
-        border: "1px solid var(--border-brand)",
-        borderRadius: "var(--radius-xl)",
-        minHeight: 380,
-      }}
+      className={cn(
+        cardVariants({ variant: "featured" }),
+        "group/featured rounded-[var(--radius-xl)] p-6 max-sm:p-6 sm:p-8",
+      )}
+      style={{ minHeight: 380 }}
       initial="rest"
       animate="rest"
       whileHover="hover"
@@ -112,11 +118,14 @@ export function FeaturedProjectCard({
         }}
       />
 
-      <CardHead label="featured" meta={<Badge variant="brand-soft">SHIPPED</Badge>} />
+      <CardHeader>
+        <CardLabel>featured</CardLabel>
+        <CardMeta>{<Badge color="brand">SHIPPED</Badge>}</CardMeta>
+      </CardHeader>
 
       <p
         className="text-mono-sm relative font-mono tracking-[0.04em]"
-        style={{ color: "var(--fg-brand)" }}
+        style={{ color: "var(--fg-brand-text)" }}
       >
         {String(index).padStart(2, "0")} / {String(total).padStart(2, "0")}
       </p>
@@ -162,12 +171,12 @@ export function FeaturedProjectCard({
       <motion.div className="relative flex flex-wrap gap-1.5" variants={tagGroup}>
         {project.tags.slice(0, 4).map((t) => (
           <motion.span key={t} variants={tag} className="inline-flex">
-            <Badge variant="brand-soft">{t}</Badge>
+            <Badge color="brand">{t}</Badge>
           </motion.span>
         ))}
       </motion.div>
 
-      <CardFoot>
+      <CardFooter>
         <div className="flex gap-6" style={{ position: "relative", zIndex: 2 }}>
           {project.github && (
             /* Named for the project, not just "github": the contributions card
@@ -187,7 +196,7 @@ export function FeaturedProjectCard({
         <span style={{ color: "var(--fg-muted)", marginLeft: "auto" }}>
           {"// "}mit · open source
         </span>
-      </CardFoot>
+      </CardFooter>
     </motion.div>
   )
 }

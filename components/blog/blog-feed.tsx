@@ -22,7 +22,7 @@
 
 import { useMemo } from "react"
 import { FeedShell, groupInOrder, type FeedGroup } from "@/components/chrome/feed-shell"
-import { useUrlFilter } from "@/components/ui/url-filter"
+import { useUrlFilter } from "@/hooks/use-url-filter"
 import { PostCard, type PostItem } from "./post-card"
 
 export type TagCount = { name: string; count: number }
@@ -66,7 +66,7 @@ export function BlogFeed({
         <>
           <div className="flex justify-between">
             <span>{"// posts"}</span>
-            <span style={{ color: "var(--fg-brand)" }}>{filtered.length}</span>
+            <span style={{ color: "var(--fg-brand-text)" }}>{filtered.length}</span>
           </div>
           <div className="flex justify-between">
             <span>{"// tags"}</span>

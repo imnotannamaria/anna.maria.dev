@@ -1,5 +1,5 @@
 /** The board is force-dynamic and reads Postgres, so there is a moment with nothing on screen. */
-import { PageLoading } from "@/components/chrome/page-loading"
+import { PageLoading } from "@/app/components/entrepta/page-loading"
 
 export default function RoadmapLoading() {
   return (

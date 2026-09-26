@@ -96,5 +96,6 @@ flow is Client Credentials, which needs no user login and no refresh token, beca
 playlist is public and nothing here reads a private listening history.
 
 Take `lib/spotify.ts`, `store/nowPlayingStore.ts` and both component files. The pieces the card
-leans on (`.bento-card`, `CardHead`, `CardFoot`, `useReveal`, `useSpotlight`) are all in this
-repo too, and the card degrades to a plain div if you drop them.
+leans on (`Card`, `CardHeader`, `CardFooter`, `useReveal`, `useSpotlight`) come from
+[entrepta](https://entrepta.vercel.app), copied into this repo, and the card degrades to a plain
+div if you drop them.

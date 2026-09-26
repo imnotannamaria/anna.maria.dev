@@ -15,7 +15,8 @@ import {
   ListChecksIcon,
   SwatchesIcon,
 } from "@phosphor-icons/react"
-import { TabStrip } from "./tab-strip"
+import Link from "next/link"
+import { TabNav, TabNavLink } from "@/app/components/entrepta/tabs"
 import { toast } from "@/app/components/entrepta/toast"
 import dynamic from "next/dynamic"
 import { useCommandPalette } from "@/hooks/use-command-palette"
@@ -106,41 +107,16 @@ export function Titlebar() {
   const tabs = dynamicTab ? [...NAV_TABS, dynamicTab] : NAV_TABS
 
   return (
-    <div className="flex items-stretch border-b border-[var(--border-subtle)] bg-[var(--bg-canvas)] select-none">
-      {/* Traffic lights — non-functional, but they say hi if you poke them */}
-      <div className="flex w-[84px] shrink-0 items-center gap-1.5 border-r border-[var(--border-subtle)] px-3">
-        {["var(--status-error)", "var(--status-warning)", "var(--status-success)"].map((color) => (
-          <button
-            key={color}
-            type="button"
-            aria-hidden
-            tabIndex={-1}
-            onClick={showEasterEgg}
-            className="h-3 w-3 rounded-full opacity-85 transition-[opacity,transform] hover:scale-110 hover:opacity-100"
-            style={{ background: color }}
-          />
-        ))}
-      </div>
-
-      {/* Tabs. The row itself lives in `TabStrip`, which /components uses too — two tab
-          rows that did not match was the divergence worth removing. */}
-      <TabStrip
-        tabs={tabs.map((tab) => {
-          const active = isTabActive(tab.href, pathname)
-          return {
-            key: tab.href,
-            name: tab.name,
-            icon: tab.icon,
-            active,
-            href: tab.href,
-            // The × only shows on the active tab, and only where "closing" leads somewhere
-            // meaningful (everything except home).
-            onClose:
-              active && tab.href !== "/" ? () => router.push(closeTarget(tab.href)) : undefined,
-          }
-        })}
-        label="Pages"
-        layoutId="titlebar-active-tab"
+    // The window dots are entrepta's and purely decorative, so the easter egg is a delegated
+    // click: anything inside `[data-window-dots]` says hi. They were never focusable either.
+    <div
+      onClick={(e) => {
+        if ((e.target as Element).closest("[data-window-dots]")) showEasterEgg()
+      }}
+    >
+      <TabNav
+        aria-label="Pages"
+        variant="window"
         after={
           <button
             type="button"
@@ -152,15 +128,35 @@ export function Titlebar() {
             +
           </button>
         }
-      />
-
-      {/* Right meta */}
-      <div className="text-mono-sm hidden shrink-0 items-center gap-4 px-4 font-mono text-[var(--fg-muted)] md:flex">
-        <span className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-[var(--fg-brand)]" />
-          main
-        </span>
-      </div>
+        end={
+          <span className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--fg-brand)]" />
+            main
+          </span>
+        }
+      >
+        {tabs.map((tab) => {
+          const active = isTabActive(tab.href, pathname)
+          return (
+            <TabNavLink
+              key={tab.href}
+              asChild
+              active={active}
+              icon={tab.icon}
+              // The × only shows on the active tab, and only where "closing" leads somewhere
+              // meaningful (everything except home).
+              onClose={
+                active && tab.href !== "/" ? () => router.push(closeTarget(tab.href)) : undefined
+              }
+              closeLabel={`Close ${tab.name}`}
+            >
+              <Link href={tab.href} data-sound="click">
+                {tab.name}
+              </Link>
+            </TabNavLink>
+          )
+        })}
+      </TabNav>
 
       {paletteMounted && <CommandMenu open={open} onOpenChange={setOpen} />}
     </div>

@@ -1,5 +1,5 @@
 /** Same reason as the list: the edit page reads the item before it can render the form. */
-import { PageLoading } from "@/components/chrome/page-loading"
+import { PageLoading } from "@/app/components/entrepta/page-loading"
 
 export default function EditRoadmapItemLoading() {
   return (

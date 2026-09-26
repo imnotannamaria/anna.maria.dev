@@ -46,7 +46,7 @@ export function DeleteDialog({
           type="button"
           aria-label={`Delete ${title}`}
           title="Delete"
-          className="grid h-8 w-8 cursor-pointer place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft) hover:text-(--status-error-fg)"
+          className="focus-ring grid h-8 w-8 cursor-pointer place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft) hover:text-(--status-error-fg)"
           style={{ color: "var(--fg-muted)" }}
         >
           <TrashIcon size={15} aria-hidden />

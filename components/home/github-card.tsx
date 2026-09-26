@@ -1,10 +1,17 @@
 "use client"
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { motion } from "motion/react"
-import { ArrowLink } from "@/components/ui/arrow-link"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { GithubCalendar } from "@/components/about/github-calendar"
 import type { ContributionYear } from "@/lib/github/contributions"
 import type { CardState } from "@/lib/showcase/state"
@@ -13,7 +20,7 @@ import type { CardState } from "@/lib/showcase/state"
  * The frame around the calendar. It used to be `.bento-card` copied out by
  * hand into inline styles, with a React state hook driving the hover so it
  * could also lift and cast a shadow. Everything it was reimplementing already
- * exists: the class does the surface, `CardHead` and `CardFoot` do the chrome,
+ * exists: the class does the surface, `CardHeader` and `CardFooter` do the chrome,
  * `ArrowLink` does the link. The lift went with the state — no other card on
  * the page lifts, and keeping it meant keeping a re-render on every pointer
  * enter to do what CSS does free.
@@ -32,29 +39,30 @@ export function GithubCard({
   const reveal = useReveal()
 
   return (
-    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
+    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
 
-      <CardHead label="contributions" as="h3" meta={username} />
+      <CardHeader>
+        <CardLabel as="h3">contributions</CardLabel>
+        <CardMeta>{username}</CardMeta>
+      </CardHeader>
 
       <GithubCalendar state={state} />
 
       {/* Same dashed rule the tree and oss footers use — spelled with the token,
           not Tailwind's default border colour, which is a different grey. */}
-      <CardFoot
-        comment="public activity · last 12 months"
-        className="border-t border-dashed border-(--border-subtle) pt-3"
-      >
-        <span style={{ color: "var(--fg-brand)" }}>
+      <CardFooter className="border-t border-dashed border-(--border-subtle) pt-3">
+        <CardComment>public activity · last 12 months</CardComment>
+        <span style={{ color: "var(--fg-brand-text)" }}>
           <ArrowLink
             href={`https://github.com/${username}`}
             external
-            className="text-mono-sm text-(--fg-brand)"
+            className="text-mono-sm text-(--fg-brand-text)"
           >
             github
           </ArrowLink>
         </span>
-      </CardFoot>
+      </CardFooter>
     </motion.div>
   )
 }

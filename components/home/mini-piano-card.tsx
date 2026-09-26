@@ -1,11 +1,12 @@
 "use client"
 
+import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "motion/react"
-import { useReveal } from "@/components/ui/reveal"
-import { CardHead } from "@/components/ui/card-parts"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { cardVariants, CardHeader, CardLabel, CardMeta } from "@/app/components/entrepta/card"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 
 // ─── Key geometry ────────────────────────────────────────────────────────────
 //
@@ -84,7 +85,7 @@ export function MiniPianoCard() {
   return (
     <Link href="/piano" style={{ textDecoration: "none", display: "block" }}>
       <motion.div
-        className="bento-card mini-piano group/piano h-full"
+        className={cn(cardVariants(), "mini-piano group/piano h-full")}
         onMouseMove={onMouseMove}
         {...reveal}
       >
@@ -93,7 +94,10 @@ export function MiniPianoCard() {
         {/* This was a mac title bar — traffic lights over a chrome-tinted strip
             with its own border — which made the piano the one widget in the
             section wearing a costume. Same head as every other card now. */}
-        <CardHead label="piano" meta="// tap to play" />
+        <CardHeader>
+          <CardLabel>piano</CardLabel>
+          <CardMeta>{"// tap to play"}</CardMeta>
+        </CardHeader>
 
         {/* Stage */}
         <div

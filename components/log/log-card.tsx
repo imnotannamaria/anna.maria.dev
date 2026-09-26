@@ -5,9 +5,15 @@ import Image from "next/image"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { ArrowUpRightIcon, CaretDownIcon } from "@phosphor-icons/react"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import {
+  cardVariants,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
 import { formatLoggedAt } from "@/lib/log/date"
 import { posterSrc } from "@/lib/log/poster-src"
@@ -19,8 +25,8 @@ import { StarRating } from "./star-rating"
  * The "1b" catalog card from docs/log-design.html, on the shared surface.
  *
  * It used to draw its own `rounded-[14px] border p-3.5` with its own hover, which is how it
- * ended up the one card on the site that didn't react like the others. It is `.bento-card`
- * now — plus `.bento-card-sm`, because 24px of padding on a 320px tile in a poster grid is
+ * ended up the one card on the site that didn't react like the others. It is entrepta's Card
+ * now, at `size="sm"`, because 24px of padding on a 320px tile in a poster grid is
  * most of the tile, and a density modifier is cheaper than a second card.
  */
 export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number }) {
@@ -36,7 +42,8 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
   return (
     <motion.article
       className={cn(
-        "bento-card bento-card-sm group",
+        cardVariants({ size: "sm" }),
+        "group",
         link && "hover:border-(--border-brand-strong)",
       )}
       onMouseMove={onMouseMove}
@@ -63,14 +70,16 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
         <Poster entry={entry} />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <CardHead
-            label={TYPE_LABEL[entry.type]}
-            meta={
-              <time dateTime={entry.loggedAt} className="whitespace-nowrap">
-                {formatLoggedAt(entry.loggedAt)}
-              </time>
-            }
-          />
+          <CardHeader>
+            <CardLabel>{TYPE_LABEL[entry.type]}</CardLabel>
+            <CardMeta>
+              {
+                <time dateTime={entry.loggedAt} className="whitespace-nowrap">
+                  {formatLoggedAt(entry.loggedAt)}
+                </time>
+              }
+            </CardMeta>
+          </CardHeader>
 
           <h3
             className="text-heading-md mt-[9px] font-serif leading-[1.15] font-normal tracking-[-0.01em]"
@@ -99,7 +108,7 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
 
           {/* Wraps rather than squeezing: at 375px the text column is only ~200px, and
               five 18px stars plus the trigger do not always share a line. */}
-          <CardFoot className="gap-x-2 pt-2.5">
+          <CardFooter className="gap-x-2 pt-2.5">
             {entry.rating != null ? (
               <StarRating rating={entry.rating} size={18} />
             ) : (
@@ -118,7 +127,7 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
                 // `py-[5px] -my-[5px]` is the whole point of the pair: 10px mono type gives
                 // a 15px-tall target, and WCAG 2.5.8 wants 24. The padding grows the hit
                 // area to 25px and the negative margin gives it straight back to the layout,
-                // so the CardFoot row keeps the height it had — which matters here, because
+                // so the CardFooter row keeps the height it had — which matters here, because
                 // that row is `flex-wrap` and a taller button would push the stars onto a
                 // line of their own at 375px.
                 className="text-mono-xs relative z-20 -my-[5px] inline-flex shrink-0 cursor-pointer items-center gap-1 rounded py-[5px] font-mono transition-colors"
@@ -136,7 +145,7 @@ export function LogCard({ entry, index = 0 }: { entry: LogEntry; index?: number 
                 />
               </button>
             )}
-          </CardFoot>
+          </CardFooter>
         </div>
       </div>
 

@@ -1,63 +1,29 @@
 "use client"
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { useState } from "react"
 import { z } from "zod"
 import { motion } from "motion/react"
 import { CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react"
+import { Field } from "@/app/components/entrepta/field"
 import { Input } from "@/app/components/entrepta/input"
+import { Textarea } from "@/app/components/entrepta/textarea"
 import { Button, buttonVariants } from "@/app/components/entrepta/button"
-import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { Badge } from "@/app/components/entrepta/badge"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { contactSchema, type ContactFieldErrors } from "@/lib/contact-schema"
 import { cn } from "@/lib/utils"
-import { Diamond } from "@/components/ui/diamond"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 type FormState = "idle" | "loading" | "success" | "error"
-
-function FieldLabel({
-  htmlFor,
-  required,
-  children,
-}: {
-  htmlFor: string
-  required?: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <label
-      htmlFor={htmlFor}
-      className="text-mono-xs flex items-center gap-1.5 font-mono tracking-[0.08em] uppercase"
-      style={{ color: "var(--fg-muted)" }}
-    >
-      <Diamond />
-      {children}
-      {required && (
-        <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-          *
-        </span>
-      )}
-    </label>
-  )
-}
-
-function FieldError({ id, message }: { id: string; message?: string }) {
-  if (!message) return null
-  return (
-    <span
-      id={id}
-      role="alert"
-      className="text-mono-sm flex items-center gap-1 font-mono"
-      style={{ color: "var(--status-error-fg)" }}
-    >
-      <span aria-hidden style={{ opacity: 0.7 }}>
-        {"// "}
-      </span>
-      {message}
-    </span>
-  )
-}
 
 /**
  * The card both states live in.
@@ -66,9 +32,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
  * replaces the form entirely — nesting it inside a card owned by the page would have put a
  * card inside a card the moment someone hit send.
  *
- * `.bento-card` and `components/ui/card-parts`, not entrepta's `Card`. That component was
- * this file's alone: seventeen other files speak the first vocabulary and one spoke the
- * second, in a state that appears once and disappears. It has been deleted.
+ * entrepta's `Card` in both states, like every other card on the site.
  *
  * Rendering the same component type in both branches is deliberate — React reconciles it, so
  * the entrance doesn't replay when the form turns into a receipt.
@@ -88,11 +52,17 @@ function FormCard({
   const reveal = useReveal()
 
   return (
-    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
+    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
-      <CardHead label="send a message" meta={meta} />
+      <CardHeader>
+        <CardLabel>send a message</CardLabel>
+        <CardMeta>{meta}</CardMeta>
+      </CardHeader>
       <div className="relative flex flex-col">{children}</div>
-      <CardFoot comment={comment}>{footRight}</CardFoot>
+      <CardFooter>
+        <CardComment>{comment}</CardComment>
+        {footRight}
+      </CardFooter>
     </motion.div>
   )
 }
@@ -165,7 +135,7 @@ export function ContactForm({ email }: { email: string }) {
   if (state === "success") {
     return (
       <FormCard
-        meta={<Badge variant="success-soft">delivered</Badge>}
+        meta={<Badge color="success">delivered</Badge>}
         comment="replies within a day"
         footRight={
           <button
@@ -175,7 +145,7 @@ export function ContactForm({ email }: { email: string }) {
               setErrorMessage("")
               setState("idle")
             }}
-            className="focus-ring group inline-flex cursor-pointer items-center gap-2 font-mono transition-colors hover:text-[color:var(--fg-brand)]"
+            className="focus-ring group inline-flex cursor-pointer items-center gap-2 font-mono transition-colors hover:text-[color:var(--fg-brand-text)]"
           >
             <span
               aria-hidden
@@ -243,73 +213,46 @@ export function ContactForm({ email }: { email: string }) {
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-1.5">
-            <FieldLabel htmlFor="name" required>
-              name
-            </FieldLabel>
+          <Field id="name" label="name" required error={errors.name}>
             <Input
-              id="name"
               name="name"
               type="text"
               autoComplete="name"
               placeholder="anna maria"
               disabled={disabled}
               state={errors.name ? "error" : "default"}
-              aria-invalid={errors.name ? true : undefined}
-              aria-describedby={errors.name ? "name-error" : undefined}
               onChange={() => clearField("name")}
             />
-            <FieldError id="name-error" message={errors.name} />
-          </div>
+          </Field>
 
-          <div className="flex flex-col gap-1.5">
-            <FieldLabel htmlFor="email" required>
-              email
-            </FieldLabel>
+          <Field id="email" label="email" required error={errors.email}>
             <Input
-              id="email"
               name="email"
               type="email"
               autoComplete="email"
               placeholder="you@yourdomain.com"
               disabled={disabled}
               state={errors.email ? "error" : "default"}
-              aria-invalid={errors.email ? true : undefined}
-              aria-describedby={errors.email ? "email-error" : undefined}
               onChange={() => clearField("email")}
             />
-            <FieldError id="email-error" message={errors.email} />
-          </div>
+          </Field>
 
-          <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <FieldLabel htmlFor="message" required>
-              message
-            </FieldLabel>
-            <div
-              className={cn(
-                "rounded-[var(--radius-md)] border p-3 transition-all duration-150 ease-out",
-                errors.message
-                  ? "border-[var(--status-error)] focus-within:border-[var(--status-error)] focus-within:shadow-[0_0_0_3px_var(--status-error-soft)]"
-                  : "border-[var(--border-strong)] focus-within:border-[var(--fg-brand)] focus-within:shadow-[0_0_0_3px_var(--bg-surface-brand)] hover:border-[var(--fg-muted)]",
-                disabled && "pointer-events-none opacity-40",
-              )}
-              style={{ background: "var(--bg-surface)" }}
-            >
-              <textarea
-                id="message"
-                name="message"
-                rows={6}
-                placeholder="your message…"
-                disabled={disabled}
-                aria-invalid={errors.message ? true : undefined}
-                aria-describedby={errors.message ? "message-error" : undefined}
-                onChange={() => clearField("message")}
-                className="text-mono-md min-h-[140px] w-full resize-y border-0 bg-transparent font-mono leading-[1.6] outline-none placeholder:text-[var(--fg-muted)]"
-                style={{ color: "var(--fg-primary)" }}
-              />
-            </div>
-            <FieldError id="message-error" message={errors.message} />
-          </div>
+          <Field
+            id="message"
+            label="message"
+            required
+            error={errors.message}
+            className="sm:col-span-2"
+          >
+            <Textarea
+              name="message"
+              rows={6}
+              placeholder="your message…"
+              disabled={disabled}
+              state={errors.message ? "error" : "default"}
+              onChange={() => clearField("message")}
+            />
+          </Field>
         </div>
 
         {state === "error" && errorMessage && (

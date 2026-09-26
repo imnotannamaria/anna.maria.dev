@@ -1,7 +1,8 @@
+import { Em } from "@/app/components/entrepta/doc-parts"
 import Link from "next/link"
 import { ChatsCircleIcon } from "@phosphor-icons/react/dist/ssr"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
-import { TypeIn } from "@/components/ui/type-in"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 import { RoadmapBoard } from "@/components/roadmap/roadmap-board"
 import { createMetadata } from "@/lib/metadata"
 import { getPublicItems } from "@/lib/roadmap/queries"
@@ -46,7 +47,9 @@ export default async function RoadmapPage() {
           className="text-mono-sm mb-3 font-mono tracking-[0.08em] uppercase"
           style={{ color: "var(--fg-muted)" }}
         >
-          <span style={{ color: "var(--fg-brand)" }}>$</span>{" "}
+          <span aria-hidden style={{ color: "var(--fg-brand)" }}>
+            $
+          </span>{" "}
           <TypeIn text="roadmap --all --group=status" />
         </div>
 
@@ -61,13 +64,9 @@ export default async function RoadmapPage() {
           className="text-body-lg mt-4 max-w-[58ch] font-sans leading-relaxed"
           style={{ color: "var(--fg-secondary)" }}
         >
-          Everything I&apos;m working on in{" "}
-          <em className="font-serif italic" style={{ color: "var(--fg-brand)" }}>
-            open source
-          </em>{" "}
-          right now, on one board. Some of it is this site. Some of it is entrepta, the design
-          system it&apos;s drawn with. The rest is projects that don&apos;t exist yet beyond a
-          sentence I didn&apos;t want to lose.
+          Everything I&apos;m working on in <Em>open source</Em> right now, on one board. Some of it
+          is this site. Some of it is entrepta, the design system it&apos;s drawn with. The rest is
+          projects that don&apos;t exist yet beyond a sentence I didn&apos;t want to lose.
         </p>
 
         <p

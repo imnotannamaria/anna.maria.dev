@@ -1,10 +1,18 @@
 "use client"
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { EASE_OUT, useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { EASE_OUT } from "@/lib/motion"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
 import { CaretRightIcon } from "@phosphor-icons/react"
 import {
@@ -156,7 +164,7 @@ function StackBadge({ tool }: { tool: Tool }) {
         // hover, dropping back, and starting it again — a flicker loop.
         "group-hover/badge:-translate-y-0.5 group-hover/badge:border-(--border-brand-strong)",
       )}
-      style={{ background: "var(--bg-surface-brand)", color: "var(--fg-brand-hover)" }}
+      style={{ background: "var(--bg-surface-brand)", color: "var(--fg-brand-text)" }}
     >
       {tool.icon && (
         <svg
@@ -236,10 +244,15 @@ export function StackCard() {
   }
 
   return (
-    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
+    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
 
-      <CardHead label="stack" as="h2" id="card-stack" meta={`${BRANCHES.length} branches`} />
+      <CardHeader>
+        <CardLabel as="h2" id="card-stack">
+          stack
+        </CardLabel>
+        <CardMeta>{`${BRANCHES.length} branches`}</CardMeta>
+      </CardHeader>
 
       {/* The `@container` has to be a *wrapper*: `container-type` establishes a query container
           for an element's descendants, never for itself, so `@md:` sitting on the same node as
@@ -279,7 +292,7 @@ export function StackCard() {
                   <RadioDot active={isOpen} />
 
                   <span
-                    className="text-mono-md min-w-0 truncate font-mono font-semibold transition-colors duration-150 group-hover/branch:text-(--fg-brand)"
+                    className="text-mono-md min-w-0 truncate font-mono font-semibold transition-colors duration-150 group-hover/branch:text-(--fg-brand-text)"
                     style={{ color: "var(--fg-primary)" }}
                   >
                     {branch.label}
@@ -353,12 +366,10 @@ export function StackCard() {
 
         {/* Footer — mirrors the tree card's. */}
       </div>
-      <CardFoot
-        comment="click a branch to fold it away"
-        className="border-t border-dashed border-(--border-subtle) pt-3"
-      >
-        <span style={{ color: "var(--fg-brand)" }}>{TOTAL_TOOLS} tools</span>
-      </CardFoot>
+      <CardFooter className="border-t border-dashed border-(--border-subtle) pt-3">
+        <CardComment>click a branch to fold it away</CardComment>
+        <span style={{ color: "var(--fg-brand-text)" }}>{TOTAL_TOOLS} tools</span>
+      </CardFooter>
     </motion.div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "motion/react"
-import { useReveal } from "@/components/ui/reveal"
+import { useReveal } from "@/app/components/entrepta/reveal"
 import { useRouter } from "next/navigation"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,7 +10,7 @@ import { Button } from "@/app/components/entrepta/button"
 import { Input } from "@/app/components/entrepta/input"
 import { Textarea } from "@/app/components/entrepta/textarea"
 import { toast } from "@/app/components/entrepta/toast"
-import { Field } from "@/components/ui/form-field"
+import { Field } from "@/app/components/entrepta/field"
 import { slugify } from "@/lib/slug"
 import {
   roadmapItemInputSchema,

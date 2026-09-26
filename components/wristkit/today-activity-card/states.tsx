@@ -2,10 +2,10 @@
 
 import type * as React from "react"
 import { motion, useReducedMotion } from "motion/react"
-import { revealViewport } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { revealViewport } from "@/lib/motion"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import type { TodayData } from "./load"
-import { Diamond } from "@/components/ui/diamond"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 const colors = {
   move: "var(--fg-brand)",

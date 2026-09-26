@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, useReducedMotion } from "motion/react"
-import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
+import { EASE_OUT, revealViewport } from "@/lib/motion"
 import type { PublicStatus } from "@/lib/roadmap/validation"
 
 /**

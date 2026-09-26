@@ -3,15 +3,24 @@
 /**
  * The progress card.
  *
- * A `.bento-card` like the rest: head, body, foot. The body is a stepper — the three
+ * A Card like the rest: head, body, foot. The body is a stepper — the three
  * columns as stages, with the live one pulsing.
  */
 
+import { Diamond } from "@/app/components/entrepta/diamond"
+import { cardVariants } from "@/app/components/entrepta/card"
 import { motion, useReducedMotion } from "motion/react"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { revealViewport, useReveal } from "@/components/ui/reveal"
-import { RollingNumber, useRollOnHover } from "@/components/ui/rolling-number"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { revealViewport } from "@/lib/motion"
+import { RollingNumber, useRollOnHover } from "@/app/components/entrepta/rolling-number"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { PUBLIC_STATUSES, STATUS_LABEL, type PublicStatus } from "@/lib/roadmap/validation"
 
 export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, number> }) {
@@ -27,10 +36,13 @@ export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, n
   const pct = total === 0 ? 0 : counts.done / total
 
   return (
-    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
+    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
 
-      <CardHead label="progress" meta={`${Math.round(pct * 100)}% shipped`} />
+      <CardHeader>
+        <CardLabel>progress</CardLabel>
+        <CardMeta>{`${Math.round(pct * 100)}% shipped`}</CardMeta>
+      </CardHeader>
 
       <div className="relative flex flex-wrap items-center gap-4">
         <span
@@ -92,11 +104,10 @@ export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, n
         })}
       </div>
 
-      <CardFoot comment="what I'm building next">
-        <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-          ◆
-        </span>
-      </CardFoot>
+      <CardFooter>
+        <CardComment>{"what I'm building next"}</CardComment>
+        <Diamond size={10} />
+      </CardFooter>
     </motion.div>
   )
 }

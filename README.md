@@ -26,23 +26,23 @@ Spotify, wristkit and the log are all optional. Without their environment variab
 
 ## Stack
 
-| Layer            | Tech                                    |
-| ---------------- | --------------------------------------- |
-| Framework        | Next.js 16 (App Router)                 |
-| Language         | TypeScript (strict)                     |
-| Styling          | Tailwind CSS v4                         |
-| Design system    | entrepta (components copied in, no SDK) |
-| Content          | MDX via Velite                          |
-| State            | Zustand                                 |
-| Animations       | Motion v12                              |
-| Email            | Resend + React Email                    |
-| Syntax highlight | Shiki                                   |
-| Themes           | next-themes + entrepta ThemeSwitcher    |
-| OG images        | @vercel/og                              |
-| SEO              | next-sitemap                            |
-| Icons            | Phosphor Icons, simple-icons            |
-| wristkit storage | Postgres via Drizzle ORM                |
-| Deploy           | Vercel                                  |
+| Layer            | Tech                                 |
+| ---------------- | ------------------------------------ |
+| Framework        | Next.js 16 (App Router)              |
+| Language         | TypeScript (strict)                  |
+| Styling          | Tailwind CSS v4                      |
+| Design system    | entrepta 2.0 (copied in by its CLI)  |
+| Content          | MDX via Velite                       |
+| State            | Zustand                              |
+| Animations       | Motion v12                           |
+| Email            | Resend + React Email                 |
+| Syntax highlight | Shiki                                |
+| Themes           | next-themes + entrepta ThemeSwitcher |
+| OG images        | @vercel/og                           |
+| SEO              | next-sitemap                         |
+| Icons            | Phosphor Icons, simple-icons         |
+| wristkit storage | Postgres via Drizzle ORM             |
+| Deploy           | Vercel                               |
 
 ---
 
@@ -171,6 +171,26 @@ live: "https://project.vercel.app"
 featured: true
 published: true
 ---
+
+## The design system: entrepta
+
+The UI runs on [entrepta](https://entrepta.vercel.app), a dark-first design system with the same
+editor metaphor. It is not a runtime dependency: its CLI copies source into the repo, and three
+places belong to it rather than to the site:
+
+- `app/components/entrepta/`, the components
+- `app/entrepta.css`, the tokens, the six themes, the reset and the loading classes
+- `lib/utils.ts`, `lib/motion.ts`, `lib/icon.tsx`, `lib/overlay.ts` and the hooks in `hooks/`
+
+Everything the site adds on top lives elsewhere: its CSS in `app/globals.css`, its helpers in
+`lib/format.ts`.
+
+To update a component, run `npx @entrepta/cli@latest add <name> --overwrite` and read the diff.
+To update the tokens, bump `@entrepta/registry` in `devDependencies` and run
+`npx vitest run lib/entrepta-sync.test.ts`, which lists what changed.
+
+**Don't run `entrepta init --overwrite` in this repo.** It rewrites `app/globals.css`, which holds
+the site's own CSS, and adds a Google Fonts import that fights `next/font`.
 
 ## Overview
 
@@ -331,7 +351,9 @@ app/
   contact/page.tsx         # Contact form
   log/                     # Public log feed
   admin/                   # Log CRUD, behind AuthKit
-  components/entrepta/     # entrepta design system components
+  components/entrepta/     # entrepta components, written by its CLI
+  entrepta.css             # entrepta's tokens and themes
+  globals.css              # the site's own CSS
   api/
     contact/route.ts       # Email via Resend
     og/route.tsx           # Dynamic OG images
@@ -347,7 +369,7 @@ content/
   projects/*.mdx           # Project case studies
 
 components/
-  chrome/                  # Titlebar, sidebar, command palette
+  chrome/                  # Titlebar, sidebar, outline and palette, bound to the site's routes
   home/                    # Bento grid cards (stack, mini piano, GitHub, log)
   log/                     # Log feed card, star rating
   admin/                   # Log entry form, table, dialogs
@@ -357,7 +379,7 @@ components/
   projects/                # Project card
   about/                   # GitHub calendar
   contact/                 # Contact form
-  ui/                      # Shared UI helpers
+  ui/                      # Site helpers: error screen, sound, generated cover
 
 emails/
   contact-email.tsx        # React Email template

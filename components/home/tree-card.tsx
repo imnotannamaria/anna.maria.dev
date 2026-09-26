@@ -1,11 +1,18 @@
 "use client"
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
 import { defaultOpenPaths, type SiteTreeItem } from "@/lib/site-tree"
 import { TreeNode } from "./tree-node"
@@ -111,7 +118,7 @@ export function TreeCard({
 
   return (
     <motion.div
-      className={cn("bento-card relative flex flex-col overflow-hidden", className)}
+      className={cn(cardVariants(), className)}
       onMouseMove={onMouseMove}
       variants={container}
       initial="hidden"
@@ -138,7 +145,12 @@ export function TreeCard({
       />
 
       <motion.div variants={piece}>
-        <CardHead label="tree" as="h2" id="card-tree" meta={`${routeCount} routes`} />
+        <CardHeader>
+          <CardLabel as="h2" id="card-tree">
+            tree
+          </CardLabel>
+          <CardMeta>{`${routeCount} routes`}</CardMeta>
+        </CardHeader>
       </motion.div>
 
       {/* min-h-0 is what makes this the part that scrolls: without it a flex child
@@ -164,11 +176,12 @@ export function TreeCard({
       </motion.nav>
 
       <motion.div variants={piece}>
-        <CardFoot
-          comment="click a file to open it"
-          className="border-t border-dashed border-(--border-subtle) pt-3"
-        >
-          <span className="inline-flex items-center gap-1.5" style={{ color: "var(--fg-brand)" }}>
+        <CardFooter className="border-t border-dashed border-(--border-subtle) pt-3">
+          <CardComment>click a file to open it</CardComment>
+          <span
+            className="inline-flex items-center gap-1.5"
+            style={{ color: "var(--fg-brand-text)" }}
+          >
             <span
               className="inline-block h-1.5 w-1.5 rounded-full"
               style={{
@@ -178,7 +191,7 @@ export function TreeCard({
             />
             live
           </span>
-        </CardFoot>
+        </CardFooter>
       </motion.div>
     </motion.div>
   )
@@ -189,8 +202,8 @@ export function TreeCard({
 /**
  * The tree while the log count is still in Postgres.
  *
- * It traces the real card rather than standing in for it: the same `.bento-card`, the same
- * `CardHead` with the same meta — `routeCount` is arithmetic over a hand-written constant, so
+ * It traces the real card rather than standing in for it: the same Card, the same
+ * `CardHeader` with the same meta — `routeCount` is arithmetic over a hand-written constant, so
  * it is known before any query — the same 32px rows at the same indents, and the same footer.
  * The only grey is where the words go.
  *
@@ -218,8 +231,11 @@ export function TreeCardSkeleton({
   className?: string
 }) {
   return (
-    <div className={cn("bento-card relative flex flex-col overflow-hidden", className)}>
-      <CardHead label="tree" meta={`${routeCount} routes`} />
+    <div className={cn(cardVariants(), className)}>
+      <CardHeader>
+        <CardLabel>tree</CardLabel>
+        <CardMeta>{`${routeCount} routes`}</CardMeta>
+      </CardHeader>
 
       <div className="-mx-2 min-h-0 flex-1 overflow-hidden pb-1" aria-hidden>
         {SKELETON_ROWS.map((row, i) => (
@@ -245,12 +261,10 @@ export function TreeCardSkeleton({
         ))}
       </div>
 
-      <CardFoot
-        comment="reading the tree"
-        className="border-t border-dashed border-(--border-subtle) pt-3"
-      >
+      <CardFooter className="border-t border-dashed border-(--border-subtle) pt-3">
+        <CardComment>reading the tree</CardComment>
         <Skeleton style={{ width: 52, height: 9, borderRadius: 3 }} />
-      </CardFoot>
+      </CardFooter>
 
       <span className="sr-only" role="status">
         Loading the tree

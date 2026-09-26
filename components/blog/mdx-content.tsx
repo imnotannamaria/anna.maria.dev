@@ -1,8 +1,8 @@
 import * as runtime from "react/jsx-runtime"
 import Image from "next/image"
 import { InfoIcon } from "@phosphor-icons/react/dist/ssr"
-import { slugify } from "@/lib/utils"
-import { Diamond } from "@/components/ui/diamond"
+import { slugify } from "@/lib/format"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 /** Derive a stable slug id from heading children so the outline/TOC can anchor to it. */
 function headingId(children: React.ReactNode): string | undefined {
@@ -166,13 +166,17 @@ const defaultComponents = {
   ),
   em: (props: React.HTMLAttributes<HTMLElement>) => (
     <em
-      style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", color: "var(--fg-brand)" }}
+      style={{
+        fontFamily: "var(--font-serif)",
+        fontStyle: "italic",
+        color: "var(--fg-brand-text)",
+      }}
       {...props}
     />
   ),
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
-      className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand)]"
+      className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand-text)]"
       style={{ overflowWrap: "break-word" }}
       {...props}
     />

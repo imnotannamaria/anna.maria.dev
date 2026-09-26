@@ -16,12 +16,19 @@
  * this side of the line.
  */
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { EnvelopeSimpleIcon } from "@phosphor-icons/react/dist/ssr"
 import { motion } from "motion/react"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { siteConfig } from "@/lib/site-config"
 
 const EMAIL = siteConfig.email
@@ -51,13 +58,16 @@ export function ChannelsCard({ index = 0 }: { index?: number }) {
   return (
     <motion.div
       id="channels"
-      className="bento-card"
+      className={cardVariants()}
       style={{ scrollMarginTop: 24 }}
       onMouseMove={onMouseMove}
       {...reveal}
     >
       <Spotlight {...spotlight} />
-      <CardHead label="other channels" meta={String(channels.length)} />
+      <CardHeader>
+        <CardLabel>other channels</CardLabel>
+        <CardMeta>{String(channels.length)}</CardMeta>
+      </CardHeader>
 
       <div className="relative flex flex-col">
         {channels.map(({ Icon, label, value, href, primary }, i) => {
@@ -93,7 +103,7 @@ export function ChannelsCard({ index = 0 }: { index?: number }) {
                   {label}
                 </span>
                 <span
-                  className="text-mono-sm truncate font-mono transition-colors group-hover/row:text-[var(--fg-brand)] group-focus-visible/row:text-[var(--fg-brand)]"
+                  className="text-mono-sm truncate font-mono transition-colors group-hover/row:text-[var(--fg-brand-text)] group-focus-visible/row:text-[var(--fg-brand-text)]"
                   style={{ color: "var(--fg-primary)" }}
                 >
                   {value}
@@ -114,7 +124,9 @@ export function ChannelsCard({ index = 0 }: { index?: number }) {
         })}
       </div>
 
-      <CardFoot comment="all of them get read" />
+      <CardFooter>
+        <CardComment>all of them get read</CardComment>
+      </CardFooter>
     </motion.div>
   )
 }

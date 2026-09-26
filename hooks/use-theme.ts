@@ -88,12 +88,24 @@ function useTheme(options: UseThemeOptions): UseThemeReturn {
     }
   }, [themeKey, themes])
 
+  // Two switchers on one page, such as a floating one and a row in a hero, stay
+  // in step: a change in one is announced to the others.
+  React.useEffect(() => {
+    const onChange = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail
+      if (themes.some((t) => t.id === id)) setThemeState(id)
+    }
+    window.addEventListener(themeKey, onChange)
+    return () => window.removeEventListener(themeKey, onChange)
+  }, [themeKey, themes])
+
   const setTheme = React.useCallback(
     (id: string) => {
       if (!themes.some((t) => t.id === id)) return
       setThemeState(id)
       applyThemeAttribute(id)
       safeWrite(themeKey, id)
+      window.dispatchEvent(new CustomEvent(themeKey, { detail: id }))
     },
     [themes, themeKey],
   )

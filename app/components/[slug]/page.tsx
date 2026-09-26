@@ -4,7 +4,7 @@ import type { Metadata } from "next"
 import { getComponentDocBySlug, getComponentDocs, getComponentDocToc } from "@/lib/velite"
 import { MDXContent } from "@/components/blog/mdx-content"
 import { PageOutline } from "@/components/chrome/page-outline"
-import { MetaCol, MetaGrid } from "@/components/chrome/page-parts"
+import { MetaCol, MetaGrid } from "@/components/ui/meta-grid"
 import { DocSpecimen } from "@/components/showcase/doc-specimen"
 import { SHOWCASE, type ShowcaseSlug } from "@/lib/showcase/registry"
 import { sourceUrl } from "@/lib/showcase/source"
@@ -156,7 +156,7 @@ export default async function ComponentDocPage({ params }: Props) {
                     target="_blank"
                     rel="noreferrer"
                     className="break-all transition-colors"
-                    style={{ color: "var(--fg-brand)" }}
+                    style={{ color: "var(--fg-brand-text)" }}
                   >
                     {doc.source}
                     <span className="sr-only"> (opens in a new tab)</span>

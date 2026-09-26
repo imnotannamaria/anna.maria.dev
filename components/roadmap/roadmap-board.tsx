@@ -1,8 +1,9 @@
 "use client"
 
 import { useMemo } from "react"
-import { STAGGER_LIMIT } from "@/components/ui/reveal"
-import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
+import { STAGGER_LIMIT } from "@/lib/motion"
+import { useUrlFilter } from "@/hooks/use-url-filter"
+import { FilterPill } from "@/app/components/entrepta/filter-pill"
 import { countByStatus, groupByStatus } from "@/lib/roadmap/counts"
 import {
   PUBLIC_STATUSES,

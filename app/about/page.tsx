@@ -1,3 +1,4 @@
+import Link from "next/link"
 import Image from "next/image"
 import { createMetadata } from "@/lib/metadata"
 import { GithubCard } from "@/components/home/github-card"
@@ -12,7 +13,7 @@ import {
   VinylRecordIcon,
 } from "@phosphor-icons/react/dist/ssr"
 import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
-import { DisplayH2, DocLabel, Em, Section, Strong } from "@/components/chrome/page-parts"
+import { DisplayH2, DocLabel, Em, Section, Strong } from "@/app/components/entrepta/doc-parts"
 import { calcYearsOfExp, yearsWord } from "@/lib/experience"
 import { siteConfig } from "@/lib/site-config"
 import { STACK_GROUPS, STACK_TOTAL } from "@/lib/stack"
@@ -20,9 +21,9 @@ import { StackGraph } from "@/components/about/stack-graph"
 import { TechBadge } from "@/components/about/tech-badge"
 import { Timeline, type TimelineEntry } from "@/components/about/timeline"
 import { InterestCard } from "@/components/about/interest-card"
-import { ArrowLink } from "@/components/ui/arrow-link"
-import { Reveal } from "@/components/ui/reveal"
-import { TypeIn } from "@/components/ui/type-in"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
+import { Reveal } from "@/app/components/entrepta/reveal"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export const metadata = createMetadata({
   title: "About",
@@ -206,8 +207,10 @@ export default async function AboutPage() {
       <div className="min-w-0">
         <div className="mx-auto max-w-[880px] px-5 py-12 sm:px-8 lg:px-12">
           {/* ══════════ WHOAMI ══════════ */}
-          <Section id="whoami" first>
-            <DocLabel level="#">whoami</DocLabel>
+          <Section id="whoami" variant="first">
+            <Reveal>
+              <DocLabel level="#">whoami</DocLabel>
+            </Reveal>
 
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
               {/* Photo + meta */}
@@ -262,7 +265,7 @@ export default async function AboutPage() {
                         href={href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/social text-mono-sm inline-flex min-h-6 w-full items-center gap-2 py-0.5 font-mono text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand)] focus-visible:text-[var(--fg-brand)]"
+                        className="group/social text-mono-sm inline-flex min-h-6 w-full items-center gap-2 py-0.5 font-mono text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand-text)] focus-visible:text-[var(--fg-brand-text)]"
                       >
                         <Icon size={14} style={{ opacity: 0.7 }} />
                         <span>{label}</span>
@@ -366,23 +369,31 @@ export default async function AboutPage() {
 
           {/* ══════════ CAREER & EDUCATION ══════════ */}
           <Section id="career">
-            <DocLabel level="##">career &amp; education</DocLabel>
-            <DisplayH2>
-              <Em>{yearsWord(years)}</Em> years of work.
-              <br />
-              One academic track.
-            </DisplayH2>
+            <Reveal>
+              <DocLabel level="##">career &amp; education</DocLabel>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <DisplayH2>
+                <Em>{yearsWord(years)}</Em> years of work.
+                <br />
+                One academic track.
+              </DisplayH2>
+            </Reveal>
 
             <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
               <div>
-                <DocLabel level="##">career</DocLabel>
+                <Reveal>
+                  <DocLabel level="##">career</DocLabel>
+                </Reveal>
                 <div className="mt-6">
                   <Timeline entries={withBadges(career)} />
                 </div>
               </div>
 
               <div id="education" style={{ scrollMarginTop: 24 }}>
-                <DocLabel level="##">education</DocLabel>
+                <Reveal>
+                  <DocLabel level="##">education</DocLabel>
+                </Reveal>
                 <div className="mt-6">
                   <Timeline entries={withBadges(education)} />
                 </div>
@@ -392,10 +403,14 @@ export default async function AboutPage() {
 
           {/* ══════════ STACK ══════════ */}
           <Section id="stack">
-            <DocLabel level="##">stack</DocLabel>
-            <DisplayH2>
-              <Em>What</Em> I reach for.
-            </DisplayH2>
+            <Reveal>
+              <DocLabel level="##">stack</DocLabel>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <DisplayH2>
+                <Em>What</Em> I reach for.
+              </DisplayH2>
+            </Reveal>
 
             {/* Two renderings of one list. The graph is client-only and needs room to
                 breathe, so it takes the pixels from `md` up.
@@ -451,12 +466,16 @@ export default async function AboutPage() {
 
           {/* ══════════ OUTSIDE OF CODE ══════════ */}
           <Section id="outside">
-            <DocLabel level="##">outside of code</DocLabel>
-            <DisplayH2>
-              <Em>Three</Em> things I do
-              <br />
-              when I&apos;m not shipping.
-            </DisplayH2>
+            <Reveal>
+              <DocLabel level="##">outside of code</DocLabel>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <DisplayH2>
+                <Em>Three</Em> things I do
+                <br />
+                when I&apos;m not shipping.
+              </DisplayH2>
+            </Reveal>
 
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
               {interests.map(({ Icon, title, desc, foot, glyph }, i) => (
@@ -484,8 +503,10 @@ export default async function AboutPage() {
                   {"//"}
                 </span>
                 <span>everything I actually finish, from films to books, lands in</span>
-                <ArrowLink href="/log" aria-label="See the log of everything I finish">
-                  the log
+                <ArrowLink asChild>
+                  <Link href="/log" aria-label="See the log of everything I finish">
+                    the log
+                  </Link>
                 </ArrowLink>
               </p>
             </Reveal>
@@ -493,12 +514,16 @@ export default async function AboutPage() {
 
           {/* ══════════ CONTRIBUTIONS ══════════ */}
           <Section id="contributions">
-            <DocLabel level="##">contributions</DocLabel>
-            <DisplayH2>
-              Open source.
-              <br />
-              <Em>A year</Em> in commits.
-            </DisplayH2>
+            <Reveal>
+              <DocLabel level="##">contributions</DocLabel>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <DisplayH2>
+                Open source.
+                <br />
+                <Em>A year</Em> in commits.
+              </DisplayH2>
+            </Reveal>
             <Reveal delay={0.12}>
               <p
                 className="text-body-md mt-4 max-w-[60ch] leading-relaxed"

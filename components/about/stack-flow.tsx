@@ -34,7 +34,7 @@ import {
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
 import { STACK_GROUPS, STACK_TOTAL, TECH_ICONS } from "@/lib/stack"
-import { Diamond } from "@/components/ui/diamond"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 // ─── Geometry ────────────────────────────────────────────────────────────────
 
@@ -84,7 +84,7 @@ function RootNodeView({ data }: NodeProps<RootNode>) {
         height: ROOT_H,
         borderColor: "var(--border-brand-strong)",
         background: "var(--bg-surface-brand)",
-        color: "var(--fg-brand-hover)",
+        color: "var(--fg-brand-text)",
       }}
     >
       <Diamond size={10} />

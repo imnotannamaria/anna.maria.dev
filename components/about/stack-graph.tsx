@@ -22,6 +22,7 @@
  * component does not actually wear. There is one copy of each now and both callers render it.
  */
 
+import { ArrowAffordance } from "@/app/components/entrepta/arrow-link"
 import { useState } from "react"
 import dynamic from "next/dynamic"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
@@ -166,10 +167,10 @@ export function StackGraphError({ onRetry }: { onRetry?: () => void }) {
           <button
             type="button"
             onClick={onRetry}
-            className="text-mono-sm cursor-pointer font-mono transition-colors"
-            style={{ color: "var(--fg-brand)" }}
+            className="focus-ring group/arrow text-mono-sm cursor-pointer font-mono transition-colors"
+            style={{ color: "var(--fg-brand-text)" }}
           >
-            try again →
+            <ArrowAffordance>try again</ArrowAffordance>
           </button>
         )}
       </div>

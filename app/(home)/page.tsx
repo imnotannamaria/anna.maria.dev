@@ -6,9 +6,9 @@ import {
   getPublishedPosts,
   getPublishedProjects,
 } from "@/lib/velite"
-import { formatDate, estimateReadingTime } from "@/lib/utils"
-import { CardHead } from "@/components/ui/card-parts"
-import { SectHead } from "@/components/home/section-head"
+import { formatDate, estimateReadingTime } from "@/lib/format"
+import { cardVariants, CardHeader, CardLabel } from "@/app/components/entrepta/card"
+import { SectHead } from "@/app/components/entrepta/sect-head"
 import { FeaturedProjectCard } from "@/components/home/featured-project-card"
 import { FeaturedPostCard } from "@/components/home/featured-post-card"
 import { OssCard } from "@/components/home/oss-card"
@@ -102,7 +102,7 @@ async function WhoamiRow() {
           from the profile card. The inner div is what goes absolute, so the card is
           pulled out of the row's height calculation and simply fills what it's given.
 
-          The inner div exists because `.bento-card` sets `position: relative` outside
+          The inner div exists because the Card sets `position: relative` outside
           any @layer, and unlayered CSS beats Tailwind's layered utilities — putting
           `md:absolute` on the card itself silently lost that fight. A plain div has no
           such rule to argue with.
@@ -231,7 +231,7 @@ export default function Home() {
             <Link
               href="/projects"
               className="text-mono-sm font-mono tracking-normal transition-all duration-150 hover:tracking-[0.08em]"
-              style={{ color: "var(--fg-brand)", textTransform: "none" }}
+              style={{ color: "var(--fg-brand-text)", textTransform: "none" }}
             >
               all projects ↗
             </Link>
@@ -245,8 +245,10 @@ export default function Home() {
               total={getFeaturedProjects().length}
             />
           ) : (
-            <div className="bento-card">
-              <CardHead label="featured" />
+            <div className={cardVariants()}>
+              <CardHeader>
+                <CardLabel>featured</CardLabel>
+              </CardHeader>
               <p
                 className="text-body-md"
                 style={{ color: "var(--fg-muted)", fontFamily: "var(--font-sans)" }}

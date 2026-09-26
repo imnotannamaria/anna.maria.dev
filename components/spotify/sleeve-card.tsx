@@ -14,16 +14,23 @@
  * claiming it.
  */
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { useId, useState } from "react"
 import Image from "next/image"
 import { motion } from "motion/react"
 import { PauseIcon, PlayIcon, SkipBackIcon, SkipForwardIcon } from "@phosphor-icons/react"
 import type { SimplifiedTrack } from "@/lib/spotify"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { ArrowLink } from "@/components/ui/arrow-link"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { ArrowAffordance, ArrowLink } from "@/app/components/entrepta/arrow-link"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
 
 /**
@@ -195,11 +202,11 @@ function ControlButton({
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
+      className="focus-ring inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
       style={{
-        // --fg-brand-on-tint, not --fg-brand: brand ink on the brand tint fails contrast in
+        // --fg-brand-text, not --fg-brand: brand ink on the brand tint fails contrast in
         // eight of the twelve theme×mode combinations. See the token's note in globals.css.
-        color: primary ? "var(--fg-brand-on-tint)" : "var(--fg-muted)",
+        color: primary ? "var(--fg-brand-text)" : "var(--fg-muted)",
         background: primary ? "var(--bg-surface-brand)" : "transparent",
       }}
     >
@@ -247,18 +254,20 @@ export function SleeveCard({
   const out = running ? OUT_PLAYING : OUT_STOPPED
 
   return (
-    <motion.div className={cn("bento-card", className)} onMouseMove={onMouseMove} {...reveal}>
+    <motion.div className={cn(cardVariants(), className)} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
       <h3 className="sr-only">Songs that sound like me</h3>
 
-      <CardHead
-        label="me, as a playlist"
-        meta={
-          <ArrowLink href={track.spotifyUrl} external className="text-mono-xs">
-            spotify
-          </ArrowLink>
-        }
-      />
+      <CardHeader>
+        <CardLabel>me, as a playlist</CardLabel>
+        <CardMeta>
+          {
+            <ArrowLink href={track.spotifyUrl} external className="text-mono-xs">
+              spotify
+            </ArrowLink>
+          }
+        </CardMeta>
+      </CardHeader>
 
       <div className="flex items-center gap-4">
         {/* The sleeve is the big target: poking the record is the obvious way to start it, and
@@ -273,7 +282,7 @@ export function SleeveCard({
           onBlur={() => setPeek(false)}
           aria-label={running ? "Pause" : "Play"}
           aria-describedby={albumId}
-          className="relative shrink-0 cursor-pointer rounded-[var(--radius-sm)]"
+          className="focus-ring relative shrink-0 cursor-pointer rounded-[var(--radius-sm)]"
           style={{ width: COVER + out, height: COVER }}
         >
           <Bubble show={peek} album={track.album} year={track.year} />
@@ -341,7 +350,10 @@ export function SleeveCard({
         </div>
       </div>
 
-      <CardFoot comment={audible ? "30s preview · spotify" : "my friends picked some of these"}>
+      <CardFooter>
+        <CardComment>
+          {audible ? "30s preview · spotify" : "my friends picked some of these"}
+        </CardComment>
         <div className="flex items-center gap-1">
           <ControlButton label="Previous track" onClick={onPrev}>
             <SkipBackIcon size={13} weight="fill" aria-hidden />
@@ -357,7 +369,7 @@ export function SleeveCard({
             <SkipForwardIcon size={13} weight="fill" aria-hidden />
           </ControlButton>
         </div>
-      </CardFoot>
+      </CardFooter>
 
       {/* Progress rides the card's bottom edge, clipped by its radius, instead of being one
           more line competing with the text above it. A CSS transition rather than Motion, so
@@ -416,10 +428,16 @@ function SleeveShell({
   children: React.ReactNode
 }) {
   return (
-    <div className={cn("bento-card relative", className)}>
-      <CardHead label="me, as a playlist" meta={meta} />
+    <div className={cn(cardVariants(), className)}>
+      <CardHeader>
+        <CardLabel>me, as a playlist</CardLabel>
+        <CardMeta>{meta}</CardMeta>
+      </CardHeader>
       <div className="flex items-center gap-4">{children}</div>
-      <CardFoot comment={comment}>{controls}</CardFoot>
+      <CardFooter>
+        <CardComment>{comment}</CardComment>
+        {controls}
+      </CardFooter>
 
       {/* The rail keeps its 2px in every frame so the card is exactly as tall as it will be.
           No brand fill on it here: there is no position to report, and a bar sitting at zero
@@ -536,10 +554,10 @@ export function SleeveError({ onRetry, className }: { onRetry?: () => void; clas
           <button
             type="button"
             onClick={onRetry}
-            className="text-mono-sm cursor-pointer font-mono transition-colors"
-            style={{ color: "var(--fg-brand)" }}
+            className="focus-ring group/arrow text-mono-sm cursor-pointer font-mono transition-colors"
+            style={{ color: "var(--fg-brand-text)" }}
           >
-            retry →
+            <ArrowAffordance>retry</ArrowAffordance>
           </button>
         )
       }

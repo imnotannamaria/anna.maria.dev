@@ -2,11 +2,11 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { getPublishedPosts, getPostBySlug, getPostToc, getPostReadingStats } from "@/lib/velite"
-import { formatDate } from "@/lib/utils"
+import { formatDate } from "@/lib/format"
 import { MDXContent } from "@/components/blog/mdx-content"
 import { ReadingProgress } from "@/components/blog/reading-progress"
 import { PageOutline } from "@/components/chrome/page-outline"
-import { MetaCol, MetaGrid } from "@/components/chrome/page-parts"
+import { MetaCol, MetaGrid } from "@/components/ui/meta-grid"
 import { Badge } from "@/app/components/entrepta/badge"
 
 type Props = {

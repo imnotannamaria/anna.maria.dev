@@ -4,7 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { EASE_OUT } from "@/components/ui/reveal"
+import { EASE_OUT } from "@/lib/motion"
 import type { ContributionWeek, ContributionYear } from "@/lib/github/contributions"
 import type { CardState } from "@/lib/showcase/state"
 
@@ -72,7 +72,7 @@ const cell: Variants = {
  * same pointer move that finds it. The tooltip is portalled to `document.body`
  * and positioned from these rather than from percentages of the grid, because
  * the grid sits inside two independent clipping ancestors — this scroll
- * container and `.bento-card` above it — and between them there was never
+ * container and the Card above it — and between them there was never
  * enough real space for a two-line tooltip to render "above" without being cut
  * by one or the other. `position: fixed` on a portalled element escapes both;
  * nothing else reliably does. `h` is the cell's real rendered height, used to
@@ -378,7 +378,7 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
           The tooltip used to live here too, positioned by percentage. It was
           clipped the same way for any row but the first three: it needs ~55px
           of vertical room, and this box only ever had a few px to give, plus a
-          second clipping ancestor above it — `.bento-card` itself — leaves too
+          second clipping ancestor above it — the Card itself — leaves too
           little real space either way to fix with more padding. It's rendered
           through a portal below instead, which is what actually escapes both. */}
       <div

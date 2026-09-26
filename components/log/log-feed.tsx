@@ -19,7 +19,7 @@
 
 import { useMemo } from "react"
 import { FeedShell, groupInOrder, type FeedGroup } from "@/components/chrome/feed-shell"
-import { useUrlFilter } from "@/components/ui/url-filter"
+import { useUrlFilter } from "@/hooks/use-url-filter"
 import { LOG_TYPES, TYPE_PLURAL, type LogEntry, type LogType } from "@/lib/log/validation"
 import { LogCard } from "./log-card"
 import { LogRail } from "./log-rail"
@@ -64,7 +64,7 @@ export function LogFeed({
         <>
           <div className="flex justify-between">
             <span>{"// logged"}</span>
-            <span style={{ color: "var(--fg-brand)" }}>{filtered.length}</span>
+            <span style={{ color: "var(--fg-brand-text)" }}>{filtered.length}</span>
           </div>
           <div className="flex justify-between">
             <span>{"// types"}</span>

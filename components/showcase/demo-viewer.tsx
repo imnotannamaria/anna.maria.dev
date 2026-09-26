@@ -16,7 +16,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { EASE_OUT } from "@/components/ui/reveal"
+import { EASE_OUT } from "@/lib/motion"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { cn } from "@/lib/utils"
 import { renderDemo } from "./demos"
@@ -35,7 +35,7 @@ const STATE_TONE: Record<CardStateKind, string> = {
 }
 
 /**
- * The surface a demo sits on: recessed, so the component's own `.bento-card` rises back out of
+ * The surface a demo sits on: recessed, so the component's own Card rises back out of
  * it instead of being a card inside an identical card.
  *
  * `--bg-canvas` is darker than `--bg-card` in dark mode (#09090b vs #0b0b0e) *and* in light mode
@@ -84,7 +84,7 @@ export function StateList({
             type="button"
             onClick={() => onSelect(kind)}
             aria-pressed={on}
-            className="text-mono-sm flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] py-1.5 pr-2.5 pl-2 text-left font-mono transition-colors"
+            className="focus-ring text-mono-sm flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] py-1.5 pr-2.5 pl-2 text-left font-mono transition-colors"
             style={{
               color: on ? "var(--fg-primary)" : "var(--fg-muted)",
               background: on ? "var(--bg-surface-elevated)" : "transparent",

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest"
 import { THEMES } from "./site-config"
 
 /**
- * `THEMES` and the theme blocks in `app/globals.css` are the same twelve colours written twice,
+ * `THEMES` and the theme blocks in `app/entrepta.css` are the same twelve colours written twice,
  * and they have to be: the `ThemeSwitcher` needs a value to paint its swatch before any of those
  * blocks is applied to anything, so the constant cannot be derived from the stylesheet at
  * runtime. Deduplicating would mean generating one from the other at build time, which is a lot
@@ -18,7 +18,7 @@ import { THEMES } from "./site-config"
  * `color` is the dark value and `lightColor` the light one, which is why the two selectors below
  * are read separately.
  */
-const CSS = readFileSync(join(process.cwd(), "app/globals.css"), "utf8")
+const CSS = readFileSync(join(process.cwd(), "app/entrepta.css"), "utf8")
 
 /**
  * The `--fg-brand` a selector ends up with, or null if it never declares one.
@@ -44,12 +44,11 @@ function brandFor(selector: string): string | null {
 /**
  * Where a theme's colours live.
  *
- * The default one has no `[data-theme]` at all — it is what `:root` already says, and
- * `ThemeSwitcher` sets the attribute only when you pick something else. So entrepta is read off
- * `:root` and the rest off their own blocks.
+ * entrepta v2 writes every theme under `:root[data-theme="<id>"]`, the default included — the
+ * default also sits on bare `:root` in the same selector list, for pages rendered before
+ * `ThemeScript` sets the attribute. Reading the attribute form covers all six the same way.
  */
-const DEFAULT_THEME = "entrepta"
-const darkSelector = (id: string) => (id === DEFAULT_THEME ? ":root" : `[data-theme="${id}"]`)
+const darkSelector = (id: string) => `:root[data-theme="${id}"]`
 const lightSelector = (id: string) => `${darkSelector(id)}[data-mode="light"]`
 
 describe("theme colours", () => {

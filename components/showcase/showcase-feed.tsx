@@ -16,14 +16,16 @@
  *
  * It is not drawn in `FeedShell`. That shell's own comment says what it is — "the shell the three
  * index pages are drawn in" — and this is not that shape. What it reuses is every *piece* that
- * makes those pages look like this site: `FilterPill`, `CardHead`/`CardFoot`, the same
+ * makes those pages look like this site: `FilterPill`, `CardHeader`/`CardFooter`, the same
  * section-head rhythm. Standardization is about the vocabulary, not about routing a different
  * problem through one component.
  */
 
+import Link from "next/link"
 import { useState } from "react"
-import { ArrowLink } from "@/components/ui/arrow-link"
-import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
+import { useUrlFilter } from "@/hooks/use-url-filter"
+import { FilterPill } from "@/app/components/entrepta/filter-pill"
 import {
   HouseLineIcon,
   ShareNetworkIcon,
@@ -90,8 +92,8 @@ function Specimen({ entry }: { entry: ShowcaseEntry }) {
               {entry.external.label}
             </ArrowLink>
           ) : (
-            <ArrowLink href={`/components/${entry.slug}`} className="text-mono-xs">
-              read the doc
+            <ArrowLink asChild className="text-mono-xs">
+              <Link href={`/components/${entry.slug}`}>read the doc</Link>
             </ArrowLink>
           )}
         </div>

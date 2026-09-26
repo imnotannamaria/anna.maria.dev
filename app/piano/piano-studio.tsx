@@ -1,9 +1,12 @@
 "use client"
 
+import { Reveal } from "@/app/components/entrepta/reveal"
+import { cardVariants } from "@/app/components/entrepta/card"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
-import { DisplayH2, DocLabel, Em, Kbd, Prose, Section } from "@/components/chrome/page-parts"
-import { Diamond } from "@/components/ui/diamond"
+import { DisplayH2, DocLabel, Em, Prose, Section } from "@/app/components/entrepta/doc-parts"
+import { Kbd } from "@/app/components/entrepta/kbd"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 /* ════════════════════════════════════════════════
    DATA — 2 octaves, C4 → B5
@@ -557,10 +560,14 @@ export function PianoStudio() {
     <div data-sound="off">
       {/* ══════════ KEYBOARD ══════════ */}
       <Section id="keyboard">
-        <DocLabel level="##">keyboard</DocLabel>
-        <DisplayH2 size={36} margin="0 0 8px">
-          <Em>Twenty-four</Em> keys.
-        </DisplayH2>
+        <Reveal>
+          <DocLabel level="##">keyboard</DocLabel>
+        </Reveal>
+        <Reveal delay={0.06}>
+          <DisplayH2 className="mb-2">
+            <Em>Twenty-four</Em> keys.
+          </DisplayH2>
+        </Reveal>
         <Prose>
           Web Audio API, no samples. Pure additive synthesis with a piano-shaped envelope, and
           volume and sustain live in the toolbar.
@@ -622,7 +629,7 @@ export function PianoStudio() {
                   style={{
                     fontFamily: "var(--font-serif)",
                     fontStyle: "italic",
-                    color: "var(--fg-brand)",
+                    color: "var(--fg-brand-text)",
                     fontSize: "var(--text-body-md)",
                   }}
                 >
@@ -649,7 +656,7 @@ export function PianoStudio() {
                 aria-checked={sustain}
                 aria-label="Toggle sustain"
                 onClick={toggleSustain}
-                className="relative h-4 w-[30px] rounded-full transition-colors"
+                className="focus-ring relative h-4 w-[30px] rounded-full transition-colors"
                 style={{ background: sustain ? "var(--fg-brand)" : "var(--border-strong)" }}
               >
                 <span
@@ -714,7 +721,7 @@ export function PianoStudio() {
                         pressNote(note)
                       }}
                       className={cn(
-                        "relative flex h-full flex-1 cursor-pointer touch-none flex-col items-center justify-end pb-3.5 select-none",
+                        "focus-ring relative flex h-full flex-1 cursor-pointer touch-none flex-col items-center justify-end pb-3.5 select-none",
                         i >= 7 && "piano-oct2",
                       )}
                       style={{
@@ -761,7 +768,7 @@ export function PianoStudio() {
                         pressNote(b.note)
                       }}
                       className={cn(
-                        "absolute top-0 z-[3] flex cursor-pointer touch-none flex-col items-center justify-end pb-2.5 select-none",
+                        "focus-ring absolute top-0 z-[3] flex cursor-pointer touch-none flex-col items-center justify-end pb-2.5 select-none",
                         b.i >= 7 && "piano-oct2",
                       )}
                       style={{
@@ -820,10 +827,14 @@ export function PianoStudio() {
 
       {/* ══════════ SONGS ══════════ */}
       <Section id="songs">
-        <DocLabel level="##">songs</DocLabel>
-        <DisplayH2 size={36} margin="0 0 8px">
-          <Em>Six</Em> classics, one tap.
-        </DisplayH2>
+        <Reveal>
+          <DocLabel level="##">songs</DocLabel>
+        </Reveal>
+        <Reveal delay={0.06}>
+          <DisplayH2 className="mb-2">
+            <Em>Six</Em> classics, one tap.
+          </DisplayH2>
+        </Reveal>
         <Prose>
           Tap any title to auto-play. The piano lights up note by note. Tap again, press{" "}
           <Em>space</Em>, or hit any key to stop.
@@ -839,8 +850,8 @@ export function PianoStudio() {
                 key={song.id}
                 type="button"
                 onClick={() => toggleSong(song)}
-                /* `.bento-card` for the surface and `!grid` for the layout: the class sets
-                   flex-column, and this row is three columns. It used to hand-roll
+                /* entrepta's Card for the surface and `grid` for the layout: cn() swaps the
+                   card's flex-column for grid, because this row is three columns. It used to hand-roll
                    `rounded-[var(--radius-md)] border p-4` with its own hover, six times over,
                    and painted itself `--bg-surface` — the token for what sits above a card.
 
@@ -849,7 +860,8 @@ export function PianoStudio() {
                    the cursor across six of them would compete with the one that means
                    something. */
                 className={cn(
-                  "bento-card bento-card-sm group !grid grid-cols-[auto_1fr_auto] items-center !gap-3 text-left",
+                  cardVariants({ size: "sm" }),
+                  "focus-ring group grid grid-cols-[auto_1fr_auto] items-center gap-3 text-left",
                   playing && "!border-(--fg-brand) !bg-(--bg-surface-brand)",
                 )}
               >
@@ -916,11 +928,9 @@ export function PianoStudio() {
           >
             <span
               className="text-mono-xs tracking-[0.08em] uppercase"
-              style={{ color: "var(--fg-brand-hover)" }}
+              style={{ color: "var(--fg-brand-text)" }}
             >
-              <span aria-hidden style={{ marginRight: 4 }}>
-                ◆
-              </span>
+              <Diamond style={{ marginRight: 4 }} />
               now playing
             </span>
             <span
@@ -949,7 +959,7 @@ export function PianoStudio() {
             <button
               type="button"
               onClick={stopSong}
-              className="text-mono-sm rounded-[var(--radius-sm)] border px-2.5 py-1 font-mono transition-colors hover:border-[var(--fg-brand)]"
+              className="focus-ring text-mono-sm rounded-[var(--radius-sm)] border px-2.5 py-1 font-mono transition-colors hover:border-[var(--fg-brand)]"
               style={{ borderColor: "var(--border-strong)", color: "var(--fg-primary)" }}
             >
               <span aria-hidden style={{ color: "var(--fg-brand)", marginRight: 4, fontSize: 9 }}>

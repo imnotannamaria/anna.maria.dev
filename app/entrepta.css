@@ -1,0 +1,942 @@
+/* ============================================================
+   entrepta 2.0.0 · the design system's CSS, owned by entrepta.
+
+   This is the output of `entrepta init --theme=entrepta --themes=all`
+   with two things taken out, both because next/font owns the fonts:
+   the Google Fonts import and the --font-* declarations. globals.css
+   imports Tailwind and sets the sources, then imports this file.
+
+   Don't edit it by hand. lib/entrepta-sync.test.ts compares it with
+   @entrepta/registry, so updating entrepta means bumping that package
+   and copying what the test reports.
+   ============================================================ */
+
+/* ============================================================
+   TYPE SCALE
+   The only font sizes in the system. Each step sets size and leading
+   (and tracking on the display steps), never the family: pair it with
+   font-serif, font-sans or font-mono at the call site.
+   `static` emits every variable on :root even when no utility uses it,
+   so var(--text-mono-sm) also works in plain CSS.
+   ============================================================ */
+
+@theme static {
+  --text-display-xl: 80px;
+  --text-display-xl--line-height: 0.95;
+  --text-display-xl--letter-spacing: -0.02em;
+  --text-display-lg: 64px;
+  --text-display-lg--line-height: 1;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-md: 40px;
+  --text-display-md--line-height: 1.1;
+  --text-display-md--letter-spacing: -0.01em;
+  --text-heading-lg: 24px;
+  --text-heading-lg--line-height: 1.3;
+  --text-heading-md: 18px;
+  --text-heading-md--line-height: 1.4;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-md: 14px;
+  --text-body-md--line-height: 1.5;
+  --text-mono-md: 14px;
+  --text-mono-md--line-height: 1.5;
+  --text-mono-sm: 12px;
+  --text-mono-sm--line-height: 1.4;
+  --text-mono-xs: 10px;
+  --text-mono-xs--line-height: 1.3;
+}
+
+/* ============================================================
+   PRIMITIVE TOKENS
+   ============================================================ */
+
+:root {
+  /* native controls, scrollbars and Chrome's autofill fallback follow the mode */
+  color-scheme: dark;
+
+  /* zinc (neutrals) */
+  --zinc-950: #09090b;
+  --zinc-900: #18181b;
+  --zinc-800: #27272a;
+  --zinc-700: #3f3f46;
+  --zinc-600: #52525b;
+  --zinc-500: #71717a;
+  --zinc-400: #a1a1aa;
+  --zinc-300: #d4d4d8;
+  --zinc-200: #e4e4e7;
+  --zinc-100: #f4f4f5;
+  --zinc-50: #fafafa;
+
+  /* accents */
+  --violet-500: #7c6bff;
+  --violet-400: #9b8eff;
+  --indigo-500: #6366f1;
+  --indigo-400: #818cf8;
+  --emerald-500: #10b981;
+  --emerald-400: #34d399;
+  --amber-500: #f59e0b;
+  --amber-400: #fbbf24;
+  --rose-500: #f43f5e;
+  --rose-400: #fb7185;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+
+  /* ============================================================
+     SEMANTIC TOKENS, dark (default)
+     ============================================================ */
+
+  /* surfaces */
+  --bg-canvas: var(--zinc-950);
+  --bg-surface: var(--zinc-900);
+  --bg-surface-elevated: rgba(39, 39, 42, 0.6);
+  --bg-surface-brand: rgba(124, 107, 255, 0.15); /* overridden by theme */
+
+  /* --bg-card fills cards: a hair above the canvas, defined by its border.
+     --bg-overlay fills menus, tooltips, code, dialogs, the palette and
+     toasts. --bg-surface (zinc-900) is for small fills, never an area. */
+  --bg-card: #0b0b0e;
+  --bg-card-hover: #121216;
+  --bg-overlay: #0e0e10;
+
+  /* foreground */
+  --fg-primary: var(--zinc-50);
+  --fg-secondary: var(--zinc-400);
+  --fg-muted: #8a8a92; /* zinc-500 measures about 4.1:1 on the canvas, below AA */
+  --fg-brand: var(--violet-500); /* overridden by theme */
+  --fg-brand-hover: var(--violet-400); /* overridden by theme */
+
+  /* borders */
+  --border-subtle: var(--zinc-800);
+  --border-strong: var(--zinc-700);
+
+  /* focus ring */
+  --ring: rgba(124, 107, 255, 0.5); /* overridden by theme */
+
+  /* brand accents, derived from --fg-brand so they follow every theme */
+  --border-brand: color-mix(in srgb, var(--fg-brand) 35%, transparent);
+  --border-brand-strong: color-mix(in srgb, var(--fg-brand) 60%, transparent);
+  --shadow-brand: color-mix(in srgb, var(--fg-brand) 20%, transparent);
+  --fg-brand-glow: color-mix(in srgb, var(--fg-brand) 50%, transparent);
+  --bg-spotlight: color-mix(in srgb, var(--fg-brand) 15%, transparent);
+
+  /* shadows. The brand lift signals emphasis; the overlay shadow is depth
+     for what covers the page, so it stays black. */
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-lift-brand: 0 12px 32px var(--shadow-brand);
+  --shadow-overlay: var(--edge-light), 0 24px 48px rgba(0, 0, 0, 0.6);
+
+  /* The toast's finish, for every surface. A brand glow from the top-left
+     corner (the .sheen class) and a line of light on the top edge, like glass
+     catching it. Near black underneath, never zinc-900 across an area. */
+  --sheen-tint: color-mix(in srgb, var(--fg-brand) 9%, transparent);
+  --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-card: var(--edge-light);
+  --bg-field: var(--bg-overlay);
+
+  /* hover overlays (flip white→black in light mode) */
+  --bg-hover-soft: rgba(255, 255, 255, 0.04);
+  --bg-hover-strong: rgba(255, 255, 255, 0.08);
+
+  /* recessed surface used in chrome bars (code-block head, terminal bar) */
+  --bg-chrome: rgba(0, 0, 0, 0.3);
+
+  /* status */
+  --status-success: var(--emerald-500);
+  --status-warning: var(--amber-500);
+  --status-error: var(--rose-500);
+  --status-info: var(--indigo-400);
+
+  /* status, soft (translucent bg and lighter fg, for badge and toast soft variants) */
+  --status-success-fg: var(--emerald-400);
+  --status-warning-fg: var(--amber-400);
+  --status-error-fg: var(--rose-400);
+  --status-info-fg: var(--indigo-400);
+  --status-success-soft: rgba(16, 185, 129, 0.12);
+  --status-warning-soft: rgba(245, 158, 11, 0.12);
+  --status-error-soft: rgba(244, 63, 94, 0.12);
+  --status-info-soft: rgba(129, 140, 248, 0.12);
+
+  /* ============================================================
+     SPACING
+     ============================================================ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+
+  /* ============================================================
+     RADIUS
+     ============================================================ */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ============================================================
+     MOTION
+     ============================================================ */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* --font-serif, --font-mono and --font-sans come from next/font on <html>
+     (app/layout.tsx). This is the one declaration removed from entrepta's file. */
+}
+
+/* ============================================================
+   RESET, inside @layer base so Tailwind utilities can override
+   ============================================================ */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background: var(--bg-canvas);
+    color: var(--fg-primary);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    outline: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+    font-weight: 400;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+/* ============================================================
+   FOCUS VISIBLE (global ring)
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--fg-brand);
+  outline-offset: 2px;
+}
+
+/* Skip link: hidden above the viewport until focused, then an editor-style
+   chip with a $ prompt. Put it first in <body>:
+   <a href="#main" class="skip-link">skip to content</a> */
+.skip-link {
+  position: fixed;
+  top: 6px;
+  left: 6px;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-family: var(--font-mono);
+  font-size: var(--text-mono-sm);
+  line-height: var(--text-mono-sm--line-height);
+  color: var(--fg-primary);
+  background: var(--bg-overlay);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-overlay);
+  transform: translateY(-160%);
+  transition: transform 140ms var(--ease-out);
+}
+
+.skip-link::before {
+  content: "$";
+  color: var(--fg-brand);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  border-color: var(--fg-brand);
+  outline: none;
+}
+
+/* The toast's finish: a brand glow in the top-left corner. In a layer, so a
+   component's own background-image utility still wins. */
+@layer components {
+  .sheen {
+    background-image: radial-gradient(140% 120% at 0% 0%, var(--sheen-tint), transparent 55%);
+  }
+}
+
+/* A visible ring for bare buttons with no focus style of their own. It is a
+   box-shadow, so it survives the outline reset below. */
+.focus-ring:focus-visible {
+  box-shadow:
+    0 0 0 2px var(--bg-canvas),
+    0 0 0 4px var(--fg-brand);
+}
+
+/* form fields, buttons, and menu items manage their own focus state */
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible,
+button:focus,
+button:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible,
+[role="menuitem"]:focus,
+[role="menuitem"]:focus-visible,
+[role="menuitemcheckbox"]:focus,
+[role="menuitemcheckbox"]:focus-visible,
+[role="menuitemradio"]:focus,
+[role="menuitemradio"]:focus-visible,
+[role="option"]:focus,
+[role="option"]:focus-visible,
+[role="tab"]:focus,
+[role="tab"]:focus-visible,
+[cmdk-item]:focus,
+[cmdk-item]:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* ============================================================
+   AUTOFILL
+   Chrome paints autofilled fields with its own background and text
+   color, and neither `background` nor `color` can override them. An
+   inset shadow and -webkit-text-fill-color can. --bg-field matches the
+   Input wrapper, so the fill disappears into it in both modes.
+   ============================================================ */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill {
+  -webkit-box-shadow: inset 0 0 0 1000px var(--bg-field);
+  box-shadow: inset 0 0 0 1000px var(--bg-field);
+  -webkit-text-fill-color: var(--fg-primary);
+  caret-color: var(--fg-primary);
+  /* where the shadow cannot paint, such as the preview while a suggestion is
+     hovered, this holds Chrome's own fill off for a week */
+  transition:
+    background-color 600000s 0s,
+    color 600000s 0s;
+}
+
+input:autofill,
+textarea:autofill,
+select:autofill {
+  background-image: none !important;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   SCROLLBARS, themed to match the IDE chrome
+   ============================================================ */
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border: 2px solid var(--bg-canvas);
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--zinc-600);
+  }
+
+  *::-webkit-scrollbar-thumb:active {
+    background: var(--fg-brand);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+/* ============================================================
+   OVERLAYS
+   Menus, tooltips and dialogs fade and rise in, and close faster
+   than they open. Radix waits for the exit animation before it
+   unmounts. Plain classes rather than an animation plugin, so a
+   copied component needs nothing but this file.
+   ============================================================ */
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes overlay-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--pop-from, -4px)) scale(0.97);
+  }
+}
+
+@keyframes pop-out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* A checkbox or switch settling into its new state: a dip, a small
+   overshoot, then rest. It runs each time the checked style starts to apply. */
+@keyframes check-pop {
+  0% {
+    transform: scale(0.82);
+  }
+  55% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.motion-fade[data-state="open"] {
+  animation: overlay-in var(--motion-base) var(--ease-out);
+}
+
+.motion-fade[data-state="closed"] {
+  animation: overlay-out var(--motion-fast) ease-in;
+}
+
+.motion-pop[data-state="open"],
+.motion-pop[data-state="delayed-open"],
+.motion-pop[data-state="instant-open"] {
+  animation: pop-in var(--motion-base) var(--ease-out);
+}
+
+.motion-pop[data-state="closed"] {
+  animation: pop-out var(--motion-fast) ease-in;
+}
+
+.motion-pop[data-side="top"] {
+  --pop-from: 4px;
+}
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* One band of light moving across a grid of skeleton pieces that stand still.
+   For large grids, where a shimmer on every piece means hundreds of gradients
+   repainting each frame. This moves one overlay on transform instead. Put it
+   inside a position: relative container, over the pieces.
+   The band is 60% of the container wide, and transform percentages are of the
+   band, so -100% starts it off the left edge and 167% (100 / 0.6) ends it off
+   the right one. */
+@keyframes skeleton-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(167%);
+  }
+}
+
+.skeleton-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.skeleton-sweep::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 60%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--fg-primary) 7%, transparent) 50%,
+    transparent 100%
+  );
+  animation: skeleton-sweep 1.9s linear infinite;
+}
+
+/* ============================================================
+   MOTION IN CSS
+   For what has to move before JavaScript runs, such as a loading
+   state, and for small loops. The reduced-motion reset above stops
+   all of it without the component having to ask.
+   ============================================================ */
+
+@keyframes cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* A line that types itself with no JS. The text is in the DOM from the first
+   byte and CSS clips it. Set --type-chars to the character count; `ch` is only
+   exact in a monospace font, so use it on mono text.
+   <span class="type-line font-mono" style="--type-chars: 14">$ loading page</span> */
+@keyframes type-in {
+  from {
+    width: 0;
+  }
+  to {
+    width: calc(var(--type-chars) * 1ch);
+  }
+}
+
+.type-line {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  vertical-align: bottom;
+  width: 0;
+  animation: type-in var(--type-dur, 0.7s) steps(var(--type-chars)) var(--type-delay, 0s) forwards;
+}
+
+@keyframes type-fade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.type-fade {
+  opacity: 0;
+  animation: type-fade 0.26s var(--ease-out) var(--type-delay, 0s) forwards;
+}
+
+/* A block caret that waits out its delay, then blinks. */
+.type-caret {
+  display: inline-block;
+  width: 0.55ch;
+  height: 1.05em;
+  vertical-align: text-bottom;
+  background: var(--fg-brand);
+  animation: cursor-blink 1s step-end var(--type-delay, 0s) infinite backwards;
+}
+
+/* The same fade, but its delay is a measurement, not choreography: lines that
+   only show when a wait runs long. A fast page never renders them. */
+.type-late {
+  opacity: 0;
+  animation: type-fade 0.26s var(--ease-out) var(--type-delay, 0s) forwards;
+}
+
+/* The reset above zeroes durations but not delays, so without this the lines
+   would still arrive one at a time. `.type-late` is left out on purpose: its
+   delay is the wait itself. */
+@media (prefers-reduced-motion: reduce) {
+  .type-line,
+  .type-fade,
+  .type-caret {
+    animation-delay: 0s !important;
+  }
+  .type-line {
+    width: auto !important;
+  }
+  .type-fade {
+    opacity: 1 !important;
+  }
+}
+
+/* An ellipsis: three dots with the load-dot-1/2/3 delays. */
+@keyframes load-dot {
+  0%,
+  70%,
+  100% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+}
+
+.load-dot {
+  animation: load-dot 0.9s ease-in-out infinite backwards;
+}
+
+.load-dot-1 {
+  animation-delay: 0.52s;
+}
+
+.load-dot-2 {
+  animation-delay: 0.64s;
+}
+
+.load-dot-3 {
+  animation-delay: 0.76s;
+}
+
+/* A status dot that breathes, and one that glows in the brand. */
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+@keyframes dot-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--fg-brand-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+
+/* ============================================================
+   LIGHT MODE, activated by data-mode="light" on <html>.
+   Dark is the default; the toggle is explicit, not OS-driven.
+   The theme block (--fg-brand etc.) lives separately, see your
+   chosen theme file in styles/themes/.
+   ============================================================ */
+
+:root[data-mode="light"] {
+  --bg-canvas: #fafafa;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f4f4f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f7f7f8;
+  --bg-overlay: #ffffff;
+
+  --fg-primary: #09090b;
+  --fg-secondary: #52525b;
+  --fg-muted: #68686f; /* zinc-500 has no margin on a hovered card with the sheen */
+
+  --border-subtle: #e4e4e7;
+  --border-strong: #d4d4d8;
+
+  --bg-hover-soft: rgba(0, 0, 0, 0.04);
+  --bg-hover-strong: rgba(0, 0, 0, 0.08);
+  --bg-chrome: rgba(0, 0, 0, 0.03);
+
+  /* the 400 status inks are for dark backgrounds; on white they fall to about 2:1 */
+  --status-success-fg: #047857;
+  --status-warning-fg: #92400e;
+  --status-error-fg: #be123c;
+  --status-info-fg: #4338ca;
+
+  /* a wash that reads on a dark card vanishes on white, so light mixes more */
+  --bg-spotlight: color-mix(in srgb, var(--fg-brand) 26%, transparent);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --sheen-tint: color-mix(in srgb, var(--fg-brand) 4%, transparent);
+  --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-card: var(--edge-light), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-overlay: var(--edge-light), 0 24px 48px rgba(0, 0, 0, 0.12);
+  --bg-field: var(--bg-overlay);
+
+  color-scheme: light;
+}
+
+/* Scoped "always dark" surface, for terminal cards, code blocks, tooltips
+   and any element that should feel like IDE chrome regardless of page mode.
+   Apply data-surface="dark" on the element root.
+   Every token that differs between modes is redeclared here. A custom
+   property resolves on the element that declares it and inherits as a
+   literal, so anything left out would carry the light value inside. */
+[data-surface="dark"] {
+  --bg-canvas: #09090b;
+  --bg-surface: #0e0e10;
+  --bg-surface-elevated: rgba(39, 39, 42, 0.6);
+  --bg-card: #0b0b0e;
+  --bg-card-hover: #121216;
+  --bg-overlay: #0e0e10;
+
+  --fg-primary: #fafafa;
+  --fg-secondary: #a1a1aa;
+  --fg-muted: #8a8a92;
+
+  --border-subtle: #27272a;
+  --border-strong: #3f3f46;
+
+  --bg-hover-soft: rgba(255, 255, 255, 0.04);
+  --bg-hover-strong: rgba(255, 255, 255, 0.08);
+  --bg-chrome: rgba(0, 0, 0, 0.3);
+
+  --bg-spotlight: color-mix(in srgb, var(--fg-brand) 15%, transparent);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --sheen-tint: color-mix(in srgb, var(--fg-brand) 9%, transparent);
+  --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-card: var(--edge-light);
+  --shadow-overlay: var(--edge-light), 0 24px 48px rgba(0, 0, 0, 0.6);
+  --bg-field: var(--bg-overlay);
+
+  --status-success-fg: var(--emerald-400);
+  --status-warning-fg: var(--amber-400);
+  --status-error-fg: var(--rose-400);
+  --status-info-fg: var(--indigo-400);
+
+  color-scheme: dark;
+}
+
+/* themes, switch with data-theme on <html> */
+/* ============================================================
+   entrepta theme, violet, the default
+   ============================================================ */
+
+/* --fg-on-brand is the ink for text on a --fg-brand fill (a primary button,
+   a solid badge, the status bar). --fg-brand-text is the ink for brand-colored
+   text on the canvas, a card or the --bg-surface-brand tint. Neither can be
+   derived from the brand, so each theme sets both. All of them clear WCAG AA
+   in both modes. Measure again after changing any value here. */
+
+:root,
+:root[data-theme="entrepta"] {
+  --fg-brand: #7c6bff;
+  --fg-brand-hover: #9b8eff;
+  --fg-on-brand: #09090b;
+  --fg-brand-text: #9b8eff;
+  --bg-surface-brand: rgba(124, 107, 255, 0.15);
+  --ring: rgba(124, 107, 255, 0.5);
+}
+
+:root[data-mode="light"],
+:root[data-theme="entrepta"][data-mode="light"] {
+  --fg-brand: #6656ff;
+  --fg-brand-hover: #5848e0;
+  --fg-on-brand: #fafafa;
+  --fg-brand-text: #5a4cd6;
+  --bg-surface-brand: rgba(102, 86, 255, 0.08);
+  --ring: rgba(102, 86, 255, 0.4);
+}
+
+/* ============================================================
+   blossom theme, cherry red, bold and confident
+   ============================================================ */
+
+/* --fg-on-brand is the ink for text on a --fg-brand fill (a primary button,
+   a solid badge, the status bar). --fg-brand-text is the ink for brand-colored
+   text on the canvas, a card or the --bg-surface-brand tint. Neither can be
+   derived from the brand, so each theme sets both. All of them clear WCAG AA
+   in both modes. Measure again after changing any value here. */
+
+:root[data-theme="blossom"] {
+  --fg-brand: #cc2e36;
+  --fg-brand-hover: #e04750;
+  --fg-on-brand: #fafafa;
+  --fg-brand-text: #e8787d;
+  --bg-surface-brand: rgba(204, 46, 54, 0.14);
+  --ring: rgba(204, 46, 54, 0.45);
+}
+
+:root[data-theme="blossom"][data-mode="light"] {
+  --fg-brand: #b02028;
+  --fg-brand-hover: #cc2e36;
+  --fg-on-brand: #fafafa;
+  --fg-brand-text: #b02028;
+  --bg-surface-brand: rgba(176, 32, 40, 0.08);
+  --ring: rgba(176, 32, 40, 0.4);
+}
+
+/* ============================================================
+   marmalade theme, warm orange, editorial and energetic
+   ============================================================ */
+
+/* --fg-on-brand is the ink for text on a --fg-brand fill (a primary button,
+   a solid badge, the status bar). --fg-brand-text is the ink for brand-colored
+   text on the canvas, a card or the --bg-surface-brand tint. Neither can be
+   derived from the brand, so each theme sets both. All of them clear WCAG AA
+   in both modes. Measure again after changing any value here. */
+
+:root[data-theme="marmalade"] {
+  --fg-brand: #ff8213;
+  --fg-brand-hover: #ff9d45;
+  --fg-on-brand: #09090b;
+  --fg-brand-text: #ff9d45;
+  --bg-surface-brand: rgba(255, 130, 19, 0.14);
+  --ring: rgba(255, 130, 19, 0.45);
+}
+
+:root[data-theme="marmalade"][data-mode="light"] {
+  --fg-brand: #e06800;
+  --fg-brand-hover: #ff8213;
+  --fg-on-brand: #09090b;
+  --fg-brand-text: #a14b00;
+  --bg-surface-brand: rgba(224, 104, 0, 0.08);
+  --ring: rgba(224, 104, 0, 0.4);
+}
+
+/* ============================================================
+   julia theme, warm pink, soft and expressive
+   ============================================================ */
+
+/* --fg-on-brand is the ink for text on a --fg-brand fill (a primary button,
+   a solid badge, the status bar). --fg-brand-text is the ink for brand-colored
+   text on the canvas, a card or the --bg-surface-brand tint. Neither can be
+   derived from the brand, so each theme sets both. All of them clear WCAG AA
+   in both modes. Measure again after changing any value here. */
+
+:root[data-theme="julia"] {
+  --fg-brand: #e85a8a;
+  --fg-brand-hover: #f178a0;
+  --fg-on-brand: #09090b;
+  --fg-brand-text: #f178a0;
+  --bg-surface-brand: rgba(232, 90, 138, 0.14);
+  --ring: rgba(232, 90, 138, 0.45);
+}
+
+:root[data-theme="julia"][data-mode="light"] {
+  --fg-brand: #cc3a6a;
+  --fg-brand-hover: #e85a8a;
+  --fg-on-brand: #fafafa;
+  --fg-brand-text: #af325b;
+  --bg-surface-brand: rgba(204, 58, 106, 0.08);
+  --ring: rgba(204, 58, 106, 0.4);
+}
+
+/* ============================================================
+   ivy theme, forest green, calm and grounded
+   ============================================================ */
+
+/* --fg-on-brand is the ink for text on a --fg-brand fill (a primary button,
+   a solid badge, the status bar). --fg-brand-text is the ink for brand-colored
+   text on the canvas, a card or the --bg-surface-brand tint. Neither can be
+   derived from the brand, so each theme sets both. All of them clear WCAG AA
+   in both modes. Measure again after changing any value here. */
+
+:root[data-theme="ivy"] {
+  --fg-brand: #35a365;
+  --fg-brand-hover: #4cba7c;
+  --fg-on-brand: #09090b;
+  --fg-brand-text: #4cba7c;
+  --bg-surface-brand: rgba(53, 163, 101, 0.14);
+  --ring: rgba(53, 163, 101, 0.45);
+}
+
+:root[data-theme="ivy"][data-mode="light"] {
+  --fg-brand: #258a50;
+  --fg-brand-hover: #35a365;
+  --fg-on-brand: #09090b;
+  --fg-brand-text: #1e7142;
+  --bg-surface-brand: rgba(37, 138, 80, 0.08);
+  --ring: rgba(37, 138, 80, 0.4);
+}
+
+/* ============================================================
+   bosco theme, deep blue, technical and steady
+   ============================================================ */
+
+/* --fg-on-brand is the ink for text on a --fg-brand fill (a primary button,
+   a solid badge, the status bar). --fg-brand-text is the ink for brand-colored
+   text on the canvas, a card or the --bg-surface-brand tint. Neither can be
+   derived from the brand, so each theme sets both. All of them clear WCAG AA
+   in both modes. Measure again after changing any value here. */
+
+:root[data-theme="bosco"] {
+  --fg-brand: #2563eb;
+  --fg-brand-hover: #4f86f3;
+  --fg-on-brand: #fafafa;
+  --fg-brand-text: #6b9bf5;
+  --bg-surface-brand: rgba(37, 99, 235, 0.14);
+  --ring: rgba(37, 99, 235, 0.45);
+}
+
+:root[data-theme="bosco"][data-mode="light"] {
+  --fg-brand: #1d4ed8;
+  --fg-brand-hover: #2563eb;
+  --fg-on-brand: #fafafa;
+  --fg-brand-text: #1d4ed8;
+  --bg-surface-brand: rgba(29, 78, 216, 0.08);
+  --ring: rgba(29, 78, 216, 0.4);
+}

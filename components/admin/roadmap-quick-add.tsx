@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 import { motion } from "motion/react"
-import { useReveal } from "@/components/ui/reveal"
+import { useReveal } from "@/app/components/entrepta/reveal"
 import { useRouter } from "next/navigation"
 import { PlusIcon } from "@phosphor-icons/react"
 import { Button } from "@/app/components/entrepta/button"
 import { Input } from "@/app/components/entrepta/input"
 import { toast } from "@/app/components/entrepta/toast"
-import { Diamond } from "@/components/ui/diamond"
+import { Diamond } from "@/app/components/entrepta/diamond"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 /**

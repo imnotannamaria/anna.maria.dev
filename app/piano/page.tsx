@@ -1,18 +1,19 @@
+import { Reveal } from "@/app/components/entrepta/reveal"
 import Link from "next/link"
 import { createMetadata } from "@/lib/metadata"
 import { PianoStudio } from "./piano-studio"
 import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
 import { KeymapCard, type KeyLine } from "@/components/piano/keymap-card"
-import { TypeIn } from "@/components/ui/type-in"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 import {
   DisplayH2,
   DocLabel,
   Em,
-  Kbd,
   Prose,
   Section,
   Strong,
-} from "@/components/chrome/page-parts"
+} from "@/app/components/entrepta/doc-parts"
+import { Kbd } from "@/app/components/entrepta/kbd"
 
 export const metadata = createMetadata({
   title: "Piano",
@@ -81,9 +82,7 @@ export default function PianoPage() {
           <>
             <div className="flex items-center justify-between">
               <span>{"// keys"}</span>
-              <span style={{ color: "var(--fg-brand)", fontFamily: "var(--font-serif)" }}>
-                <em>24</em>
-              </span>
+              <Em>24</Em>
             </div>
             <div className="flex items-center justify-between">
               <span>{"// range"}</span>
@@ -125,8 +124,10 @@ export default function PianoPage() {
           </nav>
 
           {/* ══════════ HERO ══════════ */}
-          <Section id="piano" first>
-            <DocLabel level="#">piano</DocLabel>
+          <Section id="piano" variant="first">
+            <Reveal>
+              <DocLabel level="#">piano</DocLabel>
+            </Reveal>
             <TypeIn
               as="h1"
               text="Tap to play."
@@ -167,10 +168,14 @@ export default function PianoPage() {
 
           {/* ══════════ KEY MAPPING ══════════ */}
           <Section id="controls">
-            <DocLabel level="##">key mapping</DocLabel>
-            <DisplayH2 size={36} margin="0 0 8px">
-              Where every <Em>note</Em> lives.
-            </DisplayH2>
+            <Reveal>
+              <DocLabel level="##">key mapping</DocLabel>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <DisplayH2 className="mb-2">
+                Where every <Em>note</Em> lives.
+              </DisplayH2>
+            </Reveal>
             <Prose>
               Two QWERTY rows, one per octave. Black keys sit above their white-key neighbours,
               exactly like a real piano.
@@ -179,7 +184,7 @@ export default function PianoPage() {
             {/* Four cards, not one box. The box was `rounded-[var(--radius-lg)] border p-6`
                 written by hand — and it painted itself `--bg-surface`, which by convention is
                 for what sits *above* a card (dropdowns, dialogs, code blocks), not for the
-                card. Four groups in four `.bento-card` also read better than four groups
+                card. Four groups in four Cards also read better than four groups
                 sharing one frame. */}
             <div className="grid grid-cols-1 gap-4 min-[821px]:grid-cols-2">
               {KEYMAP_GROUPS.map((group, i) => (

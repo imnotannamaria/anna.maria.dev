@@ -1,6 +1,6 @@
 /** The list is force-dynamic and hits Postgres, so navigating here shows nothing until the
  *  query returns. */
-import { PageLoading } from "@/components/chrome/page-loading"
+import { PageLoading } from "@/app/components/entrepta/page-loading"
 
 export default function AdminLogLoading() {
   return (

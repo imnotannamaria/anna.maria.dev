@@ -22,7 +22,7 @@
  * bogus `/projects/x` answered 200; inside the group it answers 404 and the home page still gets
  * its loading state.
  */
-import { PageLoading } from "@/components/chrome/page-loading"
+import { PageLoading } from "@/app/components/entrepta/page-loading"
 
 export default function HomeLoading() {
   return (

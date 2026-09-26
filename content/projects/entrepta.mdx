@@ -13,75 +13,81 @@ published: true
 
 ## Overview
 
-entrepta is a dark-first design system. You copy the components into your project and own the code. No SDK, no black box.
+entrepta is a dark-first design system for sites that look like an engineer built them. Tabs, a command palette, a status bar, shell prompts, serif italic next to mono.
+
+Components are copied into your repo as source, in the shadcn model. No SDK, no runtime. You own the code.
 
 ```bash
 npx @entrepta/cli@latest init
+npx @entrepta/cli@latest add button card command-palette
 ```
 
 ## What you get
 
-14 components across 4 categories, written in React 19 and styled with Tailwind v4 + CSS variables.
+33 components across 6 sections, in React 19, Tailwind v4 and CSS variables.
 
-- **Primitives**: Button, Badge, Input, Card, Dialog, Dropdown, Tooltip, Tabs
-- **Layout**: StatusBar, TopNav
-- **Feedback**: Toast, Skeleton, CommandPalette
-- **Content**: CodeBlock
+| Section    | Components                                                         |
+| ---------- | ------------------------------------------------------------------ |
+| Primitives | Button, Badge, Card, Dialog, Dropdown, Tooltip, Kbd, Tabs          |
+| Forms      | Input, Textarea, Checkbox, Switch, Field, FilterPill               |
+| Layout     | StatusBar, TopNav, ThemeSwitcher, ModeToggle, Sidebar, PageOutline |
+| Content    | CodeBlock, SectHead, doc parts                                     |
+| Feedback   | Toast, Skeleton, CommandPalette, ChromeMessage, PageLoading        |
+| Motion     | Reveal, TypeIn, RollingNumber, Spotlight, ArrowLink                |
 
-Plus 6 theme presets you can switch with one flag: `entrepta`, `blossom`, `marmalade`, `julia`, `ivy`, `bosco`.
+Six theme presets: `entrepta`, `blossom`, `marmalade`, `julia`, `ivy` and `bosco`. Pick one, or install all six and switch at runtime. Every text color clears WCAG AA in all 12 theme and mode combinations, and a test measures it on every change.
 
-## Two ways to install
+## Built for coding agents
 
-### With the CLI
+entrepta is meant to be installed and used by Claude Code, Cursor or Codex as much as by people.
+
+- **An AGENTS.md for your project.** The AGENTS.md button on the site builds one: pick the framework, theme and components, and it says how to install, where things live, which token goes where and how each component is used.
+- **Every docs page in Markdown.** Add `.md` to any docs URL, such as `/docs/components/button.md`.
+- **`/llms.txt`** indexes every page, and **`/llms-full.txt`** is the whole site in one file.
+
+## Install
 
 ```bash
 npx @entrepta/cli@latest init --theme=ivy
-npx @entrepta/cli@latest add button card command-palette
+
+# all six themes, switchable at runtime
+npx @entrepta/cli@latest init --theme=ivy --themes=all
+
+npx @entrepta/cli@latest add button card field
 ```
 
-The CLI writes your `globals.css`, sets up `lib/utils.ts`, installs peer deps, and copies the components into your project.
+`init` writes the tokens, the `cn` helper and `entrepta.json`. `add` copies each component with everything it imports and installs its npm packages. It works in Next.js (App or Pages Router) and Vite, and never overwrites a file without `--overwrite`.
 
-### By hand
+Every component page in the docs also has a **Manual** tab with its dependencies and the source, imports already rewritten.
 
-If you want to skip the CLI:
-
-1. Install peer deps: `pnpm add clsx tailwind-merge class-variance-authority`
-2. Copy `packages/registry/styles/globals.css` into your project, then append one theme file from `packages/registry/styles/themes/`
-3. Copy `lib/utils.ts` with the `cn` helper
-4. Copy any component file from `packages/registry/` into `components/entrepta/`
-
-Each component page in the docs has a **Manual** tab with its own dependency list and source code ready to paste.
-
-## Quick usage
+## Use it
 
 ```tsx
 import { Button } from "@/components/entrepta/button"
-import { CodeBlock } from "@/components/entrepta/code-block"
+import { Card, CardHeader, CardLabel, CardTitle } from "@/components/entrepta/card"
 
-export function Hero() {
+export function Launch() {
   return (
-    <>
-      <Button variant="primary">Ship</Button>
-      <CodeBlock
-        code="npx @entrepta/cli@latest init --theme=ivy"
-        variant="terminal"
-        filename="terminal · zsh"
-        language="bash"
-      />
-    </>
+    <Card variant="featured">
+      <CardHeader>
+        <CardLabel>launch</CardLabel>
+      </CardHeader>
+      <CardTitle>
+        Ship it <em>tonight.</em>
+      </CardTitle>
+      <Button>deploy</Button>
+    </Card>
   )
 }
 ```
 
+## Built with entrepta
+
+This site runs on it. entrepta started here, and v2 was built here first before it moved into the design system.
+
 ## Stack
 
-- React 19 + Next.js 15 (App Router) as the reference setup
-- Tailwind v4 for utility classes
-- Radix UI primitives for behavior and a11y
-- CSS variables for all design tokens
-- TypeScript strict
-- class-variance-authority for variants
-- lucide-react icons (1.5px stroke)
+React 19, Next.js 15 as the reference setup, Tailwind v4, Radix UI, CSS variables, TypeScript strict, class-variance-authority, Phosphor icons, and `motion` for the components that animate through JavaScript.
 
 ## License
 

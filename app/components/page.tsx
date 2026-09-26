@@ -1,5 +1,5 @@
 /**
- * `/components` — what the site is drawn from, what is built from it, and what not to do.
+ * `/components` — the cards this site is built from, in every state they can be in.
  *
  * Fully static, and deliberately so. Every other page that reads Postgres is force-dynamic and
  * that reasoning is good; it does not apply here. This is documentation, and documentation whose
@@ -14,16 +14,15 @@
  */
 
 import { ShowcasePage } from "@/components/showcase/showcase-page"
-import { THEMES } from "@/lib/site-config"
 import { createMetadata } from "@/lib/metadata"
 
 export const metadata = createMetadata({
   title: "Components",
   description:
-    "The design tokens this site is drawn from, and the components built from them — each shown in every state it can be in.",
+    "The cards this site is built from, each shown in every state it can be in. Tokens and rules live in entrepta, the design system underneath.",
   path: "/components",
 })
 
 export default function ComponentsPage() {
-  return <ShowcasePage themeCount={THEMES.length} />
+  return <ShowcasePage />
 }

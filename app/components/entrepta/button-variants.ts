@@ -1,10 +1,10 @@
 import { type VariantProps, cva } from "class-variance-authority"
 
-// Kept in a client-free module so both the "use client" Button and
-// server components (e.g. Link-as-button on the home page) can share it.
+// No "use client" here, so server components can style a link as a button.
 export const buttonVariants = cva(
   [
     "group relative inline-flex items-center justify-center gap-2 shrink-0 whitespace-nowrap",
+    "[&_svg]:shrink-0",
     "font-mono font-medium",
     "border rounded-[var(--radius-md)]",
     "transition-all duration-150 ease-out",
@@ -15,8 +15,6 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary: [
-          // --fg-on-brand, not --bg-canvas: the canvas flips with the mode, and the label
-          // sits on the brand, whose hue decides which ink is legible. See globals.css.
           "bg-[var(--fg-brand)] text-[var(--fg-on-brand)] border-transparent",
           "hover:bg-[var(--fg-brand-hover)] hover:-translate-y-px",
           "active:translate-y-0",
@@ -30,15 +28,19 @@ export const buttonVariants = cva(
           "hover:text-[var(--fg-primary)] hover:bg-[var(--bg-hover-soft)]",
         ],
         command: [
-          "bg-[var(--bg-surface)] text-[var(--fg-primary)] border-[var(--border-subtle)] font-normal",
+          "sheen bg-[var(--bg-overlay)] text-[var(--fg-primary)] border-[var(--border-strong)] font-normal shadow-[var(--shadow-card)]",
           "before:content-['$'] before:text-[var(--fg-brand)] before:mr-0.5",
-          "hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface-elevated)]",
+          "hover:border-[var(--fg-muted)] hover:bg-[var(--bg-card-hover)]",
         ],
       },
       size: {
         sm: "h-8 px-3 text-mono-sm",
         md: "h-10 px-4 text-mono-md",
         lg: "h-12 px-6 text-body-lg",
+        // square, for an icon alone: give the button an aria-label
+        "icon-sm": "size-8 text-mono-sm",
+        "icon-md": "size-10 text-mono-md",
+        "icon-lg": "size-12 text-body-lg",
       },
     },
     defaultVariants: {

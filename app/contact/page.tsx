@@ -2,9 +2,16 @@ import { createMetadata } from "@/lib/metadata"
 import { ContactForm } from "@/components/contact/contact-form"
 import { ChannelsCard } from "@/components/contact/channels-card"
 import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
-import { DisplayH2, DocLabel, Em, Prose, Section, Strong } from "@/components/chrome/page-parts"
-import { Reveal } from "@/components/ui/reveal"
-import { TypeIn } from "@/components/ui/type-in"
+import {
+  DisplayH2,
+  DocLabel,
+  Em,
+  Prose,
+  Section,
+  Strong,
+} from "@/app/components/entrepta/doc-parts"
+import { Reveal } from "@/app/components/entrepta/reveal"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 import { siteConfig } from "@/lib/site-config"
 
 export const metadata = createMetadata({
@@ -42,8 +49,11 @@ export default function ContactPage() {
               >
                 <span
                   aria-hidden
-                  className="inline-block size-1.5 animate-pulse rounded-full"
-                  style={{ background: "var(--status-success)" }}
+                  className="inline-block size-1.5 rounded-full"
+                  style={{
+                    background: "var(--status-success)",
+                    animation: "live-pulse 2s ease-in-out infinite",
+                  }}
                 />
                 open
               </span>
@@ -72,8 +82,10 @@ export default function ContactPage() {
           </nav>
 
           {/* ══════════ HERO — one line of status, a title, a sentence ══════════ */}
-          <Section id="contact" first>
-            <DocLabel level="#">contact</DocLabel>
+          <Section id="contact" variant="first">
+            <Reveal>
+              <DocLabel level="#">contact</DocLabel>
+            </Reveal>
 
             <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
               <div className="min-w-0">
@@ -120,14 +132,17 @@ export default function ContactPage() {
                   className="text-mono-sm inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 font-mono"
                   style={{
                     borderColor: "var(--border-subtle)",
-                    background: "var(--bg-surface)",
+                    background: "var(--bg-card)",
                     color: "var(--fg-secondary)",
                   }}
                 >
                   <span
                     aria-hidden
-                    className="inline-block size-2 animate-pulse rounded-full"
-                    style={{ background: "var(--status-success)" }}
+                    className="inline-block size-2 rounded-full"
+                    style={{
+                      background: "var(--status-success)",
+                      animation: "live-pulse 2s ease-in-out infinite",
+                    }}
                   />
                   inbox open · recife · brt
                 </div>
@@ -137,10 +152,14 @@ export default function ContactPage() {
 
           {/* ══════════ THE FORM LEADS ══════════ */}
           <Section id="message">
-            <DocLabel level="##">send a message</DocLabel>
-            <DisplayH2 margin="0 0 16px">
-              Type it <Em>here.</Em>
-            </DisplayH2>
+            <Reveal>
+              <DocLabel level="##">send a message</DocLabel>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <DisplayH2 className="mb-4">
+                Type it <Em>here.</Em>
+              </DisplayH2>
+            </Reveal>
             <Prose className="text-body-lg mb-8 leading-[1.7]">
               This drops straight into my inbox. If it&apos;s about work, a couple of lines on what
               you&apos;re building and where I&apos;d fit in is all I need to get back to you.

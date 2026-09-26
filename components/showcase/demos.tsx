@@ -128,7 +128,7 @@ const DEMOS: DemoMap = {
   },
 
   "stack-graph": {
-    // The real pane in both cases: this card is not a `.bento-card`, it is a bordered canvas
+    // The real pane in both cases: this card is not a Card, it is a bordered canvas
     // with a fixed height, and a card-shaped skeleton claimed a shape it never has.
     loading: () => <StackGraphLoading />,
     error: () => <StackGraphError />,

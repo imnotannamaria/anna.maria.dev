@@ -15,7 +15,7 @@ import { PencilSimpleIcon } from "@phosphor-icons/react"
 import { toast } from "@/app/components/entrepta/toast"
 import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
-import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
+import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
 import { STATUS_LABEL, type RoadmapItem, type RoadmapStatus } from "@/lib/roadmap/validation"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
 
