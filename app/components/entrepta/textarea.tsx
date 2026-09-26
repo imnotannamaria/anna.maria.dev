@@ -6,17 +6,19 @@ import { cn } from "@/lib/utils"
 
 const textareaVariants = cva(
   [
-    "w-full block",
-    "bg-[var(--bg-surface)]",
+    "block w-full",
+    "bg-[var(--bg-field)]",
     "border rounded-[var(--radius-md)]",
     "px-3 py-2.5",
     "font-sans text-body-md leading-relaxed text-[var(--fg-primary)]",
-    "placeholder:text-[var(--fg-muted)] placeholder:font-mono",
+    "placeholder:font-mono placeholder:text-[var(--fg-muted)]",
     "appearance-none outline-none resize-y",
     "transition-all duration-150 ease-out",
     "hover:border-[var(--fg-muted)]",
     "focus:border-[var(--fg-brand)] focus:shadow-[0_0_0_3px_var(--bg-surface-brand)]",
-    "disabled:opacity-40 disabled:pointer-events-none disabled:cursor-not-allowed",
+    "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40",
+    // an invalid textarea, such as one a Field marks, looks like the error state
+    "aria-invalid:border-[var(--status-error)] aria-invalid:focus:shadow-[0_0_0_3px_var(--status-error-soft)]",
   ],
   {
     variants: {
@@ -38,12 +40,13 @@ export interface TextareaProps
     React.TextareaHTMLAttributes<HTMLTextAreaElement>,
     VariantProps<typeof textareaVariants> {}
 
-/** Sans rather than mono: this holds prose, and prose reads better in Inter. */
+/** Sans, not mono: a textarea holds prose. The placeholder stays mono, like a hint. */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, state, rows = 4, ...props }, ref) => (
     <textarea
       ref={ref}
       rows={rows}
+      aria-invalid={state === "error" || undefined}
       className={cn(textareaVariants({ state }), className)}
       {...props}
     />
@@ -51,4 +54,4 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 )
 Textarea.displayName = "Textarea"
 
-export { Textarea }
+export { Textarea, textareaVariants }

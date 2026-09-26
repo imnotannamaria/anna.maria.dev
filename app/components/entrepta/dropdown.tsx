@@ -1,9 +1,11 @@
 "use client"
 
+import { CaretRightIcon, CheckIcon, CircleIcon } from "@phosphor-icons/react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { Check, ChevronRight, Circle } from "lucide-react"
 import * as React from "react"
+import { MENU_LABEL, MENU_ROW, MENU_SEPARATOR, OVERLAY_SURFACE } from "@/lib/overlay"
 import { cn } from "@/lib/utils"
+import { Kbd } from "./kbd"
 
 const DropdownMenu = DropdownMenuPrimitive.Root
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
@@ -13,25 +15,20 @@ const DropdownMenuSub = DropdownMenuPrimitive.Sub
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 
 const dropdownContentClass = cn(
-  "z-50 min-w-[180px] overflow-hidden",
-  "bg-[var(--bg-surface)] border border-[var(--border-strong)]",
-  "rounded-[var(--radius-lg)] p-2",
-  "shadow-[0_16px_32px_rgba(0,0,0,0.5)]",
-  "data-[state=open]:animate-in data-[state=closed]:animate-out",
-  "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-  "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-  "data-[side=bottom]:slide-in-from-top-1 data-[side=top]:slide-in-from-bottom-1",
-  "data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1",
-  "duration-150 ease-out",
+  OVERLAY_SURFACE,
+  "motion-pop z-50 min-w-[200px] overflow-hidden rounded-[var(--radius-md)] p-1",
+  "origin-[var(--radix-dropdown-menu-content-transform-origin)]",
 )
 
+// The highlighted item takes the brand tint, like a selected palette row, and
+// its icon turns brand. No bar on the edge: the whole row is the signal.
 const dropdownItemClass = cn(
-  "relative flex cursor-default select-none items-center gap-3",
-  "rounded-[var(--radius-sm)] px-3 py-2",
-  "font-mono text-mono-md text-[var(--fg-secondary)]",
-  "outline-none transition-colors duration-150",
-  "focus:bg-[var(--bg-surface-elevated)] focus:text-[var(--fg-primary)] focus:shadow-[inset_2px_0_0_var(--fg-brand)]",
-  "data-[state=open]:bg-[var(--bg-surface-elevated)]",
+  MENU_ROW,
+  "cursor-default",
+  "[&_svg]:shrink-0 [&_svg]:text-[var(--fg-muted)] [&_svg]:transition-colors",
+  "data-[highlighted]:bg-[var(--bg-surface-brand)] data-[highlighted]:text-[var(--fg-primary)]",
+  "data-[highlighted]:[&_svg]:text-[var(--fg-brand)]",
+  "data-[state=open]:bg-[var(--bg-hover-soft)] data-[state=open]:text-[var(--fg-primary)]",
   "data-[disabled]:pointer-events-none data-[disabled]:opacity-40",
 )
 
@@ -68,7 +65,7 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={cn(dropdownItemClass, inset && "pl-9", className)}
+    className={cn(dropdownItemClass, inset && "pl-8", className)}
     {...props}
   />
 ))
@@ -82,8 +79,9 @@ const DropdownMenuDestructiveItem = React.forwardRef<
     ref={ref}
     className={cn(
       dropdownItemClass,
-      "text-[var(--status-error-fg)]",
-      "focus:bg-[var(--status-error-soft)] focus:text-[var(--status-error-fg)]",
+      "text-[var(--status-error-fg)] [&_svg]:text-[var(--status-error-fg)]",
+      "data-[highlighted]:bg-[var(--status-error-soft)] data-[highlighted]:text-[var(--status-error-fg)]",
+      "data-[highlighted]:[&_svg]:text-[var(--status-error-fg)]",
       className,
     )}
     {...props}
@@ -97,17 +95,13 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 >(({ className, children, checked, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
-    className={cn(dropdownItemClass, "pl-9", className)}
+    className={cn(dropdownItemClass, "pl-8", className)}
     checked={checked}
     {...props}
   >
-    <span className="absolute left-2.5 flex h-3.5 w-3.5 items-center justify-center">
+    <span className="absolute left-2.5 flex size-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Check
-          aria-hidden
-          style={{ width: 12, height: 12, strokeWidth: 2 }}
-          className="text-[var(--fg-brand)]"
-        />
+        <CheckIcon aria-hidden size={12} weight="bold" className="!text-[var(--fg-brand)]" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -121,16 +115,12 @@ const DropdownMenuRadioItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
-    className={cn(dropdownItemClass, "pl-9", className)}
+    className={cn(dropdownItemClass, "pl-8", className)}
     {...props}
   >
-    <span className="absolute left-2.5 flex h-3.5 w-3.5 items-center justify-center">
+    <span className="absolute left-2.5 flex size-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <Circle
-          aria-hidden
-          style={{ width: 7, height: 7 }}
-          className="fill-[var(--fg-brand)] stroke-[var(--fg-brand)]"
-        />
+        <CircleIcon aria-hidden size={7} weight="fill" className="!text-[var(--fg-brand)]" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -144,15 +134,11 @@ const DropdownMenuSubTrigger = React.forwardRef<
 >(({ className, inset, children, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
-    className={cn(dropdownItemClass, inset && "pl-9", className)}
+    className={cn(dropdownItemClass, inset && "pl-8", className)}
     {...props}
   >
     {children}
-    <ChevronRight
-      aria-hidden
-      className="ml-auto text-[var(--fg-muted)]"
-      style={{ width: 14, height: 14, strokeWidth: 1.5 }}
-    />
+    <CaretRightIcon aria-hidden className="ml-auto" size={12} />
   </DropdownMenuPrimitive.SubTrigger>
 ))
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName
@@ -164,9 +150,10 @@ const DropdownMenuLabel = React.forwardRef<
   <DropdownMenuPrimitive.Label
     ref={ref}
     className={cn(
-      "px-3 pt-3 pb-2",
-      "text-mono-xs font-mono tracking-[0.08em] text-[var(--fg-muted)] uppercase",
-      inset && "pl-9",
+      MENU_LABEL,
+      // the ◆ comes in through ::before, so the label needs no extra file
+      "before:[font-size:9px] before:text-[var(--fg-brand)] before:content-['◆']",
+      inset && "pl-8",
       className,
     )}
     {...props}
@@ -178,22 +165,12 @@ const DropdownMenuSeparator = React.forwardRef<
   React.ComponentRef<typeof DropdownMenuPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
 >(({ className, ...props }, ref) => (
-  <DropdownMenuPrimitive.Separator
-    ref={ref}
-    className={cn("-mx-2 my-1 h-px bg-[var(--border-subtle)]", className)}
-    {...props}
-  />
+  <DropdownMenuPrimitive.Separator ref={ref} className={cn(MENU_SEPARATOR, className)} {...props} />
 ))
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 
-const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span
-    className={cn(
-      "text-mono-sm ml-auto font-mono tracking-[0.04em] text-[var(--fg-muted)]",
-      className,
-    )}
-    {...props}
-  />
+const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
+  <Kbd variant="plain" className={cn("ml-auto pl-4", className)} {...props} />
 )
 DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
 

@@ -99,9 +99,9 @@ export default function RootLayout({
             </main>
           </div>
 
-          {/* No position override: StatusBar is `relative` now, so it sits in the grid row
-              rather than being pinned and then un-pinned from here. */}
+          {/* `static` makes it the last row of the editor grid rather than pinned to the viewport. */}
           <StatusBar
+            position="static"
             left={
               <>
                 <StatusBarItem>◆ annamaria.app</StatusBarItem>

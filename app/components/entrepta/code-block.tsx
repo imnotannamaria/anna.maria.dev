@@ -1,9 +1,8 @@
 "use client"
 
-import { AlertTriangle, Check, Copy } from "lucide-react"
+import { CheckIcon, CopyIcon, WarningIcon } from "@phosphor-icons/react"
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 interface CodeBlockProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   /** Raw code copied to clipboard. Required for the copy button. */
@@ -20,6 +19,10 @@ interface CodeBlockProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "tit
   showCopy?: boolean
   /** Milliseconds the "copied" state stays visible after a successful copy. */
   copyTimeout?: number
+  /** Wrap long lines instead of scrolling sideways, for prose such as Markdown. */
+  wrap?: boolean
+  /** `sm` for a compact block inside a card or a narrow panel. */
+  size?: "sm" | "md"
 }
 
 const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
@@ -32,6 +35,8 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
       variant = "default",
       showCopy = true,
       copyTimeout = 1500,
+      wrap = false,
+      size = "md",
       className,
       children,
       ...props
@@ -54,12 +59,10 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
         }
         await navigator.clipboard.writeText(code)
         setCopyState("copied")
-        playSoundEffect("success")
       } catch {
-        // clipboard may be unavailable (insecure context, denied permission, etc.) — sound is
-        // supplementary, so a failed copy needs a visible state too, not just an error tone.
+        // No clipboard on an insecure origin, or permission denied. Say so instead
+        // of claiming a copy that did not happen.
         setCopyState("error")
-        playSoundEffect("error")
       } finally {
         if (timerRef.current) clearTimeout(timerRef.current)
         timerRef.current = setTimeout(() => setCopyState("idle"), copyTimeout)
@@ -72,8 +75,9 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
       <div
         ref={ref}
         className={cn(
-          "relative rounded-[var(--radius-md)] border border-[var(--border-subtle)]",
-          "overflow-hidden bg-[var(--bg-surface)]",
+          // a column, so a block given a height scrolls its body and keeps its header
+          "relative flex flex-col rounded-[var(--radius-md)] border border-[var(--border-subtle)]",
+          "sheen overflow-hidden bg-[var(--bg-overlay)] shadow-[var(--shadow-card)]",
           className,
         )}
         {...props}
@@ -81,8 +85,9 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
         {hasChrome && (
           <div
             className={cn(
-              "flex items-center gap-3 px-4 py-2",
-              "border-b border-[var(--border-subtle)] bg-[var(--bg-chrome)]",
+              // the halves shrink before the copy button does, so it never leaves the block
+              "flex min-w-0 items-center gap-3 px-4 py-2",
+              "border-b border-[var(--border-subtle)]",
               "text-mono-sm font-mono text-[var(--fg-secondary)]",
             )}
           >
@@ -93,11 +98,17 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                 <span className="h-2.5 w-2.5 rounded-full bg-[var(--status-success)] opacity-60" />
               </div>
             )}
-            {filename && <span className="truncate text-[var(--fg-muted)]">{filename}</span>}
-            <div className="ml-auto flex items-center gap-3">
-              {meta && <span className="truncate text-[var(--fg-muted)]">{meta}</span>}
+            {filename && (
+              <span className="min-w-0 truncate text-[var(--fg-muted)]">{filename}</span>
+            )}
+            <div className="ml-auto flex min-w-0 items-center gap-3">
+              {meta && (
+                <span className="hidden min-w-0 truncate text-[var(--fg-muted)] sm:inline">
+                  {meta}
+                </span>
+              )}
               {language && (
-                <span className="text-mono-xs tracking-[0.08em] text-[var(--fg-brand)] uppercase">
+                <span className="text-mono-xs tracking-[0.08em] text-[var(--fg-brand-text)] uppercase">
                   {language}
                 </span>
               )}
@@ -119,30 +130,22 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                     "border border-[var(--border-subtle)] bg-[var(--bg-canvas)]",
                     "text-[var(--fg-muted)] hover:border-[var(--border-strong)] hover:text-[var(--fg-primary)]",
                     "transition-colors duration-150",
-                    "focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:outline-none",
+                    "focus-ring",
                   )}
                 >
                   {copyState === "copied" ? (
                     <>
-                      <Check
-                        aria-hidden
-                        style={{ width: 11, height: 11, strokeWidth: 1.8 }}
-                        className="text-[var(--status-success)]"
-                      />
+                      <CheckIcon aria-hidden size={11} className="text-[var(--status-success)]" />
                       <span>copied</span>
                     </>
                   ) : copyState === "error" ? (
                     <>
-                      <AlertTriangle
-                        aria-hidden
-                        style={{ width: 11, height: 11, strokeWidth: 1.8 }}
-                        className="text-[var(--status-error)]"
-                      />
+                      <WarningIcon aria-hidden size={11} className="text-[var(--status-error)]" />
                       <span>copy failed</span>
                     </>
                   ) : (
                     <>
-                      <Copy aria-hidden style={{ width: 11, height: 11, strokeWidth: 1.5 }} />
+                      <CopyIcon aria-hidden size={11} />
                       <span>copy</span>
                     </>
                   )}
@@ -151,13 +154,25 @@ const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
             </div>
           </div>
         )}
-        <div className="overflow-x-auto">
+        <div className="min-h-0 flex-1 overflow-auto overscroll-contain">
           {children ? (
-            <div className="text-mono-md p-4 font-mono leading-relaxed whitespace-pre text-[var(--fg-secondary)]">
+            <div
+              className={cn(
+                "p-4 font-mono leading-relaxed text-[var(--fg-secondary)]",
+                size === "sm" ? "text-mono-sm" : "text-mono-md",
+                wrap ? "[overflow-wrap:anywhere] whitespace-pre-wrap" : "whitespace-pre",
+              )}
+            >
               {children}
             </div>
           ) : (
-            <pre className="text-mono-md m-0 p-4 font-mono leading-relaxed whitespace-pre text-[var(--fg-secondary)]">
+            <pre
+              className={cn(
+                "m-0 p-4 font-mono leading-relaxed text-[var(--fg-secondary)]",
+                size === "sm" ? "text-mono-sm" : "text-mono-md",
+                wrap ? "[overflow-wrap:anywhere] whitespace-pre-wrap" : "whitespace-pre",
+              )}
+            >
               <code>{code}</code>
             </pre>
           )}

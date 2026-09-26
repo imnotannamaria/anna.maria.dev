@@ -1,10 +1,10 @@
 "use client"
 
+import { CircleNotchIcon } from "@phosphor-icons/react"
 import { Slot } from "@radix-ui/react-slot"
-import { Loader2 } from "lucide-react"
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { buttonVariants, type ButtonVariantProps } from "./button-variants"
+import { type ButtonVariantProps, buttonVariants } from "./button-variants"
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>, ButtonVariantProps {
@@ -35,7 +35,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             aria-hidden
             className="absolute top-1/2 left-1/2 inline-flex -translate-x-1/2 -translate-y-1/2"
           >
-            <Loader2 className="animate-spin" style={{ width: 14, height: 14, strokeWidth: 1.5 }} />
+            <CircleNotchIcon className="animate-spin" size={14} />
           </span>
         )}
       </Comp>

@@ -4,14 +4,10 @@ import { cn } from "@/lib/utils"
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "line" | "circle" | "rect"
   /**
-   * Seconds to offset this piece's shimmer by, so a card full of them reads as one sweep
-   * travelling across it rather than every bar blinking in lockstep. Pass the piece's position
-   * in reading order times a small number — `i * 0.06` is the going rate here.
-   *
-   * Applied negative: a positive delay would hold the piece at the start of the gradient until
-   * its turn came, so the top-left of a card sat frozen while the rest moved. A negative one
-   * starts it part-way through a cycle it is already in, which is the same wave with nothing
-   * ever still.
+   * Seconds to offset the shimmer, so a card of pieces reads as one wave
+   * instead of blinking in lockstep. Pass the piece's index times a small
+   * step, such as `i * 0.06`. Applied as a negative delay, so every piece is
+   * already moving on the first frame.
    */
   delay?: number
 }
@@ -23,7 +19,8 @@ const Skeleton = React.forwardRef<HTMLDivElement, SkeletonProps>(
       aria-hidden="true"
       style={{
         backgroundImage:
-          "linear-gradient(90deg, var(--bg-surface) 0%, var(--bg-surface-elevated) 50%, var(--bg-surface) 100%)",
+          // translucent, like the sweep, so a piece reads on a card, an overlay or a light page
+          "linear-gradient(90deg, var(--bg-hover-strong) 0%, color-mix(in srgb, var(--fg-primary) 12%, transparent) 50%, var(--bg-hover-strong) 100%)",
         backgroundSize: "200% 100%",
         animation: "shimmer 1.5s linear infinite",
         animationDelay: delay ? `${-delay}s` : undefined,
