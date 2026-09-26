@@ -7,7 +7,10 @@ import { cn } from "@/lib/utils"
 const cardVariants = cva(
   [
     "relative flex flex-col overflow-hidden border",
-    "transition-[border-color,background-color,box-shadow,transform] duration-200 ease-[var(--ease-out)]",
+    // `translate`, not `transform`: Tailwind's hover lift sets the `translate` property, while
+    // Motion writes `transform` every frame when it animates `x` or `y`. A CSS transition on
+    // `transform` would ease each of those frames and drag a card's entrance behind its spring.
+    "transition-[border-color,background-color,box-shadow,translate] duration-200 ease-[var(--ease-out)]",
   ],
   {
     variants: {
