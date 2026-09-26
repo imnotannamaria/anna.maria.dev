@@ -320,7 +320,7 @@ function FilterRow({
             /* Dashed, and with no count chip, because it is not a filter — it is the control
                that reveals the rest of them. Related to the pills beside it, deliberately not
                one of them. */
-            className="text-mono-sm inline-flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-dashed px-3 font-mono whitespace-nowrap transition-colors duration-120 hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-primary)]"
+            className="focus-ring text-mono-sm inline-flex h-7 shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-dashed px-3 font-mono whitespace-nowrap transition-colors duration-120 hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-primary)]"
             style={{ borderColor: "var(--border-strong)", color: "var(--fg-secondary)" }}
           >
             {open ? <CaretDown size={12} aria-hidden /> : <CaretRight size={12} aria-hidden />}

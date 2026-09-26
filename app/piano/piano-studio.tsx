@@ -656,7 +656,7 @@ export function PianoStudio() {
                 aria-checked={sustain}
                 aria-label="Toggle sustain"
                 onClick={toggleSustain}
-                className="relative h-4 w-[30px] rounded-full transition-colors"
+                className="focus-ring relative h-4 w-[30px] rounded-full transition-colors"
                 style={{ background: sustain ? "var(--fg-brand)" : "var(--border-strong)" }}
               >
                 <span
@@ -721,7 +721,7 @@ export function PianoStudio() {
                         pressNote(note)
                       }}
                       className={cn(
-                        "relative flex h-full flex-1 cursor-pointer touch-none flex-col items-center justify-end pb-3.5 select-none",
+                        "focus-ring relative flex h-full flex-1 cursor-pointer touch-none flex-col items-center justify-end pb-3.5 select-none",
                         i >= 7 && "piano-oct2",
                       )}
                       style={{
@@ -768,7 +768,7 @@ export function PianoStudio() {
                         pressNote(b.note)
                       }}
                       className={cn(
-                        "absolute top-0 z-[3] flex cursor-pointer touch-none flex-col items-center justify-end pb-2.5 select-none",
+                        "focus-ring absolute top-0 z-[3] flex cursor-pointer touch-none flex-col items-center justify-end pb-2.5 select-none",
                         b.i >= 7 && "piano-oct2",
                       )}
                       style={{
@@ -861,7 +861,7 @@ export function PianoStudio() {
                    something. */
                 className={cn(
                   cardVariants({ size: "sm" }),
-                  "group grid grid-cols-[auto_1fr_auto] items-center gap-3 text-left",
+                  "focus-ring group grid grid-cols-[auto_1fr_auto] items-center gap-3 text-left",
                   playing && "!border-(--fg-brand) !bg-(--bg-surface-brand)",
                 )}
               >
@@ -930,9 +930,7 @@ export function PianoStudio() {
               className="text-mono-xs tracking-[0.08em] uppercase"
               style={{ color: "var(--fg-brand-text)" }}
             >
-              <span aria-hidden style={{ marginRight: 4 }}>
-                ◆
-              </span>
+              <Diamond style={{ marginRight: 4 }} />
               now playing
             </span>
             <span
@@ -961,7 +959,7 @@ export function PianoStudio() {
             <button
               type="button"
               onClick={stopSong}
-              className="text-mono-sm rounded-[var(--radius-sm)] border px-2.5 py-1 font-mono transition-colors hover:border-[var(--fg-brand)]"
+              className="focus-ring text-mono-sm rounded-[var(--radius-sm)] border px-2.5 py-1 font-mono transition-colors hover:border-[var(--fg-brand)]"
               style={{ borderColor: "var(--border-strong)", color: "var(--fg-primary)" }}
             >
               <span aria-hidden style={{ color: "var(--fg-brand)", marginRight: 4, fontSize: 9 }}>

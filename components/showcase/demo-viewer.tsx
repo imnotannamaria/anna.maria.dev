@@ -84,7 +84,7 @@ export function StateList({
             type="button"
             onClick={() => onSelect(kind)}
             aria-pressed={on}
-            className="text-mono-sm flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] py-1.5 pr-2.5 pl-2 text-left font-mono transition-colors"
+            className="focus-ring text-mono-sm flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] py-1.5 pr-2.5 pl-2 text-left font-mono transition-colors"
             style={{
               color: on ? "var(--fg-primary)" : "var(--fg-muted)",
               background: on ? "var(--bg-surface-elevated)" : "transparent",

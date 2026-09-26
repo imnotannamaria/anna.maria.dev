@@ -21,7 +21,7 @@ import { motion } from "motion/react"
 import { PauseIcon, PlayIcon, SkipBackIcon, SkipForwardIcon } from "@phosphor-icons/react"
 import type { SimplifiedTrack } from "@/lib/spotify"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { ArrowLink } from "@/app/components/entrepta/arrow-link"
+import { ArrowAffordance, ArrowLink } from "@/app/components/entrepta/arrow-link"
 import {
   CardComment,
   CardFooter,
@@ -202,7 +202,7 @@ function ControlButton({
       onClick={onClick}
       aria-label={label}
       title={label}
-      className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
+      className="focus-ring inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
       style={{
         // --fg-brand-text, not --fg-brand: brand ink on the brand tint fails contrast in
         // eight of the twelve theme×mode combinations. See the token's note in globals.css.
@@ -282,7 +282,7 @@ export function SleeveCard({
           onBlur={() => setPeek(false)}
           aria-label={running ? "Pause" : "Play"}
           aria-describedby={albumId}
-          className="relative shrink-0 cursor-pointer rounded-[var(--radius-sm)]"
+          className="focus-ring relative shrink-0 cursor-pointer rounded-[var(--radius-sm)]"
           style={{ width: COVER + out, height: COVER }}
         >
           <Bubble show={peek} album={track.album} year={track.year} />
@@ -554,10 +554,10 @@ export function SleeveError({ onRetry, className }: { onRetry?: () => void; clas
           <button
             type="button"
             onClick={onRetry}
-            className="text-mono-sm cursor-pointer font-mono transition-colors"
+            className="focus-ring group/arrow text-mono-sm cursor-pointer font-mono transition-colors"
             style={{ color: "var(--fg-brand-text)" }}
           >
-            retry →
+            <ArrowAffordance>retry</ArrowAffordance>
           </button>
         )
       }
