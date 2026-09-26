@@ -16,7 +16,7 @@ export function TechBadge({ name }: { name: string }) {
     <Badge
       variant="soft"
       color="brand"
-      className="h-[26px] cursor-default gap-1.5 border border-transparent px-2.5 transition-[border-color,transform,color] duration-150 hover:-translate-y-px hover:border-[var(--fg-brand)] hover:text-[var(--fg-brand)]"
+      className="h-[26px] cursor-default gap-1.5 border border-transparent px-2.5 transition-[border-color,transform,color] duration-150 hover:-translate-y-px hover:border-[var(--fg-brand)] hover:text-[var(--fg-brand-text)]"
     >
       {icon && (
         <svg

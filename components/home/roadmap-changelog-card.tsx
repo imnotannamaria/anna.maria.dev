@@ -58,7 +58,7 @@ export function RoadmapChangelogCard({
         <CardLabel as="h3">roadmap</CardLabel>
         <CardMeta>
           {
-            <ArrowLink asChild className="text-mono-sm text-(--fg-brand)">
+            <ArrowLink asChild className="text-mono-sm text-(--fg-brand-text)">
               <Link href="/roadmap">open the board</Link>
             </ArrowLink>
           }
@@ -74,7 +74,7 @@ export function RoadmapChangelogCard({
           style={{ color: "var(--fg-primary)", margin: 0 }}
         >
           What I&rsquo;m{" "}
-          <em className="italic" style={{ color: "var(--fg-brand)" }}>
+          <em className="italic" style={{ color: "var(--fg-brand-text)" }}>
             building
           </em>
         </p>
@@ -101,7 +101,7 @@ export function RoadmapChangelogCard({
       <CardFooter>
         <CardComment>{slice ? `${slice.total} items on the board` : "the board"}</CardComment>
         {slice && slice.hidden > 0 ? (
-          <Link href="/roadmap" style={{ color: "var(--fg-brand)" }}>
+          <Link href="/roadmap" style={{ color: "var(--fg-brand-text)" }}>
             +{slice.hidden} more
           </Link>
         ) : (

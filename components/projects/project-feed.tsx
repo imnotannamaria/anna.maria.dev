@@ -75,7 +75,7 @@ export function ProjectFeed({
         <>
           <div className="flex justify-between">
             <span>{"// projects"}</span>
-            <span style={{ color: "var(--fg-brand)" }}>{filtered.length}</span>
+            <span style={{ color: "var(--fg-brand-text)" }}>{filtered.length}</span>
           </div>
           <div className="flex justify-between">
             <span>{"// tags"}</span>

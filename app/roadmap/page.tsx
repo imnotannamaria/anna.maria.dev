@@ -62,7 +62,7 @@ export default async function RoadmapPage() {
           style={{ color: "var(--fg-secondary)" }}
         >
           Everything I&apos;m working on in{" "}
-          <em className="font-serif italic" style={{ color: "var(--fg-brand)" }}>
+          <em className="font-serif italic" style={{ color: "var(--fg-brand-text)" }}>
             open source
           </em>{" "}
           right now, on one board. Some of it is this site. Some of it is entrepta, the design

@@ -33,7 +33,7 @@ export function StatusPicker({
           aria-describedby={invalid && id ? `${id}-error` : undefined}
           className={[
             "flex h-10 w-full cursor-pointer items-center justify-between gap-2",
-            "rounded-md border bg-(--bg-surface) px-3",
+            "rounded-md border bg-(--bg-field) px-3",
             "text-mono-md font-mono text-(--fg-primary)",
             "transition-all duration-150 ease-out outline-none",
             "hover:border-(--fg-muted)",

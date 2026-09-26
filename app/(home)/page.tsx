@@ -231,7 +231,7 @@ export default function Home() {
             <Link
               href="/projects"
               className="text-mono-sm font-mono tracking-normal transition-all duration-150 hover:tracking-[0.08em]"
-              style={{ color: "var(--fg-brand)", textTransform: "none" }}
+              style={{ color: "var(--fg-brand-text)", textTransform: "none" }}
             >
               all projects ↗
             </Link>

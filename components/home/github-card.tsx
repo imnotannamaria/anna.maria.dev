@@ -53,11 +53,11 @@ export function GithubCard({
           not Tailwind's default border colour, which is a different grey. */}
       <CardFooter className="border-t border-dashed border-(--border-subtle) pt-3">
         <CardComment>public activity · last 12 months</CardComment>
-        <span style={{ color: "var(--fg-brand)" }}>
+        <span style={{ color: "var(--fg-brand-text)" }}>
           <ArrowLink
             href={`https://github.com/${username}`}
             external
-            className="text-mono-sm text-(--fg-brand)"
+            className="text-mono-sm text-(--fg-brand-text)"
           >
             github
           </ArrowLink>

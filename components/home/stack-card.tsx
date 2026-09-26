@@ -164,7 +164,7 @@ function StackBadge({ tool }: { tool: Tool }) {
         // hover, dropping back, and starting it again — a flicker loop.
         "group-hover/badge:-translate-y-0.5 group-hover/badge:border-(--border-brand-strong)",
       )}
-      style={{ background: "var(--bg-surface-brand)", color: "var(--fg-brand-hover)" }}
+      style={{ background: "var(--bg-surface-brand)", color: "var(--fg-brand-text)" }}
     >
       {tool.icon && (
         <svg
@@ -292,7 +292,7 @@ export function StackCard() {
                   <RadioDot active={isOpen} />
 
                   <span
-                    className="text-mono-md min-w-0 truncate font-mono font-semibold transition-colors duration-150 group-hover/branch:text-(--fg-brand)"
+                    className="text-mono-md min-w-0 truncate font-mono font-semibold transition-colors duration-150 group-hover/branch:text-(--fg-brand-text)"
                     style={{ color: "var(--fg-primary)" }}
                   >
                     {branch.label}
@@ -368,7 +368,7 @@ export function StackCard() {
       </div>
       <CardFooter className="border-t border-dashed border-(--border-subtle) pt-3">
         <CardComment>click a branch to fold it away</CardComment>
-        <span style={{ color: "var(--fg-brand)" }}>{TOTAL_TOOLS} tools</span>
+        <span style={{ color: "var(--fg-brand-text)" }}>{TOTAL_TOOLS} tools</span>
       </CardFooter>
     </motion.div>
   )

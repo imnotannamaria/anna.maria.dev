@@ -125,7 +125,7 @@ export function FeaturedProjectCard({
 
       <p
         className="text-mono-sm relative font-mono tracking-[0.04em]"
-        style={{ color: "var(--fg-brand)" }}
+        style={{ color: "var(--fg-brand-text)" }}
       >
         {String(index).padStart(2, "0")} / {String(total).padStart(2, "0")}
       </p>

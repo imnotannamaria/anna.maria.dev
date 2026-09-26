@@ -103,7 +103,7 @@ export function ChannelsCard({ index = 0 }: { index?: number }) {
                   {label}
                 </span>
                 <span
-                  className="text-mono-sm truncate font-mono transition-colors group-hover/row:text-[var(--fg-brand)] group-focus-visible/row:text-[var(--fg-brand)]"
+                  className="text-mono-sm truncate font-mono transition-colors group-hover/row:text-[var(--fg-brand-text)] group-focus-visible/row:text-[var(--fg-brand-text)]"
                   style={{ color: "var(--fg-primary)" }}
                 >
                   {value}

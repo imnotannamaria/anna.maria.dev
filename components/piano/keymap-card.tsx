@@ -71,7 +71,7 @@ export function KeymapCard({
                 style={{
                   fontFamily: "var(--font-serif)",
                   fontStyle: "italic",
-                  color: "var(--fg-brand)",
+                  color: "var(--fg-brand-text)",
                 }}
               >
                 {line.note}

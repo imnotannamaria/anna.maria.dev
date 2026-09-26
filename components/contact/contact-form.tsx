@@ -187,7 +187,7 @@ export function ContactForm({ email }: { email: string }) {
               setErrorMessage("")
               setState("idle")
             }}
-            className="focus-ring group inline-flex cursor-pointer items-center gap-2 font-mono transition-colors hover:text-[color:var(--fg-brand)]"
+            className="focus-ring group inline-flex cursor-pointer items-center gap-2 font-mono transition-colors hover:text-[color:var(--fg-brand-text)]"
           >
             <span
               aria-hidden
@@ -305,7 +305,7 @@ export function ContactForm({ email }: { email: string }) {
                   : "border-[var(--border-strong)] focus-within:border-[var(--fg-brand)] focus-within:shadow-[0_0_0_3px_var(--bg-surface-brand)] hover:border-[var(--fg-muted)]",
                 disabled && "pointer-events-none opacity-40",
               )}
-              style={{ background: "var(--bg-surface)" }}
+              style={{ background: "var(--bg-field)" }}
             >
               <textarea
                 id="message"

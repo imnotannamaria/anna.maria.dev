@@ -64,7 +64,7 @@ export function LogFeed({
         <>
           <div className="flex justify-between">
             <span>{"// logged"}</span>
-            <span style={{ color: "var(--fg-brand)" }}>{filtered.length}</span>
+            <span style={{ color: "var(--fg-brand-text)" }}>{filtered.length}</span>
           </div>
           <div className="flex justify-between">
             <span>{"// types"}</span>

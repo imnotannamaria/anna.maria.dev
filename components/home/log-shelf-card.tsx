@@ -96,7 +96,7 @@ export function LogShelfCard({
         <CardLabel as="h3">log</CardLabel>
         <CardMeta>
           {
-            <ArrowLink asChild className="text-mono-sm text-(--fg-brand)">
+            <ArrowLink asChild className="text-mono-sm text-(--fg-brand-text)">
               <Link href="/log">open the log</Link>
             </ArrowLink>
           }
@@ -111,7 +111,7 @@ export function LogShelfCard({
           style={{ color: "var(--fg-primary)", margin: 0 }}
         >
           Everything I{" "}
-          <em className="italic" style={{ color: "var(--fg-brand)" }}>
+          <em className="italic" style={{ color: "var(--fg-brand-text)" }}>
             finished
           </em>
         </p>
@@ -358,7 +358,7 @@ function Caption({
               <span className="flex min-w-0 items-baseline gap-2">
                 <span
                   className="text-mono-xs shrink-0 font-mono tracking-[0.08em] uppercase"
-                  style={{ color: "var(--fg-brand)" }}
+                  style={{ color: "var(--fg-brand-text)" }}
                 >
                   {TYPE_LABEL[entry.type]}
                 </span>

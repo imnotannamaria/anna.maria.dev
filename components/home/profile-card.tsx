@@ -38,7 +38,7 @@ function Stat({ value, label, delay }: { value: number; label: string; delay: nu
         }}
       />
       <span
-        className="text-mono-xs font-mono tracking-[0.1em] uppercase transition-colors duration-200 group-hover/stat:text-(--fg-brand)"
+        className="text-mono-xs font-mono tracking-[0.1em] uppercase transition-colors duration-200 group-hover/stat:text-(--fg-brand-text)"
         style={{ color: "var(--fg-muted)" }}
       >
         {label}
@@ -152,9 +152,9 @@ function SocialButton({
           "border-(--border-subtle) text-(--fg-secondary)",
           "transition-[transform,background-color,border-color,color] duration-200 ease-out",
           "group-hover/social:-translate-y-1 group-hover/social:border-(--fg-brand)",
-          "group-hover/social:bg-(--bg-surface-brand) group-hover/social:text-(--fg-brand)",
+          "group-hover/social:bg-(--bg-surface-brand) group-hover/social:text-(--fg-brand-text)",
           "group-focus-visible/social:-translate-y-1 group-focus-visible/social:border-(--fg-brand)",
-          "group-focus-visible/social:bg-(--bg-surface-brand) group-focus-visible/social:text-(--fg-brand)",
+          "group-focus-visible/social:bg-(--bg-surface-brand) group-focus-visible/social:text-(--fg-brand-text)",
         )}
       >
         <Icon
@@ -168,7 +168,7 @@ function SocialButton({
         aria-hidden
         className={cn(
           "text-mono-xs pointer-events-none absolute -bottom-4 translate-y-1 font-mono tracking-[0.06em] opacity-0",
-          "text-(--fg-brand) transition-all duration-200 ease-out",
+          "text-(--fg-brand-text) transition-all duration-200 ease-out",
           // focus as well as hover: a keyboard user gets the same reveal.
           "group-hover/social:translate-y-0 group-hover/social:opacity-100",
           "group-focus-visible/social:translate-y-0 group-focus-visible/social:opacity-100",

@@ -97,7 +97,7 @@ export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
 
         <CardFooter>
           <CardComment>notes · public</CardComment>
-          <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
+          <span className="font-mono" style={{ color: "var(--fg-brand-text)" }}>
             <ArrowAffordance>read post</ArrowAffordance>
           </span>
         </CardFooter>

@@ -265,7 +265,7 @@ export default async function AboutPage() {
                         href={href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/social text-mono-sm inline-flex min-h-6 w-full items-center gap-2 py-0.5 font-mono text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand)] focus-visible:text-[var(--fg-brand)]"
+                        className="group/social text-mono-sm inline-flex min-h-6 w-full items-center gap-2 py-0.5 font-mono text-[var(--fg-secondary)] transition-colors hover:text-[var(--fg-brand-text)] focus-visible:text-[var(--fg-brand-text)]"
                       >
                         <Icon size={14} style={{ opacity: 0.7 }} />
                         <span>{label}</span>

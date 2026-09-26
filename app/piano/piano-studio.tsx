@@ -629,7 +629,7 @@ export function PianoStudio() {
                   style={{
                     fontFamily: "var(--font-serif)",
                     fontStyle: "italic",
-                    color: "var(--fg-brand)",
+                    color: "var(--fg-brand-text)",
                     fontSize: "var(--text-body-md)",
                   }}
                 >
@@ -928,7 +928,7 @@ export function PianoStudio() {
           >
             <span
               className="text-mono-xs tracking-[0.08em] uppercase"
-              style={{ color: "var(--fg-brand-hover)" }}
+              style={{ color: "var(--fg-brand-text)" }}
             >
               <span aria-hidden style={{ marginRight: 4 }}>
                 ◆

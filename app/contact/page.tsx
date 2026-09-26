@@ -129,7 +129,7 @@ export default function ContactPage() {
                   className="text-mono-sm inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 font-mono"
                   style={{
                     borderColor: "var(--border-subtle)",
-                    background: "var(--bg-surface)",
+                    background: "var(--bg-card)",
                     color: "var(--fg-secondary)",
                   }}
                 >

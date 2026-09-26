@@ -166,13 +166,17 @@ const defaultComponents = {
   ),
   em: (props: React.HTMLAttributes<HTMLElement>) => (
     <em
-      style={{ fontFamily: "var(--font-serif)", fontStyle: "italic", color: "var(--fg-brand)" }}
+      style={{
+        fontFamily: "var(--font-serif)",
+        fontStyle: "italic",
+        color: "var(--fg-brand-text)",
+      }}
       {...props}
     />
   ),
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
-      className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand)]"
+      className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand-text)]"
       style={{ overflowWrap: "break-word" }}
       {...props}
     />

@@ -82,7 +82,7 @@ export default function PianoPage() {
           <>
             <div className="flex items-center justify-between">
               <span>{"// keys"}</span>
-              <span style={{ color: "var(--fg-brand)", fontFamily: "var(--font-serif)" }}>
+              <span style={{ color: "var(--fg-brand-text)", fontFamily: "var(--font-serif)" }}>
                 <em>24</em>
               </span>
             </div>

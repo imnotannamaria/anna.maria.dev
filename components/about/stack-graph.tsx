@@ -167,7 +167,7 @@ export function StackGraphError({ onRetry }: { onRetry?: () => void }) {
             type="button"
             onClick={onRetry}
             className="text-mono-sm cursor-pointer font-mono transition-colors"
-            style={{ color: "var(--fg-brand)" }}
+            style={{ color: "var(--fg-brand-text)" }}
           >
             try again →
           </button>

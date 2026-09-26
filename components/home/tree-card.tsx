@@ -178,7 +178,10 @@ export function TreeCard({
       <motion.div variants={piece}>
         <CardFooter className="border-t border-dashed border-(--border-subtle) pt-3">
           <CardComment>click a file to open it</CardComment>
-          <span className="inline-flex items-center gap-1.5" style={{ color: "var(--fg-brand)" }}>
+          <span
+            className="inline-flex items-center gap-1.5"
+            style={{ color: "var(--fg-brand-text)" }}
+          >
             <span
               className="inline-block h-1.5 w-1.5 rounded-full"
               style={{

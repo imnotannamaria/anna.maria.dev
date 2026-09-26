@@ -84,7 +84,7 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
         </div>
 
         <h3
-          className="m-0 transition-colors group-hover/arrow:text-(--fg-brand)"
+          className="m-0 transition-colors group-hover/arrow:text-(--fg-brand-text)"
           style={{
             fontFamily: "var(--font-serif)",
             fontSize: "clamp(20px, 2.4vw, 26px)",
@@ -116,7 +116,7 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
               </Badge>
             ))}
           </span>
-          <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
+          <span className="font-mono" style={{ color: "var(--fg-brand-text)" }}>
             <ArrowAffordance>open .mdx</ArrowAffordance>
           </span>
         </CardFooter>

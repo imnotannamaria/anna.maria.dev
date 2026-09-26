@@ -97,7 +97,7 @@ export default function ProjectsPage() {
             href="https://github.com/imnotannamaria"
             target="_blank"
             rel="noopener noreferrer"
-            className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand)]"
+            className="border-b border-[color:var(--border-strong)] text-[color:var(--fg-primary)] transition-colors hover:border-[color:var(--fg-brand)] hover:text-[color:var(--fg-brand-text)]"
           >
             GitHub
             <span className="sr-only"> (opens in a new tab)</span>

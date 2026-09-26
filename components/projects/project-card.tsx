@@ -62,7 +62,7 @@ function OutLink({ href, kind }: { href: string; kind: "github" | "live" }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-mono-sm relative z-[2] inline-flex min-h-6 items-center gap-1.5 font-mono transition-colors hover:text-(--fg-brand) focus-visible:text-(--fg-brand)"
+      className="text-mono-sm relative z-[2] inline-flex min-h-6 items-center gap-1.5 font-mono transition-colors hover:text-(--fg-brand-text) focus-visible:text-(--fg-brand-text)"
       style={{ color: "var(--fg-primary)" }}
     >
       {kind === "github" ? <GithubLogoIcon size={13} /> : <ArrowSquareOutIcon size={12} />}
@@ -157,7 +157,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
             <span style={{ opacity: 0.6 }}>{"// case study"}</span>
           )}
         </span>
-        <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
+        <span className="font-mono" style={{ color: "var(--fg-brand-text)" }}>
           <ArrowAffordance>open .tsx</ArrowAffordance>
         </span>
       </CardFooter>

@@ -567,7 +567,7 @@
 }
 .rm-step[data-state="live"] .rm-step-mark {
   border-color: var(--fg-brand);
-  color: var(--fg-brand);
+  color: var(--fg-brand-text);
   animation: dot-glow 2.4s ease-in-out infinite;
 }
 .rm-step-rule {

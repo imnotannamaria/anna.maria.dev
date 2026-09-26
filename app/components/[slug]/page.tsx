@@ -156,7 +156,7 @@ export default async function ComponentDocPage({ params }: Props) {
                     target="_blank"
                     rel="noreferrer"
                     className="break-all transition-colors"
-                    style={{ color: "var(--fg-brand)" }}
+                    style={{ color: "var(--fg-brand-text)" }}
                   >
                     {doc.source}
                     <span className="sr-only"> (opens in a new tab)</span>
