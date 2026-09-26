@@ -206,6 +206,25 @@ const defaultComponents = {
   li: (props: React.HTMLAttributes<HTMLLIElement>) => (
     <li className="leading-[1.7]" style={{ overflowWrap: "break-word" }} {...props} />
   ),
+  // Wide tables scroll inside their own frame rather than reflowing: at 375px minus the
+  // sidebar there is no room for a second column otherwise.
+  table: (props: React.TableHTMLAttributes<HTMLTableElement>) => (
+    <div className="my-6 overflow-x-auto rounded-[var(--radius-md)] border border-[var(--border-subtle)]">
+      <table className="w-full border-collapse text-left" {...props} />
+    </div>
+  ),
+  th: (props: React.ThHTMLAttributes<HTMLTableCellElement>) => (
+    <th
+      className="text-mono-xs border-b border-[var(--border-subtle)] bg-[var(--bg-hover-soft)] px-4 py-2.5 font-mono font-normal tracking-[0.08em] whitespace-nowrap text-[var(--fg-muted)] uppercase"
+      {...props}
+    />
+  ),
+  td: (props: React.TdHTMLAttributes<HTMLTableCellElement>) => (
+    <td
+      className="text-body-md border-t border-[var(--border-subtle)] px-4 py-2.5 align-top font-sans leading-relaxed text-[var(--fg-secondary)] first:font-mono first:whitespace-nowrap first:text-[var(--fg-primary)]"
+      {...props}
+    />
+  ),
   blockquote: (props: React.HTMLAttributes<HTMLQuoteElement>) => (
     <blockquote
       className="my-6 pl-4 italic"
