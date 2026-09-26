@@ -23,7 +23,7 @@
 import { useMemo, useState } from "react"
 import { CaretDown, CaretRight } from "@phosphor-icons/react"
 import { PageOutline, type OutlineItem } from "./page-outline"
-import { FilterPill } from "@/components/ui/url-filter"
+import { FilterPill } from "@/app/components/entrepta/filter-pill"
 import { splitPills, type FeedPill } from "@/lib/feed-filter"
 import { cn } from "@/lib/utils"
 

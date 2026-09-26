@@ -1,8 +1,9 @@
+import { Reveal } from "@/app/components/entrepta/reveal"
 import { createMetadata } from "@/lib/metadata"
 import { getPublishedProjects } from "@/lib/velite"
 import { ProjectFeed, type TagCount } from "@/components/projects/project-feed"
 import { type ProjectItem } from "@/components/projects/project-card"
-import { DocLabel, Em } from "@/components/chrome/page-parts"
+import { DocLabel, Em } from "@/app/components/entrepta/doc-parts"
 import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export const metadata = createMetadata({
@@ -57,7 +58,9 @@ export default function ProjectsPage() {
       </nav>
 
       <div id="projects" style={{ scrollMarginTop: 24 }}>
-        <DocLabel level="#">ls ./projects --sort=date</DocLabel>
+        <Reveal>
+          <DocLabel level="#">ls ./projects --sort=date</DocLabel>
+        </Reveal>
 
         <TypeIn
           as="h1"

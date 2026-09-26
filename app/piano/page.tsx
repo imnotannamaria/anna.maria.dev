@@ -1,3 +1,4 @@
+import { Reveal } from "@/app/components/entrepta/reveal"
 import Link from "next/link"
 import { createMetadata } from "@/lib/metadata"
 import { PianoStudio } from "./piano-studio"
@@ -8,11 +9,11 @@ import {
   DisplayH2,
   DocLabel,
   Em,
-  Kbd,
   Prose,
   Section,
   Strong,
-} from "@/components/chrome/page-parts"
+} from "@/app/components/entrepta/doc-parts"
+import { Kbd } from "@/app/components/entrepta/kbd"
 
 export const metadata = createMetadata({
   title: "Piano",
@@ -125,8 +126,10 @@ export default function PianoPage() {
           </nav>
 
           {/* ══════════ HERO ══════════ */}
-          <Section id="piano" first>
-            <DocLabel level="#">piano</DocLabel>
+          <Section id="piano" variant="first">
+            <Reveal>
+              <DocLabel level="#">piano</DocLabel>
+            </Reveal>
             <TypeIn
               as="h1"
               text="Tap to play."
@@ -167,10 +170,14 @@ export default function PianoPage() {
 
           {/* ══════════ KEY MAPPING ══════════ */}
           <Section id="controls">
-            <DocLabel level="##">key mapping</DocLabel>
-            <DisplayH2 size={36} margin="0 0 8px">
-              Where every <Em>note</Em> lives.
-            </DisplayH2>
+            <Reveal>
+              <DocLabel level="##">key mapping</DocLabel>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <DisplayH2 className="mb-2">
+                Where every <Em>note</Em> lives.
+              </DisplayH2>
+            </Reveal>
             <Prose>
               Two QWERTY rows, one per octave. Black keys sit above their white-key neighbours,
               exactly like a real piano.

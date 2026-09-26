@@ -6,7 +6,7 @@
  * it bought less than it looks: the tiles it drew were a guess at how many entries there are,
  * so the layout it was protecting from jumping jumped anyway the moment the real count differed.
  */
-import { PageLoading } from "@/components/chrome/page-loading"
+import { PageLoading } from "@/app/components/entrepta/page-loading"
 
 export default function LogLoading() {
   return (

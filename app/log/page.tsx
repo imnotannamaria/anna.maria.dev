@@ -1,8 +1,9 @@
+import { Reveal } from "@/app/components/entrepta/reveal"
 import { createMetadata } from "@/lib/metadata"
 import { countByType } from "@/lib/log/counts"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { LogFeed } from "@/components/log/log-feed"
-import { DocLabel, Em } from "@/components/chrome/page-parts"
+import { DocLabel, Em } from "@/app/components/entrepta/doc-parts"
 import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export const metadata = createMetadata({
@@ -42,7 +43,9 @@ export default async function LogPage() {
       </nav>
 
       <div id="log" style={{ scrollMarginTop: 24 }}>
-        <DocLabel level="#">log --all --sort=albums,favorites</DocLabel>
+        <Reveal>
+          <DocLabel level="#">log --all --sort=albums,favorites</DocLabel>
+        </Reveal>
 
         <TypeIn
           as="h1"

@@ -24,7 +24,8 @@
 import Link from "next/link"
 import { useState } from "react"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
-import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
+import { useUrlFilter } from "@/hooks/use-url-filter"
+import { FilterPill } from "@/app/components/entrepta/filter-pill"
 import {
   HouseLineIcon,
   ShareNetworkIcon,

@@ -10,7 +10,7 @@ import { Button } from "@/app/components/entrepta/button"
 import { Input } from "@/app/components/entrepta/input"
 import { Textarea } from "@/app/components/entrepta/textarea"
 import { toast } from "@/app/components/entrepta/toast"
-import { Field } from "@/components/ui/form-field"
+import { Field } from "@/app/components/entrepta/field"
 import { slugify } from "@/lib/slug"
 import {
   roadmapItemInputSchema,

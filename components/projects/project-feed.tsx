@@ -27,7 +27,7 @@
 
 import { useMemo } from "react"
 import { FeedShell, groupInOrder, type FeedGroup } from "@/components/chrome/feed-shell"
-import { useUrlFilter } from "@/components/ui/url-filter"
+import { useUrlFilter } from "@/hooks/use-url-filter"
 import { KIND_ORDER, KIND_SECTION_LABEL, type ProjectKind } from "@/lib/projects"
 import { ProjectCard, type ProjectItem } from "./project-card"
 

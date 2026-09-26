@@ -1,5 +1,5 @@
 /** Same as the log list: force-dynamic, and Postgres before anything can render. */
-import { PageLoading } from "@/components/chrome/page-loading"
+import { PageLoading } from "@/app/components/entrepta/page-loading"
 
 export default function AdminRoadmapLoading() {
   return (

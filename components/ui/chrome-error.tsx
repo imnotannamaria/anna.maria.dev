@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { Button } from "@/app/components/entrepta/button"
-import { ChromeMessage } from "./chrome-message"
+import { ChromeMessage } from "@/app/components/entrepta/chrome-message"
 import { SoundEffectOnMount } from "./sound-feedback"
 
 /**

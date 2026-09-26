@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
-import { ChromeMessage } from "@/components/ui/chrome-message"
+import { ChromeMessage } from "@/app/components/entrepta/chrome-message"
 import { SoundEffectOnMount } from "@/components/ui/sound-feedback"
 
 export const metadata: Metadata = { title: "Page not found" }

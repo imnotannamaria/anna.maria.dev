@@ -2,7 +2,8 @@
 
 import { useMemo } from "react"
 import { STAGGER_LIMIT } from "@/lib/motion"
-import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
+import { useUrlFilter } from "@/hooks/use-url-filter"
+import { FilterPill } from "@/app/components/entrepta/filter-pill"
 import { countByStatus, groupByStatus } from "@/lib/roadmap/counts"
 import {
   PUBLIC_STATUSES,

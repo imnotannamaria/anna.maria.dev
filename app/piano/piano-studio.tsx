@@ -1,9 +1,11 @@
 "use client"
 
+import { Reveal } from "@/app/components/entrepta/reveal"
 import { cardVariants } from "@/app/components/entrepta/card"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
-import { DisplayH2, DocLabel, Em, Kbd, Prose, Section } from "@/components/chrome/page-parts"
+import { DisplayH2, DocLabel, Em, Prose, Section } from "@/app/components/entrepta/doc-parts"
+import { Kbd } from "@/app/components/entrepta/kbd"
 import { Diamond } from "@/app/components/entrepta/diamond"
 
 /* ════════════════════════════════════════════════
@@ -558,10 +560,14 @@ export function PianoStudio() {
     <div data-sound="off">
       {/* ══════════ KEYBOARD ══════════ */}
       <Section id="keyboard">
-        <DocLabel level="##">keyboard</DocLabel>
-        <DisplayH2 size={36} margin="0 0 8px">
-          <Em>Twenty-four</Em> keys.
-        </DisplayH2>
+        <Reveal>
+          <DocLabel level="##">keyboard</DocLabel>
+        </Reveal>
+        <Reveal delay={0.06}>
+          <DisplayH2 className="mb-2">
+            <Em>Twenty-four</Em> keys.
+          </DisplayH2>
+        </Reveal>
         <Prose>
           Web Audio API, no samples. Pure additive synthesis with a piano-shaped envelope, and
           volume and sustain live in the toolbar.
@@ -821,10 +827,14 @@ export function PianoStudio() {
 
       {/* ══════════ SONGS ══════════ */}
       <Section id="songs">
-        <DocLabel level="##">songs</DocLabel>
-        <DisplayH2 size={36} margin="0 0 8px">
-          <Em>Six</Em> classics, one tap.
-        </DisplayH2>
+        <Reveal>
+          <DocLabel level="##">songs</DocLabel>
+        </Reveal>
+        <Reveal delay={0.06}>
+          <DisplayH2 className="mb-2">
+            <Em>Six</Em> classics, one tap.
+          </DisplayH2>
+        </Reveal>
         <Prose>
           Tap any title to auto-play. The piano lights up note by note. Tap again, press{" "}
           <Em>space</Em>, or hit any key to stop.

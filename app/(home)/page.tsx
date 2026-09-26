@@ -8,7 +8,7 @@ import {
 } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/format"
 import { cardVariants, CardHeader, CardLabel } from "@/app/components/entrepta/card"
-import { SectHead } from "@/components/home/section-head"
+import { SectHead } from "@/app/components/entrepta/sect-head"
 import { FeaturedProjectCard } from "@/components/home/featured-project-card"
 import { FeaturedPostCard } from "@/components/home/featured-post-card"
 import { OssCard } from "@/components/home/oss-card"

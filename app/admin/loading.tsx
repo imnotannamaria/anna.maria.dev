@@ -7,7 +7,7 @@
  * Next picks the nearest `loading.tsx` up the tree, so the four files below this one still win
  * on their own routes.
  */
-import { PageLoading } from "@/components/chrome/page-loading"
+import { PageLoading } from "@/app/components/entrepta/page-loading"
 
 export default function AdminLoading() {
   return (
