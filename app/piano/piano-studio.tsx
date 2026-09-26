@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { DisplayH2, DocLabel, Em, Kbd, Prose, Section } from "@/components/chrome/page-parts"
-import { Diamond } from "@/components/ui/diamond"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 /* ════════════════════════════════════════════════
    DATA — 2 octaves, C4 → B5

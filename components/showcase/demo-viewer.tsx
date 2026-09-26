@@ -16,7 +16,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { EASE_OUT } from "@/components/ui/reveal"
+import { EASE_OUT } from "@/lib/motion"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { cn } from "@/lib/utils"
 import { renderDemo } from "./demos"

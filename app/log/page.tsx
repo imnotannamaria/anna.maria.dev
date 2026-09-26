@@ -3,7 +3,7 @@ import { countByType } from "@/lib/log/counts"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { LogFeed } from "@/components/log/log-feed"
 import { DocLabel, Em } from "@/components/chrome/page-parts"
-import { TypeIn } from "@/components/ui/type-in"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export const metadata = createMetadata({
   title: "Log",

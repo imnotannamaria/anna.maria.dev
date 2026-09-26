@@ -20,10 +20,10 @@ import { motion } from "motion/react"
 import { PauseIcon, PlayIcon, SkipBackIcon, SkipForwardIcon } from "@phosphor-icons/react"
 import type { SimplifiedTrack } from "@/lib/spotify"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { ArrowLink } from "@/components/ui/arrow-link"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
 
 /**

@@ -3,7 +3,7 @@ import { getPublishedProjects } from "@/lib/velite"
 import { ProjectFeed, type TagCount } from "@/components/projects/project-feed"
 import { type ProjectItem } from "@/components/projects/project-card"
 import { DocLabel, Em } from "@/components/chrome/page-parts"
-import { TypeIn } from "@/components/ui/type-in"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export const metadata = createMetadata({
   title: "Projects",

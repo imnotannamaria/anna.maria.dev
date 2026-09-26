@@ -1,13 +1,15 @@
 "use client"
 
+import Link from "next/link"
 import { memo, useCallback, useState } from "react"
 import Image from "next/image"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { ArrowLink } from "@/components/ui/arrow-link"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { CardHead } from "@/components/ui/card-parts"
-import { EASE_OUT, useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { EASE_OUT } from "@/lib/motion"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { posterSrc } from "@/lib/log/poster-src"
 import type { CardState } from "@/lib/showcase/state"
 import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
@@ -94,8 +96,8 @@ export function LogShelfCard({
         label="log"
         as="h3"
         meta={
-          <ArrowLink href="/log" className="text-mono-sm text-(--fg-brand)">
-            open the log
+          <ArrowLink asChild className="text-mono-sm text-(--fg-brand)">
+            <Link href="/log">open the log</Link>
           </ArrowLink>
         }
       />

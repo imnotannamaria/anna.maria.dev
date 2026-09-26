@@ -20,8 +20,8 @@ import { EnvelopeSimpleIcon } from "@phosphor-icons/react/dist/ssr"
 import { motion } from "motion/react"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { siteConfig } from "@/lib/site-config"
 
 const EMAIL = siteConfig.email

@@ -3,10 +3,10 @@
 import Link from "next/link"
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react"
 import type { Variants } from "motion/react"
-import { ArrowLink } from "@/components/ui/arrow-link"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
-import { EASE_OUT } from "@/components/ui/reveal"
-import { TypeIn } from "@/components/ui/type-in"
+import { EASE_OUT } from "@/lib/motion"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export type FeaturedProject = {
   slug: string

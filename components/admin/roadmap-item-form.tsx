@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "motion/react"
-import { useReveal } from "@/components/ui/reveal"
+import { useReveal } from "@/app/components/entrepta/reveal"
 import { useRouter } from "next/navigation"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"

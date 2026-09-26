@@ -3,8 +3,9 @@
 import { useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { EASE_OUT, useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { EASE_OUT } from "@/lib/motion"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
 import { CaretRightIcon } from "@phosphor-icons/react"
 import {

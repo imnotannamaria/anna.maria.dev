@@ -9,9 +9,10 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { revealViewport, useReveal } from "@/components/ui/reveal"
-import { RollingNumber, useRollOnHover } from "@/components/ui/rolling-number"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { revealViewport } from "@/lib/motion"
+import { RollingNumber, useRollOnHover } from "@/app/components/entrepta/rolling-number"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { PUBLIC_STATUSES, STATUS_LABEL, type PublicStatus } from "@/lib/roadmap/validation"
 
 export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, number> }) {

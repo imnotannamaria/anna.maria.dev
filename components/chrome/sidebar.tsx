@@ -15,7 +15,7 @@ import {
   SwatchesIcon,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
-import { EASE_OUT } from "@/components/ui/reveal"
+import { EASE_OUT } from "@/lib/motion"
 
 const NAV_ITEMS = [
   // Same order as the titlebar and the palette — see the note in `titlebar.tsx`.

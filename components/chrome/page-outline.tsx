@@ -19,8 +19,8 @@
 
 import { useEffect, useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
-import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
-import { Diamond } from "@/components/ui/diamond"
+import { EASE_OUT, revealViewport } from "@/lib/motion"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 export type OutlineItem = {
   id: string

@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { ChatsCircleIcon } from "@phosphor-icons/react/dist/ssr"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
-import { TypeIn } from "@/components/ui/type-in"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 import { RoadmapBoard } from "@/components/roadmap/roadmap-board"
 import { createMetadata } from "@/lib/metadata"
 import { getPublicItems } from "@/lib/roadmap/queries"

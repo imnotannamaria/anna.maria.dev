@@ -1,10 +1,10 @@
 "use client"
 
 import { motion } from "motion/react"
-import { ArrowLink } from "@/components/ui/arrow-link"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { GithubCalendar } from "@/components/about/github-calendar"
 import type { ContributionYear } from "@/lib/github/contributions"
 import type { CardState } from "@/lib/showcase/state"

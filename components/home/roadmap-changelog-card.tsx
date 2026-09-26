@@ -4,10 +4,11 @@ import { useId, useState } from "react"
 import Link from "next/link"
 import { motion, useReducedMotion } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { ArrowLink } from "@/components/ui/arrow-link"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { EASE_OUT, useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { EASE_OUT } from "@/lib/motion"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { roadmapSlice } from "@/lib/roadmap/widget"
 import { STATUS_LABEL, STATUS_MARK, type RoadmapItem } from "@/lib/roadmap/validation"
 import type { CardState } from "@/lib/showcase/state"
@@ -50,8 +51,8 @@ export function RoadmapChangelogCard({
         label="roadmap"
         as="h3"
         meta={
-          <ArrowLink href="/roadmap" className="text-mono-sm text-(--fg-brand)">
-            open the board
+          <ArrowLink asChild className="text-mono-sm text-(--fg-brand)">
+            <Link href="/roadmap">open the board</Link>
           </ArrowLink>
         }
       />

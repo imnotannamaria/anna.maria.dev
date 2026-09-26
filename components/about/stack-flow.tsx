@@ -34,7 +34,7 @@ import {
 } from "@xyflow/react"
 import "@xyflow/react/dist/base.css"
 import { STACK_GROUPS, STACK_TOTAL, TECH_ICONS } from "@/lib/stack"
-import { Diamond } from "@/components/ui/diamond"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 // ─── Geometry ────────────────────────────────────────────────────────────────
 

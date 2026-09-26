@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import { Diamond } from "@/components/ui/diamond"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 /**
  * The bits every home card shares. They lived as locals in app/page.tsx until

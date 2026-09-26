@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { Diamond } from "@/components/ui/diamond"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 /**
  * The label and error treatment shared by the contact form and the admin.

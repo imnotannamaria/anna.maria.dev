@@ -1,8 +1,8 @@
 "use client"
 
 import { motion, useReducedMotion, type Variants } from "motion/react"
-import { EASE_OUT } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { EASE_OUT } from "@/lib/motion"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { Badge, CardHead } from "@/components/ui/card-parts"
 
 /** The gap between segments, and — doubled — the width of the goal boundary. */

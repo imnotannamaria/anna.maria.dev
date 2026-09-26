@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "motion/react"
-import { useReveal } from "@/components/ui/reveal"
+import { useReveal } from "@/app/components/entrepta/reveal"
 import { CardHead } from "@/components/ui/card-parts"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 
 // ─── Key geometry ────────────────────────────────────────────────────────────
 //

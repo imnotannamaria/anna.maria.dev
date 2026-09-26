@@ -30,7 +30,7 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { motion, useReducedMotion } from "motion/react"
 import type { Icon } from "@phosphor-icons/react"
-import { EASE_OUT } from "@/components/ui/reveal"
+import { EASE_OUT } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 
 export type StripTab = {

@@ -15,8 +15,8 @@
 
 import { motion } from "motion/react"
 import { CardFoot, CardHead } from "@/components/ui/card-parts"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 
 export function InterestCard({
   label,

@@ -3,11 +3,11 @@
 import Link from "next/link"
 import { motion } from "motion/react"
 import { BookOpenIcon } from "@phosphor-icons/react"
-import { ArrowAffordance } from "@/components/ui/arrow-link"
+import { ArrowAffordance } from "@/app/components/entrepta/arrow-link"
 import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
-import { useReveal } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
-import { TypeIn } from "@/components/ui/type-in"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export type FeaturedPost = {
   slug: string

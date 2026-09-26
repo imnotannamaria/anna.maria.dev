@@ -3,7 +3,7 @@
 import { XIcon } from "@phosphor-icons/react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import * as React from "react"
-import { Diamond } from "./diamond"
+import { Diamond } from "@/app/components/entrepta/diamond"
 import { type IconProp, IconSlot } from "@/lib/icon"
 import { OVERLAY_SURFACE } from "@/lib/overlay"
 import { cn } from "@/lib/utils"

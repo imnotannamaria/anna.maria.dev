@@ -16,8 +16,8 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
-import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { EASE_OUT, revealViewport } from "@/lib/motion"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import {
   STATUS_LABEL,
   STATUS_MARK,

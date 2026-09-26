@@ -1,3 +1,4 @@
+import Link from "next/link"
 import Image from "next/image"
 import { createMetadata } from "@/lib/metadata"
 import { GithubCard } from "@/components/home/github-card"
@@ -20,9 +21,9 @@ import { StackGraph } from "@/components/about/stack-graph"
 import { TechBadge } from "@/components/about/tech-badge"
 import { Timeline, type TimelineEntry } from "@/components/about/timeline"
 import { InterestCard } from "@/components/about/interest-card"
-import { ArrowLink } from "@/components/ui/arrow-link"
-import { Reveal } from "@/components/ui/reveal"
-import { TypeIn } from "@/components/ui/type-in"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
+import { Reveal } from "@/app/components/entrepta/reveal"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export const metadata = createMetadata({
   title: "About",
@@ -484,8 +485,10 @@ export default async function AboutPage() {
                   {"//"}
                 </span>
                 <span>everything I actually finish, from films to books, lands in</span>
-                <ArrowLink href="/log" aria-label="See the log of everything I finish">
-                  the log
+                <ArrowLink asChild>
+                  <Link href="/log" aria-label="See the log of everything I finish">
+                    the log
+                  </Link>
                 </ArrowLink>
               </p>
             </Reveal>

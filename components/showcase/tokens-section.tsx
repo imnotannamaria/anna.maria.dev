@@ -13,7 +13,7 @@
 import { useMemo, useSyncExternalStore } from "react"
 import { RULES, TOKEN_GROUPS, type TokenEntry, type TokenGroup } from "@/lib/design-tokens"
 import { contrastRatio, flatten, parseRgb, wcagGrade, type Rgba } from "@/lib/color-contrast"
-import { Diamond } from "@/components/ui/diamond"
+import { Diamond } from "@/app/components/entrepta/diamond"
 
 /**
  * Reads what a custom property actually resolves to.

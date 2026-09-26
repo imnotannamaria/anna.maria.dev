@@ -3,7 +3,7 @@ import { createMetadata } from "@/lib/metadata"
 import { PianoStudio } from "./piano-studio"
 import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
 import { KeymapCard, type KeyLine } from "@/components/piano/keymap-card"
-import { TypeIn } from "@/components/ui/type-in"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 import {
   DisplayH2,
   DocLabel,

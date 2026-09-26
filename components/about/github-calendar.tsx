@@ -4,7 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { EASE_OUT } from "@/components/ui/reveal"
+import { EASE_OUT } from "@/lib/motion"
 import type { ContributionWeek, ContributionYear } from "@/lib/github/contributions"
 import type { CardState } from "@/lib/showcase/state"
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { STAGGER_LIMIT } from "@/components/ui/reveal"
+import { STAGGER_LIMIT } from "@/lib/motion"
 import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
 import { countByStatus, groupByStatus } from "@/lib/roadmap/counts"
 import {

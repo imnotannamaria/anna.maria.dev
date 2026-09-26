@@ -3,8 +3,8 @@ import { ContactForm } from "@/components/contact/contact-form"
 import { ChannelsCard } from "@/components/contact/channels-card"
 import { PageOutline, type OutlineItem } from "@/components/chrome/page-outline"
 import { DisplayH2, DocLabel, Em, Prose, Section, Strong } from "@/components/chrome/page-parts"
-import { Reveal } from "@/components/ui/reveal"
-import { TypeIn } from "@/components/ui/type-in"
+import { Reveal } from "@/app/components/entrepta/reveal"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 import { siteConfig } from "@/lib/site-config"
 
 export const metadata = createMetadata({

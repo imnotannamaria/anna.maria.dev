@@ -15,7 +15,7 @@
  */
 
 import { motion, useReducedMotion, type Variants } from "motion/react"
-import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/components/ui/reveal"
+import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
 
 export type TimelineEntry = {
   id: string

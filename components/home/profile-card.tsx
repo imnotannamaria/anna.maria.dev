@@ -11,9 +11,9 @@ import {
 } from "@phosphor-icons/react"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
-import { EASE_OUT, revealViewport } from "@/components/ui/reveal"
-import { RollingNumber, useRollOnHover } from "@/components/ui/rolling-number"
-import { Spotlight, useSpotlight } from "@/components/ui/spotlight"
+import { EASE_OUT, revealViewport } from "@/lib/motion"
+import { RollingNumber, useRollOnHover } from "@/app/components/entrepta/rolling-number"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
 import { siteConfig } from "@/lib/site-config"
 

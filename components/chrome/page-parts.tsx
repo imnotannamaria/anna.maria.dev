@@ -21,7 +21,7 @@
  */
 
 import type React from "react"
-import { Reveal } from "@/components/ui/reveal"
+import { Reveal } from "@/app/components/entrepta/reveal"
 import { cn } from "@/lib/utils"
 
 export function Strong({ children }: { children: React.ReactNode }) {

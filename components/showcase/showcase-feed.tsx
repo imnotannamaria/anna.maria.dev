@@ -21,8 +21,9 @@
  * problem through one component.
  */
 
+import Link from "next/link"
 import { useState } from "react"
-import { ArrowLink } from "@/components/ui/arrow-link"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { FilterPill, useUrlFilter } from "@/components/ui/url-filter"
 import {
   HouseLineIcon,
@@ -90,8 +91,8 @@ function Specimen({ entry }: { entry: ShowcaseEntry }) {
               {entry.external.label}
             </ArrowLink>
           ) : (
-            <ArrowLink href={`/components/${entry.slug}`} className="text-mono-xs">
-              read the doc
+            <ArrowLink asChild className="text-mono-xs">
+              <Link href={`/components/${entry.slug}`}>read the doc</Link>
             </ArrowLink>
           )}
         </div>

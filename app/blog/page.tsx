@@ -4,7 +4,7 @@ import { formatDate } from "@/lib/format"
 import { BlogFeed, type TagCount } from "@/components/blog/blog-feed"
 import { type PostItem } from "@/components/blog/post-card"
 import { DocLabel, Em } from "@/components/chrome/page-parts"
-import { TypeIn } from "@/components/ui/type-in"
+import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export const metadata = createMetadata({
   title: "Blog",
