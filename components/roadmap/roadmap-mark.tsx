@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "motion/react"
 import { EASE_OUT, revealViewport } from "@/lib/motion"
-import type { PublicStatus } from "@/lib/roadmap/validation"
+import type { PublicStatus } from "@/lib/roadmap/constants"
 
 /**
  * The checkbox on a roadmap card — state, not a control.

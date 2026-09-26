@@ -8,7 +8,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/app/components/entrepta/dropdown"
-import { ROADMAP_STATUSES, STATUS_LABEL, type RoadmapStatus } from "@/lib/roadmap/validation"
+import { ROADMAP_STATUSES, STATUS_LABEL, type RoadmapStatus } from "@/lib/roadmap/constants"
 
 /** The same control as TypePicker, for the one field that decides which column an item is in. */
 export function StatusPicker({

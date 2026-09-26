@@ -28,7 +28,8 @@ import { DeleteDialog } from "@/components/admin/delete-dialog"
 import { StarRating } from "@/components/log/star-rating"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
 import { formatLoggedAt } from "@/lib/log/date"
-import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
+import { TYPE_LABEL } from "@/lib/log/constants"
+import type { LogEntry } from "@/lib/log/validation"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 export function LogEntryRows({ entries }: { entries: LogEntry[] }) {

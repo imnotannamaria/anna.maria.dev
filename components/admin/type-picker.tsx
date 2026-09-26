@@ -8,7 +8,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/app/components/entrepta/dropdown"
-import { LOG_TYPES, TYPE_LABEL, type LogType } from "@/lib/log/validation"
+import { LOG_TYPES, TYPE_LABEL, type LogType } from "@/lib/log/constants"
 
 /**
  * The entrepta dropdown rather than a native `<select>`, so the type field matches the

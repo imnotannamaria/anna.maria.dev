@@ -5,12 +5,8 @@ import { STAGGER_LIMIT } from "@/lib/motion"
 import { useUrlFilter } from "@/hooks/use-url-filter"
 import { FilterPill } from "@/app/components/entrepta/filter-pill"
 import { countByStatus, groupByStatus } from "@/lib/roadmap/counts"
-import {
-  PUBLIC_STATUSES,
-  STATUS_LABEL,
-  type PublicStatus,
-  type RoadmapItem,
-} from "@/lib/roadmap/validation"
+import { PUBLIC_STATUSES, STATUS_LABEL, type PublicStatus } from "@/lib/roadmap/constants"
+import type { RoadmapItem } from "@/lib/roadmap/validation"
 import { RoadmapItemCard } from "./roadmap-card"
 import { RoadmapProgressCard } from "./roadmap-progress"
 
