@@ -1,5 +1,6 @@
 "use client"
 
+import { Em } from "@/app/components/entrepta/doc-parts"
 import Link from "next/link"
 import { memo, useCallback, useState } from "react"
 import Image from "next/image"
@@ -110,10 +111,7 @@ export function LogShelfCard({
           className="text-heading-md font-serif leading-none"
           style={{ color: "var(--fg-primary)", margin: 0 }}
         >
-          Everything I{" "}
-          <em className="italic" style={{ color: "var(--fg-brand-text)" }}>
-            finished
-          </em>
+          Everything I <Em>finished</Em>
         </p>
         {entries && (
           <span

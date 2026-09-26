@@ -7,6 +7,7 @@
  * columns as stages, with the live one pulsing.
  */
 
+import { Diamond } from "@/app/components/entrepta/diamond"
 import { cardVariants } from "@/app/components/entrepta/card"
 import { motion, useReducedMotion } from "motion/react"
 import {
@@ -105,9 +106,7 @@ export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, n
 
       <CardFooter>
         <CardComment>{"what I'm building next"}</CardComment>
-        <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-          ◆
-        </span>
+        <Diamond size={10} />
       </CardFooter>
     </motion.div>
   )

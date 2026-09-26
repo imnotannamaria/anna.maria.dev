@@ -49,8 +49,11 @@ export default function ContactPage() {
               >
                 <span
                   aria-hidden
-                  className="inline-block size-1.5 animate-pulse rounded-full"
-                  style={{ background: "var(--status-success)" }}
+                  className="inline-block size-1.5 rounded-full"
+                  style={{
+                    background: "var(--status-success)",
+                    animation: "live-pulse 2s ease-in-out infinite",
+                  }}
                 />
                 open
               </span>
@@ -135,8 +138,11 @@ export default function ContactPage() {
                 >
                   <span
                     aria-hidden
-                    className="inline-block size-2 animate-pulse rounded-full"
-                    style={{ background: "var(--status-success)" }}
+                    className="inline-block size-2 rounded-full"
+                    style={{
+                      background: "var(--status-success)",
+                      animation: "live-pulse 2s ease-in-out infinite",
+                    }}
                   />
                   inbox open · recife · brt
                 </div>

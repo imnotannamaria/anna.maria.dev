@@ -1,5 +1,7 @@
 "use client"
 
+import { Diamond } from "@/app/components/entrepta/diamond"
+import { Em } from "@/app/components/entrepta/doc-parts"
 import { cardVariants } from "@/app/components/entrepta/card"
 import { useId, useState } from "react"
 import Link from "next/link"
@@ -73,10 +75,7 @@ export function RoadmapChangelogCard({
           className="text-heading-md font-serif leading-none"
           style={{ color: "var(--fg-primary)", margin: 0 }}
         >
-          What I&rsquo;m{" "}
-          <em className="italic" style={{ color: "var(--fg-brand-text)" }}>
-            building
-          </em>
+          What I&rsquo;m <Em>building</Em>
         </p>
         {slice && slice.total > 0 && (
           <span
@@ -105,9 +104,7 @@ export function RoadmapChangelogCard({
             +{slice.hidden} more
           </Link>
         ) : (
-          <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-            ◆
-          </span>
+          <Diamond size={10} />
         )}
       </CardFooter>
     </motion.div>
