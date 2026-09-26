@@ -1,148 +1,114 @@
-# [anna.maria.dev](http://anna.maria.dev)
+<p align="center">
+  <img src="public/images/og-cover.jpg" alt="annamaria.app: a personal site posed as a code editor" width="100%" />
+</p>
 
-anna.maria.dev cover
+<p align="center">
+  <a href="https://annamaria.app">Live</a> ·
+  <a href="https://annamaria.app/blog">Blog</a> ·
+  <a href="https://annamaria.app/projects">Projects</a> ·
+  <a href="https://entrepta.vercel.app">entrepta</a>
+</p>
 
-Personal portfolio and open source template for full-stack engineers. Built as an editor metaphor: titlebar with tabs, sidebar navigation, status bar, all styled with the entrepta design system. Dark first, TypeScript strict.
+<p align="center">
+  <a href="https://github.com/imnotannamaria/anna.maria.dev/actions/workflows/test.yml"><img src="https://github.com/imnotannamaria/anna.maria.dev/actions/workflows/test.yml/badge.svg" alt="test" /></a>
+  <img src="https://img.shields.io/badge/Next.js-16-7c6bff" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/entrepta-2.0-7c6bff" alt="entrepta 2.0" />
+  <img src="https://img.shields.io/badge/license-MIT-7c6bff" alt="MIT license" />
+</p>
 
-**Live:** [annamaria.app](https://annamaria.app)
+# anna.maria.dev
 
----
+A personal site posed as a code editor. Tabs across the top, an icon rail on the side, a status bar at the bottom, and a command palette on ⌘K. Every page reads as an open file.
+
+It is also an open source template for full-stack engineers: fork it, swap in your own name, content and keys, and deploy.
 
 ## What's inside
 
-- **Home**: bento grid with a hero card, Spotify Now Playing widget, an Apple Watch activity card (via wristkit), GitHub contributions, a featured project, and career stats
-- **About**: career timeline, education, tech stack grid, GitHub contributions calendar
-- **Blog**: MDX posts with syntax highlighting (Shiki), reading progress bar, and tag filtering
-- **Projects**: case studies with sidebar metadata and rich MDX content
-- **Piano**: a small interactive piano
-- **Log**: one feed for everything you finish — films, series, books, albums, podcasts, games — with ratings, favourites and notes, plus an admin behind WorkOS AuthKit to manage it
-- **Contact**: email form powered by Resend and React Email, with a honeypot
-- **Command palette**: ⌘K navigation across the whole site
-- **Editor chrome**: titlebar, sidebar, and status bar shared across every page
-- **Themes**: dark by default, light toggle, 6 brand color presets, no flash
-- **SEO**: dynamic OG images, sitemap, robots.txt, canonical URLs
+| Page          | What it is                                                                                                     |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| `/`           | A bento grid: profile, featured work, open source, a Spotify playlist, Apple Watch rings, GitHub contributions |
+| `/about`      | Bio, career timeline, the stack as an interactive graph, a contributions calendar                              |
+| `/blog`       | MDX posts grouped by year, with tag filters, Shiki highlighting and a reading progress bar                     |
+| `/projects`   | Case studies with a cover, sidebar metadata and MDX                                                            |
+| `/log`        | One feed for everything I finish: films, series, books, albums, podcasts, games, with ratings                  |
+| `/roadmap`    | A board of what the site is going to become: to do, in progress, shipped                                       |
+| `/contact`    | A form sent through Resend and React Email, with a honeypot                                                    |
+| `/components` | The site's own cards, each shown in every state it can be in                                                   |
+| `/piano`      | A two-octave Web Audio piano                                                                                   |
+| `/admin`      | CRUD for the log and the roadmap, behind WorkOS AuthKit and an email allowlist                                 |
 
-Spotify, wristkit and the log are all optional. Without their environment variables the site still builds and runs: the widgets show an empty or error state, `/log` renders empty, and `/admin` is unreachable.
+Six brand themes in dark and light, dynamic OG images, a sitemap and canonical URLs come with it. Spotify, the Apple Watch card, the log and the roadmap are all optional: without their keys the site still builds, and each one shows an empty state.
 
 ## Stack
 
-| Layer            | Tech                                 |
-| ---------------- | ------------------------------------ |
-| Framework        | Next.js 16 (App Router)              |
-| Language         | TypeScript (strict)                  |
-| Styling          | Tailwind CSS v4                      |
-| Design system    | entrepta 2.0 (copied in by its CLI)  |
-| Content          | MDX via Velite                       |
-| State            | Zustand                              |
-| Animations       | Motion v12                           |
-| Email            | Resend + React Email                 |
-| Syntax highlight | Shiki                                |
-| Themes           | next-themes + entrepta ThemeSwitcher |
-| OG images        | @vercel/og                           |
-| SEO              | next-sitemap                         |
-| Icons            | Phosphor Icons, simple-icons         |
-| wristkit storage | Postgres via Drizzle ORM             |
-| Deploy           | Vercel                               |
+Next.js 16 (App Router), React 19, TypeScript strict, Tailwind v4 and [entrepta](https://entrepta.vercel.app) for the design system. MDX through Velite and Shiki, Motion for animation, Postgres through Drizzle, a Hono API at `/api/v1`, WorkOS AuthKit for the admin, Resend for email. Deployed on Vercel.
 
----
+## Built on entrepta
 
-## Fork and customize in 5 minutes
+The UI runs on [entrepta](https://github.com/imnotannamaria/entrepta), a dark-first design system with the same editor metaphor. entrepta started inside this site, and v2 was built here first.
 
-### 1. Clone the repo
+It is not a runtime dependency. Its CLI copies source into the repo, and three places belong to it rather than to the site:
+
+- `app/components/entrepta/`, the components
+- `app/entrepta.css`, the tokens, the six themes, the reset and the loading classes
+- `lib/utils.ts`, `lib/motion.ts`, `lib/icon.tsx`, `lib/overlay.ts` and the hooks in `hooks/`
+
+What the site adds on top lives elsewhere: its CSS in `app/globals.css`, its helpers in `lib/format.ts`, and `components/chrome/`, which binds entrepta's Sidebar, PageOutline and TabNav to the site's routes.
+
+To update a component, run `npx @entrepta/cli@latest add <name> --overwrite` and read the diff. To update the tokens, bump `@entrepta/registry` in `devDependencies` and run `npx vitest run lib/entrepta-sync.test.ts`, which lists what changed.
+
+**Don't run `entrepta init --overwrite` here.** It rewrites `app/globals.css`, which holds the site's own CSS, and adds a Google Fonts import that fights `next/font`.
+
+## Fork it
+
+### 1. Install
 
 ```bash
-git clone https://github.com/imnotannamaria/anna.maria.dev.git my-portfolio
-cd my-portfolio
+git clone https://github.com/imnotannamaria/anna.maria.dev.git my-site
+cd my-site
 npm install
 ```
 
-### 2. Set up environment variables
-
-Copy the example and fill in your values:
+### 2. Environment
 
 ```bash
 cp .env.example .env.local
 ```
 
-(The live site manages its own secrets with [Infisical](https://infisical.com) instead of a
-committed `.env.local`, which is why `npm run dev` is wrapped in it — see step 4 for the fork
-path.)
+Only two variables are required:
 
 ```bash
-# Required: get yours at resend.com
-RESEND_API_KEY=re_xxxxxxxxxxxx
-
-# Your public URL (used for sitemap and OG images)
+RESEND_API_KEY=re_xxxxxxxxxxxx          # resend.com
 NEXT_PUBLIC_BASE_URL=https://yourdomain.com
-
-# Optional: Spotify Now Playing widget (Client Credentials flow)
-SPOTIFY_CLIENT_ID=xxx
-SPOTIFY_CLIENT_SECRET=xxx
-SPOTIFY_PLAYLIST_ID=xxx
-
-# Optional: Postgres, shared by the wristkit card and /log
-# On Supabase use the transaction pooler string (port 6543), not the direct one
-DATABASE_URL=postgresql://user:pass@host:6543/postgres
-
-# Optional: wristkit ingest endpoint
-WRISTKIT_API_KEY=replace-with-32-random-bytes
-
-# Optional: WorkOS AuthKit, guards /admin
-WORKOS_API_KEY=sk_test_xxx
-WORKOS_CLIENT_ID=client_xxx
-WORKOS_COOKIE_PASSWORD=            # 32+ chars: openssl rand -base64 32
-NEXT_PUBLIC_WORKOS_REDIRECT_URI=https://yourdomain.com/api/auth/callback
-
-# Optional: comma-separated emails allowed into /admin
-ADMIN_EMAILS=you@example.com
-
-# Optional: GitHub GraphQL, for the contributions grid on / and /about
-# Classic PAT, `read:user` scope
-GITHUB_TOKEN=ghp_xxxxxxxxxxxx
 ```
 
-Leave out whatever you don't need. Only `RESEND_API_KEY` and `NEXT_PUBLIC_BASE_URL` are required.
+Everything else in `.env.example` is optional and switches on one feature: Spotify, Postgres for the log, roadmap and Apple Watch card, WorkOS for the admin, a GitHub token for the contributions grid.
 
-### 3. Update your personal info
+### 3. Make it yours
 
-Edit the following files with your own data:
+| File                         | What to change                              |
+| ---------------------------- | ------------------------------------------- |
+| `lib/site-config.ts`         | Name, email, social handles, theme swatches |
+| `app/(home)/page.tsx`        | The home page sections                      |
+| `app/about/page.tsx`         | Bio, timeline, stack, interests             |
+| `app/layout.tsx`             | Site title and description                  |
+| `app/api/contact/route.ts`   | The `from` and `to` of contact emails       |
+| `lib/metadata.ts`            | The `baseUrl` fallback                      |
+| `public/images/og-cover.jpg` | The share image                             |
 
-| File                                   | What to change                         |
-| -------------------------------------- | -------------------------------------- |
-| `lib/site-config.ts`                   | Name, email, GitHub/LinkedIn/X handles |
-| `app/page.tsx`                         | Bio, stats, sections shown on home     |
-| `app/about/page.tsx`                   | Full bio, timeline, stack, interests   |
-| `app/layout.tsx`                       | Site title, description, theme presets |
-| `app/api/contact/route.ts`             | Email `from` and `to` addresses        |
-| `components/about/github-calendar.tsx` | Your GitHub username                   |
-| `lib/metadata.ts`                      | `baseUrl` fallback                     |
-
-### 4. Run locally
-
-```bash
-npm run dev
-```
-
-`dev` is wrapped in [Infisical](https://infisical.com), which is how this repo keeps its own
-secrets out of the working tree. **On a fork, that is not what you want** — use the script that
-reads your `.env.local` instead:
+### 4. Run
 
 ```bash
 npm run dev:local
 ```
 
-(Or run `infisical login` and point `.infisical.json` at your own workspace, if you'd rather
-have a secrets manager too.)
+`npm run dev` is the same thing wrapped in [Infisical](https://infisical.com), which is how the live site keeps its secrets out of the working tree. On a fork, `dev:local` reads your `.env.local` instead.
 
 Open [localhost:3000](http://localhost:3000).
 
----
+## Writing content
 
-## Adding content
-
-### Blog post
-
-Create `content/blog/your-post-slug.mdx`:
+A post is `content/blog/<slug>.mdx`:
 
 ```mdx
 ---
@@ -156,125 +122,54 @@ published: true
 Your content here.
 ```
 
-### Project
-
-Create `content/projects/your-project-slug.mdx`:
+A project is `content/projects/<slug>.mdx`:
 
 ```mdx
 ---
-title: "Project Name"
+title: "Project name"
 description: "What it does in one sentence."
 date: "2026-01-01"
 tags: ["react", "typescript"]
 github: "https://github.com/you/project"
 live: "https://project.vercel.app"
+cover: "/projects/project.png"
 featured: true
 published: true
 ---
-
-## The design system: entrepta
-
-The UI runs on [entrepta](https://entrepta.vercel.app), a dark-first design system with the same
-editor metaphor. It is not a runtime dependency: its CLI copies source into the repo, and three
-places belong to it rather than to the site:
-
-- `app/components/entrepta/`, the components
-- `app/entrepta.css`, the tokens, the six themes, the reset and the loading classes
-- `lib/utils.ts`, `lib/motion.ts`, `lib/icon.tsx`, `lib/overlay.ts` and the hooks in `hooks/`
-
-Everything the site adds on top lives elsewhere: its CSS in `app/globals.css`, its helpers in
-`lib/format.ts`.
-
-To update a component, run `npx @entrepta/cli@latest add <name> --overwrite` and read the diff.
-To update the tokens, bump `@entrepta/registry` in `devDependencies` and run
-`npx vitest run lib/entrepta-sync.test.ts`, which lists what changed.
-
-**Don't run `entrepta init --overwrite` in this repo.** It rewrites `app/globals.css`, which holds
-the site's own CSS, and adds a Google Fonts import that fights `next/font`.
 
 ## Overview
 
 ...
 ```
 
-Set `featured: true` to show it as the featured project on the home page. Only the most recent featured project is shown there.
+`cover` is optional and points at a file in `public/projects/`; without one, the card draws a cover from the slug. The most recent `featured: true` project shows on the home page.
 
----
+## Optional features
 
-## Configuring email (Resend)
+### Spotify playlist
 
-1. Create an account at [resend.com](https://resend.com)
-2. Add and verify your domain
-3. Create an API key and add it to `.env.local`
-4. Update `from` and `to` in `app/api/contact/route.ts`:
+Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), then set `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and the ID of a public playlist in `SPOTIFY_PLAYLIST_ID`. It uses the Client Credentials flow, server to server, so the secret never reaches the browser.
 
-```ts
-from: "Portfolio <hello@yourdomain.com>",
-to: ["you@yourdomain.com"],
-```
+### The log and the roadmap
 
-## Configuring the Spotify widget (optional)
+Both read the same Postgres database.
 
-1. Create an app at the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Grab the client ID and secret, and the ID of a public playlist
-3. Add `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, and `SPOTIFY_PLAYLIST_ID` to `.env.local`
-
-The widget uses the Client Credentials flow, server to server, so the secret never reaches the browser.
-
-## Generating UI sound effects with ElevenLabs (optional)
-
-A short click plays on every button and nav control site-wide, and success/error confirmations
-play on form submissions, admin CRUD and deletes, and the code-block copy button. The sound files
-are generated once and committed as static assets; visitors never make a request to ElevenLabs
-and never receive an API key or client SDK.
-
-1. Add `ELEVENLABS_API_KEY` to `.env.local`, or add it to the project's Infisical secrets.
-2. Run `npm run generate:sounds` for `.env.local`, or `infisical run -- npm run generate:sounds`
-   for the managed secret, to create the small palette in `public/sounds/`.
-3. Listen to the files, adjust the prompts in `lib/sound-effects.ts` if needed, then rerun with
-   `npm run generate:sounds -- success --force` to replace only `success.mp3` (or omit `success`
-   to replace the whole palette).
-
-The generator uses ElevenLabs' [Sound Effects API](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert)
-with a 22.05 kHz / 32 kbps MP3 output so these short UI cues stay lightweight.
-
-## Configuring wristkit (optional)
-
-The Apple Watch activity card reads from your own Postgres database. See [wristkit](https://wristkit-web.vercel.app/) for the full setup: the SQL migration, the iOS Shortcut, and the sync endpoint at `/api/v1/wristkit/sync`.
-
----
-
-## Configuring the log (optional)
-
-`/log` is a single feed for everything you finish, with an admin at `/admin/log` to manage it. It shares the same Postgres database as wristkit.
-
-1. Set `DATABASE_URL` and run `[docs/sql/001-log-entries.sql](docs/sql/001-log-entries.sql)` against it.
-2. Optionally seed it with sample entries: `npm run seed:log`.
+1. Set `DATABASE_URL` (on Supabase, the transaction pooler string on port 6543) and run [docs/sql/001-log-entries.sql](docs/sql/001-log-entries.sql) and [docs/sql/003-roadmap-items.sql](docs/sql/003-roadmap-items.sql) against it.
+2. Seed sample data if you like: `npm run seed:log` and `npm run seed:roadmap`.
 3. For the admin, create an application at [workos.com](https://workos.com), register `<your-domain>/api/auth/callback` as a redirect URI, and fill in the four `WORKOS_*` variables.
-4. Put your own email in `ADMIN_EMAILS`.
+4. Put your email in `ADMIN_EMAILS`.
 
-**That last step is not optional if you want the admin.** AuthKit decides who is signed in, not who is allowed — without an allowlist, anyone who creates an account in your WorkOS organisation reaches your admin. `lib/auth/require-admin.ts` is what actually guards it.
+The last step matters. AuthKit decides who is signed in, not who is allowed in; without the allowlist, anyone who signs up in your WorkOS organisation reaches the admin. `lib/auth/require-admin.ts` is the real guard.
 
-Without `DATABASE_URL` the page renders empty and the build still passes. Without the WorkOS variables `/admin` is simply unreachable.
+Roadmap items start as `raw`, which never renders publicly: somewhere to keep an idea before deciding anything about it. The design behind each feature is in [docs/log-plan.md](docs/log-plan.md) and [docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
 
-The design decisions behind all of it, phase by phase, are in [docs/log-plan.md](docs/log-plan.md).
+### Apple Watch rings
 
----
+The activity card reads from the same database, fed by an iOS Shortcut. [wristkit](https://wristkit-web.vercel.app/) has the full setup: the migration ([docs/sql/002-wristkit-samples.sql](docs/sql/002-wristkit-samples.sql)), the Shortcut, and the sync endpoint at `/api/v1/wristkit/sync`.
 
-## Configuring the roadmap (optional)
+### Sound effects
 
-`/roadmap` is a board of what the site is going to become — to do, in progress, shipped — with an admin at `/admin/roadmap`. It rides on the same database and the same allowlist as the log, so if you already did the steps above there are only two left:
-
-1. Run `[docs/sql/003-roadmap-items.sql](docs/sql/003-roadmap-items.sql)` against `DATABASE_URL`.
-2. Optionally seed it: `npm run seed:roadmap`.
-
-Items start with status `raw`, which never renders publicly — that is the holding pen for an idea you don't want to lose but haven't decided anything about. Promote one to `todo` when it becomes real.
-
-Without `DATABASE_URL` the board renders empty and the build still passes.
-
-The reasoning, phase by phase, is in [docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
-
----
+A short click plays on buttons and nav controls, and success and error cues play on form submissions and admin actions. The files in `public/sounds/` are generated once with the [ElevenLabs Sound Effects API](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert) and committed, so visitors never talk to ElevenLabs. To regenerate them, set `ELEVENLABS_API_KEY` and run `npm run generate:sounds`; the prompts live in `lib/sound-effects.ts`.
 
 ## Testing
 
@@ -282,128 +177,46 @@ The reasoning, phase by phase, is in [docs/roadmap-component-plan.md](docs/roadm
 npm run test:all
 ```
 
-That is the whole thing: it starts a throwaway Postgres, builds content, then runs all three
-layers — 123 unit, 38 integration, 9 end-to-end — and stops the database afterwards. Docker
-(or OrbStack) needs to be running; nothing else has to be set up, and no environment variable
-has to be exported.
+One command runs every layer: 173 unit tests, 38 integration tests against a real Postgres, and 9 end-to-end tests in a real browser. It starts a throwaway database in Docker, builds what each layer needs and tears it all down afterwards. Docker or OrbStack has to be running; nothing else needs setting up.
 
 ```bash
-npm run test:all -- --keep     # leave the database up, so the next run is faster
+npm run test:all -- --keep     # leave the database up for a faster rerun
 npm run test:all -- --no-e2e   # skip the browser layer and its production build
+npm test                       # unit tests only, no infrastructure
 ```
 
-The layers can still be run one at a time. Only the first needs no infrastructure:
+The integration and e2e suites write to and truncate their database, so both refuse to run unless `DATABASE_URL` points at localhost. The e2e layer needs a browser once: `npx playwright install --with-deps chromium`. What each test guards against, and why nothing mocks Postgres, is in [docs/tests-plan.md](docs/tests-plan.md).
 
-```bash
-npm test                  # unit — pure functions and the API surface
-npm run test:watch        # the same, in watch mode
-npm run test:integration  # + a real Postgres
-npm run test:e2e          # + Playwright, builds and starts the app itself
-```
+## Deploy
 
-Run on their own, the last two expect the database and the e2e secret to already be in the
-environment — `npm run test:all` exists precisely because wiring that up by hand every time
-was five steps of ceremony:
-
-```bash
-docker compose -f docker-compose.test.yml up -d
-export DATABASE_URL=postgresql://postgres:postgres@localhost:5433/postgres
-export TEST_WORKOS_COOKIE_PASSWORD=$(openssl rand -base64 32)
-```
-
-**Both suites are destructive.** The integration setup `TRUNCATE`s `log_entries`,
-`roadmap_items` and `wristkit_samples` between every test, and the e2e suite writes and
-deletes real rows. Both refuse to run unless `DATABASE_URL` points at localhost, so
-pointing them at Supabase fails loudly instead of erasing it — override with
-`ALLOW_NONLOCAL_TEST_DB=true` only for a database you are willing to lose.
-
-`TEST_WORKOS_COOKIE_PASSWORD` is any 32+ character string. It seals throwaway admin sessions,
-signed against a local stand-in for WorkOS's JWKS rather than the real WorkOS, and is
-unrelated to the production `WORKOS_COOKIE_PASSWORD`. In CI it comes from a repo secret of
-the same name, which the workflow checks for before doing any work.
-
-The e2e layer also needs a browser once: `npx playwright install --with-deps chromium`.
-
-The full reasoning — why a mocked DB was ruled out, why the e2e auth setup runs a local
-JWKS server instead of stubbing WorkOS, what each test is actually guarding against — is in
-[docs/tests-plan.md](docs/tests-plan.md).
-
----
-
-## Deploy to Vercel
-
-1. Push to GitHub
-2. Import the repo at [vercel.com/new](https://vercel.com/new)
-3. Add the environment variables from `.env.local` in the Vercel dashboard
-4. Deploy: sitemap and robots.txt are generated automatically at build time
-
----
+Import the repo at [vercel.com/new](https://vercel.com/new), add the environment variables, and deploy. The sitemap and robots.txt are generated at build time.
 
 ## Project structure
 
 ```
 app/
-  page.tsx                 # Home
-  about/page.tsx           # About
-  blog/                    # Blog list + [slug]
-  projects/                # Projects list + [slug]
-  piano/                   # Piano
-  contact/page.tsx         # Contact form
-  log/                     # Public log feed
-  admin/                   # Log CRUD, behind AuthKit
-  components/entrepta/     # entrepta components, written by its CLI
-  entrepta.css             # entrepta's tokens and themes
-  globals.css              # the site's own CSS
-  api/
-    contact/route.ts       # Email via Resend
-    og/route.tsx           # Dynamic OG images
-    now-playing/route.ts   # Spotify Now Playing
-    auth/callback/route.ts # WorkOS AuthKit callback
-    v1/[[...route]]/       # Hono app: wristkit ingest + admin CRUD
-  layout.tsx               # Root layout (editor chrome)
-
-proxy.ts                   # AuthKit proxy, scoped to /admin
-
-content/
-  blog/*.mdx               # Blog posts
-  projects/*.mdx           # Project case studies
+  (home)/                  home page, loading and error states
+  about/ blog/ projects/   content pages, lists and [slug]
+  log/ roadmap/            public feeds read from Postgres
+  contact/ piano/ components/
+  admin/                   log and roadmap CRUD, behind AuthKit + the allowlist
+  components/entrepta/     entrepta components, written by its CLI
+  api/                     contact, OG images, Spotify, auth callback, the Hono app at v1/
+  entrepta.css             entrepta's tokens and themes
+  globals.css              the site's own CSS
+  layout.tsx               editor chrome, fonts, theme setup
 
 components/
-  chrome/                  # Titlebar, sidebar, outline and palette, bound to the site's routes
-  home/                    # Bento grid cards (stack, mini piano, GitHub, log)
-  log/                     # Log feed card, star rating
-  admin/                   # Log entry form, table, dialogs
-  spotify/                 # Now Playing widget
-  wristkit/                # Apple Watch activity card
-  blog/                    # MDX renderer, reading progress
-  projects/                # Project card
-  about/                   # GitHub calendar
-  contact/                 # Contact form
-  ui/                      # Site helpers: error screen, sound, generated cover
+  chrome/                  titlebar, sidebar, outline, palette, feed shell
+  home/ about/ blog/ projects/ log/ roadmap/ contact/ piano/ spotify/ wristkit/ admin/
+  ui/                      error screen, sound feedback, generated cover, meta grid
 
-emails/
-  contact-email.tsx        # React Email template
-
-lib/
-  api/                     # Hono app, routes, middleware
-  auth/                    # Admin email allowlist
-  db/client.ts             # Shared Postgres client
-  log/                     # Schema, validation, queries, mutations
-  velite.ts                # Content query helpers
-  site-config.ts           # Name, email, socials
-  experience.ts            # Career start date, years of experience
-  spotify.ts               # Spotify token + playlist fetch
-  wristkit/                # wristkit schema + queries
-  utils.ts                 # cn(), formatDate(), estimateReadingTime()
-  metadata.ts              # createMetadata() helper
-
-docs/
-  log-plan.md              # /log design decisions, phase by phase
-  sql/                     # Hand-run migrations
+content/                   blog/, projects/ and components/ in MDX
+emails/                    the React Email template
+lib/                       API, auth, database, queries, site config, helpers
+docs/                      design plans and the SQL migrations
 ```
-
----
 
 ## License
 
-MIT. Fork freely, customize, make it yours.
+MIT. Built by [Anna Maria](https://annamaria.app).
