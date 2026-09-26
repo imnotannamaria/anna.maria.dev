@@ -10,8 +10,8 @@
  * themselves individually.
  *
  * That split is also why this is a sentence and not a skeleton. A skeleton works when it stands
- * in for one known box and can trace it exactly — `ProfileCardSkeleton` knows there is a 96px
- * avatar and a four-cell stats rail. This stands in for the whole page before any of those
+ * in for one known box and can trace it exactly — `TreeCardSkeleton` knows the real rows at
+ * their real indents. This stands in for the whole page before any of those
  * exist, and a grey rectangle per card is a caricature of a layout rather than a picture of one.
  *
  * It lives in a `(home)` route group, and that is not cosmetic. As `app/loading.tsx` it was the

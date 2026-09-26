@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense, use } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion, useReducedMotion, type Variants } from "motion/react"
@@ -186,12 +187,73 @@ export type ProfileStats = {
   years: number
   projects: number
   posts: number
-  /** null when the database didn't answer — the stat is dropped rather than
-   *  guessed at. A real 0 is a count and still gets its cell. */
-  logged: number | null
 }
 
-export function ProfileCard({ stats }: { stats: ProfileStats }) {
+/**
+ * One cell of the stats rail: two-up on a phone, one row from sm. At 375px the sidebar leaves
+ * ~287px of card, which four columns cannot hold.
+ */
+function StatCell({ index, children }: { index: number; children: React.ReactNode }) {
+  return (
+    <div
+      className={cn("basis-1/2 py-1 sm:flex-1 sm:basis-0 sm:py-0", index > 0 && "sm:border-l")}
+      style={{ borderColor: "var(--border-subtle)" }}
+    >
+      {children}
+    </div>
+  )
+}
+
+/**
+ * The log count, the one number that comes from the database.
+ *
+ * It arrives as a promise and resolves here, inside its own Suspense, so the rest of the card
+ * does not wait for Postgres. The card used to: the whole row sat behind `await` on the server,
+ * and the bio below, which is the home page's LCP element, reached the browser only after the
+ * query. PageSpeed measured 920ms of render delay against 130ms of TTFB, and charged every
+ * script downloaded in between to the LCP.
+ *
+ * null when the database didn't answer: the cell is dropped rather than guessed at. A real 0 is
+ * a count and still gets its cell.
+ */
+function LoggedStat({
+  logged,
+  index,
+  delay,
+}: {
+  logged: Promise<number | null>
+  index: number
+  delay: number
+}) {
+  const value = use(logged)
+  if (value === null) return null
+  return (
+    <StatCell index={index}>
+      <Stat value={value} label="logged" delay={delay} />
+    </StatCell>
+  )
+}
+
+/** The logged cell while its count is on the way: the same 34px number and label, in grey. */
+function StatSkeleton({ index }: { index: number }) {
+  return (
+    <StatCell index={index}>
+      <div aria-hidden className="flex flex-col items-center gap-1.5 py-1">
+        <Skeleton delay={0.3} style={{ width: 34, height: 26, borderRadius: 4 }} />
+        <Skeleton delay={0.3} style={{ width: 46, height: 8, borderRadius: 3 }} />
+      </div>
+    </StatCell>
+  )
+}
+
+export function ProfileCard({
+  stats,
+  logged,
+}: {
+  stats: ProfileStats
+  /** The log count, still on its way from Postgres. See `LoggedStat`. */
+  logged: Promise<number | null>
+}) {
   const reduce = useReducedMotion() ?? false
 
   /** The numbers only roll once the card has finished arriving. */
@@ -239,9 +301,6 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
     { value: stats.years, label: "years" },
     { value: stats.projects, label: "projects" },
     { value: stats.posts, label: "posts" },
-    // A database blip costs this one cell — there is no number to show, and
-    // inventing a 0 would turn a gap into a claim.
-    ...(stats.logged !== null ? [{ value: stats.logged, label: "logged" }] : []),
   ]
 
   return (
@@ -319,23 +378,21 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
           style={{ background: "var(--bg-hover-soft)", border: "1px solid var(--border-subtle)" }}
         >
           {cells.map((cell, i) => (
-            <div
-              key={cell.label}
-              className={cn(
-                // Two-up on a phone, one row from sm. At 375px the sidebar
-                // leaves ~287px of card, which four columns cannot hold.
-                "basis-1/2 py-1 sm:flex-1 sm:basis-0 sm:py-0",
-                i > 0 && "sm:border-l",
-              )}
-              style={{ borderColor: "var(--border-subtle)" }}
-            >
+            <StatCell key={cell.label} index={i}>
               <Stat
                 value={cell.value}
                 label={cell.label}
                 delay={ROLL_DELAY + (reduce ? 0 : i * 0.07)}
               />
-            </div>
+            </StatCell>
           ))}
+          <Suspense fallback={<StatSkeleton index={cells.length} />}>
+            <LoggedStat
+              logged={logged}
+              index={cells.length}
+              delay={ROLL_DELAY + (reduce ? 0 : cells.length * 0.07)}
+            />
+          </Suspense>
         </div>
 
         <p
@@ -390,111 +447,5 @@ export function ProfileCard({ stats }: { stats: ProfileStats }) {
         </Link>
       </motion.div>
     </motion.div>
-  )
-}
-
-// ─── Loading ──────────────────────────────────────────────────────────────────
-
-/**
- * The profile card while the log count is still in flight.
- *
- * `app/(home)/loading.tsx` argues at length that a grey caricature of this card reads as broken
- * rather than loading, and it was right about the version it was arguing with: a rounded
- * rectangle, three bars and a pill, which is a picture of a generic card. The answer is not to
- * give up and print `$ loading…` — it is to trace *this* card. Same box, same 420px floor, same
- * dot pattern, avatar at the real 96px with the real 14px radius and the brand frame behind it,
- * the stats rail with its four cells and its dividers, three buttons at 40px.
- *
- * What is grey is only what comes from the query. Everything structural is the real thing, so
- * nothing moves when the data lands.
- */
-export function ProfileCardSkeleton() {
-  return (
-    <div
-      className="relative flex flex-col items-center gap-6 overflow-hidden p-6 text-center sm:p-8"
-      style={{
-        background: "var(--bg-card)",
-        border: "1px solid var(--border-subtle)",
-        borderRadius: "var(--radius-xl)",
-        minHeight: 420,
-      }}
-    >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          opacity: 0.14,
-          backgroundImage: "radial-gradient(var(--fg-brand) 1px, transparent 1.4px)",
-          backgroundSize: "20px 20px",
-          maskImage: "radial-gradient(circle at 50% 0%, #000, transparent 70%)",
-          WebkitMaskImage: "radial-gradient(circle at 50% 0%, #000, transparent 70%)",
-        }}
-      />
-
-      {/* The offset frame is the avatar's resting state, not a hover effect, so it belongs
-          here — without it the photo slot is a plain square and the card loses the one shape
-          you recognise it by from across the page. */}
-      <div className="relative" style={{ width: 96, height: 96 }} aria-hidden>
-        <span
-          className="absolute inset-0"
-          style={{ border: "1.5px solid var(--fg-brand)", borderRadius: 14, opacity: 0.45 }}
-        />
-        <Skeleton className="absolute inset-0" style={{ borderRadius: 14 }} />
-      </div>
-
-      <div className="relative flex flex-col items-center gap-2.5" aria-hidden>
-        <Skeleton delay={0.06} style={{ width: 172, height: 26, borderRadius: 5 }} />
-        <Skeleton delay={0.12} style={{ width: 210, height: 10, borderRadius: 3 }} />
-      </div>
-
-      <div className="relative flex w-full max-w-[42ch] flex-col items-center gap-2" aria-hidden>
-        <Skeleton delay={0.18} style={{ width: "88%", height: 10, borderRadius: 3 }} />
-        <Skeleton delay={0.24} style={{ width: "64%", height: 10, borderRadius: 3 }} />
-      </div>
-
-      <div className="relative flex w-full max-w-110 flex-col gap-2" aria-hidden>
-        <div
-          className="flex flex-wrap rounded-[var(--radius-lg)] px-2 py-3"
-          style={{ background: "var(--bg-hover-soft)", border: "1px solid var(--border-subtle)" }}
-        >
-          {[0, 1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className={cn("basis-1/2 py-1 sm:flex-1 sm:basis-0 sm:py-0", i > 0 && "sm:border-l")}
-              style={{ borderColor: "var(--border-subtle)" }}
-            >
-              <div className="flex flex-col items-center gap-1.5 py-1">
-                {/* 34px is `RollingNumber`'s `height` on the real tile, and the label under it
-                    is `text-mono-xs`. Both are traced so the rail keeps its height. */}
-                <Skeleton
-                  delay={0.3 + i * 0.06}
-                  style={{ width: 34, height: 26, borderRadius: 4 }}
-                />
-                <Skeleton
-                  delay={0.3 + i * 0.06}
-                  style={{ width: 46, height: 8, borderRadius: 3 }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        <Skeleton delay={0.54} style={{ width: "76%", height: 8, borderRadius: 3 }} />
-      </div>
-
-      <div className="relative flex flex-wrap items-center justify-center gap-2" aria-hidden>
-        {[0, 1, 2].map((i) => (
-          <Skeleton
-            key={i}
-            delay={0.6 + i * 0.06}
-            style={{ width: 40, height: 40, borderRadius: 12 }}
-          />
-        ))}
-        <Skeleton delay={0.78} style={{ width: 132, height: 40, borderRadius: 12 }} />
-      </div>
-
-      <span className="sr-only" role="status">
-        Loading the profile
-      </span>
-    </div>
   )
 }

@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
    */
   experimental: {
     optimizePackageImports: ["simple-icons", "@phosphor-icons/react"],
+    // Not `inlineCss`, although PageSpeed flags the two stylesheet requests as render-blocking.
+    // Measured on the home page, it put the 21 KB gzipped sheet into the HTML three times over
+    // (the <style> plus the RSC payload), taking the HTML from 45 KB to 106 KB gzipped — more
+    // bytes on the critical path than the request it saves, and again on every navigation.
   },
 
   images: {
