@@ -54,7 +54,8 @@ Sidebar, PageOutline and TabNav to the site's routes.
 
 **Never run `entrepta init --overwrite` here.** It rewrites `app/globals.css` whole, which is where
 the site's own ~1,100 lines of CSS live, and it brings a Google Fonts `@import` that fights
-`next/font`. The migration guide says to run it; for this repo it is wrong.
+`next/font`. The migration guide's first step assumes a project whose `globals.css` is entrepta's alone; this
+one keeps its own CSS there.
 
 **Updating entrepta** is: bump the pinned `@entrepta/registry` devDependency, run
 `lib/entrepta-sync.test.ts`, and copy into `app/entrepta.css` what it reports (the output of
