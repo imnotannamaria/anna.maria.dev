@@ -3,19 +3,28 @@
 /**
  * One roadmap item.
  *
- * It is a `.bento-card` like every other card on the site: `CardHead` on top, `CardFoot`
+ * It is a Card like every other card on the site: `CardHeader` on top, `CardFooter`
  * at the bottom, a `Badge` for the status and the spotlight that trails the cursor.
  * `.rm-item` adds what is the roadmap's own — the accent bar on the left edge, the light
  * that runs the border on hover, and the shipped treatment.
  *
- * Not `.featured-card`, which is the only card hover on the site that lifts. `layout` here
+ * Not the featured variant, which is the only card hover on the site that lifts. `layout` here
  * means Motion owns this element's `transform` and writes it inline the moment a filter
  * moves the card, so the CSS lift would quietly stop happening after the first click. The
  * hover is the light and the shadow instead, and those are properties nobody else claims.
  */
 
+import { cn } from "@/lib/utils"
+import { cardVariants } from "@/app/components/entrepta/card"
 import { motion, useReducedMotion } from "motion/react"
-import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { Badge } from "@/app/components/entrepta/badge"
 import { EASE_OUT, revealViewport } from "@/lib/motion"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import {
@@ -26,10 +35,10 @@ import {
 } from "@/lib/roadmap/validation"
 import { RoadmapMark } from "./roadmap-mark"
 
-const BADGE_VARIANT: Record<PublicStatus, "default" | "brand-soft" | "success-soft"> = {
-  todo: "default",
-  doing: "brand-soft",
-  done: "success-soft",
+const BADGE_COLOR: Record<PublicStatus, "neutral" | "brand" | "success"> = {
+  todo: "neutral",
+  doing: "brand",
+  done: "success",
 }
 
 export function RoadmapItemCard({
@@ -52,7 +61,7 @@ export function RoadmapItemCard({
       layout
       layoutId={`rm-${item.id}`}
       transition={reduce ? { duration: 0 } : { layout: { duration: 0.45, ease: EASE_OUT } }}
-      className="bento-card rm-item"
+      className={cn(cardVariants(), "rm-item")}
       data-status={status}
       id={`item-${item.slug}`}
       onMouseMove={onMouseMove}
@@ -72,10 +81,10 @@ export function RoadmapItemCard({
             the <h3> sits below it, next to the mark. The status is announced here, once:
             the mark and the badge below are both decoration. The ordinal is an index within
             a column, which is a fact about the layout and not about the item. */}
-        <CardHead
-          label={STATUS_LABEL[status]}
-          meta={<span aria-hidden>{String(index + 1).padStart(2, "0")}</span>}
-        />
+        <CardHeader>
+          <CardLabel>{STATUS_LABEL[status]}</CardLabel>
+          <CardMeta>{<span aria-hidden>{String(index + 1).padStart(2, "0")}</span>}</CardMeta>
+        </CardHeader>
 
         <div className="flex items-start gap-3">
           <span className="mt-0.5">
@@ -86,11 +95,12 @@ export function RoadmapItemCard({
 
         {item.blurb && <p className="rm-blurb">{item.blurb}</p>}
 
-        <CardFoot comment={item.planUrl ?? `roadmap/${status}`}>
-          <Badge variant={BADGE_VARIANT[status]}>
+        <CardFooter>
+          <CardComment>{item.planUrl ?? `roadmap/${status}`}</CardComment>
+          <Badge color={BADGE_COLOR[status]}>
             <span aria-hidden>{STATUS_MARK[status]}</span>
           </Badge>
-        </CardFoot>
+        </CardFooter>
       </motion.div>
     </motion.li>
   )

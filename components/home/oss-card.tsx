@@ -3,7 +3,8 @@
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { EASE_OUT } from "@/lib/motion"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
-import { Badge, CardHead } from "@/components/ui/card-parts"
+import { cardVariants, CardHeader, CardLabel, CardMeta } from "@/app/components/entrepta/card"
+import { Badge } from "@/app/components/entrepta/badge"
 
 /** The gap between segments, and — doubled — the width of the goal boundary. */
 const SEGMENT_GAP = 3
@@ -113,14 +114,14 @@ export function OssCard({
    * bottom: the seventh project of a six-project year rendered "-1 to go". A goal you
    * have passed is the good outcome, so it gets said as one. Every string here is at
    * most eight characters, the same as the "-1 to go" it replaces, which is what keeps
-   * it inside `CardHead`'s nowrap meta half in a card that clips.
+   * it inside `CardHeader`'s nowrap meta half in a card that clips.
    */
   const over = count - goal
   const status = over > 0 ? `+${over} over` : over === 0 ? "goal met" : `${-over} to go`
 
   return (
     <motion.div
-      className="bento-card"
+      className={cardVariants()}
       onMouseMove={onMouseMove}
       initial="hidden"
       // Same reason as the wristkit rings: this section sits below the fold, so
@@ -131,13 +132,12 @@ export function OssCard({
     >
       <Spotlight {...spotlight} />
 
-      <CardHead
-        label={`oss '${yearShort}`}
-        as="h3"
-        id="card-oss"
-        meta={
-          <Badge variant="success-soft">
-            {/* Same pulse as the tree card's "live" dot — a count that is still
+      <CardHeader>
+        <CardLabel as="h3" id="card-oss">{`oss '${yearShort}`}</CardLabel>
+        <CardMeta>
+          {
+            <Badge color="success">
+              {/* Same pulse as the tree card's "live" dot — a count that is still
                 moving should read as still moving. `live-pulse` is a CSS
                 keyframe, so the global prefers-reduced-motion block already
                 stops it without anything needed here.
@@ -147,17 +147,18 @@ export function OssCard({
                 result, and a dot still resolving beside it would suggest the
                 number hasn't landed yet. The dot stays, so the badge still reads
                 as live data. */}
-            <span
-              className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
-              style={{
-                background: "currentColor",
-                animation: over >= 0 ? undefined : "live-pulse 2s ease-in-out infinite",
-              }}
-            />
-            {status}
-          </Badge>
-        }
-      />
+              <span
+                className="mr-1 inline-block h-1.5 w-1.5 rounded-full"
+                style={{
+                  background: "currentColor",
+                  animation: over >= 0 ? undefined : "live-pulse 2s ease-in-out infinite",
+                }}
+              />
+              {status}
+            </Badge>
+          }
+        </CardMeta>
+      </CardHeader>
 
       <div className="relative flex items-end gap-4">
         <div

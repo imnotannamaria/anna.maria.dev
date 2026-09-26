@@ -6,7 +6,7 @@ import Image from "next/image"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
-import { CardHead } from "@/components/ui/card-parts"
+import { cardVariants, CardHeader, CardLabel, CardMeta } from "@/app/components/entrepta/card"
 import { useReveal } from "@/app/components/entrepta/reveal"
 import { EASE_OUT } from "@/lib/motion"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
@@ -86,24 +86,25 @@ export function LogShelfCard({
 
   return (
     <motion.div
-      className={cn("bento-card log-shelf", className)}
+      className={cn(cardVariants(), "log-shelf", className)}
       onMouseMove={onMouseMove}
       {...reveal}
     >
       <Spotlight {...spotlight} />
 
-      <CardHead
-        label="log"
-        as="h3"
-        meta={
-          <ArrowLink asChild className="text-mono-sm text-(--fg-brand)">
-            <Link href="/log">open the log</Link>
-          </ArrowLink>
-        }
-      />
+      <CardHeader>
+        <CardLabel as="h3">log</CardLabel>
+        <CardMeta>
+          {
+            <ArrowLink asChild className="text-mono-sm text-(--fg-brand)">
+              <Link href="/log">open the log</Link>
+            </ArrowLink>
+          }
+        </CardMeta>
+      </CardHeader>
 
       {/* Two children and `justify-between`, so it needs a contract: the row wraps and
-          neither half breaks, which is what `CardHead` settled on for the same shape. */}
+          neither half breaks, which is what `CardHeader` settled on for the same shape. */}
       <div className="relative flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <p
           className="text-heading-md font-serif leading-none"
@@ -352,7 +353,7 @@ function Caption({
         >
           {entry ? (
             <>
-              {/* Each line truncates. `.bento-card` clips with no ellipsis, so a title that
+              {/* Each line truncates. the Card clips with no ellipsis, so a title that
                   overflows would look like missing data rather than a long title. */}
               <span className="flex min-w-0 items-baseline gap-2">
                 <span

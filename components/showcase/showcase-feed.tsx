@@ -16,7 +16,7 @@
  *
  * It is not drawn in `FeedShell`. That shell's own comment says what it is — "the shell the three
  * index pages are drawn in" — and this is not that shape. What it reuses is every *piece* that
- * makes those pages look like this site: `FilterPill`, `CardHead`/`CardFoot`, the same
+ * makes those pages look like this site: `FilterPill`, `CardHeader`/`CardFooter`, the same
  * section-head rhythm. Standardization is about the vocabulary, not about routing a different
  * problem through one component.
  */

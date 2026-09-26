@@ -13,19 +13,27 @@
  *
  * This replaces a card that hand-rolled its own `CardBadge`, its own header row, its own
  * footer rule and two decorative gradients. All of that already existed in
- * `components/ui/card-parts` and `Spotlight`.
+ * entrepta's Card parts and `Spotlight`.
  *
  * A stretched overlay link rather than wrapping the card, because github and live are links
  * of their own and an anchor inside an anchor is not markup. The overlay sits at `z-1` and
  * they sit above it.
  */
 
+import { cn } from "@/lib/utils"
 import Image from "next/image"
 import Link from "next/link"
 import { motion } from "motion/react"
 import { GithubLogoIcon, ArrowSquareOutIcon } from "@phosphor-icons/react"
 import { ArrowAffordance } from "@/app/components/entrepta/arrow-link"
-import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
+import {
+  cardVariants,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { Badge } from "@/app/components/entrepta/badge"
 import { GeneratedCover } from "@/components/ui/generated-cover"
 import { useReveal } from "@/app/components/entrepta/reveal"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
@@ -69,7 +77,11 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
   const reveal = useReveal(Math.min(index, 6) * 0.05)
 
   return (
-    <motion.article className="bento-card group/arrow h-full" onMouseMove={onMouseMove} {...reveal}>
+    <motion.article
+      className={cn(cardVariants(), "group/arrow h-full")}
+      onMouseMove={onMouseMove}
+      {...reveal}
+    >
       <Spotlight {...spotlight} />
 
       <Link
@@ -78,7 +90,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
         aria-label={`${project.title} — read the case study`}
       />
 
-      {/* Bleeds to the card edge. The negative margins have to match `.bento-card`'s
+      {/* Bleeds to the card edge. The negative margins have to match the Card's
           padding, which is 20px below `sm` and 24px above it. */}
       <div className="relative -mx-5 -mt-5 aspect-[16/9] overflow-hidden sm:-mx-6 sm:-mt-6">
         {project.cover ? (
@@ -102,7 +114,10 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
         )}
       </div>
 
-      <CardHead label={KIND_LABEL[project.kind]} meta={project.year} />
+      <CardHeader>
+        <CardLabel>{KIND_LABEL[project.kind]}</CardLabel>
+        <CardMeta>{project.year}</CardMeta>
+      </CardHeader>
 
       <h3
         className="relative m-0 transition-colors group-hover/arrow:text-(--fg-brand)"
@@ -127,14 +142,14 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
 
       <div className="relative flex flex-wrap gap-1.5">
         {project.tags.slice(0, 4).map((tag) => (
-          <Badge key={tag} variant="brand-soft">
+          <Badge key={tag} color="brand">
             {tag}
           </Badge>
         ))}
         {project.tags.length > 4 && <Badge>+{project.tags.length - 4}</Badge>}
       </div>
 
-      <CardFoot className="gap-y-2">
+      <CardFooter className="gap-y-2">
         <span className="flex items-center gap-4">
           {project.github && <OutLink href={project.github} kind="github" />}
           {project.live && <OutLink href={project.live} kind="live" />}
@@ -145,7 +160,7 @@ export function ProjectCard({ project, index = 0 }: { project: ProjectItem; inde
         <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
           <ArrowAffordance>open .tsx</ArrowAffordance>
         </span>
-      </CardFoot>
+      </CardFooter>
     </motion.article>
   )
 }

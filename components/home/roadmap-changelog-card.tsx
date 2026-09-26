@@ -1,11 +1,18 @@
 "use client"
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { useId, useState } from "react"
 import Link from "next/link"
 import { motion, useReducedMotion } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
 import { useReveal } from "@/app/components/entrepta/reveal"
 import { EASE_OUT } from "@/lib/motion"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
@@ -44,18 +51,19 @@ export function RoadmapChangelogCard({
   const slice = items ? roadmapSlice(items) : null
 
   return (
-    <motion.div className={cn("bento-card", className)} onMouseMove={onMouseMove} {...reveal}>
+    <motion.div className={cn(cardVariants(), className)} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
 
-      <CardHead
-        label="roadmap"
-        as="h3"
-        meta={
-          <ArrowLink asChild className="text-mono-sm text-(--fg-brand)">
-            <Link href="/roadmap">open the board</Link>
-          </ArrowLink>
-        }
-      />
+      <CardHeader>
+        <CardLabel as="h3">roadmap</CardLabel>
+        <CardMeta>
+          {
+            <ArrowLink asChild className="text-mono-sm text-(--fg-brand)">
+              <Link href="/roadmap">open the board</Link>
+            </ArrowLink>
+          }
+        </CardMeta>
+      </CardHeader>
 
       {/* Same shape as the log card's headline row beside it: the row wraps and neither
           half breaks. Two sibling cards in one grid row solving this differently is the
@@ -90,7 +98,8 @@ export function RoadmapChangelogCard({
         />
       )}
 
-      <CardFoot comment={slice ? `${slice.total} items on the board` : "the board"}>
+      <CardFooter>
+        <CardComment>{slice ? `${slice.total} items on the board` : "the board"}</CardComment>
         {slice && slice.hidden > 0 ? (
           <Link href="/roadmap" style={{ color: "var(--fg-brand)" }}>
             +{slice.hidden} more
@@ -100,7 +109,7 @@ export function RoadmapChangelogCard({
             ◆
           </span>
         )}
-      </CardFoot>
+      </CardFooter>
     </motion.div>
   )
 }
@@ -176,7 +185,7 @@ function Row({
         {STATUS_MARK[item.status]}
       </span>
 
-      {/* The overflow contract: the title truncates. `.bento-card` clips with no ellipsis,
+      {/* The overflow contract: the title truncates. the Card clips with no ellipsis,
           so a title left to overflow reads as missing data rather than as a long title. */}
       {/* The colour is a class, not an inline style. It used to be inline, which outranks a
           stylesheet — so the hover and open rules in globals.css, including the measured

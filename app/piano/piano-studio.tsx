@@ -1,5 +1,6 @@
 "use client"
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import { DisplayH2, DocLabel, Em, Kbd, Prose, Section } from "@/components/chrome/page-parts"
@@ -839,8 +840,8 @@ export function PianoStudio() {
                 key={song.id}
                 type="button"
                 onClick={() => toggleSong(song)}
-                /* `.bento-card` for the surface and `!grid` for the layout: the class sets
-                   flex-column, and this row is three columns. It used to hand-roll
+                /* entrepta's Card for the surface and `grid` for the layout: cn() swaps the
+                   card's flex-column for grid, because this row is three columns. It used to hand-roll
                    `rounded-[var(--radius-md)] border p-4` with its own hover, six times over,
                    and painted itself `--bg-surface` — the token for what sits above a card.
 
@@ -849,7 +850,8 @@ export function PianoStudio() {
                    the cursor across six of them would compete with the one that means
                    something. */
                 className={cn(
-                  "bento-card bento-card-sm group !grid grid-cols-[auto_1fr_auto] items-center !gap-3 text-left",
+                  cardVariants({ size: "sm" }),
+                  "group grid grid-cols-[auto_1fr_auto] items-center gap-3 text-left",
                   playing && "!border-(--fg-brand) !bg-(--bg-surface-brand)",
                 )}
               >

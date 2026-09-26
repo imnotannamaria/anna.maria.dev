@@ -16,9 +16,16 @@
  * this side of the line.
  */
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { EnvelopeSimpleIcon } from "@phosphor-icons/react/dist/ssr"
 import { motion } from "motion/react"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
 import { useReveal } from "@/app/components/entrepta/reveal"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
@@ -51,13 +58,16 @@ export function ChannelsCard({ index = 0 }: { index?: number }) {
   return (
     <motion.div
       id="channels"
-      className="bento-card"
+      className={cardVariants()}
       style={{ scrollMarginTop: 24 }}
       onMouseMove={onMouseMove}
       {...reveal}
     >
       <Spotlight {...spotlight} />
-      <CardHead label="other channels" meta={String(channels.length)} />
+      <CardHeader>
+        <CardLabel>other channels</CardLabel>
+        <CardMeta>{String(channels.length)}</CardMeta>
+      </CardHeader>
 
       <div className="relative flex flex-col">
         {channels.map(({ Icon, label, value, href, primary }, i) => {
@@ -114,7 +124,9 @@ export function ChannelsCard({ index = 0 }: { index?: number }) {
         })}
       </div>
 
-      <CardFoot comment="all of them get read" />
+      <CardFooter>
+        <CardComment>all of them get read</CardComment>
+      </CardFooter>
     </motion.div>
   )
 }

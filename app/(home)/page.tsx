@@ -7,7 +7,7 @@ import {
   getPublishedProjects,
 } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/format"
-import { CardHead } from "@/components/ui/card-parts"
+import { cardVariants, CardHeader, CardLabel } from "@/app/components/entrepta/card"
 import { SectHead } from "@/components/home/section-head"
 import { FeaturedProjectCard } from "@/components/home/featured-project-card"
 import { FeaturedPostCard } from "@/components/home/featured-post-card"
@@ -102,7 +102,7 @@ async function WhoamiRow() {
           from the profile card. The inner div is what goes absolute, so the card is
           pulled out of the row's height calculation and simply fills what it's given.
 
-          The inner div exists because `.bento-card` sets `position: relative` outside
+          The inner div exists because the Card sets `position: relative` outside
           any @layer, and unlayered CSS beats Tailwind's layered utilities — putting
           `md:absolute` on the card itself silently lost that fight. A plain div has no
           such rule to argue with.
@@ -245,8 +245,10 @@ export default function Home() {
               total={getFeaturedProjects().length}
             />
           ) : (
-            <div className="bento-card">
-              <CardHead label="featured" />
+            <div className={cardVariants()}>
+              <CardHeader>
+                <CardLabel>featured</CardLabel>
+              </CardHeader>
               <p
                 className="text-body-md"
                 style={{ color: "var(--fg-muted)", fontFamily: "var(--font-sans)" }}

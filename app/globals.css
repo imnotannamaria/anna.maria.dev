@@ -122,70 +122,11 @@
   }
 }
 
-/* ─── Bento card hover ─────────────────────────────────────────────────────── */
-.bento-card {
-  position: relative;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow: hidden;
-  transition:
-    border-color 200ms var(--ease-out),
-    background 200ms var(--ease-out);
-}
-.bento-card:hover {
-  border-color: var(--border-strong);
-  background: var(--bg-card-hover);
-}
-.bento-card-xl {
-  border-radius: var(--radius-xl);
-  padding: 56px 48px 48px;
-}
-
-/* The dense end of the same card. `/log` packs a poster grid where 24px of padding on a
-   320px tile is most of the tile — this keeps the surface, the border, the hover and the
-   tokens identical and only tightens the box. A modifier, not a second card: the log used
-   to draw its own `rounded-[14px] border p-3.5` and drifted from everything else. */
-.bento-card-sm {
-  border-radius: var(--radius-lg);
-  padding: 14px;
-  gap: 10px;
-}
-
-/* Tighten card padding on small screens so content isn't cramped */
-@media (max-width: 640px) {
-  .bento-card {
-    padding: 20px;
-  }
-  .bento-card-sm {
-    padding: 14px;
-  }
-  .bento-card-xl {
-    padding: 32px 20px 28px;
-  }
-}
-
-.featured-card {
-  transition:
-    border-color 200ms var(--ease-out),
-    box-shadow 200ms var(--ease-out),
-    transform 200ms var(--ease-out);
-}
-.featured-card:hover {
-  border-color: var(--border-brand-strong) !important;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lift-brand);
-}
-
 /* ============================================================
    WRISTKIT  — the activity card surface and its rings
    ============================================================ */
 
-/* Not `.bento-card`: this one is `--radius-xl` with a stronger border and it
+/* Not entrepta's Card: this one is `--radius-xl` with a stronger border and it
    lifts, which the shared card deliberately doesn't. It was a `useState`
    re-rendering the card on every pointer enter until it moved here. */
 .wk-panel {
@@ -273,7 +214,7 @@
     color 150ms var(--ease-out);
 }
 
-/* Not --bg-surface-elevated: .bento-card:hover already paints the whole card
+/* Not --bg-surface-elevated: the Card's hover already paints the whole card
    that color, so a row using it would vanish exactly when you hover it. */
 .tree-row:hover {
   background: var(--bg-surface-brand);
@@ -414,7 +355,7 @@
 
 /* ============================================================
    ROADMAP — the item card's own bits, the sidebar tab and the
-   progress stepper. The card surface itself is .bento-card.
+   progress stepper. The card surface itself is entrepta's Card.
    ============================================================ */
 
 /* ---------- the status mark ---------- */
@@ -451,9 +392,9 @@
   height: 100%;
 }
 
-/* ---------- item: a .bento-card, plus what is the roadmap's own ---------- */
+/* ---------- item: an entrepta Card, plus what is the roadmap's own ---------- */
 
-/* Everything .featured-card gives, minus the lift. The card carries Motion's `layout`, so
+/* Everything the featured Card gives, minus the lift. The card carries Motion's `layout`, so
    Motion owns its transform and writes it inline the first time a filter moves it — a CSS
    translateY on hover would stop applying from then on, silently. Border and shadow have
    no second owner, and the light running the perimeter is this card's hover anyway. */
@@ -562,8 +503,8 @@
 }
 
 /* Shipped recedes: no surface of its own, so the two live columns carry the weight. At
-   rest only — this ties with .bento-card:hover on specificity and would win on source
-   order, and a card that answers nothing when you point at it reads as disabled. */
+   rest only — this is unlayered and would beat the Card's hover utility outright, and a
+   card that answers nothing when you point at it reads as disabled. */
 .rm-item[data-status="done"]:not(:hover):not(:focus-within) {
   background: transparent;
 }
@@ -941,7 +882,7 @@
  * column, from one declaration and with no measuring.
  *
  * The mask does the fading; `overflow-x` does the clipping. Padding on both axes is
- * clearance rather than spacing: `.bento-card` cards carry a 2px focus ring at 2px offset,
+ * clearance rather than spacing: cards carry a 2px focus ring at 2px offset,
  * and a scroller clips at its padding box — with none, tabbing to the first card drew the
  * ring straight into the clip. The negative margins hand the room back to the layout.
  */

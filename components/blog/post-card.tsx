@@ -9,7 +9,7 @@
  * rectangle of fake code beside every one of them was decoration competing with the sentence
  * that does the work.
  *
- * Nothing here invents a surface. `.bento-card` is the card, `CardHead` names it, `CardFoot`
+ * Nothing here invents a surface. `Card` is the card, `CardHeader` names it, `CardFooter`
  * carries the `//` comment and the accent, `Spotlight` is the glow every card has, and the
  * footer affordance is a span reacting to the card's hover through `group/arrow`, not a second
  * anchor pointing where the first one already goes.
@@ -22,10 +22,12 @@
  * business answering the same question two ways.
  */
 
+import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { motion } from "motion/react"
 import { ArrowAffordance } from "@/app/components/entrepta/arrow-link"
-import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
+import { cardVariants, CardFooter, CardHeader, CardLabel } from "@/app/components/entrepta/card"
+import { Badge } from "@/app/components/entrepta/badge"
 import { useReveal } from "@/app/components/entrepta/reveal"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 
@@ -51,7 +53,7 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
 
   return (
     <motion.article
-      className="bento-card group/arrow w-full !gap-0"
+      className={cn(cardVariants(), "group/arrow w-full gap-0")}
       onMouseMove={onMouseMove}
       {...reveal}
     >
@@ -70,7 +72,9 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
             before it — without this the glow would wash over the text. */}
       <div className="relative flex min-w-0 flex-col gap-2">
         <div className="flex items-baseline justify-between gap-3">
-          <CardHead label="post" />
+          <CardHeader>
+            <CardLabel>post</CardLabel>
+          </CardHeader>
           <span
             className="text-mono-sm font-mono whitespace-nowrap"
             style={{ color: "var(--fg-muted)" }}
@@ -104,10 +108,10 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
           {post.description}
         </p>
 
-        <CardFoot className="mt-2 gap-y-2">
+        <CardFooter className="mt-2 gap-y-2">
           <span className="flex flex-wrap gap-1.5">
             {post.tags.slice(0, 4).map((tag) => (
-              <Badge key={tag} variant="brand-soft">
+              <Badge key={tag} color="brand">
                 {tag}
               </Badge>
             ))}
@@ -115,7 +119,7 @@ export function PostCard({ post, index = 0 }: { post: PostItem; index?: number }
           <span className="font-mono" style={{ color: "var(--fg-brand)" }}>
             <ArrowAffordance>open .mdx</ArrowAffordance>
           </span>
-        </CardFoot>
+        </CardFooter>
       </div>
     </motion.article>
   )

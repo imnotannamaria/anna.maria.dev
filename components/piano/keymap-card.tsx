@@ -5,7 +5,7 @@
  *
  * The four groups used to share a single hand-written box — `rounded-[var(--radius-lg)]
  * border p-6`, painted `--bg-surface`, which by convention is the token for what sits *above*
- * a card (dropdowns, dialogs, code blocks), not for a card itself. Four `.bento-card` instead,
+ * a card (dropdowns, dialogs, code blocks), not for a card itself. Four Cards instead,
  * with the head naming the octave and the foot saying which physical row it is.
  *
  * The instrument above it stays exactly as it is. The wooden cabinet is skeuomorphic on
@@ -13,8 +13,15 @@
  * frame.
  */
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { motion } from "motion/react"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
 import { useReveal } from "@/app/components/entrepta/reveal"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 
@@ -35,9 +42,12 @@ export function KeymapCard({
   const reveal = useReveal(Math.min(index, 6) * 0.06)
 
   return (
-    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
+    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
-      <CardHead label={title} meta={`${lines.length} keys`} />
+      <CardHeader>
+        <CardLabel>{title}</CardLabel>
+        <CardMeta>{`${lines.length} keys`}</CardMeta>
+      </CardHeader>
 
       <div className="relative flex flex-col">
         {lines.map((line, i) => (
@@ -72,7 +82,9 @@ export function KeymapCard({
         ))}
       </div>
 
-      <CardFoot comment={foot} />
+      <CardFooter>
+        <CardComment>{foot}</CardComment>
+      </CardFooter>
     </motion.div>
   )
 }

@@ -1,8 +1,15 @@
 "use client"
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
-import { CardFoot, CardHead } from "@/components/ui/card-parts"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
 import { useReveal } from "@/app/components/entrepta/reveal"
 import { EASE_OUT } from "@/lib/motion"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
@@ -237,10 +244,15 @@ export function StackCard() {
   }
 
   return (
-    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
+    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
 
-      <CardHead label="stack" as="h2" id="card-stack" meta={`${BRANCHES.length} branches`} />
+      <CardHeader>
+        <CardLabel as="h2" id="card-stack">
+          stack
+        </CardLabel>
+        <CardMeta>{`${BRANCHES.length} branches`}</CardMeta>
+      </CardHeader>
 
       {/* The `@container` has to be a *wrapper*: `container-type` establishes a query container
           for an element's descendants, never for itself, so `@md:` sitting on the same node as
@@ -354,12 +366,10 @@ export function StackCard() {
 
         {/* Footer — mirrors the tree card's. */}
       </div>
-      <CardFoot
-        comment="click a branch to fold it away"
-        className="border-t border-dashed border-(--border-subtle) pt-3"
-      >
+      <CardFooter className="border-t border-dashed border-(--border-subtle) pt-3">
+        <CardComment>click a branch to fold it away</CardComment>
         <span style={{ color: "var(--fg-brand)" }}>{TOTAL_TOOLS} tools</span>
-      </CardFoot>
+      </CardFooter>
     </motion.div>
   )
 }

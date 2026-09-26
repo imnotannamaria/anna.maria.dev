@@ -1,12 +1,20 @@
 "use client"
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import { useState } from "react"
 import { z } from "zod"
 import { motion } from "motion/react"
 import { CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react"
 import { Input } from "@/app/components/entrepta/input"
 import { Button, buttonVariants } from "@/app/components/entrepta/button"
-import { Badge, CardFoot, CardHead } from "@/components/ui/card-parts"
+import {
+  CardComment,
+  CardFooter,
+  CardHeader,
+  CardLabel,
+  CardMeta,
+} from "@/app/components/entrepta/card"
+import { Badge } from "@/app/components/entrepta/badge"
 import { useReveal } from "@/app/components/entrepta/reveal"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { contactSchema, type ContactFieldErrors } from "@/lib/contact-schema"
@@ -66,9 +74,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
  * replaces the form entirely — nesting it inside a card owned by the page would have put a
  * card inside a card the moment someone hit send.
  *
- * `.bento-card` and `components/ui/card-parts`, not entrepta's `Card`. That component was
- * this file's alone: seventeen other files speak the first vocabulary and one spoke the
- * second, in a state that appears once and disappears. It has been deleted.
+ * entrepta's `Card` in both states, like every other card on the site.
  *
  * Rendering the same component type in both branches is deliberate — React reconciles it, so
  * the entrance doesn't replay when the form turns into a receipt.
@@ -88,11 +94,17 @@ function FormCard({
   const reveal = useReveal()
 
   return (
-    <motion.div className="bento-card" onMouseMove={onMouseMove} {...reveal}>
+    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
       <Spotlight {...spotlight} />
-      <CardHead label="send a message" meta={meta} />
+      <CardHeader>
+        <CardLabel>send a message</CardLabel>
+        <CardMeta>{meta}</CardMeta>
+      </CardHeader>
       <div className="relative flex flex-col">{children}</div>
-      <CardFoot comment={comment}>{footRight}</CardFoot>
+      <CardFooter>
+        <CardComment>{comment}</CardComment>
+        {footRight}
+      </CardFooter>
     </motion.div>
   )
 }
@@ -165,7 +177,7 @@ export function ContactForm({ email }: { email: string }) {
   if (state === "success") {
     return (
       <FormCard
-        meta={<Badge variant="success-soft">delivered</Badge>}
+        meta={<Badge color="success">delivered</Badge>}
         comment="replies within a day"
         footRight={
           <button

@@ -179,7 +179,7 @@ export default function PianoPage() {
             {/* Four cards, not one box. The box was `rounded-[var(--radius-lg)] border p-6`
                 written by hand — and it painted itself `--bg-surface`, which by convention is
                 for what sits *above* a card (dropdowns, dialogs, code blocks), not for the
-                card. Four groups in four `.bento-card` also read better than four groups
+                card. Four groups in four Cards also read better than four groups
                 sharing one frame. */}
             <div className="grid grid-cols-1 gap-4 min-[821px]:grid-cols-2">
               {KEYMAP_GROUPS.map((group, i) => (

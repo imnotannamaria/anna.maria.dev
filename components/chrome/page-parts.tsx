@@ -20,6 +20,7 @@
  * client component that renders `Section` and `DocLabel`, so this has to work from both sides.
  */
 
+import { cardVariants } from "@/app/components/entrepta/card"
 import type React from "react"
 import { Reveal } from "@/app/components/entrepta/reveal"
 import { cn } from "@/lib/utils"
@@ -134,8 +135,8 @@ export function Section({
  * It was written twice, identically, once in each `[slug]/page.tsx` — and both drew their own
  * surface: `rounded-[var(--radius-lg)] border p-4` painted `--bg-surface`, which by convention
  * is the token for what sits *above* a card, not for a card. The same box `/piano`'s key map
- * used to be. It is `.bento-card` now, at the dense end, with `!grid` because the class sets
- * flex-column and this is four columns — the modifier pattern the piano song rows use.
+ * used to be. It is entrepta's Card now, at `size="sm"`, with `grid` because this is four columns —
+ * the same pattern the piano song rows use.
  */
 export function MetaGrid({ children }: { children: React.ReactNode }) {
   return (
@@ -147,7 +148,12 @@ export function MetaGrid({ children }: { children: React.ReactNode }) {
     // query container for an element's *descendants*, so `@sm:` on the same node would resolve
     // against an ancestor container instead — i.e. against nothing.
     <div className="@container">
-      <dl className="bento-card bento-card-sm !grid grid-cols-1 !gap-3 @sm:grid-cols-2 @2xl:grid-cols-4">
+      <dl
+        className={cn(
+          cardVariants({ size: "sm" }),
+          "grid grid-cols-1 gap-3 @sm:grid-cols-2 @2xl:grid-cols-4",
+        )}
+      >
         {children}
       </dl>
     </div>

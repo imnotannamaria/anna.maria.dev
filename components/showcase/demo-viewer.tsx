@@ -35,7 +35,7 @@ const STATE_TONE: Record<CardStateKind, string> = {
 }
 
 /**
- * The surface a demo sits on: recessed, so the component's own `.bento-card` rises back out of
+ * The surface a demo sits on: recessed, so the component's own Card rises back out of
  * it instead of being a card inside an identical card.
  *
  * `--bg-canvas` is darker than `--bg-card` in dark mode (#09090b vs #0b0b0e) *and* in light mode
