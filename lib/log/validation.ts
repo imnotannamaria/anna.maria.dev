@@ -1,28 +1,10 @@
 import { z } from "zod"
 
-export const LOG_TYPES = ["film", "series", "book", "music", "podcast", "game"] as const
+import { LOG_TYPES, type LogType } from "./constants"
+
+export { LOG_TYPES, TYPE_LABEL, TYPE_PLURAL, type LogType } from "./constants"
+
 export const LogTypeSchema = z.enum(LOG_TYPES)
-export type LogType = z.infer<typeof LogTypeSchema>
-
-/** Badge text on a card. "podcast" shows as "pod", per the design. */
-export const TYPE_LABEL: Record<LogType, string> = {
-  film: "film",
-  series: "series",
-  book: "book",
-  music: "album",
-  podcast: "pod",
-  game: "game",
-}
-
-/** Filter pill text. */
-export const TYPE_PLURAL: Record<LogType, string> = {
-  film: "films",
-  series: "series",
-  book: "books",
-  music: "music",
-  podcast: "podcasts",
-  game: "games",
-}
 
 /** Optional text field: empty string and undefined both mean "not set". */
 const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(""))

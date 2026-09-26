@@ -16,7 +16,8 @@ import { toast } from "@/app/components/entrepta/toast"
 import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
-import { STATUS_LABEL, type RoadmapItem, type RoadmapStatus } from "@/lib/roadmap/validation"
+import { STATUS_LABEL, type RoadmapStatus } from "@/lib/roadmap/constants"
+import type { RoadmapItem } from "@/lib/roadmap/validation"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 /** Muted for raw, brand for anything public, success for shipped. */

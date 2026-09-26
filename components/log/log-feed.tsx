@@ -20,7 +20,8 @@
 import { useMemo } from "react"
 import { FeedShell, groupInOrder, type FeedGroup } from "@/components/chrome/feed-shell"
 import { useUrlFilter } from "@/hooks/use-url-filter"
-import { LOG_TYPES, TYPE_PLURAL, type LogEntry, type LogType } from "@/lib/log/validation"
+import { LOG_TYPES, TYPE_PLURAL, type LogType } from "@/lib/log/constants"
+import type { LogEntry } from "@/lib/log/validation"
 import { LogCard } from "./log-card"
 import { LogRail } from "./log-rail"
 

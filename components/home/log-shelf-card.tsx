@@ -13,7 +13,8 @@ import { EASE_OUT } from "@/lib/motion"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { posterSrc } from "@/lib/log/poster-src"
 import type { CardState } from "@/lib/showcase/state"
-import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
+import { TYPE_LABEL } from "@/lib/log/constants"
+import type { LogEntry } from "@/lib/log/validation"
 import { cn } from "@/lib/utils"
 
 /**

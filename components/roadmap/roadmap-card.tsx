@@ -27,12 +27,8 @@ import {
 import { Badge } from "@/app/components/entrepta/badge"
 import { EASE_OUT, revealViewport } from "@/lib/motion"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
-import {
-  STATUS_LABEL,
-  STATUS_MARK,
-  type PublicStatus,
-  type RoadmapItem,
-} from "@/lib/roadmap/validation"
+import { STATUS_LABEL, STATUS_MARK, type PublicStatus } from "@/lib/roadmap/constants"
+import type { RoadmapItem } from "@/lib/roadmap/validation"
 import { RoadmapMark } from "./roadmap-mark"
 
 const BADGE_COLOR: Record<PublicStatus, "neutral" | "brand" | "success"> = {

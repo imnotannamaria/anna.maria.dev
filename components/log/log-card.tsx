@@ -18,7 +18,8 @@ import { cn } from "@/lib/utils"
 import { formatLoggedAt } from "@/lib/log/date"
 import { posterSrc } from "@/lib/log/poster-src"
 import { starLabel } from "@/lib/log/stars"
-import { TYPE_LABEL, type LogEntry } from "@/lib/log/validation"
+import { TYPE_LABEL } from "@/lib/log/constants"
+import type { LogEntry } from "@/lib/log/validation"
 import { StarRating } from "./star-rating"
 
 /**

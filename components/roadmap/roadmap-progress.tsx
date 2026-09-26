@@ -21,7 +21,7 @@ import { useReveal } from "@/app/components/entrepta/reveal"
 import { revealViewport } from "@/lib/motion"
 import { RollingNumber, useRollOnHover } from "@/app/components/entrepta/rolling-number"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
-import { PUBLIC_STATUSES, STATUS_LABEL, type PublicStatus } from "@/lib/roadmap/validation"
+import { PUBLIC_STATUSES, STATUS_LABEL, type PublicStatus } from "@/lib/roadmap/constants"
 
 export function RoadmapProgressCard({ counts }: { counts: Record<PublicStatus, number> }) {
   const reduce = useReducedMotion() ?? false

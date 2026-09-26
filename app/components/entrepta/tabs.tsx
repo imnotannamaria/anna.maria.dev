@@ -315,7 +315,7 @@ const TabsTrigger = React.forwardRef<
       >
         <TabGlyph icon={icon} active={active} />
         {/* with an icon, phones show only the active tab's name */}
-        <span className={cn(icon && !active && "hidden sm:inline")}>{children}</span>
+        <span className={cn(icon && !active && "sr-only sm:not-sr-only")}>{children}</span>
       </TabsPrimitive.Trigger>
     </TabShell>
   )
@@ -394,7 +394,7 @@ const TabNavLink = React.forwardRef<HTMLAnchorElement, TabNavLinkProps>(
     const inner = (
       <>
         <TabGlyph icon={icon} active={active} />
-        <span className={cn(icon && !active && "hidden sm:inline")}>{label}</span>
+        <span className={cn(icon && !active && "sr-only sm:not-sr-only")}>{label}</span>
       </>
     )
     const shared = {

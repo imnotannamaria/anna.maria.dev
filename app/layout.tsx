@@ -30,9 +30,10 @@ const sans = Inter({
   fallback: ["-apple-system", "system-ui", "sans-serif"],
 })
 
+// Upright only. Every italic on the site is the serif, and the mono italic was a preloaded
+// font file on every page that nothing rendered.
 const mono = JetBrains_Mono({
   subsets: ["latin"],
-  style: ["normal", "italic"],
   display: "swap",
   variable: "--font-mono",
   fallback: ["SF Mono", "Menlo", "monospace"],

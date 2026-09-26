@@ -35,10 +35,11 @@ plan below, this is why:
 - **The status bar's `<kbd>` stayed hand-rolled.** It sits on the brand fill, and entrepta's
   `Kbd` has no variant for that surface.
 - **No native checkbox existed**, so `Checkbox` was not added.
-- **`card.tsx` is ahead of 2.0.0.** The code review found the Card's CSS transition on `transform`
-  fighting Motion's entrances. The fix (transition `translate` instead) is in this repo and
-  committed in entrepta as a 2.0.1 patch; until 2.0.1 is published, don't
-  `add card --overwrite` from 2.0.0.
+- **`card.tsx` and `tabs.tsx` are ahead of 2.0.0.** The code review found the Card's CSS
+  transition on `transform` fighting Motion's entrances (fixed by transitioning `translate`),
+  and PageSpeed found icon tabs with no accessible name on phones (fixed with `sr-only` instead
+  of `hidden`). Both fixes are in this repo and committed in entrepta as a 2.0.1 patch; until
+  2.0.1 is published, don't `add card` or `add tabs --overwrite` from 2.0.0.
 
 ## What we decided
 
