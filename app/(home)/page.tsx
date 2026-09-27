@@ -11,7 +11,7 @@ import { cardVariants, CardHeader, CardLabel } from "@/app/components/entrepta/c
 import { SectHead } from "@/app/components/entrepta/sect-head"
 import { FeaturedProjectCard } from "@/components/home/featured-project-card"
 import { FeaturedPostCard } from "@/components/home/featured-post-card"
-import { OssCard } from "@/components/home/oss-card"
+import { ShortlogCard, type ShortlogGoal } from "@/components/home/shortlog-card"
 import { NowPlayingWidget } from "@/components/spotify/now-playing-widget"
 import { GithubCard } from "@/components/home/github-card"
 import { TodayActivityCard } from "@/components/wristkit/today-activity-card"
@@ -28,6 +28,7 @@ import { getPublicItems } from "@/lib/roadmap/queries"
 import { createMetadata } from "@/lib/metadata"
 import { calcYearsOfExp, yearsWord } from "@/lib/experience"
 import { getContributions } from "@/lib/github/contributions"
+import { getShortlog } from "@/lib/github/shortlog"
 import { siteConfig } from "@/lib/site-config"
 import type { CardState } from "@/lib/showcase/state"
 
@@ -180,6 +181,24 @@ function toState<T>(rows: T[] | null): CardState<T[]> {
   return { kind: "ok", data: rows }
 }
 
+/**
+ * Commits in the last thirty days, on the repositories that are projects here. Streams on its
+ * own, like the contributions card: the featured project beside it never waits for GitHub.
+ */
+async function ShortlogSlot({
+  goal,
+  projects,
+}: {
+  goal: ShortlogGoal
+  projects: ReturnType<typeof getPublishedProjects>
+}) {
+  const repos = projects.flatMap((p) =>
+    p.github ? [{ slug: p.slug, title: p.title, github: p.github }] : [],
+  )
+  const state = await getShortlog(siteConfig.githubUser, repos)
+  return <ShortlogCard state={state} goal={goal} className="h-full" />
+}
+
 async function GithubSlot() {
   const state = await getContributions(siteConfig.githubUser)
   return <GithubCard username={siteConfig.githubUser} state={state} />
@@ -192,9 +211,13 @@ export default function Home() {
   const featuredProject = getFeaturedProjects()[0]
   const featuredPost = getFeaturedPosts()[0]
   const currentYear = new Date().getFullYear()
-  const ossCount = projects.filter((p) => new Date(p.date).getFullYear() === currentYear).length
-  const ossGoal = 6
-  const yrShort = currentYear.toString().slice(2)
+  // Projects shipped this year against six. It used to be a card of its own; now it is the
+  // shortlog's footer line, which is the size it earned once the goal was met.
+  const goal: ShortlogGoal = {
+    shipped: projects.filter((p) => new Date(p.date).getFullYear() === currentYear).length,
+    goal: 6,
+    yearShort: currentYear.toString().slice(2),
+  }
   const yearsOfExp = calcYearsOfExp()
 
   return (
@@ -234,29 +257,33 @@ export default function Home() {
             </Link>
           }
         />
+        {/* The featured project and the featured post stacked on the left, the shortlog on its
+            own on the right. It was the other way round — the shortlog above the post — and the
+            featured project stretched to the height of two cards with half of it empty. `1fr`
+            on the project's row means it takes whatever height the shortlog leaves over, and
+            the post keeps its own. On a phone it is one column in reading order: project, post,
+            then the commits. */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.35fr_1fr]">
-          {featuredProject ? (
-            <FeaturedProjectCard
-              project={featuredProject}
-              index={1}
-              total={getFeaturedProjects().length}
-            />
-          ) : (
-            <div className={cardVariants()}>
-              <CardHeader>
-                <CardLabel>featured</CardLabel>
-              </CardHeader>
-              <p
-                className="text-body-md"
-                style={{ color: "var(--fg-muted)", fontFamily: "var(--font-sans)" }}
-              >
-                No featured projects yet.
-              </p>
-            </div>
-          )}
-
-          <div className="flex flex-col gap-3">
-            <OssCard count={ossCount} goal={ossGoal} yearShort={yrShort} />
+          <div className="grid grid-rows-[1fr_auto] gap-3">
+            {featuredProject ? (
+              <FeaturedProjectCard
+                project={featuredProject}
+                index={1}
+                total={getFeaturedProjects().length}
+              />
+            ) : (
+              <div className={cardVariants()}>
+                <CardHeader>
+                  <CardLabel>featured</CardLabel>
+                </CardHeader>
+                <p
+                  className="text-body-md"
+                  style={{ color: "var(--fg-muted)", fontFamily: "var(--font-sans)" }}
+                >
+                  No featured projects yet.
+                </p>
+              </div>
+            )}
 
             {featuredPost && (
               <FeaturedPostCard
@@ -271,6 +298,12 @@ export default function Home() {
               />
             )}
           </div>
+
+          <Suspense
+            fallback={<ShortlogCard state={{ kind: "loading" }} goal={goal} className="h-full" />}
+          >
+            <ShortlogSlot goal={goal} projects={projects} />
+          </Suspense>
         </div>
       </section>
 
