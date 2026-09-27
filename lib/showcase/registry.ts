@@ -90,6 +90,22 @@ export const SHOWCASE = {
     where: ["/", "/piano"],
     states: ["ok"],
   },
+  shortlog: {
+    slug: "shortlog",
+    name: "git shortlog",
+    blurb:
+      "A month of commits per project, the last one under each, and the projects that went quiet.",
+    source: "components/home/shortlog-card.tsx",
+    group: "home",
+    where: ["/"],
+    /**
+     * No `stale`. GitHub's answer is cached for an hour and then asked again; there is no day-old
+     * copy kept around to fall back on, which is the only thing `stale` means here. A repository
+     * GitHub can't resolve is not a state of the card either — it costs that one row its last
+     * commit, and the `ok` fixture carries a row like that.
+     */
+    states: ["loading", "empty", "error", "ok"],
+  },
   contributions: {
     slug: "contributions",
     name: "contributions",

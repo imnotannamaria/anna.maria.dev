@@ -22,12 +22,15 @@ import type { CardStateKind } from "@/lib/showcase/state"
 import { SHOWCASE, type ShowcaseSlug } from "@/lib/showcase/registry"
 import {
   CONTRIBUTIONS_FIXTURE,
+  SHORTLOG_FIXTURE,
+  SHORTLOG_GOAL_FIXTURE,
   TODAY_FIXTURE,
   TRACK_FIXTURE,
   TREE_FIXTURE,
   TREE_FIXTURE_EMPTY,
 } from "@/lib/showcase/fixtures"
 import { GithubCard } from "@/components/home/github-card"
+import { ShortlogCard } from "@/components/home/shortlog-card"
 import { TreeCard, TreeCardSkeleton } from "@/components/home/tree-card"
 import { StackCard } from "@/components/home/stack-card"
 import { MiniPianoCard } from "@/components/home/mini-piano-card"
@@ -118,6 +121,16 @@ const DEMOS: DemoMap = {
     ok: () => <MiniPianoCard />,
   },
 
+  shortlog: {
+    // Its width on the home page, where it is the right-hand column: the rows truncate against
+    // that width, and a stage-wide demo would show whole commit messages the site never does.
+    // One height for all four, so switching states doesn't move the page — see `ShortlogFrame`.
+    loading: () => <ShortlogFrame state={{ kind: "loading" }} />,
+    empty: () => <ShortlogFrame state={{ kind: "empty" }} />,
+    error: () => <ShortlogFrame state={{ kind: "error" }} />,
+    ok: () => <ShortlogFrame state={{ kind: "ok", data: SHORTLOG_FIXTURE }} />,
+  },
+
   contributions: {
     loading: () => <GithubCard username="imnotannamaria" state={{ kind: "loading" }} />,
     empty: () => <GithubCard username="imnotannamaria" state={{ kind: "empty" }} />,
@@ -142,6 +155,19 @@ const DEMOS: DemoMap = {
     stale: () => <TodayActivityCard state={{ kind: "stale", data: TODAY_FIXTURE }} />,
     ok: () => <TodayActivityCard state={{ kind: "ok", data: TODAY_FIXTURE }} />,
   },
+}
+
+/**
+ * The shortlog at its home-page width and at the height of its tallest state. On the home page
+ * the grid row gives it that height; here nothing does, so `empty` and `error` would be a
+ * third of the `ok` frame and the stage would lurch on every switch.
+ */
+function ShortlogFrame({ state }: { state: React.ComponentProps<typeof ShortlogCard>["state"] }) {
+  return (
+    <div className="mx-auto w-full max-w-[480px]">
+      <ShortlogCard state={state} goal={SHORTLOG_GOAL_FIXTURE} className="min-h-160" />
+    </div>
+  )
 }
 
 /** Looks a frame up without the caller having to narrow the slug/kind pair itself. */

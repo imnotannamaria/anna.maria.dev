@@ -1,0 +1,104 @@
+---
+title: "git shortlog"
+description: "A month of commits per project, the last one under each, and the projects that went quiet. One GitHub request, four states."
+entry: "shortlog"
+source: "components/home/shortlog-card.tsx"
+deps: ["motion", "@phosphor-icons/react"]
+---
+
+Commits in the last thirty days, one row per project, busiest first. Under each row sits the last
+thing I committed there. Below the busy rows, the projects that got nothing this month, dimmed,
+with how long they have been quiet.
+
+It sits under `ls ./work` on the home page, the tall card on the right, beside the featured
+project and the featured post.
+
+## What it replaced
+
+The card before it was `oss '26`: projects shipped this year against a goal of six. It had
+something to say until the goal was met. After that it was `8 / 6` every day until January. A
+card that stops changing in August is a card people stop reading.
+
+This one changes every week. The goal is still there, as the comment in the footer, which is the
+size it deserved once it was met.
+
+## Only projects, and every project
+
+The rows come from the repositories that have a page in `/projects`, matched on the `github` URL
+in each project's frontmatter. The profile README and coursework have commits too, but a row
+under `ls ./work` with nothing to link to would be the one row that goes nowhere. A new project
+joins the card the day its MDX lands. There is no list to keep in step.
+
+The quiet ones are listed as well. A card that only showed the busy projects would say everything
+is moving, and `wristkit, 56d ago` is the honest half of it. Both lists have a ceiling, five
+busy and four quiet, because the card grows with every project that ships and its height has to
+stay close to the column beside it.
+
+## One request
+
+The month's counts come from `contributionsCollection`. The quiet projects are not in it, since
+they have no contributions in the window, so each project also gets an aliased `repository`
+field (`r0`, `r1`…) in the same query for its last commit. Merges and the changesets release
+commit are skipped, and so is anyone else's commit.
+
+```ts
+r0: repository(owner: $o0, name: $n0) {
+  defaultBranchRef { target { ... on Commit { history(first: 20) { … } } } }
+}
+```
+
+Owners and names are variables and never part of the query text. They come from frontmatter,
+and a variable can't change the shape of a query.
+
+Two details keep it cheap. The window starts at UTC midnight rather than exactly thirty days
+ago. `from` is in the request body and the body is the cache key, so a timestamp accurate to the
+millisecond would have cached nothing. And "3h" or "18d" is worked out on the server for each
+request, after the cached fetch. Computed in the component, it would come out different on each
+side of hydration.
+
+## Four states, and the one that isn't a state
+
+`loading` is the card with its rows in grey at their real sizes. The home page streams the card
+in `<Suspense>`, so the featured project beside it never waits for GitHub.
+
+`error` covers three failures: no `GITHUB_TOKEN`, a status that isn't 200, and a GraphQL error.
+GitHub reports a bad login or a spent quota as a 200 with an `errors` array, so checking
+`res.ok` alone misses it.
+
+`empty` is the only one about the account and not the server: the request worked and there were
+no commits this month.
+
+A repository GitHub can't resolve, renamed or made private, is not a state. It comes back as
+`null` next to an `errors` entry, and the card keeps going. That row loses its last commit and
+shows a dash, and the rest of the card is untouched. The last quiet row in the `ok` demo is one
+of those.
+
+## The hover
+
+Point at a row and it gets an editor's current-line highlight, with a mark in the gutter where
+git draws a changed line. The bar lights up and a glint runs along it once. The other rows fade
+back, and the big number rolls from the month's total to that project's count, with the caption
+giving its share of the month. Leave the list and it rolls back.
+
+That last part is why there is a hover at all. The number and the rows showed the same data and
+never connected. Now pointing at a row gives you the number the bar only hints at.
+
+The number keeps its width while it rolls. `RollingNumber` keys its digits by position, so going
+from `127` to `66` would slide both digits one place to the right mid-roll. It is padded with
+figure spaces and right-aligned instead, so the hundreds digit just goes and the other two turn
+where they stand.
+
+Moving from one row to the next doesn't reset anything; only leaving the whole list does. The rows
+are padded rather than spaced apart, so the pointer never lands in a gap that belongs to no row,
+and the number goes straight from one project to the next without dipping back to the total.
+
+It only reacts to a mouse and to the keyboard. A tap on a phone should go straight to the link,
+and iOS turns the first tap into a hover when a mouse handler changes the page, so `pointerType`
+gates it. Focusing a row with Tab does what pointing does.
+
+Nothing under the cursor moves. The highlight and the gutter mark reach into the card's padding,
+and the text and the hit areas stay put.
+
+The glint is a fixed gradient translated across the bar, never a gradient string rebuilt per
+frame. It runs out on hover and snaps back out of sight on leave, so it only ever travels one
+way. Its colour is `--fg-on-brand`, the ink every theme guarantees is readable on the brand fill.

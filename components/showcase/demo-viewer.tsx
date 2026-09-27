@@ -136,6 +136,7 @@ const STAGE_HEIGHT: Record<string, number> = {
   contributions: 320,
   "stack-graph": 480,
   wristkit: 470,
+  shortlog: 680,
 }
 
 /**
