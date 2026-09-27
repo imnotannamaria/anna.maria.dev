@@ -75,30 +75,22 @@ of those.
 
 ## The hover
 
-Point at a row and it gets an editor's current-line highlight, with a mark in the gutter where
-git draws a changed line. The bar lights up and a glint runs along it once. The other rows fade
-back, and the big number rolls from the month's total to that project's count, with the caption
-giving its share of the month. Leave the list and it rolls back.
+Every row is a link, so every row answers the pointer. The row gets a faint version of an
+editor's current-line highlight, with a thin mark in the gutter where git draws a changed line.
+Its bar lights up and a glint runs along it once. Its count and commit line get a little
+brighter, an arrow appears on the commit line to say it leaves the site, and pointing at the
+commit itself underlines the message. A quiet row comes up from 70% to full.
 
-That last part is why there is a hover at all. The number and the rows showed the same data and
-never connected. Now pointing at a row gives you the number the bar only hints at.
-
-The number keeps its width while it rolls. `RollingNumber` keys its digits by position, so going
-from `127` to `66` would slide both digits one place to the right mid-roll. It is padded with
-figure spaces and right-aligned instead, so the hundreds digit just goes and the other two turn
-where they stand.
-
-Moving from one row to the next doesn't reset anything; only leaving the whole list does. The rows
-are padded rather than spaced apart, so the pointer never lands in a gap that belongs to no row,
-and the number goes straight from one project to the next without dipping back to the total.
-
-It only reacts to a mouse and to the keyboard. A tap on a phone should go straight to the link,
-and iOS turns the first tap into a hover when a mouse handler changes the page, so `pointerType`
-gates it. Focusing a row with Tab does what pointing does.
-
-Nothing under the cursor moves. The highlight and the gutter mark reach into the card's padding,
-and the text and the hit areas stay put.
+The first version did more. The other rows faded back, and the big number rolled from the
+month's total to the row's own count. Each part was defensible on its own. Together they were
+too much for a card whose job is to be read, so those two went and the number stays put.
 
 The glint is a fixed gradient translated across the bar, never a gradient string rebuilt per
 frame. It runs out on hover and snaps back out of sight on leave, so it only ever travels one
 way. Its colour is `--fg-on-brand`, the ink every theme guarantees is readable on the brand fill.
+
+It is all CSS on `:hover` and `:focus-within`, with no state and nothing to re-render. Tailwind v4
+puts `hover:` behind `@media (hover: hover)`, so a tap on a phone goes straight to the link. The
+highlight and the gutter mark reach into the card's padding, and the text and the hit areas stay
+put. Rows are padded instead of spaced apart, so the highlights meet and the pointer never lands
+in a gap that belongs to no row.
