@@ -1,0 +1,115 @@
+---
+title: "git shortlog"
+description: "A month of commits per project, the last one under each, and the projects that went quiet. One GitHub request, four states."
+entry: "shortlog"
+source: "components/home/shortlog-card.tsx"
+deps: ["motion", "@phosphor-icons/react"]
+---
+
+Commits in the last thirty days, one row per project, busiest first. Under each row sits the last
+thing I committed there. Below the busy rows, the projects that got nothing this month, dimmed,
+with how long they have been quiet.
+
+It sits under `ls ./work` on the home page, the tall card on the right, beside the featured
+project and the featured post.
+
+## What it replaced
+
+The card before it was `oss '26`: projects shipped this year against a goal of six. It had
+something to say until the goal was met. After that it was `8 / 6` every day until January. A
+card that stops changing in August is a card people stop reading.
+
+This one changes every week. The goal is still there, as the comment in the footer, which is the
+size it deserved once it was met.
+
+## Only projects, and every project
+
+The rows come from the repositories that have a page in `/projects`, matched on the `github` URL
+in each project's frontmatter. The profile README and coursework have commits too, but a row
+under `ls ./work` with nothing to link to would be the one row that goes nowhere. A new project
+joins the card the day its MDX lands. There is no list to keep in step.
+
+The quiet ones are listed as well. A card that only showed the busy projects would say everything
+is moving, and `wristkit, 56d ago` is the honest half of it. Both lists have a ceiling, five
+busy and four quiet, because the card grows with every project that ships and its height has to
+stay close to the column beside it.
+
+## One request
+
+The month's counts come from `contributionsCollection`. The quiet projects are not in it, since
+they have no contributions in the window, so each project also gets an aliased `repository`
+field (`r0`, `r1`…) in the same query for its last commit. Merges and the changesets release
+commit are skipped, and so is anyone else's commit.
+
+```ts
+r0: repository(owner: $o0, name: $n0) {
+  defaultBranchRef { target { ... on Commit { history(first: 20) { … } } } }
+}
+```
+
+Owners and names are variables and never part of the query text. They come from frontmatter,
+and a variable can't change the shape of a query.
+
+Two details keep it cheap. The window starts at UTC midnight rather than exactly thirty days
+ago. `from` is in the request body and the body is the cache key, so a timestamp accurate to the
+millisecond would have cached nothing. And "3h" or "18d" is worked out on the server for each
+request, after the cached fetch. Computed in the component, it would come out different on each
+side of hydration.
+
+## Four states, and the one that isn't a state
+
+`loading` is the finished card in grey, piece for piece: the number, four busy rows with their
+commit lines, the dashed rule with its label, and four quiet rows. Each grey bar sits
+in a box the height of the real line, so nothing moves when GitHub answers. The home page streams
+the card in `<Suspense>`, so the featured project beside it never waits.
+
+`error` and `empty` used to be one muted line centred in a dashed frame. That said what happened
+and nothing else. The card's header already reads `git shortlog`, so now, when there is nothing
+to chart, the body is a terminal pane: the command, what it printed, and a caret blinking at a
+fresh prompt. The number stays on top so the card keeps its shape.
+
+`error` covers three failures: no `GITHUB_TOKEN`, a status that isn't 200, and a GraphQL error.
+GitHub reports a bad login or a spent quota as a 200 with an `errors` array, so checking `res.ok`
+alone misses it. The pane prints `fatal: github.com didn't answer` and never the reason, which is
+for the logs. The number is a dash, not a zero: an answer that never came is not the same as no
+commits.
+
+`empty` means no project has a `github` URL that points at a repository. That's a fresh fork of
+this site, so the pane says what to do about it. It is decided before GitHub is asked anything,
+and before the token is checked, so a fork with no projects isn't told its token is missing.
+
+A quiet month is not `empty`. It is `ok` with no busy rows: the number is `0`, and every project
+sits in the quiet list with its last commit. That says more than a blank frame, and it's what the
+home page would show after a month off.
+
+A repository GitHub can't resolve, renamed or made private, is not a state either. It comes back
+as `null` next to an `errors` entry, and the card keeps going. That row loses its last commit and
+shows a dash. The last quiet row in the `ok` demo is one of those.
+
+## The hover
+
+Every row is a link, so every row answers the pointer. The row gets a faint version of an
+editor's current-line highlight, with a thin mark in the gutter where git draws a changed line.
+Its bar lights up and a glint runs along it once. Its count and commit line get a little
+brighter, an arrow appears on the commit line to say it leaves the site, and pointing at the
+commit itself underlines the message. A quiet row's muted name and sha come up to the busy
+rows' colours.
+
+Quiet rows are quieter through colour, not opacity. They used to sit at 70% opacity, which put
+muted text on the card at 3.3:1 in dark mode and 3.0:1 in light, under AA on the part of the card
+that is nothing but text. Now the name is `--fg-muted` and the sha drops the brand ink, both of
+which clear AA on their own.
+
+The first version did more. The other rows faded back, and the big number rolled from the
+month's total to the row's own count. Each part was defensible on its own. Together they were
+too much for a card whose job is to be read, so those two went and the number stays put.
+
+The glint is a fixed gradient translated across the bar, never a gradient string rebuilt per
+frame. It runs out on hover and snaps back out of sight on leave, so it only ever travels one
+way. Its colour is `--fg-on-brand`, the ink every theme guarantees is readable on the brand fill.
+
+It is all CSS on `:hover` and `:focus-within`, with no state and nothing to re-render. Tailwind v4
+puts `hover:` behind `@media (hover: hover)`, so a tap on a phone goes straight to the link. The
+highlight and the gutter mark reach into the card's padding, and the text and the hit areas stay
+put. Rows are padded instead of spaced apart, so the highlights meet and the pointer never lands
+in a gap that belongs to no row.

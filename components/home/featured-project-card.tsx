@@ -2,18 +2,19 @@
 
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react"
-import type { Variants } from "motion/react"
+import { motion } from "motion/react"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import {
   cardVariants,
+  CardComment,
   CardFooter,
   CardHeader,
   CardLabel,
   CardMeta,
 } from "@/app/components/entrepta/card"
 import { Badge } from "@/app/components/entrepta/badge"
-import { EASE_OUT } from "@/lib/motion"
+import { useReveal } from "@/app/components/entrepta/reveal"
+import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export type FeaturedProject = {
@@ -26,64 +27,41 @@ export type FeaturedProject = {
 }
 
 /**
- * The featured project, with the movement living entirely in the hover.
+ * The featured project, on the same card as everything else on the page.
  *
- * Nothing here animates on its own. The section already has the page's own
- * entrance happening around it, and one more thing moving by itself would be
- * noise — so the card stays still until you reach for it, which also means it
- * never wears out on the tenth visit.
+ * It used to be the one card that wasn't: entrepta's `featured` variant, with a brand-tinted
+ * surface, a brand border, a lift and a glow, a larger radius and more padding, plus a dot
+ * mesh drifting against the pointer. On its own that read as emphasis. Beside the shortlog
+ * and above the featured post, both plain cards, it read as a card from a different site —
+ * the divergence the Standardization check is about. Its emphasis now comes from what it
+ * says, the serif title at display size, and the surface and the hover are the shared ones:
+ * the spotlight, the reveal, the border that firms up.
  *
- * The surface, the lift and the brand shadow are entrepta's `featured` Card, in CSS
- * rather than Motion: that shadow is built from `var(--shadow-brand)`, and Motion
- * can't interpolate a colour hiding inside a custom property. CSS can.
+ * The head and foot are the fixed card shape: `◆ featured` and the status on top, a `//`
+ * comment on the left of the foot with the links on the right. The links used to lead the
+ * foot and the comment trail it, the one card on the page with the foot the wrong way round.
  */
 export function FeaturedProjectCard({
   project,
   index,
   total,
+  className,
 }: {
   project: FeaturedProject
   index: number
   total: number
+  className?: string
 }) {
-  const reduce = useReducedMotion() ?? false
-
-  // The dot mesh drifts against the pointer, which reads as depth without
-  // moving any of the content the visitor is trying to read.
-  const mx = useMotionValue(0.5)
-  const my = useMotionValue(0.5)
-  const meshX = useSpring(useTransform(mx, [0, 1], [16, -16]), { stiffness: 50, damping: 20 })
-  const meshY = useSpring(useTransform(my, [0, 1], [12, -12]), { stiffness: 50, damping: 20 })
-
-  const tagGroup: Variants = {
-    rest: {},
-    hover: { transition: { staggerChildren: reduce ? 0 : 0.04 } },
-  }
-  const tag: Variants = {
-    rest: { y: 0 },
-    hover: { y: reduce ? 0 : -3, transition: { duration: 0.2, ease: EASE_OUT } },
-  }
+  const { onMouseMove, spotlight } = useSpotlight(420)
+  const reveal = useReveal()
 
   const [head, ...rest] = project.title.split("-")
   const hasDash = rest.length > 0
 
   return (
-    <motion.div
-      className={cn(
-        cardVariants({ variant: "featured" }),
-        "group/featured rounded-[var(--radius-xl)] p-6 max-sm:p-6 sm:p-8",
-      )}
-      style={{ minHeight: 380 }}
-      initial="rest"
-      animate="rest"
-      whileHover="hover"
-      onMouseMove={(e) => {
-        if (reduce) return
-        const r = e.currentTarget.getBoundingClientRect()
-        mx.set((e.clientX - r.left) / r.width)
-        my.set((e.clientY - r.top) / r.height)
-      }}
-    >
+    <motion.div className={cn(cardVariants(), className)} onMouseMove={onMouseMove} {...reveal}>
+      <Spotlight {...spotlight} />
+
       {/*
        * Stretch link — covers the whole card. The real links sit above it.
        *
@@ -92,55 +70,33 @@ export function FeaturedProjectCard({
        * "View wristkit" link pointing somewhere else entirely, and two links on
        * one page with the same name and different destinations is exactly what
        * a screen-reader link list makes unusable.
+       *
+       * Its focus ring is drawn inward. The global ring sits 2px outside the element, and this
+       * element is the whole card, whose `overflow: hidden` would clip it to nothing.
        */}
       <Link
         href={`/projects/${project.slug}`}
-        className="absolute inset-0"
-        style={{ zIndex: 1 }}
+        className="absolute inset-0 z-[1] rounded-[var(--radius-lg)] focus-visible:-outline-offset-2"
         aria-label={`Read the ${project.title} case study`}
-      />
-
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute"
-        style={{
-          right: "-10%",
-          bottom: "-30%",
-          width: "60%",
-          aspectRatio: "1",
-          opacity: 0.35,
-          x: meshX,
-          y: meshY,
-          backgroundImage: "radial-gradient(var(--fg-brand) 1px, transparent 1.4px)",
-          backgroundSize: "22px 22px",
-          maskImage: "radial-gradient(circle, #000 0%, transparent 60%)",
-          WebkitMaskImage: "radial-gradient(circle, #000 0%, transparent 60%)",
-        }}
       />
 
       <CardHeader>
         <CardLabel>featured</CardLabel>
-        <CardMeta>{<Badge color="brand">SHIPPED</Badge>}</CardMeta>
+        <CardMeta>
+          <Badge color="brand">SHIPPED</Badge>
+        </CardMeta>
       </CardHeader>
 
       <p
-        className="text-mono-sm relative font-mono tracking-[0.04em]"
+        className="text-mono-sm relative m-0 font-mono tracking-[0.04em]"
         style={{ color: "var(--fg-brand-text)" }}
       >
         {String(index).padStart(2, "0")} / {String(total).padStart(2, "0")}
       </p>
 
       <h3
-        className="relative"
-        style={{
-          fontFamily: "var(--font-serif)",
-          fontWeight: 400,
-          fontSize: "var(--text-display-md)",
-          lineHeight: 1,
-          letterSpacing: "-0.02em",
-          color: "var(--fg-primary)",
-          margin: 0,
-        }}
+        className="text-display-md relative m-0 font-serif font-normal"
+        style={{ lineHeight: 1, letterSpacing: "-0.02em", color: "var(--fg-primary)" }}
       >
         {hasDash ? (
           <>
@@ -162,27 +118,28 @@ export function FeaturedProjectCard({
       </h3>
 
       <p
-        className="text-body-md relative max-w-[44ch] leading-relaxed"
-        style={{ fontFamily: "var(--font-sans)", color: "var(--fg-secondary)" }}
+        className="text-body-md relative m-0 max-w-[52ch] font-sans leading-relaxed"
+        style={{ color: "var(--fg-secondary)" }}
       >
         {project.description}
       </p>
 
-      <motion.div className="relative flex flex-wrap gap-1.5" variants={tagGroup}>
+      <div className="relative flex flex-wrap gap-1.5">
         {project.tags.slice(0, 4).map((t) => (
-          <motion.span key={t} variants={tag} className="inline-flex">
-            <Badge color="brand">{t}</Badge>
-          </motion.span>
+          <Badge key={t} color="brand">
+            {t}
+          </Badge>
         ))}
-      </motion.div>
+      </div>
 
       <CardFooter>
-        <div className="flex gap-6" style={{ position: "relative", zIndex: 2 }}>
+        <CardComment>mit · open source</CardComment>
+        {/* Above the stretch link, so each one is its own target. */}
+        <div className="relative z-[2] flex gap-5">
           {project.github && (
-            /* Named for the project, not just "github": the contributions card
-               further down this page has a "github" link of its own pointing at
-               the profile, and two links with one name and two destinations is
-               what makes a screen reader's link list useless. */
+            /* Named for the project, not just "github": the shortlog beside this card has a
+               "github" link of its own pointing at the profile, and two links with one name
+               and two destinations is what makes a screen reader's link list useless. */
             <ArrowLink href={project.github} external aria-label={`${project.title} on GitHub`}>
               github
             </ArrowLink>
@@ -193,9 +150,6 @@ export function FeaturedProjectCard({
             </ArrowLink>
           )}
         </div>
-        <span style={{ color: "var(--fg-muted)", marginLeft: "auto" }}>
-          {"// "}mit · open source
-        </span>
       </CardFooter>
     </motion.div>
   )

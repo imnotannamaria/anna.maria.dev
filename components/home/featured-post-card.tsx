@@ -97,7 +97,10 @@ export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
 
         <CardFooter>
           <CardComment>notes · public</CardComment>
-          <span className="font-mono" style={{ color: "var(--fg-brand-text)" }}>
+          {/* The same colours as ArrowLink: primary at rest, brand on hover and focus. It was
+              brand all the time, the one "→" on the page already lit before you reached it.
+              The card is the link, so the trigger is its `group/arrow`. */}
+          <span className="font-mono text-[var(--fg-primary)] transition-colors duration-200 group-hover/arrow:text-[var(--fg-brand-text)] group-focus-visible/arrow:text-[var(--fg-brand-text)]">
             <ArrowAffordance>read post</ArrowAffordance>
           </span>
         </CardFooter>

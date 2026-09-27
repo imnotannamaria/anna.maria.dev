@@ -275,6 +275,8 @@ hooks/                      entrepta's: use-theme, use-mode, use-command-palette
 
 Bento grid. Hero card, Spotify Now Playing, wristkit Apple Watch activity card, GitHub contributions, featured project, career stats. Section headers use `$ whoami`, `$ ls projects/`, style commands.
 
+`ls ./work` is the featured project and the featured post stacked on the left, and `git shortlog` on its own on the right: commits in the last thirty days per project, the last commit under each, and the projects that went quiet. It replaced `oss '26`, a goal counter that stopped changing once the goal was met; the goal is its footer comment now. One GitHub request feeds it, cached for an hour — see `lib/github/shortlog.ts` and [/components/shortlog](content/components/shortlog.mdx).
+
 ### `/about`
 
 Two columns: photo + long bio. Career timeline (vertical brand line, circular dots). Stack icon grid. Interests.

@@ -23,6 +23,7 @@ import type {
   ContributionWeek,
   ContributionYear,
 } from "@/lib/github/contributions"
+import type { Shortlog } from "@/lib/github/shortlog"
 import type { SimplifiedTrack } from "@/lib/spotify"
 import type { TodayData } from "@/components/wristkit/today-activity-card/load"
 import type { SiteTreeItem } from "@/lib/site-tree"
@@ -113,3 +114,103 @@ export const TREE_FIXTURE_EMPTY: SiteTreeItem[] = buildSiteTree({
   projects: [],
   logCount: null,
 })
+
+const commit = (repo: string, sha: string, message: string, ago: string) => ({
+  sha,
+  message,
+  url: `https://github.com/imnotannamaria/${repo}/commit/${sha}`,
+  ago,
+})
+
+/**
+ * A real month, frozen: the numbers and messages the card showed the week it shipped. `ago` is
+ * a literal for the same reason every date here is — the card receives it already worked out on
+ * the server, and a fixture that computed it would differ across the hydration boundary.
+ *
+ * The last quiet row has no commit on purpose. That is what a repository GitHub can't resolve
+ * (renamed, or made private) looks like: the row stays, with a dash where its age would be.
+ */
+export const SHORTLOG_FIXTURE: Shortlog = {
+  total: 127,
+  active: 4,
+  rows: [
+    {
+      slug: "annamaria-app",
+      title: "annamaria.app",
+      commits: 66,
+      latest: commit(
+        "anna.maria.dev",
+        "4b6fd0a",
+        "fix(a11y): titlebar tabs keep their names on phones",
+        "2h",
+      ),
+    },
+    {
+      slug: "from-anna",
+      title: "from anna",
+      commits: 32,
+      latest: commit(
+        "from-anna",
+        "c594e95",
+        "fix: focus rings, the desk's sticky bars, and photographs on their way",
+        "3d",
+      ),
+    },
+    {
+      slug: "entrepta",
+      title: "entrepta",
+      commits: 15,
+      latest: commit("entrepta", "f0fef72", "fix(repo): final code review, security first", "10h"),
+    },
+    {
+      slug: "nomatch",
+      title: "nomatch",
+      commits: 14,
+      latest: commit(
+        "no-match",
+        "7cbf407",
+        "Stop the hover flicker, add analytics, and let the intro wait to be asked",
+        "18d",
+      ),
+    },
+  ],
+  quiet: [
+    {
+      slug: "capacity",
+      title: "capacity",
+      commits: 0,
+      latest: commit(
+        "capacity",
+        "6491ed4",
+        "fix(web): stop repeated Space keydowns from toggling the drag off and on",
+        "31d",
+      ),
+    },
+    {
+      slug: "mailroom",
+      title: "mailroom",
+      commits: 0,
+      latest: commit(
+        "mailroom",
+        "6ba264d",
+        "docs: use a static PNG for the README hero instead of the GIF",
+        "36d",
+      ),
+    },
+    {
+      slug: "wristkit",
+      title: "wristkit",
+      commits: 0,
+      latest: commit(
+        "wristkit",
+        "fed6458",
+        "fix(web): sync pnpm-lock and drop stray package-lock.json",
+        "56d",
+      ),
+    },
+    { slug: "resend-ecommerce", title: "resend-ecommerce", commits: 0 },
+  ],
+}
+
+/** The year the card shipped in: eight against a goal of six. */
+export const SHORTLOG_GOAL_FIXTURE = { shipped: 8, goal: 6, yearShort: "26" }

@@ -145,7 +145,14 @@ export default function RootLayout({
 
         <ThemeSwitcher themes={THEMES} defaultTheme="entrepta" position="bottom-right" />
 
-        <Toaster position="top-center" />
+        {/* Bottom centre, where it covers nothing: at the top it sat over the titlebar tabs.
+            48px clears the 28px status bar with the same gap the theme switcher keeps; below
+            600px Sonner goes full width, so it rises above the switcher instead of over it. */}
+        <Toaster
+          position="bottom-center"
+          offset={{ bottom: 48 }}
+          mobileOffset={{ bottom: 96, left: 16, right: 16 }}
+        />
         <ButtonSoundFeedback />
 
         {/* Vercel-only — the insights script 404s (and floods the console) off-platform */}

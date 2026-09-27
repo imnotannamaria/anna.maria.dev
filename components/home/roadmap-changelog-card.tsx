@@ -22,6 +22,7 @@ import { roadmapSlice } from "@/lib/roadmap/widget"
 import { STATUS_LABEL, STATUS_MARK } from "@/lib/roadmap/constants"
 import type { RoadmapItem } from "@/lib/roadmap/validation"
 import type { CardState } from "@/lib/showcase/state"
+import { CardBlank } from "@/components/ui/card-blank"
 import { cn } from "@/lib/utils"
 
 /**
@@ -93,7 +94,8 @@ export function RoadmapChangelogCard({
       ) : slice && slice.rows.length > 0 ? (
         <Rows slice={slice} reduce={reduce} />
       ) : (
-        <Blank
+        <CardBlank
+          className="flex-1 py-8"
           message={state.kind === "error" ? "couldn't load the board" : "nothing on the board yet"}
         />
       )}
@@ -277,20 +279,6 @@ function Row({
 }
 
 // ─── The states that are not rows ─────────────────────────────────────────────
-
-/** Empty and error share a frame and differ only in the line, the way the calendar does. */
-function Blank({ message }: { message: string }) {
-  return (
-    <div
-      className="relative grid flex-1 place-items-center rounded-[10px] border border-dashed py-8"
-      style={{ borderColor: "var(--border-subtle)" }}
-    >
-      <span className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
-        {message}
-      </span>
-    </div>
-  )
-}
 
 /**
  * The rows in grey at the rows' own rhythm — gutter, mark, title, date — so the card is
