@@ -44,7 +44,7 @@ function response(counts: Record<string, number>, commits: (Commit[] | null)[]):
               abbreviatedOid: `sha${i}${j}`,
               messageHeadline: c.message,
               committedDate: c.date,
-              url: `${gh("x")}/commit/${i}${j}`,
+              url: `https://github.com/imnotannamaria/x/commit/${i}${j}`,
               author: { user: { login: c.login ?? LOGIN } },
             })),
           },
@@ -105,9 +105,23 @@ describe("toShortlog", () => {
     expect(result.rows[0].latest).toEqual({
       sha: "sha03",
       message: "fix(registry): card transitions",
-      url: `${gh("x")}/commit/03`,
+      url: "https://github.com/imnotannamaria/x/commit/03",
       ago: "10h",
     })
+  })
+
+  it("never hands the card a commit link that isn't GitHub's own https", () => {
+    const data = response({ entrepta: 1 }, [
+      [
+        { message: "evil", date: "2026-09-26T10:00:00Z" },
+        { message: "fine", date: "2026-09-26T09:00:00Z" },
+      ],
+    ])
+    const history = data.r0?.defaultBranchRef?.target.history
+    if (!history) throw new Error("fixture")
+    history.nodes[0].url = "javascript:alert(1)"
+    const result = toShortlog(data, [project("entrepta")], LOGIN, NOW)
+    expect(result.rows[0].latest?.message).toBe("fine")
   })
 
   it("lists the quiet projects under the busy ones, most recently touched first", () => {

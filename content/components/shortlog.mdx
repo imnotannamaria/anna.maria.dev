@@ -59,7 +59,7 @@ side of hydration.
 ## Four states, and the one that isn't a state
 
 `loading` is the finished card in grey, piece for piece: the number, four busy rows with their
-commit lines, the dashed rule with its label, and the quiet rows at their 70%. Each grey bar sits
+commit lines, the dashed rule with its label, and four quiet rows. Each grey bar sits
 in a box the height of the real line, so nothing moves when GitHub answers. The home page streams
 the card in `<Suspense>`, so the featured project beside it never waits.
 
@@ -92,7 +92,13 @@ Every row is a link, so every row answers the pointer. The row gets a faint vers
 editor's current-line highlight, with a thin mark in the gutter where git draws a changed line.
 Its bar lights up and a glint runs along it once. Its count and commit line get a little
 brighter, an arrow appears on the commit line to say it leaves the site, and pointing at the
-commit itself underlines the message. A quiet row comes up from 70% to full.
+commit itself underlines the message. A quiet row's muted name and sha come up to the busy
+rows' colours.
+
+Quiet rows are quieter through colour, not opacity. They used to sit at 70% opacity, which put
+muted text on the card at 3.3:1 in dark mode and 3.0:1 in light, under AA on the part of the card
+that is nothing but text. Now the name is `--fg-muted` and the sha drops the brand ink, both of
+which clear AA on their own.
 
 The first version did more. The other rows faded back, and the big number rolled from the
 month's total to the row's own count. Each part was defensible on its own. Together they were

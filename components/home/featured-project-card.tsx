@@ -70,10 +70,13 @@ export function FeaturedProjectCard({
        * "View wristkit" link pointing somewhere else entirely, and two links on
        * one page with the same name and different destinations is exactly what
        * a screen-reader link list makes unusable.
+       *
+       * Its focus ring is drawn inward. The global ring sits 2px outside the element, and this
+       * element is the whole card, whose `overflow: hidden` would clip it to nothing.
        */}
       <Link
         href={`/projects/${project.slug}`}
-        className="focus-ring absolute inset-0 z-[1] rounded-[var(--radius-lg)]"
+        className="absolute inset-0 z-[1] rounded-[var(--radius-lg)] focus-visible:-outline-offset-2"
         aria-label={`Read the ${project.title} case study`}
       />
 

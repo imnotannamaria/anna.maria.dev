@@ -156,8 +156,13 @@ export function toShortlog(
   const lastAt = new Map<string, string>()
   const rows: ShortlogRow[] = projects.map((project, i) => {
     const nodes = data[`r${i}`]?.defaultBranchRef?.target.history?.nodes ?? []
+    // The URL becomes an href, so it has to be GitHub's own https before it gets that far. It
+    // comes from GitHub's API and always is; this is the check that keeps it so.
     const last = nodes.find(
-      (n) => n.author?.user?.login === login && !NOISE.test(n.messageHeadline),
+      (n) =>
+        n.author?.user?.login === login &&
+        !NOISE.test(n.messageHeadline) &&
+        n.url.startsWith("https://github.com/"),
     )
     if (last) lastAt.set(project.slug, last.committedDate)
     return {

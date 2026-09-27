@@ -196,24 +196,24 @@ function Body({ data }: { data: Shortlog }) {
             whileInView="show"
             viewport={{ once: true, amount: 0.2 }}
           >
-            <h4 className="text-mono-xs m-0 border-t border-dashed border-[var(--border-subtle)] pt-3 font-mono font-normal tracking-[0.08em] text-[var(--fg-muted)] uppercase">
-              quiet this month
-            </h4>
+            <QuietHeading />
             <ul className="m-0 flex list-none flex-col p-0">
               {data.quiet.map((row) => (
-                <Row key={row.slug} quiet>
+                <Row key={row.slug}>
                   <Link
                     href={`/projects/${row.slug}`}
                     className="focus-ring flex items-baseline justify-between gap-3 rounded-[var(--radius-sm)]"
                   >
-                    <span className="text-mono-sm truncate font-mono text-[var(--fg-secondary)]">
+                    {/* min-w-0: a flex item won't shrink below its content without it, and
+                        `truncate` would never get the chance to cut. */}
+                    <span className="text-mono-sm min-w-0 truncate font-mono text-[var(--fg-muted)] transition-colors duration-150 group-focus-within/row:text-[var(--fg-secondary)] group-hover/row:text-[var(--fg-secondary)]">
                       {row.title}
                     </span>
                     <span className="text-mono-xs font-mono whitespace-nowrap text-[var(--fg-muted)]">
                       {row.latest ? `${row.latest.ago} ago` : "—"}
                     </span>
                   </Link>
-                  {row.latest && <CommitLine project={row.title} commit={row.latest} hideAgo />}
+                  {row.latest && <CommitLine project={row.title} commit={row.latest} quiet />}
                 </Row>
               ))}
             </ul>
@@ -224,6 +224,15 @@ function Body({ data }: { data: Shortlog }) {
   )
 }
 
+/** The rule and label over the quiet rows, shared with the skeleton so the two can't drift. */
+function QuietHeading() {
+  return (
+    <h4 className="text-mono-xs m-0 border-t border-dashed border-[var(--border-subtle)] pt-3 font-mono font-normal tracking-[0.08em] text-[var(--fg-muted)] uppercase">
+      quiet this month
+    </h4>
+  )
+}
+
 /**
  * One row's frame: the highlight and the gutter mark. The children are the row's links.
  *
@@ -231,18 +240,14 @@ function Body({ data }: { data: Shortlog }) {
  * their own vertical padding instead of a gap between them, so the highlights meet and the
  * pointer never falls into a space that belongs to no row.
  *
- * A quiet row rests at 70% — the honest half of the card, but the second half — and comes up
- * to full when it is the one pointed at.
+ * A quiet row is quieter in its colours, not in its opacity: its name is muted and its sha
+ * loses the brand ink, and both come up when the row is pointed at. It used to sit at 70%
+ * opacity, which put muted text on the card at 3.3:1 in dark mode and 3.0:1 in light — under
+ * AA, on the half of the card that is text and nothing else.
  */
-function Row({ quiet, children }: { quiet?: boolean; children: React.ReactNode }) {
+function Row({ children }: { children: React.ReactNode }) {
   return (
-    <li
-      className={cn(
-        "group/row relative py-2",
-        quiet &&
-          "opacity-70 transition-opacity duration-150 focus-within:opacity-100 hover:opacity-100",
-      )}
-    >
+    <li className="group/row relative py-2">
       <span
         aria-hidden
         className="pointer-events-none absolute inset-y-0 -right-3 -left-3 rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--fg-brand)_5%,transparent)] opacity-0 transition-opacity duration-150 group-focus-within/row:opacity-100 group-hover/row:opacity-100"
@@ -266,11 +271,12 @@ function Row({ quiet, children }: { quiet?: boolean; children: React.ReactNode }
 function CommitLine({
   project,
   commit,
-  hideAgo,
+  quiet,
 }: {
   project: string
   commit: ShortlogCommit
-  hideAgo?: boolean
+  /** A quiet row prints its age beside the name, and keeps its sha out of the brand ink. */
+  quiet?: boolean
 }) {
   return (
     <a
@@ -281,12 +287,21 @@ function CommitLine({
       aria-label={`Last commit to ${project}, ${commit.ago} ago: ${commit.message}`}
       className="focus-ring group/commit text-mono-xs grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-[var(--radius-sm)] font-mono text-[var(--fg-muted)] transition-colors duration-150 group-focus-within/row:text-[var(--fg-secondary)] group-hover/row:text-[var(--fg-secondary)]"
     >
-      <span className="text-[var(--fg-brand-text)]">{commit.sha}</span>
+      <span
+        className={cn(
+          "transition-colors duration-150",
+          quiet
+            ? "group-focus-within/row:text-[var(--fg-brand-text)] group-hover/row:text-[var(--fg-brand-text)]"
+            : "text-[var(--fg-brand-text)]",
+        )}
+      >
+        {commit.sha}
+      </span>
       <span className="truncate group-hover/commit:underline group-hover/commit:decoration-[var(--border-strong)] group-hover/commit:underline-offset-2">
         {commit.message}
       </span>
       <span className="inline-flex items-center gap-1 whitespace-nowrap">
-        {!hideAgo && commit.ago}
+        {!quiet && commit.ago}
         {/* Space held for it always, so the line never reflows when it appears. */}
         <ArrowUpRightIcon
           aria-hidden
@@ -372,18 +387,20 @@ function Terminal({ kind }: { kind: "empty" | "error" }) {
         {kind === "error" ? (
           <>
             <p className="m-0 text-[var(--fg-secondary)]">
-              <span className="text-[var(--status-error)]">fatal:</span> github.com didn&rsquo;t
-              answer
+              {/* Spaces as expressions: a space between a tag and text is the kind the JSX
+                  whitespace rules are allowed to eat, and "fatal:github" is what that looks like. */}
+              <span className="text-[var(--status-error-fg)]">fatal:</span>
+              {" github.com didn\u2019t answer"}
             </p>
             <p className="m-0 text-[var(--fg-muted)]">
-              <span aria-hidden># </span>the counts come back on their own
+              <span aria-hidden>{"# "}</span>the counts come back on their own
             </p>
           </>
         ) : (
           <>
             <p className="m-0 text-[var(--fg-secondary)]">no project here points at a repository</p>
             <p className="m-0 text-[var(--fg-muted)]">
-              <span aria-hidden># </span>add a github url to a project&rsquo;s frontmatter
+              <span aria-hidden>{"# "}</span>add a github url to a project&rsquo;s frontmatter
             </p>
           </>
         )}
@@ -413,7 +430,7 @@ function Prompt() {
 
 /**
  * The loaded card in grey, piece for piece: the figure, four busy rows with their commit lines,
- * the dashed rule and its label, and the quiet rows at the quiet rows' 70%. Every line sits in
+ * the dashed rule and its label, and four quiet rows. Every line sits in
  * a box with the real line's type size, so its height is the real height and nothing moves
  * when GitHub answers. The label is real text — it is known before anything loads.
  */
@@ -448,10 +465,8 @@ function BodySkeleton() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <h4 className="text-mono-xs m-0 border-t border-dashed border-[var(--border-subtle)] pt-3 font-mono font-normal tracking-[0.08em] text-[var(--fg-muted)] uppercase">
-              quiet this month
-            </h4>
-            <div className="flex flex-col opacity-70">
+            <QuietHeading />
+            <div className="flex flex-col">
               {[0, 1, 2, 3].map((i) => (
                 <div key={i} className="flex flex-col gap-1 py-2">
                   <div className="flex items-center justify-between gap-3">

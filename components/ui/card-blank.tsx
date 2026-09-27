@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils"
  * and the blank has to hold that height so nothing below it moves when the data arrives or
  * fails, so the height comes in through `className` or `style`.
  *
- * It was a private `Blank` in the log card and again in the roadmap card; the shortlog card
- * would have been the third copy.
+ * It was a private `Blank` in the log card and again in the roadmap card: two copies of one
+ * frame, which is the warning, and folded here before a third arrived.
  */
 export function CardBlank({
   message,
