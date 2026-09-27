@@ -18,8 +18,7 @@ import {
   CardLabel,
   CardMeta,
 } from "@/app/components/entrepta/card"
-import { CardBlank } from "@/components/ui/card-blank"
-import { SHORTLOG_ACTIVE_ROWS, SHORTLOG_DAYS } from "@/lib/github/shortlog-constants"
+import { SHORTLOG_DAYS } from "@/lib/github/shortlog-constants"
 import type { Shortlog, ShortlogCommit } from "@/lib/github/shortlog"
 import type { CardState } from "@/lib/showcase/state"
 import { siteConfig } from "@/lib/site-config"
@@ -73,10 +72,7 @@ export function ShortlogCard({
       ) : data ? (
         <Body data={data} />
       ) : (
-        <CardBlank
-          className="min-h-[10.5rem] flex-1"
-          message={state.kind === "error" ? "couldn't reach github" : "a quiet month"}
-        />
+        <Terminal kind={state.kind === "error" ? "error" : "empty"} />
       )}
 
       <CardFooter>
@@ -135,61 +131,62 @@ function Body({ data }: { data: Shortlog }) {
 
   return (
     <>
-      <div className="flex items-end gap-3">
-        <span
-          className="text-display-md font-serif italic"
-          style={{ color: "var(--fg-brand)", lineHeight: 1, letterSpacing: "-0.02em" }}
-        >
-          <RollingNumber value={data.total} height={40} />
-        </span>
-        <span className="text-mono-sm mb-1 font-mono tracking-[0.06em] text-[var(--fg-muted)]">
-          commits across {data.active} {data.active === 1 ? "project" : "projects"}
-        </span>
-      </div>
+      <Figure
+        value={data.total}
+        caption={
+          data.active === 0
+            ? `commits in the last ${SHORTLOG_DAYS} days`
+            : `commits across ${data.active} ${data.active === 1 ? "project" : "projects"}`
+        }
+      />
 
       {/* Whatever height the column gives the card beyond its content goes between the busy
           rows and the quiet ones, not into a gap under the footer. */}
       <div className="flex flex-1 flex-col justify-between gap-4">
-        <motion.ul
-          className="m-0 flex list-none flex-col p-0"
-          variants={list}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          {data.rows.map((row) => (
-            <Row key={row.slug}>
-              {/* Name, bar, count. The name truncates and the count never does: the column
+        {/* A month with no commits is still `ok`: every project lands in the quiet list with
+            its last commit, which says more than an empty frame would. */}
+        {data.rows.length > 0 && (
+          <motion.ul
+            className="m-0 flex list-none flex-col p-0"
+            variants={list}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            {data.rows.map((row) => (
+              <Row key={row.slug}>
+                {/* Name, bar, count. The name truncates and the count never does: the column
                   is ~280px on a phone, and a number cut in half is a wrong number. */}
-              <Link
-                href={`/projects/${row.slug}`}
-                className="focus-ring grid grid-cols-[minmax(0,8.5rem)_1fr_auto] items-center gap-3 rounded-[var(--radius-sm)]"
-              >
-                <span className="text-mono-sm truncate font-mono text-[var(--fg-primary)]">
-                  {row.title}
-                </span>
-                <span className="relative h-1.5" aria-hidden>
-                  <motion.span
-                    variants={bar}
-                    className="absolute inset-y-0 left-0 overflow-hidden rounded-full bg-[var(--fg-brand)] transition-shadow duration-300 group-focus-within/row:shadow-[0_0_14px_color-mix(in_srgb,var(--fg-brand)_60%,transparent)] group-hover/row:shadow-[0_0_14px_color-mix(in_srgb,var(--fg-brand)_60%,transparent)]"
-                    style={{ width: `${Math.max(4, (row.commits / max) * 100)}%`, originX: 0 }}
-                  >
-                    {/* The glint: a fixed gradient that translates, never a gradient string
+                <Link
+                  href={`/projects/${row.slug}`}
+                  className="focus-ring grid grid-cols-[minmax(0,8.5rem)_1fr_auto] items-center gap-3 rounded-[var(--radius-sm)]"
+                >
+                  <span className="text-mono-sm truncate font-mono text-[var(--fg-primary)]">
+                    {row.title}
+                  </span>
+                  <span className="relative h-1.5" aria-hidden>
+                    <motion.span
+                      variants={bar}
+                      className="absolute inset-y-0 left-0 overflow-hidden rounded-full bg-[var(--fg-brand)] transition-shadow duration-300 group-focus-within/row:shadow-[0_0_14px_color-mix(in_srgb,var(--fg-brand)_60%,transparent)] group-hover/row:shadow-[0_0_14px_color-mix(in_srgb,var(--fg-brand)_60%,transparent)]"
+                      style={{ width: `${Math.max(4, (row.commits / max) * 100)}%`, originX: 0 }}
+                    >
+                      {/* The glint: a fixed gradient that translates, never a gradient string
                         rebuilt per frame. It runs out on hover and snaps back unseen, so it
                         only ever travels one way. `--fg-on-brand` because that is the ink
                         each theme guarantees reads on the brand fill. */}
-                    <span className="absolute inset-y-0 left-0 w-1/2 -translate-x-full bg-[linear-gradient(90deg,transparent,color-mix(in_srgb,var(--fg-on-brand)_55%,transparent),transparent)] group-focus-within/row:translate-x-[260%] group-focus-within/row:transition-transform group-focus-within/row:duration-700 group-focus-within/row:ease-[var(--ease-out)] group-hover/row:translate-x-[260%] group-hover/row:transition-transform group-hover/row:duration-700 group-hover/row:ease-[var(--ease-out)]" />
-                  </motion.span>
-                </span>
-                <span className="text-mono-sm font-mono whitespace-nowrap text-[var(--fg-muted)] tabular-nums transition-colors duration-150 group-focus-within/row:text-[var(--fg-secondary)] group-hover/row:text-[var(--fg-secondary)]">
-                  {row.commits}
-                  <span className="sr-only"> commits</span>
-                </span>
-              </Link>
-              {row.latest && <CommitLine project={row.title} commit={row.latest} />}
-            </Row>
-          ))}
-        </motion.ul>
+                      <span className="absolute inset-y-0 left-0 w-1/2 -translate-x-full bg-[linear-gradient(90deg,transparent,color-mix(in_srgb,var(--fg-on-brand)_55%,transparent),transparent)] group-focus-within/row:translate-x-[260%] group-focus-within/row:transition-transform group-focus-within/row:duration-700 group-focus-within/row:ease-[var(--ease-out)] group-hover/row:translate-x-[260%] group-hover/row:transition-transform group-hover/row:duration-700 group-hover/row:ease-[var(--ease-out)]" />
+                    </motion.span>
+                  </span>
+                  <span className="text-mono-sm font-mono whitespace-nowrap text-[var(--fg-muted)] tabular-nums transition-colors duration-150 group-focus-within/row:text-[var(--fg-secondary)] group-hover/row:text-[var(--fg-secondary)]">
+                    {row.commits}
+                    <span className="sr-only"> commits</span>
+                  </span>
+                </Link>
+                {row.latest && <CommitLine project={row.title} commit={row.latest} />}
+              </Row>
+            ))}
+          </motion.ul>
+        )}
 
         {data.quiet.length > 0 && (
           <motion.div
@@ -301,32 +298,179 @@ function CommitLine({
   )
 }
 
-/** The figure and the rows in grey, at their own sizes, so nothing moves when GitHub answers. */
+/**
+ * The big figure and its caption. A number rolls in; anything else (the error's dash) is set
+ * still, with words for a screen reader, since "em dash" is not a count.
+ */
+function Figure({ value, caption }: { value: number | null; caption: string }) {
+  return (
+    <div className="flex items-end gap-3">
+      <span
+        className="text-display-md font-serif italic"
+        style={{
+          color: value === null ? "var(--fg-muted)" : "var(--fg-brand)",
+          lineHeight: 1,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {value === null ? (
+          <>
+            <span aria-hidden className="block h-10 leading-10">
+              —
+            </span>
+            <span className="sr-only">unknown</span>
+          </>
+        ) : (
+          <RollingNumber value={value} height={40} />
+        )}
+      </span>
+      <span className="text-mono-sm mb-1 font-mono tracking-[0.06em] text-[var(--fg-muted)]">
+        {caption}
+      </span>
+    </div>
+  )
+}
+
+const COMMAND = `git shortlog -sn --since=${SHORTLOG_DAYS}.days.ago`
+
+/**
+ * Empty and error, as the command and what it printed.
+ *
+ * They used to be one muted line centred in a dashed frame, which said what happened and
+ * nothing about the card. This is the card's own premise played straight: the header already
+ * reads `git shortlog`, so when there is nothing to chart, the body is a terminal pane showing
+ * that command run and its output, with a caret waiting at a fresh prompt. The figure stays on
+ * top so the card keeps its shape — `0` when there is genuinely nothing, a dash when the answer
+ * never came, which is not the same as zero.
+ *
+ * `empty` only happens when no project has a `github` URL, which is a fresh fork of this site
+ * rather than a quiet month (a quiet month is `ok`, with every project in the quiet list). So
+ * its output says what to do about it. `error` never prints why: the reason is for the logs,
+ * and a status code on the home page tells a visitor nothing they can use.
+ *
+ * The pane is `--bg-canvas`, a step below the card, so it reads as inset rather than as
+ * another card on top. The text is real text; only the prompts and the caret are decoration.
+ */
+function Terminal({ kind }: { kind: "empty" | "error" }) {
+  return (
+    <>
+      <Figure
+        value={kind === "error" ? null : 0}
+        caption={
+          kind === "error"
+            ? `commits in the last ${SHORTLOG_DAYS} days`
+            : "projects linked to github"
+        }
+      />
+
+      <div className="text-mono-sm flex min-h-48 flex-1 flex-col gap-1.5 rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-4 font-mono [overflow-wrap:anywhere]">
+        <p className="m-0 text-[var(--fg-primary)]">
+          <Prompt />
+          {COMMAND}
+        </p>
+
+        {kind === "error" ? (
+          <>
+            <p className="m-0 text-[var(--fg-secondary)]">
+              <span className="text-[var(--status-error)]">fatal:</span> github.com didn&rsquo;t
+              answer
+            </p>
+            <p className="m-0 text-[var(--fg-muted)]">
+              <span aria-hidden># </span>the counts come back on their own
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="m-0 text-[var(--fg-secondary)]">no project here points at a repository</p>
+            <p className="m-0 text-[var(--fg-muted)]">
+              <span aria-hidden># </span>add a github url to a project&rsquo;s frontmatter
+            </p>
+          </>
+        )}
+
+        <p aria-hidden className="m-0 mt-1">
+          <Prompt />
+          <span className="type-caret" />
+        </p>
+
+        <div className="mt-auto pt-4">
+          <ArrowLink asChild className="text-mono-sm">
+            <Link href="/projects">all projects</Link>
+          </ArrowLink>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function Prompt() {
+  return (
+    <span aria-hidden className="text-[var(--fg-brand)]">
+      ${" "}
+    </span>
+  )
+}
+
+/**
+ * The loaded card in grey, piece for piece: the figure, four busy rows with their commit lines,
+ * the dashed rule and its label, and the quiet rows at the quiet rows' 70%. Every line sits in
+ * a box with the real line's type size, so its height is the real height and nothing moves
+ * when GitHub answers. The label is real text — it is known before anything loads.
+ */
 function BodySkeleton() {
   return (
     <>
       <div className="flex flex-1 flex-col gap-4" aria-hidden>
         <div className="flex items-end gap-3">
-          <Skeleton style={{ width: 64, height: 40, borderRadius: 4 }} />
-          <Skeleton className="mb-1" style={{ width: 170, height: 10, borderRadius: 3 }} />
+          <Skeleton style={{ width: 74, height: 40, borderRadius: 4 }} />
+          <Line size="sm" className="mb-1">
+            <Skeleton style={{ width: 180, height: 9, borderRadius: 3 }} />
+          </Line>
         </div>
-        <div className="flex flex-col">
-          {Array.from({ length: SHORTLOG_ACTIVE_ROWS - 1 }, (_, i) => (
-            <div key={i} className="flex flex-col gap-2 py-2">
-              <div className="grid grid-cols-[minmax(0,8.5rem)_1fr_auto] items-center gap-3">
-                <Skeleton delay={i * 0.05} style={{ width: "70%", height: 10, borderRadius: 3 }} />
-                <Skeleton
-                  delay={i * 0.05}
-                  style={{ width: `${88 - i * 20}%`, height: 6, borderRadius: 999 }}
-                />
-                <Skeleton delay={i * 0.05} style={{ width: 18, height: 10, borderRadius: 3 }} />
+
+        <div className="flex flex-1 flex-col justify-between gap-4">
+          <div className="flex flex-col">
+            {[88, 46, 22, 20].map((bar, i) => (
+              <div key={bar} className="flex flex-col gap-1 py-2">
+                <div className="grid grid-cols-[minmax(0,8.5rem)_1fr_auto] items-center gap-3">
+                  <Line size="sm">
+                    <Skeleton delay={i * 0.05} style={{ width: `${70 - i * 8}%`, height: 9 }} />
+                  </Line>
+                  <Skeleton
+                    delay={i * 0.05}
+                    style={{ width: `${bar}%`, height: 6, borderRadius: 999 }}
+                  />
+                  <Skeleton delay={i * 0.05} style={{ width: 16, height: 9, borderRadius: 3 }} />
+                </div>
+                <CommitSkeleton delay={i * 0.05} width={78 - i * 9} />
               </div>
-              <Skeleton
-                delay={i * 0.05}
-                style={{ width: `${80 - i * 8}%`, height: 8, borderRadius: 3 }}
-              />
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <h4 className="text-mono-xs m-0 border-t border-dashed border-[var(--border-subtle)] pt-3 font-mono font-normal tracking-[0.08em] text-[var(--fg-muted)] uppercase">
+              quiet this month
+            </h4>
+            <div className="flex flex-col opacity-70">
+              {[0, 1, 2, 3].map((i) => (
+                <div key={i} className="flex flex-col gap-1 py-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <Line size="sm">
+                      <Skeleton
+                        delay={0.2 + i * 0.05}
+                        style={{ width: 72 - i * 6, height: 9, borderRadius: 3 }}
+                      />
+                    </Line>
+                    <Skeleton
+                      delay={0.2 + i * 0.05}
+                      style={{ width: 44, height: 8, borderRadius: 3 }}
+                    />
+                  </div>
+                  <CommitSkeleton delay={0.2 + i * 0.05} width={70 - i * 7} />
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
       {/* Outside the aria-hidden box: a status under a hidden ancestor is never announced. */}
@@ -334,5 +478,39 @@ function BodySkeleton() {
         Loading recent commits
       </span>
     </>
+  )
+}
+
+/** A box one real line tall at the given size, so a grey bar inside it takes that height. */
+function Line({
+  size,
+  className,
+  children,
+}: {
+  size: "sm" | "xs"
+  className?: string
+  children: React.ReactNode
+}) {
+  return (
+    <span
+      className={cn(
+        "flex items-center font-mono",
+        size === "sm" ? "text-mono-sm" : "text-mono-xs",
+        className,
+      )}
+    >
+      {"\u200b"}
+      {children}
+    </span>
+  )
+}
+
+/** sha, message, age — the commit line's three columns, in grey. */
+function CommitSkeleton({ delay, width }: { delay: number; width: number }) {
+  return (
+    <Line size="xs" className="gap-2">
+      <Skeleton delay={delay} style={{ width: 44, height: 8, borderRadius: 3 }} />
+      <Skeleton delay={delay} style={{ width: `${width}%`, height: 8, borderRadius: 3 }} />
+    </Line>
   )
 }

@@ -58,20 +58,33 @@ side of hydration.
 
 ## Four states, and the one that isn't a state
 
-`loading` is the card with its rows in grey at their real sizes. The home page streams the card
-in `<Suspense>`, so the featured project beside it never waits for GitHub.
+`loading` is the finished card in grey, piece for piece: the number, four busy rows with their
+commit lines, the dashed rule with its label, and the quiet rows at their 70%. Each grey bar sits
+in a box the height of the real line, so nothing moves when GitHub answers. The home page streams
+the card in `<Suspense>`, so the featured project beside it never waits.
+
+`error` and `empty` used to be one muted line centred in a dashed frame. That said what happened
+and nothing else. The card's header already reads `git shortlog`, so now, when there is nothing
+to chart, the body is a terminal pane: the command, what it printed, and a caret blinking at a
+fresh prompt. The number stays on top so the card keeps its shape.
 
 `error` covers three failures: no `GITHUB_TOKEN`, a status that isn't 200, and a GraphQL error.
-GitHub reports a bad login or a spent quota as a 200 with an `errors` array, so checking
-`res.ok` alone misses it.
+GitHub reports a bad login or a spent quota as a 200 with an `errors` array, so checking `res.ok`
+alone misses it. The pane prints `fatal: github.com didn't answer` and never the reason, which is
+for the logs. The number is a dash, not a zero: an answer that never came is not the same as no
+commits.
 
-`empty` is the only one about the account and not the server: the request worked and there were
-no commits this month.
+`empty` means no project has a `github` URL that points at a repository. That's a fresh fork of
+this site, so the pane says what to do about it. It is decided before GitHub is asked anything,
+and before the token is checked, so a fork with no projects isn't told its token is missing.
 
-A repository GitHub can't resolve, renamed or made private, is not a state. It comes back as
-`null` next to an `errors` entry, and the card keeps going. That row loses its last commit and
-shows a dash, and the rest of the card is untouched. The last quiet row in the `ok` demo is one
-of those.
+A quiet month is not `empty`. It is `ok` with no busy rows: the number is `0`, and every project
+sits in the quiet list with its last commit. That says more than a blank frame, and it's what the
+home page would show after a month off.
+
+A repository GitHub can't resolve, renamed or made private, is not a state either. It comes back
+as `null` next to an `errors` entry, and the card keeps going. That row loses its last commit and
+shows a dash. The last quiet row in the `ok` demo is one of those.
 
 ## The hover
 

@@ -201,24 +201,31 @@ export function windowStart(now: number): string {
 }
 
 /**
- * The same contract as `getContributions`: a state, never a throw, and the failures kept
- * apart from the quiet month. Three branches are about this server (no token, a non-200, a
- * GraphQL error) and one is about the account (the request worked and nothing was
- * committed), and only the last one is `empty`.
+ * The same contract as `getContributions`: a state, never a throw.
+ *
+ * `error` is about this server: no token, a non-200, a GraphQL error. `empty` is about the
+ * content, and it is decided before asking GitHub anything: no project has a `github` URL that
+ * points at a repository, which is a fresh fork of this site. A month with no commits is not
+ * `empty`. It is `ok` with no busy rows, and every project in the quiet list with its last
+ * commit, which says far more than a blank frame would.
  */
 export async function getShortlog(
   login: string,
   projects: ShortlogProject[],
 ): Promise<CardState<Shortlog>> {
-  const token = process.env.GITHUB_TOKEN
-  if (!token) return { kind: "error", message: "GITHUB_TOKEN not set" }
-
   // A project whose `github` isn't a repository URL can't be asked about; it drops out here
   // rather than failing the whole query.
   const repos = projects.flatMap((p) => {
     const repo = parseRepo(p.github)
     return repo ? [{ project: p, ...repo }] : []
   })
+  if (repos.length === 0) return { kind: "empty" }
+
+  // After the empty check: a fork with no projects yet has nothing to ask about, and "couldn't
+  // reach github" would blame a token it doesn't need.
+  const token = process.env.GITHUB_TOKEN
+  if (!token) return { kind: "error", message: "GITHUB_TOKEN not set" }
+
   const { query, variables } = buildQuery(repos)
 
   try {
@@ -258,7 +265,7 @@ export async function getShortlog(
       login,
       Date.now(),
     )
-    return shortlog.active === 0 ? { kind: "empty" } : { kind: "ok", data: shortlog }
+    return { kind: "ok", data: shortlog }
   } catch (err) {
     // `err.message`, never the error: a failed fetch can carry its request, and the request
     // carries the Authorization header.

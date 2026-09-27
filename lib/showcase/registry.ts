@@ -103,6 +103,9 @@ export const SHOWCASE = {
      * copy kept around to fall back on, which is the only thing `stale` means here. A repository
      * GitHub can't resolve is not a state of the card either — it costs that one row its last
      * commit, and the `ok` fixture carries a row like that.
+     *
+     * `empty` is a fresh fork, with no project pointing at a repository. A month with no commits
+     * is `ok` with every project in the quiet list, so it is not a frame of its own here.
      */
     states: ["loading", "empty", "error", "ok"],
   },

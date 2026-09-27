@@ -1,7 +1,8 @@
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import {
   ago,
   buildQuery,
+  getShortlog,
   parseRepo,
   toShortlog,
   windowStart,
@@ -195,5 +196,48 @@ describe("windowStart", () => {
     const night = Date.parse("2026-09-26T23:59:59Z")
     expect(windowStart(morning)).toBe("2026-08-27T00:00:00.000Z")
     expect(windowStart(night)).toBe(windowStart(morning))
+  })
+})
+
+describe("getShortlog", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+  })
+
+  it("is empty, without asking GitHub, when no project points at a repository", async () => {
+    const fetch = vi.fn()
+    vi.stubGlobal("fetch", fetch)
+    vi.stubEnv("GITHUB_TOKEN", "")
+    expect(await getShortlog(LOGIN, [])).toEqual({ kind: "empty" })
+    expect(
+      await getShortlog(LOGIN, [
+        { slug: "x", title: "x", github: "https://github.com/imnotannamaria" },
+      ]),
+    ).toEqual({ kind: "empty" })
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
+  it("is an error, not empty, when there are projects and no token", async () => {
+    vi.stubEnv("GITHUB_TOKEN", "")
+    const state = await getShortlog(LOGIN, [project("entrepta")])
+    expect(state.kind).toBe("error")
+  })
+
+  it("keeps a month with no commits as ok, every project in the quiet list", async () => {
+    vi.stubEnv("GITHUB_TOKEN", "t")
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        Response.json({
+          data: response({}, [[{ message: "feat: a", date: "2026-08-01T12:00:00Z" }]]),
+        }),
+      ),
+    )
+    const state = await getShortlog(LOGIN, [project("wristkit")])
+    expect(state.kind).toBe("ok")
+    if (state.kind !== "ok") return
+    expect(state.data.rows).toEqual([])
+    expect(state.data.quiet.map((r) => r.slug)).toEqual(["wristkit"])
   })
 })
