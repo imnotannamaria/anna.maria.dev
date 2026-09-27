@@ -15,6 +15,7 @@ import { posterSrc } from "@/lib/log/poster-src"
 import type { CardState } from "@/lib/showcase/state"
 import { TYPE_LABEL } from "@/lib/log/constants"
 import type { LogEntry } from "@/lib/log/validation"
+import { CardBlank } from "@/components/ui/card-blank"
 import { cn } from "@/lib/utils"
 
 /**
@@ -129,7 +130,8 @@ export function LogShelfCard({
       ) : entries && entries.length > 0 ? (
         <Drift entries={entries} pinned={pinned} onHover={setHovered} onPin={pin} />
       ) : (
-        <Blank
+        <CardBlank
+          style={{ height: "calc(var(--log-cover-h) * 2 + 10px)" }}
           message={
             state.kind === "error"
               ? "couldn't load the log"
@@ -388,23 +390,6 @@ function Caption({
 }
 
 // ─── The states that are not covers ───────────────────────────────────────────
-
-/** Empty and error share a frame and differ only in the line, the way the calendar does. */
-function Blank({ message }: { message: string }) {
-  return (
-    <div
-      className="relative grid place-items-center rounded-[10px] border border-dashed"
-      style={{
-        height: "calc(var(--log-cover-h) * 2 + 10px)",
-        borderColor: "var(--border-subtle)",
-      }}
-    >
-      <span className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
-        {message}
-      </span>
-    </div>
-  )
-}
 
 /**
  * The rows in grey, at the size the real rows will be, so nothing below moves when the
