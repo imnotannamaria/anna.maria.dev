@@ -5,13 +5,11 @@ import { motion, useReducedMotion, type Variants } from "motion/react"
 import { ArrowUpRightIcon } from "@phosphor-icons/react"
 import { EASE_OUT } from "@/lib/motion"
 import { cn } from "@/lib/utils"
-import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
-import { useReveal } from "@/app/components/entrepta/reveal"
+import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 import { RollingNumber } from "@/app/components/entrepta/rolling-number"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import {
-  cardVariants,
   CardComment,
   CardFooter,
   CardHeader,
@@ -54,14 +52,10 @@ export function ShortlogCard({
   goal: ShortlogGoal
   className?: string
 }) {
-  const { onMouseMove, spotlight } = useSpotlight(480)
-  const reveal = useReveal()
   const data = state.kind === "ok" || state.kind === "stale" ? state.data : null
 
   return (
-    <motion.div className={cn(cardVariants(), className)} onMouseMove={onMouseMove} {...reveal}>
-      <Spotlight {...spotlight} />
-
+    <SpotlightCard glow={480} className={className}>
       <CardHeader>
         <CardLabel as="h3">git shortlog</CardLabel>
         <CardMeta>last {SHORTLOG_DAYS} days</CardMeta>
@@ -81,7 +75,7 @@ export function ShortlogCard({
           github
         </ArrowLink>
       </CardFooter>
-    </motion.div>
+    </SpotlightCard>
   )
 }
 

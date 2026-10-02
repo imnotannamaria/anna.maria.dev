@@ -17,7 +17,6 @@
 import { cardVariants } from "@/app/components/entrepta/card"
 import { useId, useState } from "react"
 import Image from "next/image"
-import { motion } from "motion/react"
 import { PauseIcon, PlayIcon, SkipBackIcon, SkipForwardIcon } from "@phosphor-icons/react"
 import type { SimplifiedTrack } from "@/lib/spotify"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
@@ -29,7 +28,6 @@ import {
   CardLabel,
   CardMeta,
 } from "@/app/components/entrepta/card"
-import { useReveal } from "@/app/components/entrepta/reveal"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
 
@@ -247,14 +245,16 @@ export function SleeveCard({
   const [peek, setPeek] = useState(false)
   const [coverError, setCoverError] = useState(false)
   const { onMouseMove, spotlight } = useSpotlight(360)
-  const reveal = useReveal()
   const albumId = useId()
 
   const progress = totalMs > 0 ? Math.min(elapsedMs / totalMs, 1) : 0
   const out = running ? OUT_PLAYING : OUT_STOPPED
 
   return (
-    <motion.div className={cn(cardVariants(), className)} onMouseMove={onMouseMove} {...reveal}>
+    // `cardVariants()` and the hook, not `SpotlightCard`, because of the progress bar at the
+    // bottom: it rides the card's own edge, and `SpotlightCard` puts its children in a wrapper
+    // inside the padding, where the same bar lands right under the footer text.
+    <div className={cn(cardVariants(), className)} onMouseMove={onMouseMove}>
       <Spotlight {...spotlight} />
       <h3 className="sr-only">Songs that sound like me</h3>
 
@@ -388,7 +388,7 @@ export function SleeveCard({
           style={{ background: "var(--fg-brand)", transform: `scaleX(${progress})` }}
         />
       </div>
-    </motion.div>
+    </div>
   )
 }
 

@@ -1,7 +1,6 @@
 "use client"
 
 import { Suspense, use } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import {
@@ -10,6 +9,7 @@ import {
   PaperPlaneTiltIcon,
   XLogoIcon,
 } from "@phosphor-icons/react"
+import { Avatar } from "@/app/components/entrepta/avatar"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { EASE_OUT, revealViewport } from "@/lib/motion"
@@ -56,14 +56,21 @@ function Stat({ value, label, delay }: { value: number; label: string; delay: nu
 // ─── Avatar ──────────────────────────────────────────────────────────────────
 
 /**
- * Square, not round. At rest the brand frame sits behind and aligned; on hover
- * the photo lifts up-left and the frame slides the other way, showing through
- * like a print offset that missed registration.
+ * entrepta's `Avatar`, square and at its largest size, inside this card's own hover: at rest
+ * the brand frame sits behind and aligned; on hover the photo lifts up-left and the frame
+ * slides the other way, showing through like a print offset that missed registration.
  *
- * `alt=""` because the h1 beside it already says whose face this is — a screen
- * reader announcing the name twice is worse than not announcing the photo.
+ * The face used to be drawn here, a `next/image` in a hand-rolled bordered box. v3 ships
+ * the Avatar, so the box, the border and the corner are entrepta's now, and what stays is what
+ * only this card does. Two things came with the swap: the initials sit under the photo until
+ * it loads, so the square is never empty, and the image is a plain lazy `<img>` rather than a
+ * preloaded `next/image` — at 24 KB for the whole file that is a fair trade for one avatar on
+ * the site instead of two.
+ *
+ * `aria-hidden` because the h1 beside it already says whose face this is — a screen reader
+ * announcing the name twice is worse than not announcing the photo.
  */
-function Avatar() {
+function AvatarFrame() {
   const reduce = useReducedMotion() ?? false
 
   const frame: Variants = {
@@ -84,30 +91,27 @@ function Avatar() {
       animate="rest"
       transition={{ duration: reduce ? 0 : 0.32, ease: EASE_OUT }}
     >
+      {/* The same corner as the Avatar's `xl` square, so the frame lines up behind it. */}
       <motion.span
         aria-hidden
         variants={frame}
         transition={{ duration: reduce ? 0 : 0.32, ease: EASE_OUT }}
         className="absolute inset-0"
-        style={{ border: "1.5px solid var(--fg-brand)", borderRadius: 14 }}
+        style={{ border: "1.5px solid var(--fg-brand)", borderRadius: "var(--radius-xl)" }}
       />
       <motion.div
         variants={photo}
         transition={{ duration: reduce ? 0 : 0.32, ease: EASE_OUT }}
-        className="absolute inset-0 overflow-hidden"
-        style={{
-          borderRadius: 14,
-          border: "1px solid var(--border-strong)",
-          background: "var(--bg-card)",
-        }}
+        className="absolute inset-0 flex"
       >
-        <Image
+        <Avatar
+          aria-hidden
+          name={siteConfig.name}
           src="/images/avatar.png"
-          alt=""
-          width={96}
-          height={96}
-          priority
-          className="h-full w-full object-cover"
+          size="xl"
+          shape="square"
+          // The card is what it sits on, so that is the color under the photo.
+          className="[--cutout:var(--bg-card)]"
         />
       </motion.div>
     </motion.div>
@@ -332,7 +336,7 @@ export function ProfileCard({
       />
 
       <motion.div variants={item} className="relative">
-        <Avatar />
+        <AvatarFrame />
       </motion.div>
 
       <motion.div variants={item} className="relative flex flex-col items-center gap-1.5">

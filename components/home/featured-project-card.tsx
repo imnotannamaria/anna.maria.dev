@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import { motion } from "motion/react"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import {
   cardVariants,
@@ -13,7 +12,6 @@ import {
   CardMeta,
 } from "@/app/components/entrepta/card"
 import { Badge } from "@/app/components/entrepta/badge"
-import { useReveal } from "@/app/components/entrepta/reveal"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { TypeIn } from "@/app/components/entrepta/type-in"
 
@@ -53,13 +51,12 @@ export function FeaturedProjectCard({
   className?: string
 }) {
   const { onMouseMove, spotlight } = useSpotlight(420)
-  const reveal = useReveal()
 
   const [head, ...rest] = project.title.split("-")
   const hasDash = rest.length > 0
 
   return (
-    <motion.div className={cn(cardVariants(), className)} onMouseMove={onMouseMove} {...reveal}>
+    <div className={cn(cardVariants(), className)} onMouseMove={onMouseMove}>
       <Spotlight {...spotlight} />
 
       {/*
@@ -151,6 +148,6 @@ export function FeaturedProjectCard({
           )}
         </div>
       </CardFooter>
-    </motion.div>
+    </div>
   )
 }

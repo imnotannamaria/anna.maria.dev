@@ -1,9 +1,6 @@
 "use client"
 
-import { cn } from "@/lib/utils"
-import { cardVariants } from "@/app/components/entrepta/card"
 import Link from "next/link"
-import { motion } from "motion/react"
 import { BookOpenIcon } from "@phosphor-icons/react"
 import { ArrowAffordance } from "@/app/components/entrepta/arrow-link"
 import {
@@ -14,8 +11,7 @@ import {
   CardMeta,
 } from "@/app/components/entrepta/card"
 import { Badge } from "@/app/components/entrepta/badge"
-import { useReveal } from "@/app/components/entrepta/reveal"
-import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 import { TypeIn } from "@/app/components/entrepta/type-in"
 
 export type FeaturedPost = {
@@ -34,19 +30,13 @@ export type FeaturedPost = {
  * anywhere on it pulls the rule under "read post".
  */
 export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
-  const { onMouseMove, spotlight } = useSpotlight(340)
-  const reveal = useReveal(0.08)
-
   return (
     <Link
       href={`/blog/${post.slug}`}
       className="group/arrow flex flex-1 flex-col"
       style={{ textDecoration: "none" }}
-      onMouseMove={onMouseMove}
     >
-      <motion.div className={cn(cardVariants(), "flex-1")} {...reveal}>
-        <Spotlight {...spotlight} />
-
+      <SpotlightCard glow={340} className="flex-1">
         <CardHeader>
           <CardLabel>featured post</CardLabel>
           <CardMeta>
@@ -104,7 +94,7 @@ export function FeaturedPostCard({ post }: { post: FeaturedPost }) {
             <ArrowAffordance>read post</ArrowAffordance>
           </span>
         </CardFooter>
-      </motion.div>
+      </SpotlightCard>
     </Link>
   )
 }

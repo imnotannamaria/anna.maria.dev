@@ -1,6 +1,5 @@
 "use client"
 
-import { cardVariants } from "@/app/components/entrepta/card"
 import { useState } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import {
@@ -10,9 +9,8 @@ import {
   CardLabel,
   CardMeta,
 } from "@/app/components/entrepta/card"
-import { useReveal } from "@/app/components/entrepta/reveal"
 import { EASE_OUT } from "@/lib/motion"
-import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 import { cn } from "@/lib/utils"
 import { CaretRightIcon } from "@phosphor-icons/react"
 import {
@@ -188,8 +186,6 @@ function StackBadge({ tool }: { tool: Tool }) {
 export function StackCard() {
   const reduce = useReducedMotion() ?? false
   const [open, setOpen] = useState<Set<string>>(() => new Set(["front", "back"]))
-  const { onMouseMove, spotlight } = useSpotlight(700)
-  const reveal = useReveal(0.12)
 
   const toggle = (id: string) =>
     setOpen((prev) => {
@@ -244,9 +240,7 @@ export function StackCard() {
   }
 
   return (
-    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
-      <Spotlight {...spotlight} />
-
+    <SpotlightCard glow={700}>
       <CardHeader>
         <CardLabel as="h2" id="card-stack">
           stack
@@ -370,6 +364,6 @@ export function StackCard() {
         <CardComment>click a branch to fold it away</CardComment>
         <span style={{ color: "var(--fg-brand-text)" }}>{TOTAL_TOOLS} tools</span>
       </CardFooter>
-    </motion.div>
+    </SpotlightCard>
   )
 }
