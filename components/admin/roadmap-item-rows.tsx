@@ -16,6 +16,7 @@ import { TableBody, TableCell } from "@/app/components/entrepta/table"
 import { toast } from "@/app/components/entrepta/toast"
 import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
+import { Tip } from "@/components/ui/tip"
 import { MotionTableRow } from "@/components/admin/motion-table-row"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
 import { STATUS_LABEL, type RoadmapStatus } from "@/lib/roadmap/constants"
@@ -131,15 +132,16 @@ export function RoadmapItemRows({ items }: { items: RoadmapItem[] }) {
 
             <TableCell align="end">
               <div className="flex items-center justify-end gap-1">
-                <Link
-                  href={`/admin/roadmap/${item.id}`}
-                  aria-label={`Edit ${item.title}`}
-                  title="Edit"
-                  className="grid h-8 w-8 place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft)"
-                  style={{ color: "var(--fg-muted)" }}
-                >
-                  <PencilSimpleIcon size={15} aria-hidden />
-                </Link>
+                <Tip label="Edit">
+                  <Link
+                    href={`/admin/roadmap/${item.id}`}
+                    aria-label={`Edit ${item.title}`}
+                    className="grid h-8 w-8 place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft)"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    <PencilSimpleIcon size={15} aria-hidden />
+                  </Link>
+                </Tip>
                 <DeleteDialog
                   noun="item"
                   title={item.title}

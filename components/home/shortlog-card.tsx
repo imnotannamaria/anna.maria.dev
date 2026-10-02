@@ -5,6 +5,7 @@ import { motion, useReducedMotion, type Variants } from "motion/react"
 import { ArrowUpRightIcon } from "@phosphor-icons/react"
 import { EASE_OUT } from "@/lib/motion"
 import { cn } from "@/lib/utils"
+import { Tip } from "@/components/ui/tip"
 import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 import { RollingNumber } from "@/app/components/entrepta/rolling-number"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
@@ -273,37 +274,39 @@ function CommitLine({
   quiet?: boolean
 }) {
   return (
-    <a
-      href={commit.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      title={commit.message}
-      aria-label={`Last commit to ${project}, ${commit.ago} ago: ${commit.message}`}
-      className="focus-ring group/commit text-mono-xs grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-[var(--radius-sm)] font-mono text-[var(--fg-muted)] transition-colors duration-150 group-focus-within/row:text-[var(--fg-secondary)] group-hover/row:text-[var(--fg-secondary)]"
-    >
-      <span
-        className={cn(
-          "transition-colors duration-150",
-          quiet
-            ? "group-focus-within/row:text-[var(--fg-brand-text)] group-hover/row:text-[var(--fg-brand-text)]"
-            : "text-[var(--fg-brand-text)]",
-        )}
+    // The row truncates the message; the tooltip is where the rest of it can be read.
+    <Tip label={commit.message} wrap>
+      <a
+        href={commit.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Last commit to ${project}, ${commit.ago} ago: ${commit.message}`}
+        className="focus-ring group/commit text-mono-xs grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-[var(--radius-sm)] font-mono text-[var(--fg-muted)] transition-colors duration-150 group-focus-within/row:text-[var(--fg-secondary)] group-hover/row:text-[var(--fg-secondary)]"
       >
-        {commit.sha}
-      </span>
-      <span className="truncate group-hover/commit:underline group-hover/commit:decoration-[var(--border-strong)] group-hover/commit:underline-offset-2">
-        {commit.message}
-      </span>
-      <span className="inline-flex items-center gap-1 whitespace-nowrap">
-        {!quiet && commit.ago}
-        {/* Space held for it always, so the line never reflows when it appears. */}
-        <ArrowUpRightIcon
-          aria-hidden
-          size={10}
-          className="opacity-0 transition-opacity duration-150 group-focus-within/row:opacity-100 group-hover/row:opacity-100"
-        />
-      </span>
-    </a>
+        <span
+          className={cn(
+            "transition-colors duration-150",
+            quiet
+              ? "group-focus-within/row:text-[var(--fg-brand-text)] group-hover/row:text-[var(--fg-brand-text)]"
+              : "text-[var(--fg-brand-text)]",
+          )}
+        >
+          {commit.sha}
+        </span>
+        <span className="truncate group-hover/commit:underline group-hover/commit:decoration-[var(--border-strong)] group-hover/commit:underline-offset-2">
+          {commit.message}
+        </span>
+        <span className="inline-flex items-center gap-1 whitespace-nowrap">
+          {!quiet && commit.ago}
+          {/* Space held for it always, so the line never reflows when it appears. */}
+          <ArrowUpRightIcon
+            aria-hidden
+            size={10}
+            className="opacity-0 transition-opacity duration-150 group-focus-within/row:opacity-100 group-hover/row:opacity-100"
+          />
+        </span>
+      </a>
+    </Tip>
   )
 }
 

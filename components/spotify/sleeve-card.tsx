@@ -30,6 +30,7 @@ import {
 } from "@/app/components/entrepta/card"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
+import { Tip } from "@/components/ui/tip"
 
 /**
  * The sleeve is square and the disc is a circle behind it; they only line up at a known ratio,
@@ -195,21 +196,22 @@ function ControlButton({
   primary?: boolean
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      className="focus-ring inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
-      style={{
-        // --fg-brand-text, not --fg-brand: brand ink on the brand tint fails contrast in
-        // eight of the twelve theme×mode combinations. See the token's note in globals.css.
-        color: primary ? "var(--fg-brand-text)" : "var(--fg-muted)",
-        background: primary ? "var(--bg-surface-brand)" : "transparent",
-      }}
-    >
-      {children}
-    </button>
+    <Tip label={label}>
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        className="focus-ring inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
+        style={{
+          // --fg-brand-text, not --fg-brand: brand ink on the brand tint fails contrast in
+          // eight of the twelve theme×mode combinations. See the token's note in globals.css.
+          color: primary ? "var(--fg-brand-text)" : "var(--fg-muted)",
+          background: primary ? "var(--bg-surface-brand)" : "transparent",
+        }}
+      >
+        {children}
+      </button>
+    </Tip>
   )
 }
 
@@ -354,7 +356,10 @@ export function SleeveCard({
         <CardComment>
           {audible ? "30s preview · spotify" : "my friends picked some of these"}
         </CardComment>
-        <div className="flex items-center gap-1">
+        {/* `ml-auto`: when the comment and the controls stop fitting on one line the footer
+            wraps, and a wrapped item starts its new line on the left. The controls belong on
+            the right in both cases. */}
+        <div className="ml-auto flex items-center gap-1">
           <ControlButton label="Previous track" onClick={onPrev}>
             <SkipBackIcon size={13} weight="fill" aria-hidden />
           </ControlButton>

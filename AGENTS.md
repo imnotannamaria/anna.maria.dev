@@ -579,6 +579,7 @@ idle the whole time, and it reproduces with a bare `npx next dev` and nothing co
 - Brand accents always derive from `--fg-brand` via `color-mix()`, never a hardcoded hex, so every theme stays reactive.
 - Mono is the default UI font. Reach for Inter only in long prose blocks.
 - entrepta components in `app/components/entrepta/` are entrepta's. Change them upstream and bring them back with `add --overwrite`; don't wrap or override them from outside. See Design system above.
+- No native `title` for a tooltip. Wrap the control in `Tip` (`components/ui/tip.tsx`), which is entrepta's `Tooltip` assembled once; the provider is in `app/layout.tsx`. An icon-only control still needs its own `aria-label`. The one tooltip that is not the component is the contributions calendar's: a single box following a delegated pointer over 371 cells, wearing the same overlay surface.
 - Chrome mobile won't resize below about 550px in DevTools. For real narrow viewports (375px), use the device toolbar, not window resize.
 - New API routes go in the Hono app under `lib/api/routes/`, mounted at `/api/v1`. The older handlers (`/api/contact`, `/api/og`, `/api/now-playing`) stay where they are — they work, and moving them buys nothing.
 - Anything under `/admin` calls `requireAdmin()` (pages) or `requireAdminApi` (routes). The `proxy.ts` matcher is not the gate; a matcher can be edited wrong.

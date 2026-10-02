@@ -26,6 +26,7 @@ import { TableBody, TableCell } from "@/app/components/entrepta/table"
 import { toast } from "@/app/components/entrepta/toast"
 import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
+import { Tip } from "@/components/ui/tip"
 import { MotionTableRow } from "@/components/admin/motion-table-row"
 import { StarRating } from "@/components/log/star-rating"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
@@ -169,15 +170,16 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
 
             <TableCell align="end">
               <div className="flex items-center justify-end gap-1">
-                <Link
-                  href={`/admin/log/${entry.id}`}
-                  aria-label={`Edit ${entry.title}`}
-                  title="Edit"
-                  className="grid h-8 w-8 place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft)"
-                  style={{ color: "var(--fg-muted)" }}
-                >
-                  <PencilSimpleIcon size={15} aria-hidden />
-                </Link>
+                <Tip label="Edit">
+                  <Link
+                    href={`/admin/log/${entry.id}`}
+                    aria-label={`Edit ${entry.title}`}
+                    className="grid h-8 w-8 place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft)"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    <PencilSimpleIcon size={15} aria-hidden />
+                  </Link>
+                </Tip>
                 <DeleteDialog
                   noun="entry"
                   title={entry.title}
