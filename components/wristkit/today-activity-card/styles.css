@@ -1,0 +1,239 @@
+/* wristkit v2's stylesheet, with the site's changes marked where they are.
+   Portable fallbacks; Entrepta tokens take precedence when present. */
+.wk-activity,
+.wk-rings-only {
+  --wk-bg: var(--bg-card, #0b0b0e);
+  --wk-text: var(--fg-primary, #fafafa);
+  --wk-muted: var(--fg-muted, #8a8a92);
+  --wk-border: var(--border-subtle, #27272a);
+  --wk-move: var(--fg-brand, #7c6bff);
+  --wk-exercise: var(--status-success, #10b981);
+  --wk-steps: var(--status-warning, #f59e0b);
+  color: var(--wk-text);
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+/* SITE: the surface is entrepta's Card here, put on the panel through `cardVariants()` in
+   states.tsx. wristkit ships its own border, 20px radius, padding, corner gradient and shadow
+   in this rule; they are gone, because this file is unlayered and would have beaten the Card's
+   utilities. What is left is the container the query at the bottom reads. */
+.wk-activity {
+  container-type: inline-size;
+}
+/* SITE: above the spotlight, which is the panel's first child and absolutely positioned. */
+.wk-activity-header,
+.wk-activity-body,
+.wk-activity-footer {
+  position: relative;
+}
+.wk-activity-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.wk-activity-label,
+.wk-activity-status,
+.wk-metric dt,
+.wk-metric-goal,
+.wk-activity-footer {
+  font-size: var(--text-mono-sm, 12px);
+  line-height: var(--text-mono-sm--line-height, 1.4);
+}
+.wk-activity-label {
+  color: var(--wk-muted);
+}
+.wk-activity-label > span {
+  color: var(--fg-brand-text, var(--wk-move));
+  margin-right: 8px;
+}
+.wk-activity-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 9px;
+  border-radius: 100px;
+  color: var(--status-success-fg, #34d399);
+  background: var(--status-success-soft, #10b9811f);
+}
+.wk-status-dot,
+.wk-metric-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.wk-activity-body {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  padding: 32px 0;
+  min-height: 252px;
+  /* SITE: the panel is a column now, and on the home page its tile is taller than the card.
+     The body takes the spare height and keeps the rings centred, so the footer stays at the
+     bottom instead of leaving a gap under it. */
+  flex: 1;
+}
+.wk-rings {
+  display: block;
+  width: 100%;
+  max-width: 224px;
+  margin: auto;
+  overflow: visible;
+}
+.wk-ring--move {
+  --wk-ring: var(--wk-move);
+}
+.wk-ring--exercise {
+  --wk-ring: var(--wk-exercise);
+}
+.wk-ring--steps {
+  --wk-ring: var(--wk-steps);
+}
+.wk-ring circle {
+  fill: none;
+  stroke: var(--wk-ring);
+  stroke-width: 14;
+}
+/* SITE: on hover the arc and its track thicken together. CSS and not Motion on purpose: the
+   sweep that draws each ring already owns `stroke-dashoffset` through Motion, and a second
+   property driven from the same library would restart the sweep on every hover. The rings sit
+   23 apart, so 16 leaves 7 between them. The reduced-motion block below covers it. */
+.wk-ring circle {
+  transition: stroke-width 280ms var(--ease-out, ease-out);
+}
+.wk-activity:hover .wk-ring circle {
+  stroke-width: 16;
+}
+.wk-ring-track {
+  opacity: 0.14;
+}
+.wk-ring-value {
+  stroke-linecap: round;
+}
+.wk-ring-center {
+  fill: none;
+  stroke: var(--wk-muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wk-metrics {
+  margin: 0;
+  min-width: 0;
+}
+.wk-metric {
+  padding: 12px 0;
+}
+.wk-metric + .wk-metric {
+  border-top: 1px solid var(--wk-border);
+}
+.wk-metric dt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--wk-muted);
+}
+.wk-metric-dot {
+  color: var(--wk-ring);
+}
+.wk-metric dd {
+  margin: 4px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+.wk-metric-value {
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: var(--text-display-md, 40px);
+  line-height: var(--text-display-md--line-height, 1.1);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.wk-metric-goal {
+  color: var(--wk-muted);
+  white-space: nowrap;
+}
+.wk-activity-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  color: var(--wk-muted);
+  border-top: 1px dashed var(--wk-border);
+  padding-top: 16px;
+  min-height: 50px;
+}
+.wk-activity-footer time {
+  white-space: nowrap;
+}
+.wk-activity[data-state="empty"] .wk-ring-track,
+.wk-activity[data-state="error"] .wk-ring-track {
+  stroke-dasharray: 2 5;
+  opacity: 0.35;
+}
+.wk-activity[data-state="error"] .wk-activity-status {
+  color: var(--status-error-fg, #fb7185);
+  background: var(--status-error-soft, #f43f5e1f);
+}
+.wk-activity[data-state="stale"] .wk-activity-status {
+  color: var(--status-warning-fg, #fbbf24);
+  background: var(--status-warning-soft, #f59e0b1f);
+}
+.wk-activity[data-state="empty"] .wk-activity-status,
+.wk-activity[data-state="loading"] .wk-activity-status {
+  color: var(--wk-muted);
+  background: var(--bg-surface, #18181b);
+}
+.wk-activity[data-state="loading"] .wk-ring-value {
+  animation: wk-orbit 2s linear infinite;
+}
+.wk-activity[data-state="loading"] .wk-metric-value {
+  animation: wk-pulse 1.8s ease-in-out infinite;
+}
+.wk-activity[data-state="stale"] .wk-ring-value {
+  opacity: 0.65;
+}
+@keyframes wk-orbit {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+@keyframes wk-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+@container (max-width: 340px) {
+  .wk-activity-body {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 24px 0;
+  }
+  .wk-rings {
+    max-width: 180px;
+  }
+  .wk-metric {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .wk-metric dd {
+    justify-content: flex-end;
+  }
+  .wk-metric-value {
+    font-size: var(--text-heading-lg, 24px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wk-activity *,
+  .wk-activity *::before,
+  .wk-activity *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

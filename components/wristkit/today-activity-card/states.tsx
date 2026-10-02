@@ -1,445 +1,240 @@
 "use client"
 
+/**
+ * wristkit v2's card, on this site's surface.
+ *
+ * The markup, the five states and the stylesheet are wristkit's. Three things are the site's,
+ * because v2 as it ships stands still and every other card here does not:
+ *
+ * - the surface is entrepta's Card (`cardVariants()`), with the spotlight trailing the cursor;
+ * - the rings arrive: each one fades up and sweeps from empty to its value, outer first, and
+ *   the metric rows follow;
+ * - on hover the rings thicken, in `styles.css`.
+ *
+ * It is `cardVariants()` with the hook rather than `SpotlightCard` because the panel is a
+ * `section` that drives its own entrance: the variant labels below start here and reach the
+ * rings and the rows through context.
+ *
+ * `index.tsx` and `load.ts` beside this are the site's too: the first does not re-export the
+ * loader (that pulls the Postgres client into client bundles), the second reads the shared
+ * connection through `lib/db/client.ts`.
+ */
+
 import type * as React from "react"
 import { motion, useReducedMotion } from "motion/react"
-import { revealViewport } from "@/lib/motion"
+import { cardVariants } from "@/app/components/entrepta/card"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { EASE_OUT, revealViewport } from "@/lib/motion"
+import { cn } from "@/lib/utils"
 import type { TodayData } from "./load"
-import { Diamond } from "@/app/components/entrepta/diamond"
+import "./styles.css"
 
-const colors = {
-  move: "var(--fg-brand)",
-  exercise: "#10b981",
-  steps: "#f59e0b",
-  danger: "#f43f5e",
-  warn: "#f59e0b",
-}
+const METRICS = [
+  { id: "move", label: "Move", value: "kcal", goal: "kcalGoal", unit: "kcal" },
+  {
+    id: "exercise",
+    label: "Exercise",
+    value: "exerciseMinutes",
+    goal: "exerciseGoal",
+    unit: "min",
+  },
+  { id: "steps", label: "Steps", value: "steps", goal: "stepsGoal", unit: "steps" },
+] as const
 
-function clamp01(x: number): number {
-  if (Number.isNaN(x) || !Number.isFinite(x)) return 0
-  return Math.min(1, Math.max(0, x))
-}
+type DisplayKind = "loading" | "empty" | "error" | "stale" | "ok"
 
 /**
- * The rings are unchanged in shape; what's new is that they arrive instead of
- * appearing. Each one sweeps from empty to its value, outer first.
+ * The rings. They answer to the `hidden` and `show` labels of the panel around them.
  *
- * The draw runs through Motion on `strokeDashoffset`. The hover response is CSS
- * on `stroke-width` — a presentation attribute, so a stylesheet can take it over
- * — because mixing the two on one element means every hover restarts the sweep.
- * Splitting them also means the hover inherits the global reduced-motion reset
- * for free, while the sweep asks `useReducedMotion` itself.
+ * The sweep is a variant driven from the panel, never a `whileInView` on the circle: an
+ * IntersectionObserver aimed at an SVG child is unreliable, and in practice only the outer
+ * ring fired while the inner two snapped into place. The panel is an HTML element with an
+ * honest box, so it watches and the label reaches all three.
  *
- * The sweep is a variant driven from `Panel`, not a `whileInView` on the circle.
- * An IntersectionObserver aimed at an SVG child is unreliable — in practice only
- * the outer ring ever fired and the inner two snapped into place. The panel is an
- * HTML element with an honest box, so watching that works, and the label reaches
- * all three from one place.
+ * The group scales and fades in as well as the arc drawing, because the draw alone is not
+ * equal to the eye: the same animation covers 80% of a circle for move and a tenth of one for
+ * exercise on a quiet day, and the short ones read as popping into place.
  */
-function Ring({
-  r,
-  value,
-  max,
-  color,
-  cx,
-  cy,
-  index = 0,
-}: {
-  r: number
-  value: number
-  max: number
-  color: string
-  cx: number
-  cy: number
-  index?: number
-}) {
+export function ActivityRings({ data, kind = "ok" }: { data?: TodayData; kind?: DisplayKind }) {
+  // Asked here, not inherited: the reduced-motion block in the stylesheet only reaches CSS.
   const reduce = useReducedMotion() ?? false
-  const circ = 2 * Math.PI * r
-  const p = clamp01(max > 0 ? value / max : 0)
 
   return (
-    /*
-     * The group scales and fades in; the arc draws inside it.
-     *
-     * The draw alone was not enough and it was never a bug: all three rings run
-     * the same animation, but "the same animation" covers 80% of a circle for
-     * move and about 10% for exercise on a 3-of-30-minute day. Identical motion,
-     * an eighth of the distance — the inner rings read as popping into place.
-     * The arrival is what makes each ring legible whatever its value is.
-     */
-    <motion.g
-      style={{ transformBox: "fill-box", transformOrigin: "center" }}
-      variants={{
-        hidden: { opacity: 0, scale: reduce ? 1 : 0.84 },
-        show: {
-          opacity: 1,
-          scale: 1,
-          transition: reduce
-            ? { duration: 0 }
-            : { duration: 0.5, ease: [0.2, 0.8, 0.2, 1], delay: index * 0.12 },
-        },
-      }}
-    >
-      {/* The track thickens with the arc. Left behind at 9 while the arc went to
-          12, the arc overflowed its own track by 1.5px a side and the ring read
-          as a rendering fault rather than a response. */}
-      <circle
-        className="wk-track"
-        style={{ transitionDelay: `${index * 70}ms` }}
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill="none"
-        stroke={color}
-        strokeWidth={9}
-        strokeOpacity={0.18}
-      />
-      <motion.circle
-        className="wk-ring"
-        style={{ transitionDelay: `${index * 70}ms` }}
-        cx={cx}
-        cy={cy}
-        r={r}
-        fill="none"
-        stroke={color}
-        strokeWidth={9}
-        strokeLinecap="round"
-        strokeDasharray={circ}
-        transform={`rotate(-90 ${cx} ${cy})`}
-        variants={{
-          hidden: { strokeDashoffset: circ },
-          show: {
-            strokeDashoffset: circ * (1 - p),
-            transition: reduce
-              ? { duration: 0 }
-              : { duration: 1.1, ease: [0.2, 0.8, 0.2, 1], delay: 0.2 + index * 0.12 },
-          },
-        }}
-      />
-    </motion.g>
+    <svg className="wk-rings" viewBox="0 0 200 200" role="img" aria-label="Activity rings">
+      <title>Activity rings</title>
+      {METRICS.map((metric, index) => {
+        const radius = 84 - index * 23
+        const circumference = 2 * Math.PI * radius
+        const value = data?.[metric.value] ?? 0
+        const goal = data?.[metric.goal] ?? 0
+        const progress =
+          goal > 0 && Number.isFinite(value) ? Math.max(0, Math.min(value / goal, 1)) : 0
+        return (
+          <motion.g
+            key={metric.id}
+            className={`wk-ring wk-ring--${metric.id}`}
+            style={{ transformBox: "fill-box", transformOrigin: "center" }}
+            variants={{
+              hidden: { opacity: 0, scale: reduce ? 1 : 0.84 },
+              show: {
+                opacity: 1,
+                scale: 1,
+                transition: reduce
+                  ? { duration: 0 }
+                  : { duration: 0.5, ease: EASE_OUT, delay: index * 0.12 },
+              },
+            }}
+          >
+            <circle className="wk-ring-track" cx="100" cy="100" r={radius} />
+            {kind === "loading" ? (
+              // The orbit is CSS, on `stroke-dashoffset`. Motion stays off this circle, or the
+              // two would be driving one property.
+              <circle
+                className="wk-ring-value"
+                cx="100"
+                cy="100"
+                r={radius}
+                pathLength="100"
+                strokeDasharray="18 82"
+                transform="rotate(-90 100 100)"
+              />
+            ) : progress > 0 ? (
+              // A zero-length dash with round caps still paints a dot, so an empty ring draws
+              // no value arc at all.
+              //
+              // Measured in real length, not `pathLength="100"` as wristkit ships it: on a
+              // Motion element `pathLength` is Motion's own 0-to-1 value and it would take over
+              // the dash pattern.
+              <motion.circle
+                className="wk-ring-value"
+                cx="100"
+                cy="100"
+                r={radius}
+                strokeDasharray={circumference}
+                transform="rotate(-90 100 100)"
+                variants={{
+                  hidden: { strokeDashoffset: circumference },
+                  show: {
+                    strokeDashoffset: circumference * (1 - progress),
+                    transition: reduce
+                      ? { duration: 0 }
+                      : { duration: 1.1, ease: EASE_OUT, delay: 0.2 + index * 0.12 },
+                  },
+                }}
+              />
+            ) : null}
+          </motion.g>
+        )
+      })}
+      <path className="wk-ring-center" d="M94 99h12m-5-5 5 5-5 5" />
+    </svg>
   )
 }
 
-/**
- * The card surface. Everything it does on hover — background, lift, shadow, and
- * the rings swelling inside it — lives in `.wk-panel` in globals.css.
- *
- * It used to be a `useState` re-rendering the whole card on every pointer enter
- * to do what `:hover` does for free, which is the pattern the contributions card
- * was rebuilt to get rid of. As CSS it also inherits the global reduced-motion
- * reset, which the JS version never did.
- */
-function Panel({ className, children }: { className?: string; children: React.ReactNode }) {
+function ActivityPanel({
+  kind,
+  data,
+  className,
+}: {
+  kind: DisplayKind
+  data?: TodayData
+  className?: string
+}) {
+  const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(380)
 
+  const status = kind === "ok" ? "synced" : kind
+  const notes: Record<DisplayKind, React.ReactNode> = {
+    ok: "Up to date",
+    loading: "Syncing your activity…",
+    empty: "No data yet. Run the Shortcut on your iPhone.",
+    error: "Something went wrong. We couldn't load today's activity.",
+    stale: `Last sync ${data?.hoursSinceSync ?? 0}h ago. Run the Shortcut to update.`,
+  }
   return (
     <motion.section
-      className={`wk-panel ${className ?? ""}`}
+      // `gap-0`: the body carries its own 32px of air above and below, and the Card's gap on
+      // top of that would push the three parts apart.
+      className={cn(cardVariants(), "wk-activity gap-0", className)}
+      data-state={kind}
+      aria-label="Today's activity"
+      aria-busy={kind === "loading"}
       onMouseMove={onMouseMove}
+      // The surface itself does not animate here: on the home page the tile brings it in.
+      // These labels only start the rings and the rows.
       initial="hidden"
       whileInView="show"
       viewport={revealViewport}
-      style={{
-        containerType: "inline-size",
-        color: "var(--fg-primary)",
-        fontFamily: "var(--font-mono)",
-      }}
     >
       <Spotlight {...spotlight} />
-      {children}
+
+      <header className="wk-activity-header">
+        <span className="wk-activity-label">
+          <span aria-hidden>↗</span> Today / Activity
+        </span>
+        <span className="wk-activity-status">
+          <span aria-hidden className="wk-status-dot" />
+          {status}
+        </span>
+      </header>
+      <div className="wk-activity-body">
+        <ActivityRings kind={kind} data={data} />
+        <dl className="wk-metrics">
+          {METRICS.map((metric, index) => (
+            <motion.div
+              key={metric.id}
+              className={`wk-metric wk-ring--${metric.id}`}
+              // The rings sweep for over a second; rows that snap in at frame one beside them
+              // make the card read as half-animated.
+              variants={{
+                hidden: { opacity: 0, y: reduce ? 0 : 8 },
+                show: {
+                  opacity: 1,
+                  y: 0,
+                  transition: reduce
+                    ? { duration: 0 }
+                    : { duration: 0.4, ease: EASE_OUT, delay: 0.3 + index * 0.1 },
+                },
+              }}
+            >
+              <dt>
+                <span className="wk-metric-dot" aria-hidden />
+                {metric.label}
+              </dt>
+              <dd>
+                <span className="wk-metric-value">
+                  {data ? Math.round(data[metric.value]).toLocaleString("en-US") : "—"}
+                </span>
+                <span className="wk-metric-goal">
+                  {data ? `/ ${data[metric.goal].toLocaleString("en-US")} ` : ""}
+                  {metric.unit}
+                </span>
+              </dd>
+            </motion.div>
+          ))}
+        </dl>
+      </div>
+      <footer className="wk-activity-footer">
+        <span aria-live="polite">{notes[kind]}</span>
+        {kind === "ok" && data ? (
+          <time dateTime={data.lastSyncIso}>Synced {data.lastSyncLabel}</time>
+        ) : null}
+        {kind === "empty" ? <span>Install Shortcut to connect.</span> : null}
+        {kind === "error" ? <span>Please try again later.</span> : null}
+      </footer>
     </motion.section>
   )
 }
 
-function Header({
-  status,
-  statusColor,
-  live,
-}: {
-  status: string
-  statusColor: string
-  live?: boolean
-}) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-      <h3
-        className="inline-flex items-center gap-1.5"
-        style={{
-          margin: 0,
-          fontWeight: 400,
-          color: "var(--fg-secondary)",
-          fontSize: "var(--text-mono-sm)",
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-        }}
-      >
-        <Diamond size={10} />
-        today / activity
-      </h3>
-      <span
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 5,
-          color: statusColor,
-          fontSize: "var(--text-mono-sm)",
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-        }}
-      >
-        {live && (
-          <span
-            style={{
-              display: "inline-block",
-              width: 5,
-              height: 5,
-              borderRadius: "50%",
-              background: "currentColor",
-              animation: "cursor-blink 1.2s step-start infinite",
-            }}
-          />
-        )}
-        {status}
-      </span>
-    </div>
-  )
-}
-
-/** `index` only orders the entrance; the rows are otherwise identical. */
-function MetricRow({
-  dot,
-  label,
-  value,
-  suffix,
-  index = 0,
-}: {
-  dot: string
-  label: string
-  value: React.ReactNode
-  suffix?: string
-  index?: number
-}) {
-  // Asked here, not inherited: the global prefers-reduced-motion block only
-  // zeroes CSS, and this row is animated through Motion like the rings above it.
-  const reduce = useReducedMotion() ?? false
-
-  return (
-    <motion.div
-      style={{ display: "flex", alignItems: "baseline", gap: 10 }}
-      // The rings sweep for over a second; rows that snap in at frame one beside
-      // them is what made the card read as half-animated.
-      variants={{
-        hidden: { opacity: 0, y: reduce ? 0 : 8 },
-        show: {
-          opacity: 1,
-          y: 0,
-          transition: reduce
-            ? { duration: 0 }
-            : { duration: 0.4, ease: [0.2, 0.8, 0.2, 1], delay: 0.3 + index * 0.1 },
-        },
-      }}
-    >
-      <span
-        aria-hidden
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: "50%",
-          backgroundColor: dot,
-          flexShrink: 0,
-          marginTop: 4,
-          opacity: 0.7,
-        }}
-      />
-      <span
-        style={{
-          color: "var(--fg-muted)",
-          fontSize: "var(--text-mono-xs)",
-          letterSpacing: "0.12em",
-          minWidth: 64,
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </span>
-      <span style={{ flex: 1, minWidth: 0, textAlign: "right" }}>
-        <span
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontSize: "var(--text-heading-lg)",
-            fontWeight: 400,
-            fontStyle: "italic",
-          }}
-        >
-          {value}
-        </span>
-        {suffix ? (
-          <span
-            style={{ color: "var(--fg-muted)", marginLeft: 6, fontSize: "var(--text-mono-sm)" }}
-          >
-            {suffix}
-          </span>
-        ) : null}
-      </span>
-    </motion.div>
-  )
-}
-
-function Footer({
-  left,
-  right,
-  style: extraStyle,
-}: {
-  left: React.ReactNode
-  right: React.ReactNode
-  style?: React.CSSProperties
-}) {
-  return (
-    <div
-      style={{
-        marginTop: 14,
-        paddingTop: 12,
-        borderTop: "1px dashed var(--border-subtle)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 12,
-        ...extraStyle,
-      }}
-    >
-      <span style={{ color: "var(--fg-muted)", fontSize: "var(--text-mono-sm)" }}>{left}</span>
-      <span style={{ color: "var(--fg-secondary)", fontSize: "var(--text-mono-sm)" }}>{right}</span>
-    </div>
-  )
-}
-
 export function TodayActivityCardLoading({ className }: { className?: string }) {
-  const cx = 72,
-    cy = 72
-  return (
-    <Panel className={className}>
-      <Header status="loading" statusColor={"var(--fg-muted)"} />
-      <div
-        className="wk-activity-grid wk-activity-body"
-        style={{
-          flex: 1,
-          marginTop: 12,
-          display: "grid",
-          gap: 20,
-          alignItems: "center",
-          alignContent: "center",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <svg
-            width={144}
-            height={144}
-            viewBox="0 0 144 144"
-            style={{ width: "100%", maxWidth: 144, height: "auto" }}
-            role="img"
-            aria-label="Activity rings"
-          >
-            <title>Activity rings</title>
-            <Ring index={0} r={52} value={1} max={1} color={colors.move} cx={cx} cy={cy} />
-            <Ring index={1} r={38} value={1} max={1} color={colors.exercise} cx={cx} cy={cy} />
-            <Ring index={2} r={24} value={1} max={1} color={colors.steps} cx={cx} cy={cy} />
-          </svg>
-        </div>
-        <div style={{ opacity: 0.75 }}>
-          <MetricRow index={0} dot={colors.move} label="Move" value="—" suffix="kcal" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow index={1} dot={colors.exercise} label="Exercise" value="—" suffix="min" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow index={2} dot={colors.steps} label="Steps" value="—" />
-        </div>
-      </div>
-      <Footer
-        left="// syncing…"
-        right={<output>waiting for data</output>}
-        style={{ marginTop: "auto" }}
-      />
-    </Panel>
-  )
+  return <ActivityPanel kind="loading" className={className} />
 }
-
 export function TodayActivityCardEmpty({ className }: { className?: string }) {
-  const cx = 72,
-    cy = 72
-  return (
-    <Panel className={className}>
-      <Header status="empty" statusColor={"var(--fg-muted)"} />
-      <div
-        className="wk-activity-grid wk-activity-body"
-        style={{
-          flex: 1,
-          marginTop: 12,
-          display: "grid",
-          gap: 20,
-          alignItems: "center",
-          alignContent: "center",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <svg
-            width={144}
-            height={144}
-            viewBox="0 0 144 144"
-            style={{ width: "100%", maxWidth: 144, height: "auto" }}
-            role="img"
-            aria-label="No activity yet"
-          >
-            <title>No activity yet</title>
-            <Ring index={0} r={52} value={0} max={1} color={colors.move} cx={cx} cy={cy} />
-            <Ring index={1} r={38} value={0} max={1} color={colors.exercise} cx={cx} cy={cy} />
-            <Ring index={2} r={24} value={0} max={1} color={colors.steps} cx={cx} cy={cy} />
-          </svg>
-        </div>
-        <div>
-          <MetricRow index={0} dot={colors.move} label="Move" value="—" suffix="kcal" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow index={1} dot={colors.exercise} label="Exercise" value="—" suffix="min" />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow index={2} dot={colors.steps} label="Steps" value="—" />
-        </div>
-      </div>
-      <Footer
-        left="// no data yet — run the shortcut on iPhone"
-        right={<span style={{ color: "var(--fg-muted)" }}>install shortcut →</span>}
-        style={{ marginTop: "auto" }}
-      />
-    </Panel>
-  )
+  return <ActivityPanel kind="empty" className={className} />
 }
-
 export function TodayActivityCardError({ className }: { className?: string }) {
-  return (
-    <Panel className={className}>
-      <Header status="error" statusColor={colors.danger} />
-      <div
-        className="wk-activity-body"
-        style={{
-          flex: 1,
-          marginTop: 12,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          color: "var(--fg-muted)",
-          fontSize: "var(--text-mono-md)",
-          lineHeight: 1.5,
-        }}
-      >
-        <div style={{ color: "var(--fg-primary)", marginBottom: 6 }}>Something went wrong.</div>
-        <div>We couldn&apos;t load today&apos;s activity. Try again later.</div>
-      </div>
-      <Footer
-        left="// showing nothing rather than guessing"
-        right={<span style={{ color: "var(--fg-muted)" }}>see docs</span>}
-        style={{ marginTop: "auto" }}
-      />
-    </Panel>
-  )
+  return <ActivityPanel kind="error" className={className} />
 }
-
 export function TodayActivityCardStale({
   data,
   className,
@@ -447,171 +242,8 @@ export function TodayActivityCardStale({
   data: TodayData
   className?: string
 }) {
-  const cx = 72,
-    cy = 72
-  return (
-    <Panel className={className}>
-      <Header status="stale" statusColor={colors.warn} />
-      <div
-        className="wk-activity-grid wk-activity-body"
-        style={{
-          flex: 1,
-          marginTop: 12,
-          display: "grid",
-          gap: 20,
-          alignItems: "center",
-          alignContent: "center",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <svg
-            width={144}
-            height={144}
-            viewBox="0 0 144 144"
-            style={{ width: "100%", maxWidth: 144, height: "auto" }}
-            role="img"
-            aria-label="Activity rings"
-          >
-            <title>Activity rings</title>
-            <Ring
-              index={0}
-              r={52}
-              value={data.kcal}
-              max={data.kcalGoal}
-              color={colors.move}
-              cx={cx}
-              cy={cy}
-            />
-            <Ring
-              index={1}
-              r={38}
-              value={data.exerciseMinutes}
-              max={data.exerciseGoal}
-              color={colors.exercise}
-              cx={cx}
-              cy={cy}
-            />
-            <Ring
-              index={2}
-              r={24}
-              value={data.steps}
-              max={data.stepsGoal}
-              color={colors.steps}
-              cx={cx}
-              cy={cy}
-            />
-          </svg>
-        </div>
-        <div>
-          <MetricRow
-            index={0}
-            dot={colors.move}
-            label="Move"
-            value={Math.round(data.kcal)}
-            suffix="kcal"
-          />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow
-            index={1}
-            dot={colors.exercise}
-            label="Exercise"
-            value={Math.round(data.exerciseMinutes)}
-            suffix="min"
-          />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow index={2} dot={colors.steps} label="Steps" value={Math.round(data.steps)} />
-        </div>
-      </div>
-      <Footer
-        left={`// last sync ${data.hoursSinceSync}h ago`}
-        right={<span style={{ color: colors.warn }}>run shortcut</span>}
-        style={{ marginTop: "auto" }}
-      />
-    </Panel>
-  )
+  return <ActivityPanel kind="stale" data={data} className={className} />
 }
-
 export function TodayActivityCardOk({ data, className }: { data: TodayData; className?: string }) {
-  const cx = 72,
-    cy = 72
-  return (
-    <Panel className={className}>
-      <Header status="synced" statusColor={colors.exercise} live />
-      <div
-        className="wk-activity-grid wk-activity-body"
-        style={{
-          flex: 1,
-          marginTop: 12,
-          display: "grid",
-          gap: 20,
-          alignItems: "center",
-          alignContent: "center",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <svg
-            width={144}
-            height={144}
-            viewBox="0 0 144 144"
-            style={{ width: "100%", maxWidth: 144, height: "auto" }}
-            role="img"
-            aria-label="Activity rings"
-          >
-            <title>Activity rings</title>
-            <Ring
-              index={0}
-              r={52}
-              value={data.kcal}
-              max={data.kcalGoal}
-              color={colors.move}
-              cx={cx}
-              cy={cy}
-            />
-            <Ring
-              index={1}
-              r={38}
-              value={data.exerciseMinutes}
-              max={data.exerciseGoal}
-              color={colors.exercise}
-              cx={cx}
-              cy={cy}
-            />
-            <Ring
-              index={2}
-              r={24}
-              value={data.steps}
-              max={data.stepsGoal}
-              color={colors.steps}
-              cx={cx}
-              cy={cy}
-            />
-          </svg>
-        </div>
-        <div>
-          <MetricRow
-            index={0}
-            dot={colors.move}
-            label="Move"
-            value={Math.round(data.kcal)}
-            suffix="kcal"
-          />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow
-            index={1}
-            dot={colors.exercise}
-            label="Exercise"
-            value={Math.round(data.exerciseMinutes)}
-            suffix="min"
-          />
-          <div style={{ margin: "10px 0", borderTop: `1px dotted ${"var(--border-subtle)"}` }} />
-          <MetricRow index={2} dot={colors.steps} label="Steps" value={Math.round(data.steps)} />
-        </div>
-      </div>
-      <Footer
-        left="// up to date"
-        right={`synced ${data.lastSyncLabel}`}
-        style={{ marginTop: "auto" }}
-      />
-    </Panel>
-  )
+  return <ActivityPanel kind="ok" data={data} className={className} />
 }
