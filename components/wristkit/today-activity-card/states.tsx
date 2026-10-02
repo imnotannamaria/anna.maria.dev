@@ -58,6 +58,10 @@ type DisplayKind = "loading" | "empty" | "error" | "stale" | "ok"
 export function ActivityRings({ data, kind = "ok" }: { data?: TodayData; kind?: DisplayKind }) {
   // Asked here, not inherited: the reduced-motion block in the stylesheet only reaches CSS.
   const reduce = useReducedMotion() ?? false
+  // The loading state does not take part in the entrance. It is what the server streams while
+  // the query runs, so it is on screen *before* hydration, and anything starting at
+  // `opacity: 0` there would stay invisible for exactly as long as the state exists.
+  const enters = kind !== "loading"
 
   return (
     <svg className="wk-rings" viewBox="0 0 200 200" role="img" aria-label="Activity rings">
@@ -74,16 +78,20 @@ export function ActivityRings({ data, kind = "ok" }: { data?: TodayData; kind?: 
             key={metric.id}
             className={`wk-ring wk-ring--${metric.id}`}
             style={{ transformBox: "fill-box", transformOrigin: "center" }}
-            variants={{
-              hidden: { opacity: 0, scale: reduce ? 1 : 0.84 },
-              show: {
-                opacity: 1,
-                scale: 1,
-                transition: reduce
-                  ? { duration: 0 }
-                  : { duration: 0.5, ease: EASE_OUT, delay: index * 0.12 },
-              },
-            }}
+            variants={
+              enters
+                ? {
+                    hidden: { opacity: 0, scale: reduce ? 1 : 0.84 },
+                    show: {
+                      opacity: 1,
+                      scale: 1,
+                      transition: reduce
+                        ? { duration: 0 }
+                        : { duration: 0.5, ease: EASE_OUT, delay: index * 0.12 },
+                    },
+                  }
+                : undefined
+            }
           >
             <circle className="wk-ring-track" cx="100" cy="100" r={radius} />
             {kind === "loading" ? (
@@ -169,9 +177,11 @@ function ActivityPanel({
       <Spotlight {...spotlight} />
 
       <header className="wk-activity-header">
-        <span className="wk-activity-label">
+        {/* An h3, where wristkit ships a span: every other card on the home page names itself
+            with a heading, and this one dropped out of the outline when v2 came in. */}
+        <h3 className="wk-activity-label m-0 font-normal">
           <span aria-hidden>↗</span> Today / Activity
-        </span>
+        </h3>
         <span className="wk-activity-status">
           <span aria-hidden className="wk-status-dot" />
           {status}
@@ -186,16 +196,21 @@ function ActivityPanel({
               className={`wk-metric wk-ring--${metric.id}`}
               // The rings sweep for over a second; rows that snap in at frame one beside them
               // make the card read as half-animated.
-              variants={{
-                hidden: { opacity: 0, y: reduce ? 0 : 8 },
-                show: {
-                  opacity: 1,
-                  y: 0,
-                  transition: reduce
-                    ? { duration: 0 }
-                    : { duration: 0.4, ease: EASE_OUT, delay: 0.3 + index * 0.1 },
-                },
-              }}
+              // Not while loading, for the reason the rings give above.
+              variants={
+                kind === "loading"
+                  ? undefined
+                  : {
+                      hidden: { opacity: 0, y: reduce ? 0 : 8 },
+                      show: {
+                        opacity: 1,
+                        y: 0,
+                        transition: reduce
+                          ? { duration: 0 }
+                          : { duration: 0.4, ease: EASE_OUT, delay: 0.3 + index * 0.1 },
+                      },
+                    }
+              }
             >
               <dt>
                 <span className="wk-metric-dot" aria-hidden />
