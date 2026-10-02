@@ -1,6 +1,4 @@
-"use client"
-
-import { CircleNotchIcon } from "@phosphor-icons/react"
+import { CircleNotchIcon } from "@phosphor-icons/react/dist/ssr"
 import { Slot } from "@radix-ui/react-slot"
 import * as React from "react"
 import { cn } from "@/lib/utils"
@@ -17,9 +15,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     { className, variant, size, asChild = false, loading = false, disabled, children, ...props },
     ref,
   ) => {
-    const Comp = asChild ? Slot : "button"
+    // Slot takes exactly one element, the caller's, so the label wrapper and the
+    // spinner stay out of it. A link cannot be disabled, so `loading` does not apply.
+    if (asChild) {
+      return (
+        <Slot ref={ref} className={cn(buttonVariants({ variant, size }), className)} {...props}>
+          {children}
+        </Slot>
+      )
+    }
     return (
-      <Comp
+      <button
         ref={ref}
         className={cn(buttonVariants({ variant, size }), className)}
         disabled={disabled || loading}
@@ -38,7 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             <CircleNotchIcon className="animate-spin" size={14} />
           </span>
         )}
-      </Comp>
+      </button>
     )
   },
 )

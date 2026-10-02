@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { type ThemeMode, useMode } from "./use-mode"
+import { type ThemeMode, transitionTheme, useMode } from "./use-mode"
 
 interface ThemeOption {
   /** Stable identifier written to `data-theme` and persisted. */
@@ -103,7 +103,7 @@ function useTheme(options: UseThemeOptions): UseThemeReturn {
     (id: string) => {
       if (!themes.some((t) => t.id === id)) return
       setThemeState(id)
-      applyThemeAttribute(id)
+      transitionTheme(() => applyThemeAttribute(id))
       safeWrite(themeKey, id)
       window.dispatchEvent(new CustomEvent(themeKey, { detail: id }))
     },

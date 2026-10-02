@@ -51,16 +51,26 @@ const Command = React.forwardRef<
 ))
 Command.displayName = CommandPrimitive.displayName
 
-interface CommandInputProps extends React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> {
+interface CommandInputProps extends Omit<
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>,
+  "size"
+> {
   /** Render the `esc` chip that closes the dialog. Default: true. Pass false for a Command outside CommandDialog. */
   showEsc?: boolean
+  /** `sm` for a search inside a popover, such as a Combobox. */
+  size?: "sm" | "md"
 }
 
 const CommandInput = React.forwardRef<
   React.ComponentRef<typeof CommandPrimitive.Input>,
   CommandInputProps
->(({ className, showEsc = true, ...props }, ref) => (
-  <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] px-4 py-4">
+>(({ className, showEsc = true, size = "md", ...props }, ref) => (
+  <div
+    className={cn(
+      "flex items-center border-b border-[var(--border-subtle)]",
+      size === "sm" ? "gap-2 px-3 py-2.5" : "gap-3 px-4 py-4",
+    )}
+  >
     <MagnifyingGlassIcon aria-hidden className="shrink-0 text-[var(--fg-muted)]" size={14} />
     <CommandPrimitive.Input
       ref={ref}

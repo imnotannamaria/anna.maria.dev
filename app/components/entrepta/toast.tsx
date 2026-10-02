@@ -2,8 +2,9 @@
 
 import { CheckIcon, CircleNotchIcon, InfoIcon, WarningIcon, XIcon } from "@phosphor-icons/react"
 import { Toaster as Sonner } from "sonner"
-import { OVERLAY_SURFACE } from "@/lib/overlay"
+import { DISMISS_BUTTON, OVERLAY_SURFACE } from "@/lib/overlay"
 import { cn } from "@/lib/utils"
+import { iconTileVariants } from "./icon-tile"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
@@ -26,9 +27,10 @@ const toastClass = cn(
   "[&>*]:transition-opacity data-[expanded=false]:data-[front=false]:[&>*]:opacity-0",
 )
 
+// The tile is an IconTile; sonner marks the status on the whole toast, so the
+// status tones come in through the group instead of the tile's color prop.
 const iconClass = cn(
-  "grid size-6 shrink-0 place-items-center rounded-[var(--radius-sm)]",
-  "bg-[var(--bg-hover-strong)] text-[var(--fg-secondary)]",
+  iconTileVariants({ size: "sm", color: "neutral" }),
   "group-data-[type=success]/toast:bg-[var(--status-success-soft)] group-data-[type=success]/toast:text-[var(--status-success-fg)]",
   "group-data-[type=error]/toast:bg-[var(--status-error-soft)] group-data-[type=error]/toast:text-[var(--status-error-fg)]",
   "group-data-[type=warning]/toast:bg-[var(--status-warning-soft)] group-data-[type=warning]/toast:text-[var(--status-warning-fg)]",
@@ -66,10 +68,9 @@ const Toaster = ({ toastOptions, icons, ...props }: ToasterProps) => (
           "font-mono text-mono-sm text-[var(--fg-muted)] hover:text-[var(--fg-primary)]",
         ),
         closeButton: cn(
-          "focus-ring absolute top-3 right-3 grid size-6 place-items-center rounded-[var(--radius-sm)]",
-          "text-[var(--fg-muted)] opacity-0 transition-[opacity,background-color,color]",
+          DISMISS_BUTTON,
+          "opacity-0 transition-[opacity,background-color,color]",
           "group-hover/toast:opacity-100 focus-visible:opacity-100",
-          "hover:bg-[var(--bg-hover-strong)] hover:text-[var(--fg-primary)]",
         ),
         ...toastOptions?.classNames,
       },

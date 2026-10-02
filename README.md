@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://github.com/imnotannamaria/anna.maria.dev/actions/workflows/test.yml"><img src="https://github.com/imnotannamaria/anna.maria.dev/actions/workflows/test.yml/badge.svg" alt="test" /></a>
   <img src="https://img.shields.io/badge/Next.js-16-7c6bff" alt="Next.js 16" />
-  <img src="https://img.shields.io/badge/entrepta-2.0-7c6bff" alt="entrepta 2.0" />
+  <img src="https://img.shields.io/badge/entrepta-3.0-7c6bff" alt="entrepta 3.0" />
   <img src="https://img.shields.io/badge/license-MIT-7c6bff" alt="MIT license" />
 </p>
 
