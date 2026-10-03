@@ -21,8 +21,9 @@ interface ThemeSwitcherProps
 }
 
 // Both icons stay mounted and stacked so the swap can cross-fade. They turn in
-// opposite directions, which reads like a dial. The globals.css reduced-motion
-// block flattens the transition for anyone who asks for less movement.
+// opposite directions, which reads like a dial. data-theme-motion keeps the dial
+// turning while a theme switch holds every other transition. The globals.css
+// reduced-motion block flattens it for anyone who asks for less movement.
 const ICON_BASE =
   "col-start-1 row-start-1 text-[var(--fg-primary)] transition-[opacity,rotate,scale] duration-[var(--motion-base)] ease-[var(--ease-out)]"
 const ICON_IN = "opacity-100 rotate-0 scale-100"
@@ -33,11 +34,13 @@ function ModeIcon({ mode }: { mode: ThemeMode }) {
     <span aria-hidden className="relative inline-grid h-4 w-4 shrink-0 place-items-center">
       <MoonIcon
         data-icon="moon"
+        data-theme-motion
         className={cn(ICON_BASE, mode === "dark" ? ICON_IN : "scale-50 rotate-90 opacity-0")}
         size={14}
       />
       <SunIcon
         data-icon="sun"
+        data-theme-motion
         className={cn(ICON_BASE, mode === "light" ? ICON_IN : "scale-50 -rotate-90 opacity-0")}
         size={14}
       />
@@ -249,8 +252,9 @@ interface ThemeScriptProps {
  * a flash of the default look on every page load.
  */
 function ThemeScript({ storageKey = "entrepta" }: ThemeScriptProps) {
-  const themeKey = JSON.stringify(`${storageKey}:theme`)
-  const modeKey = JSON.stringify(`${storageKey}:mode`)
+  // JSON.stringify leaves `<` alone, and a `</script>` in the key would end the tag early
+  const themeKey = JSON.stringify(`${storageKey}:theme`).replace(/</g, "\\u003c")
+  const modeKey = JSON.stringify(`${storageKey}:mode`).replace(/</g, "\\u003c")
   const script = `(function(){try{var t=localStorage.getItem(${themeKey});if(t)document.documentElement.setAttribute('data-theme',t);var m=localStorage.getItem(${modeKey});if(m==='light')document.documentElement.setAttribute('data-mode','light');}catch(e){}})();`
   // biome-ignore lint/security/noDangerouslySetInnerHtml: static string we control; no user input is interpolated.
   return <script dangerouslySetInnerHTML={{ __html: script }} />

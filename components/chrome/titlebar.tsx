@@ -1,5 +1,6 @@
 "use client"
 
+import { Tip } from "@/components/ui/tip"
 import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 import {
@@ -118,15 +119,16 @@ export function Titlebar() {
         aria-label="Pages"
         variant="window"
         after={
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label="Open command palette"
-            title="Open command palette (⌘K)"
-            className="focus-ring text-mono-md flex shrink-0 cursor-pointer items-center px-3 font-mono text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
-          >
-            +
-          </button>
+          <Tip label="Open command palette" shortcut="⌘K" side="bottom">
+            <button
+              type="button"
+              onClick={toggle}
+              aria-label="Open command palette"
+              className="focus-ring text-mono-md flex shrink-0 cursor-pointer items-center px-3 font-mono text-[var(--fg-muted)] transition-colors hover:text-[var(--fg-primary)]"
+            >
+              +
+            </button>
+          </Tip>
         }
         end={
           <span className="flex items-center gap-1.5">

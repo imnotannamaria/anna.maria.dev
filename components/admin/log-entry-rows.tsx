@@ -20,11 +20,14 @@
 
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { AnimatePresence, useReducedMotion } from "motion/react"
 import { PencilSimpleIcon } from "@phosphor-icons/react"
+import { TableBody, TableCell } from "@/app/components/entrepta/table"
 import { toast } from "@/app/components/entrepta/toast"
 import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
+import { Tip } from "@/components/ui/tip"
+import { MotionTableRow } from "@/components/admin/motion-table-row"
 import { StarRating } from "@/components/log/star-rating"
 import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
 import { formatLoggedAt } from "@/lib/log/date"
@@ -87,20 +90,19 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
   const leave = { opacity: 0, transition: { duration: reduce ? 0 : 0.18, ease: EASE_OUT } }
 
   return (
-    <tbody>
+    <TableBody>
       {/* No `initial={false}`: the rows own their entrance now, so suppressing it on the first
           pass would mean the table never animates in at all. */}
       <AnimatePresence>
         {visible.map((entry, i) => (
-          <motion.tr
+          <MotionTableRow
             key={entry.id}
             initial={{ opacity: 0 }}
             whileInView={enter(i)}
             viewport={revealViewport}
             exit={leave}
-            style={{ borderBottom: "1px solid var(--border-subtle)" }}
           >
-            <td className="px-2 py-3">
+            <TableCell>
               <span
                 className="text-mono-xs inline-flex h-5 items-center rounded-[5px] px-2 font-mono uppercase"
                 style={{
@@ -110,9 +112,9 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
               >
                 {TYPE_LABEL[entry.type]}
               </span>
-            </td>
+            </TableCell>
 
-            <td className="max-w-70 min-w-40 px-2 py-3">
+            <TableCell className="max-w-70 min-w-40 py-2.5">
               <Link
                 href={`/admin/log/${entry.id}`}
                 className="text-mono-md block truncate font-mono hover:underline"
@@ -128,9 +130,9 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
                   {entry.creator}
                 </span>
               )}
-            </td>
+            </TableCell>
 
-            <td className="px-2 py-3 whitespace-nowrap">
+            <TableCell>
               <span className="flex items-center">
                 {entry.rating == null ? (
                   <span style={{ color: "var(--fg-muted)" }}>—</span>
@@ -150,16 +152,13 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
                   </>
                 )}
               </span>
-            </td>
+            </TableCell>
 
-            <td
-              className="text-mono-sm px-2 py-3 font-mono whitespace-nowrap"
-              style={{ color: "var(--fg-muted)" }}
-            >
+            <TableCell className="text-[var(--fg-muted)]">
               <time dateTime={entry.loggedAt}>{formatLoggedAt(entry.loggedAt)}</time>
-            </td>
+            </TableCell>
 
-            <td className="text-mono-sm px-2 py-3 font-mono whitespace-nowrap">
+            <TableCell>
               <span
                 style={{
                   color: entry.published ? "var(--status-success-fg)" : "var(--fg-muted)",
@@ -167,29 +166,30 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
               >
                 {entry.published ? "published" : "draft"}
               </span>
-            </td>
+            </TableCell>
 
-            <td className="px-2 py-3 text-right whitespace-nowrap">
+            <TableCell align="end">
               <div className="flex items-center justify-end gap-1">
-                <Link
-                  href={`/admin/log/${entry.id}`}
-                  aria-label={`Edit ${entry.title}`}
-                  title="Edit"
-                  className="grid h-8 w-8 place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft)"
-                  style={{ color: "var(--fg-muted)" }}
-                >
-                  <PencilSimpleIcon size={15} aria-hidden />
-                </Link>
+                <Tip label="Edit">
+                  <Link
+                    href={`/admin/log/${entry.id}`}
+                    aria-label={`Edit ${entry.title}`}
+                    className="grid h-8 w-8 place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft)"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    <PencilSimpleIcon size={15} aria-hidden />
+                  </Link>
+                </Tip>
                 <DeleteDialog
                   noun="entry"
                   title={entry.title}
                   onConfirm={() => remove(entry.id, entry.title)}
                 />
               </div>
-            </td>
-          </motion.tr>
+            </TableCell>
+          </MotionTableRow>
         ))}
       </AnimatePresence>
-    </tbody>
+    </TableBody>
   )
 }

@@ -13,8 +13,6 @@
  * frame.
  */
 
-import { cardVariants } from "@/app/components/entrepta/card"
-import { motion } from "motion/react"
 import {
   CardComment,
   CardFooter,
@@ -22,8 +20,8 @@ import {
   CardLabel,
   CardMeta,
 } from "@/app/components/entrepta/card"
-import { useReveal } from "@/app/components/entrepta/reveal"
-import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { Reveal } from "@/app/components/entrepta/reveal"
+import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 
 export type KeyLine = { kbd: string; note: string; hint?: string }
 
@@ -38,53 +36,51 @@ export function KeymapCard({
   foot: string
   index?: number
 }) {
-  const { onMouseMove, spotlight } = useSpotlight(260)
-  const reveal = useReveal(Math.min(index, 6) * 0.06)
-
   return (
-    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
-      <Spotlight {...spotlight} />
-      <CardHeader>
-        <CardLabel>{title}</CardLabel>
-        <CardMeta>{`${lines.length} keys`}</CardMeta>
-      </CardHeader>
+    <Reveal index={index} className="flex flex-col">
+      <SpotlightCard glow={260} className="flex-1">
+        <CardHeader>
+          <CardLabel>{title}</CardLabel>
+          <CardMeta>{`${lines.length} keys`}</CardMeta>
+        </CardHeader>
 
-      <div className="relative flex flex-col">
-        {lines.map((line, i) => (
-          <div
-            key={line.kbd}
-            className="grid grid-cols-[40px_1fr] items-baseline gap-3 py-1"
-            style={{ borderTop: i === 0 ? "none" : "1px dashed var(--border-subtle)" }}
-          >
-            <span
-              className="text-mono-sm rounded-[3px] border px-1.5 py-0.5 text-center font-mono uppercase"
-              style={{
-                color: "var(--fg-primary)",
-                background: "var(--bg-canvas)",
-                borderColor: "var(--border-strong)",
-              }}
+        <div className="relative flex flex-col">
+          {lines.map((line, i) => (
+            <div
+              key={line.kbd}
+              className="grid grid-cols-[40px_1fr] items-baseline gap-3 py-1"
+              style={{ borderTop: i === 0 ? "none" : "1px dashed var(--border-subtle)" }}
             >
-              {line.kbd}
-            </span>
-            <span className="text-mono-sm font-mono" style={{ color: "var(--fg-secondary)" }}>
-              <em
+              <span
+                className="text-mono-sm rounded-[3px] border px-1.5 py-0.5 text-center font-mono uppercase"
                 style={{
-                  fontFamily: "var(--font-serif)",
-                  fontStyle: "italic",
-                  color: "var(--fg-brand-text)",
+                  color: "var(--fg-primary)",
+                  background: "var(--bg-canvas)",
+                  borderColor: "var(--border-strong)",
                 }}
               >
-                {line.note}
-              </em>
-              {line.hint ? ` · ${line.hint}` : ""}
-            </span>
-          </div>
-        ))}
-      </div>
+                {line.kbd}
+              </span>
+              <span className="text-mono-sm font-mono" style={{ color: "var(--fg-secondary)" }}>
+                <em
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    fontStyle: "italic",
+                    color: "var(--fg-brand-text)",
+                  }}
+                >
+                  {line.note}
+                </em>
+                {line.hint ? ` · ${line.hint}` : ""}
+              </span>
+            </div>
+          ))}
+        </div>
 
-      <CardFooter>
-        <CardComment>{foot}</CardComment>
-      </CardFooter>
-    </motion.div>
+        <CardFooter>
+          <CardComment>{foot}</CardComment>
+        </CardFooter>
+      </SpotlightCard>
+    </Reveal>
   )
 }

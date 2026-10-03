@@ -7,10 +7,9 @@ import Image from "next/image"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
-import { cardVariants, CardHeader, CardLabel, CardMeta } from "@/app/components/entrepta/card"
-import { useReveal } from "@/app/components/entrepta/reveal"
+import { CardHeader, CardLabel, CardMeta } from "@/app/components/entrepta/card"
 import { EASE_OUT } from "@/lib/motion"
-import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 import { posterSrc } from "@/lib/log/poster-src"
 import type { CardState } from "@/lib/showcase/state"
 import { TYPE_LABEL } from "@/lib/log/constants"
@@ -82,19 +81,11 @@ export function LogShelfCard({
     setPinned((current) => (current?.id === entry.id ? null : entry))
   }, [])
   const reduce = useReducedMotion() ?? false
-  const { onMouseMove, spotlight } = useSpotlight(760)
-  const reveal = useReveal()
 
   const entries = state.kind === "ok" || state.kind === "stale" ? state.data : null
 
   return (
-    <motion.div
-      className={cn(cardVariants(), "log-shelf", className)}
-      onMouseMove={onMouseMove}
-      {...reveal}
-    >
-      <Spotlight {...spotlight} />
-
+    <SpotlightCard glow={760} className={cn("log-shelf", className)}>
       <CardHeader>
         <CardLabel as="h3">log</CardLabel>
         <CardMeta>
@@ -147,7 +138,7 @@ export function LogShelfCard({
         and 40px of chrome it does not need is 40px the neighbour has to match.
       */}
       <Caption entry={active} state={state} reduce={reduce} />
-    </motion.div>
+    </SpotlightCard>
   )
 }
 

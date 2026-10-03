@@ -75,4 +75,62 @@ function useUrlFilter<T extends string>(
   return [active, write]
 }
 
-export { useUrlFilter }
+/**
+ * The same, for a filter that takes several values: `?category=a&category=b`.
+ * Values outside `allowed` are dropped, and each one counts once.
+ */
+function useUrlFilterList<T extends string>(
+  param: string,
+  allowed: readonly T[],
+  path?: string,
+  options: { replace?: boolean } = {},
+): [T[], (next: readonly T[]) => void] {
+  const replace = options.replace ?? false
+  const event = eventName(param)
+
+  const subscribe = React.useCallback(
+    (onChange: () => void) => {
+      window.addEventListener("popstate", onChange)
+      window.addEventListener(event, onChange)
+      return () => {
+        window.removeEventListener("popstate", onChange)
+        window.removeEventListener(event, onChange)
+      }
+    },
+    [event],
+  )
+
+  // A snapshot has to be stable between reads, and a fresh array never is, so
+  // the store holds the values joined and the array is derived from that.
+  const read = React.useCallback((): string => {
+    const values = new URLSearchParams(window.location.search).getAll(param)
+    const kept = (allowed as readonly string[]).filter((value) => values.includes(value))
+    return kept.join("\n")
+  }, [param, allowed])
+
+  const snapshot = React.useSyncExternalStore(subscribe, read, serverListSnapshot)
+  const active = React.useMemo(() => (snapshot ? (snapshot.split("\n") as T[]) : []), [snapshot])
+
+  const write = React.useCallback(
+    (next: readonly T[]) => {
+      const params = new URLSearchParams(window.location.search)
+      params.delete(param)
+      for (const value of new Set(next)) params.append(param, value)
+      const query = params.toString()
+      const base = path ?? window.location.pathname
+      const url = query ? `${base}?${query}` : base
+      if (replace) window.history.replaceState(null, "", url)
+      else window.history.pushState(null, "", url)
+      window.dispatchEvent(new Event(event))
+    },
+    [path, param, event, replace],
+  )
+
+  return [active, write]
+}
+
+function serverListSnapshot(): string {
+  return ""
+}
+
+export { useUrlFilter, useUrlFilterList }

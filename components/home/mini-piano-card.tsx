@@ -1,12 +1,9 @@
 "use client"
 
-import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { motion } from "motion/react"
-import { useReveal } from "@/app/components/entrepta/reveal"
-import { cardVariants, CardHeader, CardLabel, CardMeta } from "@/app/components/entrepta/card"
-import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { CardHeader, CardLabel, CardMeta } from "@/app/components/entrepta/card"
+import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 
 // ─── Key geometry ────────────────────────────────────────────────────────────
 //
@@ -58,8 +55,6 @@ const SEQ = [SOL, LA, SOL + 7, LA + 7]
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export function MiniPianoCard() {
-  const { onMouseMove, spotlight } = useSpotlight(340)
-  const reveal = useReveal()
   const [pressed, setPressed] = useState<number | null>(null)
   const [step, setStep] = useState(0)
 
@@ -84,13 +79,7 @@ export function MiniPianoCard() {
 
   return (
     <Link href="/piano" style={{ textDecoration: "none", display: "block" }}>
-      <motion.div
-        className={cn(cardVariants(), "mini-piano group/piano h-full")}
-        onMouseMove={onMouseMove}
-        {...reveal}
-      >
-        <Spotlight {...spotlight} />
-
+      <SpotlightCard glow={340} className="mini-piano group/piano h-full">
         {/* This was a mac title bar — traffic lights over a chrome-tinted strip
             with its own border — which made the piano the one widget in the
             section wearing a costume. Same head as every other card now. */}
@@ -230,7 +219,7 @@ export function MiniPianoCard() {
             /piano →
           </span>
         </div>
-      </motion.div>
+      </SpotlightCard>
     </Link>
   )
 }

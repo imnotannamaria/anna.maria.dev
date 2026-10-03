@@ -10,18 +10,14 @@ interface FieldLabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
   icon?: IconProp
 }
 
+/** How a form names a control or a group: a Field's label, a ChoiceCard's legend. */
+const fieldLabelClass =
+  "flex items-center gap-1.5 font-mono text-mono-xs uppercase tracking-[0.08em] text-[var(--fg-muted)]"
+
 const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
   ({ className, required, icon: LabelIcon, children, ...props }, ref) => (
     // biome-ignore lint/a11y/noLabelWithoutControl: htmlFor arrives through props
-    <label
-      ref={ref}
-      className={cn(
-        "flex items-center gap-1.5",
-        "text-mono-xs font-mono tracking-[0.08em] text-[var(--fg-muted)] uppercase",
-        className,
-      )}
-      {...props}
-    >
+    <label ref={ref} className={cn(fieldLabelClass, className)} {...props}>
       {LabelIcon ? (
         <IconSlot icon={LabelIcon} size={11} className="text-[var(--fg-brand)]" />
       ) : (
@@ -118,5 +114,5 @@ const Field = React.forwardRef<HTMLDivElement, FieldProps>(
 )
 Field.displayName = "Field"
 
-export { Field, FieldError, FieldLabel }
+export { Field, FieldError, FieldLabel, fieldLabelClass }
 export type { FieldErrorProps, FieldLabelProps, FieldProps }
