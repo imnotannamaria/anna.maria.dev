@@ -256,7 +256,7 @@ export function SleeveCard({
     // `cardVariants()` and the hook, not `SpotlightCard`, because of the progress bar at the
     // bottom: it rides the card's own edge, and `SpotlightCard` puts its children in a wrapper
     // inside the padding, where the same bar lands right under the footer text.
-    <div className={cn(cardVariants(), className)} onMouseMove={onMouseMove}>
+    <div className={cn(cardVariants(), "@container", className)} onMouseMove={onMouseMove}>
       <Spotlight {...spotlight} />
       <h3 className="sr-only">Songs that sound like me</h3>
 
@@ -356,10 +356,14 @@ export function SleeveCard({
         <CardComment>
           {audible ? "30s preview · spotify" : "my friends picked some of these"}
         </CardComment>
-        {/* `ml-auto`: when the comment and the controls stop fitting on one line the footer
-            wraps, and a wrapped item starts its new line on the left. The controls belong on
-            the right in both cases. */}
-        <div className="ml-auto flex items-center gap-1">
+        {/* Wide, the controls sit on the right of the comment. Narrow, the two stop fitting on
+            one line, and the controls take a line of their own across the whole card: previous
+            at the left edge, play in the middle, next at the right. The switch is a container
+            query on the card rather than on the viewport, because the card is narrow on a phone
+            and again in a half-width tile at 768px. Below 24rem of card content the comment and
+            the three buttons no longer share a line comfortably; the comment is the longer of
+            the two footers, "my friends picked some of these". */}
+        <div className="ml-auto flex items-center gap-1 @max-sm:ml-0 @max-sm:w-full @max-sm:justify-between">
           <ControlButton label="Previous track" onClick={onPrev}>
             <SkipBackIcon size={13} weight="fill" aria-hidden />
           </ControlButton>
