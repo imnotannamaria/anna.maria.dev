@@ -1,5 +1,6 @@
 "use client"
 
+import { Tip } from "@/components/ui/tip"
 import { useState } from "react"
 import { TrashIcon } from "@phosphor-icons/react"
 import {
@@ -41,17 +42,20 @@ export function DeleteDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button
-          type="button"
-          aria-label={`Delete ${title}`}
-          title="Delete"
-          className="focus-ring grid h-8 w-8 cursor-pointer place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft) hover:text-(--status-error-fg)"
-          style={{ color: "var(--fg-muted)" }}
-        >
-          <TrashIcon size={15} aria-hidden />
-        </button>
-      </DialogTrigger>
+      {/* Two triggers on one button: the tooltip's wraps the dialog's, and each passes its
+          props down through `asChild`. */}
+      <Tip label="Delete">
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            aria-label={`Delete ${title}`}
+            className="focus-ring grid h-8 w-8 cursor-pointer place-items-center rounded-md transition-colors hover:bg-(--bg-hover-soft) hover:text-(--status-error-fg)"
+            style={{ color: "var(--fg-muted)" }}
+          >
+            <TrashIcon size={15} aria-hidden />
+          </button>
+        </DialogTrigger>
+      </Tip>
 
       <DialogContent>
         <DialogHeader>

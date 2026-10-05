@@ -87,7 +87,7 @@ export const TODAY_FIXTURE: TodayData = {
   kcal: 412,
   kcalGoal: 600,
   exerciseMinutes: 22,
-  exerciseGoal: 30,
+  exerciseGoal: 90,
   steps: 6240,
   stepsGoal: 8000,
   lastSyncIso: "2026-08-18T14:20:00.000Z",

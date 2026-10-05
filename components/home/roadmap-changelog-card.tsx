@@ -2,7 +2,6 @@
 
 import { Diamond } from "@/app/components/entrepta/diamond"
 import { Em } from "@/app/components/entrepta/doc-parts"
-import { cardVariants } from "@/app/components/entrepta/card"
 import { useId, useState } from "react"
 import Link from "next/link"
 import { motion, useReducedMotion } from "motion/react"
@@ -15,15 +14,13 @@ import {
   CardLabel,
   CardMeta,
 } from "@/app/components/entrepta/card"
-import { useReveal } from "@/app/components/entrepta/reveal"
 import { EASE_OUT } from "@/lib/motion"
-import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 import { roadmapSlice } from "@/lib/roadmap/widget"
 import { STATUS_LABEL, STATUS_MARK } from "@/lib/roadmap/constants"
 import type { RoadmapItem } from "@/lib/roadmap/validation"
 import type { CardState } from "@/lib/showcase/state"
 import { CardBlank } from "@/components/ui/card-blank"
-import { cn } from "@/lib/utils"
 
 /**
  * The roadmap on the home page, read as `git log --graph`: a gutter that branches where the
@@ -48,16 +45,12 @@ export function RoadmapChangelogCard({
   className?: string
 }) {
   const reduce = useReducedMotion() ?? false
-  const { onMouseMove, spotlight } = useSpotlight(560)
-  const reveal = useReveal()
 
   const items = state.kind === "ok" || state.kind === "stale" ? state.data : null
   const slice = items ? roadmapSlice(items) : null
 
   return (
-    <motion.div className={cn(cardVariants(), className)} onMouseMove={onMouseMove} {...reveal}>
-      <Spotlight {...spotlight} />
-
+    <SpotlightCard glow={560} className={className}>
       <CardHeader>
         <CardLabel as="h3">roadmap</CardLabel>
         <CardMeta>
@@ -110,7 +103,7 @@ export function RoadmapChangelogCard({
           <Diamond size={10} />
         )}
       </CardFooter>
-    </motion.div>
+    </SpotlightCard>
   )
 }
 

@@ -1,5 +1,3 @@
-"use client"
-
 import { type VariantProps, cva } from "class-variance-authority"
 import * as React from "react"
 import { cn } from "@/lib/utils"
@@ -13,7 +11,9 @@ const textareaVariants = cva(
     "font-sans text-body-md leading-relaxed text-[var(--fg-primary)]",
     "placeholder:font-mono placeholder:text-[var(--fg-muted)]",
     "appearance-none outline-none resize-y",
-    "transition-all duration-150 ease-out",
+    // Border and shadow only: dragging the resize handle sets the height on every
+    // move, and easing it left the box trailing behind the cursor.
+    "transition-[border-color,box-shadow] duration-150 ease-out",
     "hover:border-[var(--fg-muted)]",
     "focus:border-[var(--fg-brand)] focus:shadow-[0_0_0_3px_var(--bg-surface-brand)]",
     "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40",

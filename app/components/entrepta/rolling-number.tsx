@@ -2,6 +2,7 @@
 
 import { motion, useInView, useReducedMotion } from "motion/react"
 import * as React from "react"
+import { Redact } from "./redact"
 import { revealViewport } from "@/lib/motion"
 
 /**
@@ -107,40 +108,42 @@ function RollingNumber({
   let digitIndex = 0
 
   return (
-    <span
-      ref={ref}
-      data-in-view={shown || undefined}
-      className={className}
-      style={{ display: "flex", ...style }}
-    >
-      <span className="sr-only">{value}</span>
-      {chars.map((char, i) => {
-        if (!/[0-9]/.test(char)) {
+    <Redact>
+      <span
+        ref={ref}
+        data-in-view={shown || undefined}
+        className={className}
+        style={{ display: "flex", ...style }}
+      >
+        <span className="sr-only">{value}</span>
+        {chars.map((char, i) => {
+          if (!/[0-9]/.test(char)) {
+            return (
+              <span
+                // biome-ignore lint/suspicious/noArrayIndexKey: characters of a formatted number
+                key={i}
+                aria-hidden
+                style={{ display: "block", height, lineHeight: `${height}px` }}
+              >
+                {char}
+              </span>
+            )
+          }
+          const order = digitIndex++
           return (
-            <span
+            <Digit
               // biome-ignore lint/suspicious/noArrayIndexKey: characters of a formatted number
               key={i}
-              aria-hidden
-              style={{ display: "block", height, lineHeight: `${height}px` }}
-            >
-              {char}
-            </span>
+              digit={Number(char)}
+              cycle={cycle}
+              delay={delay + order * 0.06}
+              height={height}
+              shown={shown}
+            />
           )
-        }
-        const order = digitIndex++
-        return (
-          <Digit
-            // biome-ignore lint/suspicious/noArrayIndexKey: characters of a formatted number
-            key={i}
-            digit={Number(char)}
-            cycle={cycle}
-            delay={delay + order * 0.06}
-            height={height}
-            shown={shown}
-          />
-        )
-      })}
-    </span>
+        })}
+      </span>
+    </Redact>
   )
 }
 

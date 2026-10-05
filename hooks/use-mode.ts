@@ -28,6 +28,59 @@ function applyModeAttribute(mode: ThemeMode) {
   else document.documentElement.removeAttribute("data-mode")
 }
 
+// Typed here rather than taken from lib.dom, which only has it from TypeScript 5.6.
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => {
+    ready: Promise<unknown>
+    finished: Promise<unknown>
+  }
+}
+
+// Two switches can overlap, such as a double click. The flag stays until the last one ends.
+let switching = 0
+
+/**
+ * Applies a theme or mode change to the whole page at once.
+ *
+ * Components ease their own colors, each on its own clock: a card over 200ms,
+ * a button over 150ms, a badge not at all. Swapped under them, the mode lands
+ * piece by piece. For the length of the switch, `data-theme-switching` on
+ * `<html>` turns every transition off (globals.css), so the page changes in one
+ * frame. Where the browser has view transitions, that frame crossfades with the
+ * last one as a single picture. Reduced motion gets the instant switch.
+ *
+ * `useMode` and `useTheme` call it for you. Wrap your own attribute changes in
+ * it if you switch the theme some other way.
+ */
+function transitionTheme(apply: () => void) {
+  if (typeof document === "undefined") return apply()
+  const root = document.documentElement
+  switching += 1
+  root.setAttribute("data-theme-switching", "")
+  const done = () => {
+    switching -= 1
+    if (switching === 0) root.removeAttribute("data-theme-switching")
+  }
+
+  const doc = document as ViewTransitionDocument
+  const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  if (!reduced && typeof doc.startViewTransition === "function") {
+    const transition = doc.startViewTransition(apply)
+    // a switch that starts before this one ends skips it, which rejects `ready`
+    transition.ready.catch(() => {})
+    transition.finished.then(done, done)
+    return
+  }
+
+  try {
+    apply()
+  } finally {
+    // The first frame paints the new colors with transitions off. Turning them
+    // back on before it would let every component ease into the change again.
+    requestAnimationFrame(() => requestAnimationFrame(done))
+  }
+}
+
 function safeRead(key: string): string | null {
   try {
     return typeof window === "undefined" ? null : window.localStorage.getItem(key)
@@ -91,9 +144,10 @@ function useMode(options: UseModeOptions = {}): UseModeReturn {
     if (disableMode || typeof window === "undefined") return
     function onStorage(event: StorageEvent) {
       if (event.key !== modeKey) return
-      if (event.newValue !== "dark" && event.newValue !== "light") return
-      setModeState(event.newValue)
-      applyModeAttribute(event.newValue)
+      const next = event.newValue
+      if (next !== "dark" && next !== "light") return
+      setModeState(next)
+      transitionTheme(() => applyModeAttribute(next))
     }
     window.addEventListener("storage", onStorage)
     return () => window.removeEventListener("storage", onStorage)
@@ -103,7 +157,7 @@ function useMode(options: UseModeOptions = {}): UseModeReturn {
     (next: ThemeMode) => {
       if (disableMode) return
       setModeState(next)
-      applyModeAttribute(next)
+      transitionTheme(() => applyModeAttribute(next))
       safeWrite(modeKey, next)
       broadcast(modeKey, next)
     },
@@ -117,5 +171,5 @@ function useMode(options: UseModeOptions = {}): UseModeReturn {
   return { mode, setMode, toggleMode }
 }
 
-export { useMode }
+export { transitionTheme, useMode }
 export type { ThemeMode, UseModeOptions, UseModeReturn }

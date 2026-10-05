@@ -16,9 +16,7 @@
  * this side of the line.
  */
 
-import { cardVariants } from "@/app/components/entrepta/card"
 import { EnvelopeSimpleIcon } from "@phosphor-icons/react/dist/ssr"
-import { motion } from "motion/react"
 import {
   CardComment,
   CardFooter,
@@ -27,8 +25,8 @@ import {
   CardMeta,
 } from "@/app/components/entrepta/card"
 import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/icons"
-import { useReveal } from "@/app/components/entrepta/reveal"
-import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { Reveal } from "@/app/components/entrepta/reveal"
+import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 import { siteConfig } from "@/lib/site-config"
 
 const EMAIL = siteConfig.email
@@ -52,81 +50,73 @@ const channels = [
 ]
 
 export function ChannelsCard({ index = 0 }: { index?: number }) {
-  const { onMouseMove, spotlight } = useSpotlight(280)
-  const reveal = useReveal(index * 0.06)
-
   return (
-    <motion.div
-      id="channels"
-      className={cardVariants()}
-      style={{ scrollMarginTop: 24 }}
-      onMouseMove={onMouseMove}
-      {...reveal}
-    >
-      <Spotlight {...spotlight} />
-      <CardHeader>
-        <CardLabel>other channels</CardLabel>
-        <CardMeta>{String(channels.length)}</CardMeta>
-      </CardHeader>
+    <Reveal index={index} className="flex flex-col">
+      <SpotlightCard id="channels" glow={280} className="flex-1" style={{ scrollMarginTop: 24 }}>
+        <CardHeader>
+          <CardLabel>other channels</CardLabel>
+          <CardMeta>{String(channels.length)}</CardMeta>
+        </CardHeader>
 
-      <div className="relative flex flex-col">
-        {channels.map(({ Icon, label, value, href, primary }, i) => {
-          const external = !href.startsWith("mailto:")
-          return (
-            <a
-              key={label}
-              href={href}
-              {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-              className="group/row flex items-center gap-3 py-2.5"
-              style={{
-                borderTop: i === 0 ? "none" : "1px dashed var(--border-subtle)",
-                textDecoration: "none",
-              }}
-            >
-              <span
-                className="grid shrink-0 place-items-center rounded-[var(--radius-sm)]"
+        <div className="relative flex flex-col">
+          {channels.map(({ Icon, label, value, href, primary }, i) => {
+            const external = !href.startsWith("mailto:")
+            return (
+              <a
+                key={label}
+                href={href}
+                {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="group/row flex items-center gap-3 py-2.5"
                 style={{
-                  width: 28,
-                  height: 28,
-                  background: primary ? "var(--bg-surface-brand)" : "var(--bg-hover-soft)",
-                  color: primary ? "var(--fg-brand)" : "var(--fg-secondary)",
+                  borderTop: i === 0 ? "none" : "1px dashed var(--border-subtle)",
+                  textDecoration: "none",
                 }}
               >
-                <Icon size={14} />
-              </span>
-
-              <span className="flex min-w-0 flex-col">
                 <span
-                  className="text-mono-xs font-mono tracking-[0.08em] uppercase"
-                  style={{ color: "var(--fg-muted)" }}
+                  className="grid shrink-0 place-items-center rounded-[var(--radius-sm)]"
+                  style={{
+                    width: 28,
+                    height: 28,
+                    background: primary ? "var(--bg-surface-brand)" : "var(--bg-hover-soft)",
+                    color: primary ? "var(--fg-brand)" : "var(--fg-secondary)",
+                  }}
                 >
-                  {label}
+                  <Icon size={14} />
                 </span>
+
+                <span className="flex min-w-0 flex-col">
+                  <span
+                    className="text-mono-xs font-mono tracking-[0.08em] uppercase"
+                    style={{ color: "var(--fg-muted)" }}
+                  >
+                    {label}
+                  </span>
+                  <span
+                    className="text-mono-sm truncate font-mono transition-colors group-hover/row:text-[var(--fg-brand-text)] group-focus-visible/row:text-[var(--fg-brand-text)]"
+                    style={{ color: "var(--fg-primary)" }}
+                  >
+                    {value}
+                  </span>
+                  {external && <span className="sr-only">(opens in a new tab)</span>}
+                </span>
+
+                {/* Mirrored on focus-visible — the affordance can't be hover-only. */}
                 <span
-                  className="text-mono-sm truncate font-mono transition-colors group-hover/row:text-[var(--fg-brand-text)] group-focus-visible/row:text-[var(--fg-brand-text)]"
-                  style={{ color: "var(--fg-primary)" }}
+                  aria-hidden
+                  className="ml-auto shrink-0 transition-transform duration-200 ease-out group-hover/row:translate-x-0.5 group-hover/row:-translate-y-0.5 group-focus-visible/row:translate-x-0.5 group-focus-visible/row:-translate-y-0.5"
+                  style={{ color: "var(--fg-brand)" }}
                 >
-                  {value}
+                  ↗
                 </span>
-                {external && <span className="sr-only">(opens in a new tab)</span>}
-              </span>
+              </a>
+            )
+          })}
+        </div>
 
-              {/* Mirrored on focus-visible — the affordance can't be hover-only. */}
-              <span
-                aria-hidden
-                className="ml-auto shrink-0 transition-transform duration-200 ease-out group-hover/row:translate-x-0.5 group-hover/row:-translate-y-0.5 group-focus-visible/row:translate-x-0.5 group-focus-visible/row:-translate-y-0.5"
-                style={{ color: "var(--fg-brand)" }}
-              >
-                ↗
-              </span>
-            </a>
-          )
-        })}
-      </div>
-
-      <CardFooter>
-        <CardComment>all of them get read</CardComment>
-      </CardFooter>
-    </motion.div>
+        <CardFooter>
+          <CardComment>all of them get read</CardComment>
+        </CardFooter>
+      </SpotlightCard>
+    </Reveal>
   )
 }

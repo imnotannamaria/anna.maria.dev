@@ -14,7 +14,7 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 | Framework        | Next.js 16 (App Router)                                            |
 | Language         | TypeScript (strict)                                                |
 | Styling          | Tailwind CSS v4 + entrepta tokens                                  |
-| Design system    | entrepta 2.0, copied in by its CLI, no SDK, dark first             |
+| Design system    | entrepta 3.0, copied in by its CLI, no SDK, dark first             |
 | Content          | MDX via Velite                                                     |
 | State            | Zustand                                                            |
 | Animation        | Motion v12                                                         |
@@ -38,14 +38,14 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 
 ## Design system: entrepta
 
-The site runs on [entrepta](https://entrepta.vercel.app) 2.0. This site is where most of v2 was
+The site runs on [entrepta](https://entrepta.vercel.app) 3.0. This site is where most of v2 was
 built; now it consumes it. entrepta is not a runtime dependency: its CLI copies source in, and three
 places are entrepta's rather than the site's:
 
 - `app/components/entrepta/`, written by `npx @entrepta/cli add <name> --overwrite`
 - `app/entrepta.css`, the tokens, themes, reset, focus and loading classes
-- `lib/utils.ts` (`cn()`), `lib/motion.ts`, `lib/icon.tsx`, `lib/overlay.ts`, and the hooks
-  `use-theme`, `use-mode`, `use-command-palette`, `use-url-filter`
+- `lib/utils.ts` (`cn()`), `lib/motion.ts`, `lib/icon.tsx`, `lib/overlay.ts`, `lib/nav.ts`, and the
+  hooks `use-theme`, `use-mode`, `use-command-palette`, `use-url-filter`, `use-redact`
 
 A change to any of them belongs in entrepta, then comes back with `add --overwrite`. A local edit
 is lost on the next update. What only this site knows stays out of those files: its CSS lives in
@@ -62,6 +62,23 @@ one keeps its own CSS there.
 `init --themes=all` in a scratch project, minus the fonts). Then `add … --overwrite` the components
 in use, commit before it, and read the diff after. The plan behind all this is
 [docs/entrepta-v2-plan.md](docs/entrepta-v2-plan.md).
+
+**`lib/format.ts` is the site's, and entrepta 3 ships a file with the same name.** `add` writes
+its lib files to `lib/`, so adding anything that depends on entrepta's `format-lib` replaces the
+site's `formatDate()`, `slugify()`, `isUuid()` and reading time with entrepta's money and date
+formatters, and every import of them breaks. Today that is `amount`, `bar-list`, `calendar`,
+`chart`, `contribution-grid`, `date-navigator`, `date-picker`, `delta`, `file-dropzone`,
+`filter-builder`, `money-input` and the `use-format` hook. None of them is installed. Before the
+first one is, move the site's helpers to a name entrepta does not use.
+
+The contributions calendar stays hand-built, in `components/about/github-calendar.tsx`. It was
+moved onto entrepta's `ContributionGrid` during the v3 migration and moved straight back: Anna
+prefers her own grid. Don't swap it again without being asked.
+
+**One local edit lives in an entrepta file:** `RAIL_TOOLTIP_OFFSET` in
+`app/components/entrepta/sidebar.tsx`, which stands the rail's tooltips 18px off their icons
+instead of the Tooltip's default 8, so they clear the rail's border. It is not in entrepta 3.0.0.
+Until it is upstream, `add sidebar --overwrite` undoes it.
 
 ### Tokens
 
@@ -204,7 +221,7 @@ app/
   log/                      public feed of everything I finish
   roadmap/                  the board: to do, in progress, shipped
   admin/                    log + roadmap CRUD, behind AuthKit + the allowlist
-  components/entrepta/     entrepta 2.0 components, written by its CLI — don't edit here
+  components/entrepta/     entrepta 3.0 components, written by its CLI — don't edit here
   api/
     contact/route.ts        email via Resend
     og/route.tsx             dynamic OG images
@@ -273,7 +290,9 @@ hooks/                      entrepta's: use-theme, use-mode, use-command-palette
 
 ### Home (`/`)
 
-Bento grid. Hero card, Spotify Now Playing, wristkit Apple Watch activity card, GitHub contributions, featured project, career stats. Section headers use `$ whoami`, `$ ls projects/`, style commands.
+entrepta's `BentoGrid`, one per section. Hero card, Spotify Now Playing, wristkit Apple Watch activity card, GitHub contributions, featured project, career stats. Section headers use `$ whoami`, `$ ls projects/`, style commands.
+
+A tile is a full row below 768px, a half from there (the `HALF_FROM_MD` class in `app/(home)/page.tsx`, since `BentoGrid` only speaks 640 and 1024) and its `colSpan.lg` from 1024px. The tile brings the entrance, so a card inside one carries none of its own; `reveal={false}` is for the two that sequence themselves — the profile card, which also holds the LCP element, and the tree. A `Suspense` boundary goes _inside_ the tile, never around it: `BentoGrid` only recognises a `BentoItem` that is its direct child.
 
 `ls ./work` is the featured project and the featured post stacked on the left, and `git shortlog` on its own on the right: commits in the last thirty days per project, the last commit under each, and the projects that went quiet. It replaced `oss '26`, a goal counter that stopped changing once the goal was met; the goal is its footer comment now. One GitHub request feeds it, cached for an hour — see `lib/github/shortlog.ts` and [/components/shortlog](content/components/shortlog.mdx).
 
@@ -393,7 +412,8 @@ Every entry has a slug, but there is no `/log/[slug]` page and there shouldn't b
 ### `/roadmap`
 
 Three columns, to do, in progress and shipped, of what this site is going to become, over a
-progress card whose stepper walks the same three stages. Every item is entrepta's Card with
+progress card whose stepper — entrepta's `Stepper`, with each stage's count as the line under
+its label — walks the same three stages. Every item is entrepta's Card with
 the status mark, a serif title, the blurb and a `Badge`; shipped ones are struck through.
 Hovering a card runs a light around its border, and the in-progress ones rest dimly lit.
 
@@ -418,6 +438,10 @@ only consumer.
 Guarded by WorkOS AuthKit **and** an `ADMIN_EMAILS` allowlist checked at the route level, not just in `proxy.ts`. Anyone else gets a 404, never a 403. `/admin/log` lists everything including drafts; `/admin/roadmap` lists everything including
 `raw`. Create, edit and delete go through Hono at `/api/v1/admin/log` and
 `/api/v1/admin/roadmap`.
+
+Both lists are entrepta's `Table`, and the type and status fields are its `Select`. The rows are
+`MotionTableRow` (`components/admin/motion-table-row.tsx`), the Table's row as a Motion component,
+because a row here fades in and fades out on delete.
 
 Full docs, including the phase-by-phase decisions and their reasoning:
 [docs/log-plan.md](docs/log-plan.md) and
@@ -555,6 +579,7 @@ idle the whole time, and it reproduces with a bare `npx next dev` and nothing co
 - Brand accents always derive from `--fg-brand` via `color-mix()`, never a hardcoded hex, so every theme stays reactive.
 - Mono is the default UI font. Reach for Inter only in long prose blocks.
 - entrepta components in `app/components/entrepta/` are entrepta's. Change them upstream and bring them back with `add --overwrite`; don't wrap or override them from outside. See Design system above.
+- No native `title` for a tooltip. Wrap the control in `Tip` (`components/ui/tip.tsx`), which is entrepta's `Tooltip` assembled once; the provider is in `app/layout.tsx`. An icon-only control still needs its own `aria-label`. The one tooltip that is not the component is the contributions calendar's: a single box following a delegated pointer over 371 cells, wearing the same overlay surface.
 - Chrome mobile won't resize below about 550px in DevTools. For real narrow viewports (375px), use the device toolbar, not window resize.
 - New API routes go in the Hono app under `lib/api/routes/`, mounted at `/api/v1`. The older handlers (`/api/contact`, `/api/og`, `/api/now-playing`) stay where they are — they work, and moving them buys nothing.
 - Anything under `/admin` calls `requireAdmin()` (pages) or `requireAdminApi` (routes). The `proxy.ts` matcher is not the gate; a matcher can be edited wrong.
@@ -650,12 +675,20 @@ Every card on the site is built from the same pieces, all of them entrepta's (`a
 | `size="sm"` / `"xl"`                                                           | The same card, denser or roomier. A size, not a new card                                                                 |
 | `CardHeader` + `CardLabel` + `CardMeta`, `CardFooter` + `CardComment`, `Badge` | The chrome inside a card                                                                                                 |
 | `ArrowLink` / `ArrowAffordance`                                                | A link with a travelling arrow and a rule that wipes in                                                                  |
-| `useSpotlight` + `Spotlight`                                                   | The glow that trails the cursor across a card                                                                            |
+| `SpotlightCard`                                                                | A Card with the glow trailing the cursor, hook included. The default for a card that is just a card                      |
+| `useSpotlight` + `Spotlight`                                                   | The same glow by hand, for a card `SpotlightCard` cannot be: see below                                                   |
+| `BentoGrid` + `BentoItem`                                                      | The home page's grids. A tile stretches what is inside it and brings its entrance                                        |
 | `useReveal` + `Reveal`                                                         | The entrance every card shares                                                                                           |
 | `RollingNumber`                                                                | An odometer for any number worth watching land                                                                           |
 | `TypeIn`                                                                       | Text that assembles itself a piece at a time                                                                             |
 
 Card shape is fixed: `◆ name` on the left of the head, muted meta on the right, no border and no fill on the head itself. The foot is a `//` comment on the left and an accent on the right. If a card needs something the pieces don't do, change the piece.
+
+**`SpotlightCard` first, the hook when it cannot be one.** `SpotlightCard` is always a `div`, and it puts its children in a wrapper above the glow. So the hook stays for a card that has to be an `article` or an `li`, that carries a `layoutId`, that sequences its own entrance through variant labels on its root, or that has a child positioned against the card's own edge. Inside `SpotlightCard` an `absolute inset-0` link covers the content box and leaves the padding dead, and a bar meant for the card's bottom edge lands under the footer text instead, which is what happened to the playlist's progress bar. That is why `project-card`, `post-card`, `log-card`, `featured-project-card`, `roadmap-card`, `tree-card`, `profile-card` and the playlist's `sleeve-card` still use `cardVariants()` with `useSpotlight`.
+
+The wristkit card (`components/wristkit/today-activity-card/`) is wristkit v2's markup and stylesheet on the site's surface: `cardVariants()` with the hook, the rings sweeping in through variant labels on the panel, and a hover that thickens them in `styles.css`. Every change to wristkit's stylesheet is marked `SITE:` there, so the next version can be pasted over and the marks put back.
+
+Outside a `BentoGrid`, a `SpotlightCard` gets its entrance from a `Reveal` around it. When that `Reveal` is a grid item it is what the row stretches, so it takes `flex flex-col` and the card `flex-1`, or a row of cards stops lining up.
 
 `--bg-card` is for cards. `--bg-surface` is for things that sit _above_ a card — dropdowns, dialogs, code blocks, tooltips — which genuinely need to be lighter than what they cover.
 

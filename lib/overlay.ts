@@ -30,3 +30,9 @@ export const MENU_LABEL = cn(
 
 /** A rule between groups, edge to edge inside the 4px padding. */
 export const MENU_SEPARATOR = "-mx-1 my-1 h-px bg-[var(--border-subtle)]"
+
+/** The × that puts away a toast or an alert, in the top-right corner. */
+export const DISMISS_BUTTON = cn(
+  "focus-ring absolute top-3 right-3 grid size-6 place-items-center rounded-[var(--radius-sm)]",
+  "text-[var(--fg-muted)] hover:bg-[var(--bg-hover-strong)] hover:text-[var(--fg-primary)]",
+)

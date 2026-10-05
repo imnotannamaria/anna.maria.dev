@@ -1,10 +1,9 @@
 "use client"
 
-import { cardVariants } from "@/app/components/entrepta/card"
 import { useState } from "react"
 import { z } from "zod"
-import { motion } from "motion/react"
-import { CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react"
+import { CheckCircleIcon } from "@phosphor-icons/react"
+import { Alert } from "@/app/components/entrepta/alert"
 import { Field } from "@/app/components/entrepta/field"
 import { Input } from "@/app/components/entrepta/input"
 import { Textarea } from "@/app/components/entrepta/textarea"
@@ -17,8 +16,8 @@ import {
   CardMeta,
 } from "@/app/components/entrepta/card"
 import { Badge } from "@/app/components/entrepta/badge"
-import { useReveal } from "@/app/components/entrepta/reveal"
-import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
+import { Reveal } from "@/app/components/entrepta/reveal"
+import { SpotlightCard } from "@/app/components/entrepta/spotlight-card"
 import { contactSchema, type ContactFieldErrors } from "@/lib/contact-schema"
 import { cn } from "@/lib/utils"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
@@ -48,22 +47,20 @@ function FormCard({
   footRight?: React.ReactNode
   children: React.ReactNode
 }) {
-  const { onMouseMove, spotlight } = useSpotlight(520)
-  const reveal = useReveal()
-
   return (
-    <motion.div className={cardVariants()} onMouseMove={onMouseMove} {...reveal}>
-      <Spotlight {...spotlight} />
-      <CardHeader>
-        <CardLabel>send a message</CardLabel>
-        <CardMeta>{meta}</CardMeta>
-      </CardHeader>
-      <div className="relative flex flex-col">{children}</div>
-      <CardFooter>
-        <CardComment>{comment}</CardComment>
-        {footRight}
-      </CardFooter>
-    </motion.div>
+    <Reveal className="flex flex-col">
+      <SpotlightCard glow={520} className="flex-1">
+        <CardHeader>
+          <CardLabel>send a message</CardLabel>
+          <CardMeta>{meta}</CardMeta>
+        </CardHeader>
+        <div className="relative flex flex-col">{children}</div>
+        <CardFooter>
+          <CardComment>{comment}</CardComment>
+          {footRight}
+        </CardFooter>
+      </SpotlightCard>
+    </Reveal>
   )
 }
 
@@ -255,24 +252,10 @@ export function ContactForm({ email }: { email: string }) {
           </Field>
         </div>
 
+        {/* entrepta's Alert: `tone="error"` is `role="alert"`, so it interrupts, and the status
+            sits in the icon tile and the corner glow rather than a red box drawn here. */}
         {state === "error" && errorMessage && (
-          <div
-            role="alert"
-            className="text-mono-sm mt-5 flex items-start gap-2.5 rounded-[var(--radius-md)] border px-4 py-3 font-mono"
-            style={{
-              borderColor: "var(--status-error)",
-              background: "var(--status-error-soft)",
-              color: "var(--status-error-fg)",
-            }}
-          >
-            <WarningCircleIcon size={16} weight="fill" className="mt-px shrink-0" />
-            <span>
-              <span aria-hidden style={{ opacity: 0.7 }}>
-                {"// "}
-              </span>
-              {errorMessage}
-            </span>
-          </div>
+          <Alert tone="error" title={errorMessage} className="mt-5" />
         )}
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">

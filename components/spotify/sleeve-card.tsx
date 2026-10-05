@@ -17,7 +17,6 @@
 import { cardVariants } from "@/app/components/entrepta/card"
 import { useId, useState } from "react"
 import Image from "next/image"
-import { motion } from "motion/react"
 import { PauseIcon, PlayIcon, SkipBackIcon, SkipForwardIcon } from "@phosphor-icons/react"
 import type { SimplifiedTrack } from "@/lib/spotify"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
@@ -29,9 +28,9 @@ import {
   CardLabel,
   CardMeta,
 } from "@/app/components/entrepta/card"
-import { useReveal } from "@/app/components/entrepta/reveal"
 import { Spotlight, useSpotlight } from "@/app/components/entrepta/spotlight"
 import { cn } from "@/lib/utils"
+import { Tip } from "@/components/ui/tip"
 
 /**
  * The sleeve is square and the disc is a circle behind it; they only line up at a known ratio,
@@ -197,21 +196,22 @@ function ControlButton({
   primary?: boolean
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-      className="focus-ring inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
-      style={{
-        // --fg-brand-text, not --fg-brand: brand ink on the brand tint fails contrast in
-        // eight of the twelve theme×mode combinations. See the token's note in globals.css.
-        color: primary ? "var(--fg-brand-text)" : "var(--fg-muted)",
-        background: primary ? "var(--bg-surface-brand)" : "transparent",
-      }}
-    >
-      {children}
-    </button>
+    <Tip label={label}>
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        className="focus-ring inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full transition-colors"
+        style={{
+          // --fg-brand-text, not --fg-brand: brand ink on the brand tint fails contrast in
+          // eight of the twelve theme×mode combinations. See the token's note in globals.css.
+          color: primary ? "var(--fg-brand-text)" : "var(--fg-muted)",
+          background: primary ? "var(--bg-surface-brand)" : "transparent",
+        }}
+      >
+        {children}
+      </button>
+    </Tip>
   )
 }
 
@@ -247,14 +247,16 @@ export function SleeveCard({
   const [peek, setPeek] = useState(false)
   const [coverError, setCoverError] = useState(false)
   const { onMouseMove, spotlight } = useSpotlight(360)
-  const reveal = useReveal()
   const albumId = useId()
 
   const progress = totalMs > 0 ? Math.min(elapsedMs / totalMs, 1) : 0
   const out = running ? OUT_PLAYING : OUT_STOPPED
 
   return (
-    <motion.div className={cn(cardVariants(), className)} onMouseMove={onMouseMove} {...reveal}>
+    // `cardVariants()` and the hook, not `SpotlightCard`, because of the progress bar at the
+    // bottom: it rides the card's own edge, and `SpotlightCard` puts its children in a wrapper
+    // inside the padding, where the same bar lands right under the footer text.
+    <div className={cn(cardVariants(), "@container", className)} onMouseMove={onMouseMove}>
       <Spotlight {...spotlight} />
       <h3 className="sr-only">Songs that sound like me</h3>
 
@@ -354,7 +356,14 @@ export function SleeveCard({
         <CardComment>
           {audible ? "30s preview · spotify" : "my friends picked some of these"}
         </CardComment>
-        <div className="flex items-center gap-1">
+        {/* Wide, the controls sit on the right of the comment. Narrow, the two stop fitting on
+            one line, and the controls take a line of their own across the whole card: previous
+            at the left edge, play in the middle, next at the right. The switch is a container
+            query on the card rather than on the viewport, because the card is narrow on a phone
+            and again in a half-width tile at 768px. Below 24rem of card content the comment and
+            the three buttons no longer share a line comfortably; the comment is the longer of
+            the two footers, "my friends picked some of these". */}
+        <div className="ml-auto flex items-center gap-1 @max-sm:ml-0 @max-sm:w-full @max-sm:justify-between">
           <ControlButton label="Previous track" onClick={onPrev}>
             <SkipBackIcon size={13} weight="fill" aria-hidden />
           </ControlButton>
@@ -388,7 +397,7 @@ export function SleeveCard({
           style={{ background: "var(--fg-brand)", transform: `scaleX(${progress})` }}
         />
       </div>
-    </motion.div>
+    </div>
   )
 }
 

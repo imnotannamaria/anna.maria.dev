@@ -5,6 +5,8 @@ import { createPortal } from "react-dom"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
 import { EASE_OUT } from "@/lib/motion"
+import { OVERLAY_SURFACE } from "@/lib/overlay"
+import { cn } from "@/lib/utils"
 import type { ContributionWeek, ContributionYear } from "@/lib/github/contributions"
 import type { CardState } from "@/lib/showcase/state"
 
@@ -456,7 +458,17 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
                     <motion.div
                       key="contributions-tooltip"
                       aria-hidden
-                      className="pointer-events-none fixed z-50 rounded-md px-2.5 py-1.5 text-center whitespace-nowrap"
+                      // The finish of entrepta's Tooltip, without the component: the overlay
+                      // surface, its radius and padding, and `data-surface="dark"` so it stays
+                      // dark in light mode like the sidebar's. The component itself is one
+                      // Radix root per trigger, which here would be 371 of them; this is one
+                      // box that follows a delegated pointer.
+                      data-surface="dark"
+                      className={cn(
+                        OVERLAY_SURFACE,
+                        "pointer-events-none fixed z-50 rounded-[var(--radius-sm)] px-2.5 py-1.5",
+                        "text-center whitespace-nowrap",
+                      )}
                       style={{
                         left: hover.x,
                         top: hover.y,
@@ -469,9 +481,6 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
                           hover.y - TOOLTIP_H - 8 < TITLEBAR_H
                             ? `${hover.h + 8}px`
                             : "calc(-100% - 8px)",
-                        background: "var(--bg-surface)",
-                        border: "1px solid var(--border-strong)",
-                        boxShadow: "var(--shadow-overlay)",
                       }}
                       initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.94 }}
                       animate={{ opacity: 1, scale: 1 }}

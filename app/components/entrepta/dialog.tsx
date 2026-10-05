@@ -3,7 +3,7 @@
 import { XIcon } from "@phosphor-icons/react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import * as React from "react"
-import { Diamond } from "@/app/components/entrepta/diamond"
+import { Diamond } from "./diamond"
 import { type IconProp, IconSlot } from "@/lib/icon"
 import { OVERLAY_SURFACE } from "@/lib/overlay"
 import { cn } from "@/lib/utils"
@@ -25,6 +25,31 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+/** The × in the corner of a dialog or a sheet. */
+const DialogCloseButton = React.forwardRef<
+  React.ComponentRef<typeof DialogPrimitive.Close>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Close
+    ref={ref}
+    aria-label="Close"
+    className={cn(
+      "absolute top-3 right-3 inline-flex items-center justify-center",
+      "h-7 w-7 rounded-[var(--radius-sm)]",
+      "text-[var(--fg-muted)] hover:bg-[var(--bg-hover-soft)] hover:text-[var(--fg-primary)]",
+      "transition-colors duration-150",
+      // the global reset removes outlines on buttons; .focus-ring draws a box-shadow instead
+      "focus-ring",
+      className,
+    )}
+    {...props}
+  >
+    <XIcon aria-hidden size={14} />
+    <span className="sr-only">Close</span>
+  </DialogPrimitive.Close>
+))
+DialogCloseButton.displayName = "DialogCloseButton"
+
 const DialogContent = React.forwardRef<
   React.ComponentRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
@@ -45,20 +70,7 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close
-        aria-label="Close"
-        className={cn(
-          "absolute top-3 right-3 inline-flex items-center justify-center",
-          "h-7 w-7 rounded-[var(--radius-sm)]",
-          "text-[var(--fg-muted)] hover:bg-[var(--bg-hover-soft)] hover:text-[var(--fg-primary)]",
-          "transition-colors duration-150",
-          // the global reset removes outlines on buttons; .focus-ring draws a box-shadow instead
-          "focus-ring",
-        )}
-      >
-        <XIcon aria-hidden size={14} />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
+      <DialogCloseButton />
     </DialogPrimitive.Content>
   </DialogPortal>
 ))
@@ -143,6 +155,7 @@ DialogLabel.displayName = "DialogLabel"
 export {
   Dialog,
   DialogClose,
+  DialogCloseButton,
   DialogContent,
   DialogDescription,
   DialogFooter,

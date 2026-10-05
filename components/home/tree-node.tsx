@@ -1,5 +1,6 @@
 "use client"
 
+import { Tip } from "@/components/ui/tip"
 import Link from "next/link"
 import { motion, type Variants } from "motion/react"
 import {
@@ -155,16 +156,18 @@ export function TreeNode({
             <LockSimpleIcon aria-hidden size={12} className="ml-auto shrink-0" />
           </span>
         ) : (
-          <Link href={item.href} className="tree-row" title={item.hint ?? item.name}>
-            {caretSlot}
-            {item.kind === "more" ? (
-              <span aria-hidden className="tree-glyph" style={{ width: 14 }} />
-            ) : (
-              fileGlyph(item.name, "tree-glyph tree-glyph-shift")
-            )}
-            {label}
-            {count}
-          </Link>
+          <TreeTip hint={item.hint}>
+            <Link href={item.href} className="tree-row">
+              {caretSlot}
+              {item.kind === "more" ? (
+                <span aria-hidden className="tree-glyph" style={{ width: 14 }} />
+              ) : (
+                fileGlyph(item.name, "tree-glyph tree-glyph-shift")
+              )}
+              {label}
+              {count}
+            </Link>
+          </TreeTip>
         )}
       </motion.div>
 
@@ -199,5 +202,22 @@ export function TreeNode({
         </motion.ul>
       )}
     </>
+  )
+}
+
+/**
+ * A row's hint, as a tooltip beside it. A file row is named after its slug, and the hint is the
+ * title that slug stands for.
+ *
+ * Only rows that have one. This used to be a native `title` on every link, falling back to the
+ * row's own name; a tooltip that repeats the word under the pointer is noise once it is a real
+ * box and not the browser's.
+ */
+function TreeTip({ hint, children }: { hint?: string; children: React.ReactElement }) {
+  if (!hint) return children
+  return (
+    <Tip label={hint} side="right" wrap>
+      {children}
+    </Tip>
   )
 }

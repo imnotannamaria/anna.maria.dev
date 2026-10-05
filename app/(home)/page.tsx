@@ -7,6 +7,7 @@ import {
   getPublishedProjects,
 } from "@/lib/velite"
 import { formatDate, estimateReadingTime } from "@/lib/format"
+import { BentoGrid, BentoItem } from "@/app/components/entrepta/bento-grid"
 import { cardVariants, CardHeader, CardLabel } from "@/app/components/entrepta/card"
 import { SectHead } from "@/app/components/entrepta/sect-head"
 import { FeaturedProjectCard } from "@/components/home/featured-project-card"
@@ -26,6 +27,7 @@ import { buildSiteTree, siteTreeRouteCount } from "@/lib/site-tree"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { getPublicItems } from "@/lib/roadmap/queries"
 import { createMetadata } from "@/lib/metadata"
+import { cn } from "@/lib/utils"
 import { calcYearsOfExp, yearsWord } from "@/lib/experience"
 import { getContributions } from "@/lib/github/contributions"
 import { getShortlog } from "@/lib/github/shortlog"
@@ -62,7 +64,19 @@ export const metadata = createMetadata({
 // `cache`, so that is still one query per request, not three.
 
 /**
- * Row 1 of `$ whoami`: the profile card and the tree, which share the log count.
+ * How a tile sits between 768 and 1024px.
+ *
+ * entrepta's `BentoGrid` speaks two breakpoints: 6 columns from 640px and 12 from 1024px. The
+ * home page pairs its cards from 768px, and at 640 a half is narrower than the same card gets
+ * on a phone. So a tile here is a full row at `sm` (no `colSpan.sm`), a half from `md` through
+ * this class, and whatever its `colSpan.lg` says from 1024px. It adds a breakpoint the
+ * component does not have; it undoes nothing the component sets.
+ */
+const HALF_FROM_MD = "md:col-span-3"
+
+/**
+ * `$ whoami` as one grid: the profile card and the tree in the first row, sharing the log
+ * count, and the stack across the second.
  *
  * Not async, on purpose. The profile card holds the home page's LCP element (the bio), and it
  * used to wait here for `await getPublishedEntries()` behind a Suspense skeleton, so the bio
@@ -70,7 +84,7 @@ export const metadata = createMetadata({
  * goes down as a prop: the card renders in the first flush and only its "logged" cell waits,
  * and the tree, which needs the count for a label, gets a boundary of its own.
  */
-function WhoamiRow() {
+function WhoamiGrid() {
   // A database blip should cost the home page one number, not the whole row. /log has an error
   // boundary instead, because there the log IS the page.
   //
@@ -82,21 +96,28 @@ function WhoamiRow() {
   const projects = getPublishedProjects()
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.5fr_1fr]">
-      {/* The profile card. It carries the page h1, so the name stays the
-          one top-level heading on the home page. */}
-      <ProfileCard
-        stats={{ years: calcYearsOfExp(), projects: projects.length, posts: posts.length }}
-        logged={logEntries.then((entries) => entries?.length ?? null)}
-      />
+    <BentoGrid>
+      {/* The profile card. It carries the page h1, so the name stays the one top-level heading
+          on the home page. `reveal={false}`: it sequences its own contents, and it holds the
+          LCP element, which must not ship at `opacity: 0` and wait for hydration. */}
+      <BentoItem colSpan={{ lg: 7 }} className={HALF_FROM_MD} reveal={false}>
+        <ProfileCard
+          stats={{ years: calcYearsOfExp(), projects: projects.length, posts: posts.length }}
+          logged={logEntries.then((entries) => entries?.length ?? null)}
+        />
+      </BentoItem>
 
-      {/* The tree. Two nested wrappers, both earning their place. This is the one card whose
-          height the visitor controls, and a grid row is sized by its tallest item's content —
-          so left alone, opening every folder made the tree the tallest thing in the row and
-          stretched the profile card to match. The outer div is the grid item and takes the row
-          height from the profile card; the inner div goes absolute, so the card simply fills
-          what it is given. Below md there is no row to share, so it's a normal block with a cap. */}
-      <div className="relative md:min-h-0">
+      {/* The tree. A tile and a wrapper inside it, both earning their place. This is the one
+          card whose height the visitor controls, and a grid row is sized by its tallest item's
+          content — so left alone, opening every folder made the tree the tallest thing in the
+          row and stretched the profile card to match. The tile takes the row height from the
+          profile card; the inner div goes absolute, so the card simply fills what it is given.
+          Below md there is no row to share, so it's a normal block with a cap. */}
+      <BentoItem
+        colSpan={{ lg: 5 }}
+        className={cn(HALF_FROM_MD, "relative md:min-h-0")}
+        reveal={false}
+      >
         <div className="md:absolute md:inset-0">
           <Suspense
             fallback={
@@ -109,8 +130,12 @@ function WhoamiRow() {
             <TreeSlot logEntries={logEntries} posts={posts} projects={projects} />
           </Suspense>
         </div>
-      </div>
-    </div>
+      </BentoItem>
+
+      <BentoItem colSpan={{ sm: 6, lg: 12 }}>
+        <StackCard />
+      </BentoItem>
+    </BentoGrid>
   )
 }
 
@@ -139,16 +164,21 @@ async function TreeSlot({
 }
 
 async function WristkitSlot() {
-  const state = await loadTodayActivity({ tz: "America/Sao_Paulo" })
+  const state = await loadTodayActivity({
+    tz: "America/Sao_Paulo",
+    // An hour and a half of exercise a day, not wristkit's default 30 minutes.
+    goals: { exerciseMinutes: 90 },
+  })
   return (
     <Link
       href="https://wristkit-web.vercel.app/"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="View wristkit"
-      className="md:row-span-2 md:h-full"
+      // The tile stretches the link, and the link hands its height to the card.
+      className="flex flex-col"
     >
-      <TodayActivityCard state={state} className="h-full" />
+      <TodayActivityCard state={state} className="flex-1" />
     </Link>
   )
 }
@@ -166,12 +196,12 @@ async function WristkitSlot() {
  */
 async function LogShelfSlot() {
   const entries = await getPublishedEntries().catch(() => null)
-  return <LogShelfCard state={toState(entries)} className="h-full" />
+  return <LogShelfCard state={toState(entries)} />
 }
 
 async function RoadmapSlot() {
   const items = await getPublicItems().catch(() => null)
-  return <RoadmapChangelogCard state={toState(items)} className="h-full" />
+  return <RoadmapChangelogCard state={toState(items)} />
 }
 
 /** null → error, [] → empty, rows → ok. One place, so the two slots cannot drift. */
@@ -196,7 +226,7 @@ async function ShortlogSlot({
     p.github ? [{ slug: p.slug, title: p.title, github: p.github }] : [],
   )
   const state = await getShortlog(siteConfig.githubUser, repos)
-  return <ShortlogCard state={state} goal={goal} className="h-full" />
+  return <ShortlogCard state={state} goal={goal} />
 }
 
 async function GithubSlot() {
@@ -233,13 +263,9 @@ export default function Home() {
           cmd="whoami"
           meta={`uptime · ${yearsWord(yearsOfExp)} years`}
         />
-        {/* Row 1: profile + tree. The profile card paints at once; the log count streams in. */}
-        <WhoamiRow />
-
-        {/* Row 2: Stack — full width */}
-        <div className="mt-6">
-          <StackCard />
-        </div>
+        {/* Profile + tree, then the stack. The profile card paints at once; the log count
+            streams in. */}
+        <WhoamiGrid />
       </section>
 
       {/* ═══════════════ WORK ═══════════════ */}
@@ -259,52 +285,57 @@ export default function Home() {
         />
         {/* The featured project and the featured post stacked on the left, the shortlog on its
             own on the right. It was the other way round — the shortlog above the post — and the
-            featured project stretched to the height of two cards with half of it empty. `1fr`
-            on the project's row means it takes whatever height the shortlog leaves over, and
-            the post keeps its own. On a phone it is one column in reading order: project, post,
-            then the commits. */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.35fr_1fr]">
-          <div className="grid grid-rows-[1fr_auto] gap-3">
-            {featuredProject ? (
-              <FeaturedProjectCard
-                project={featuredProject}
-                index={1}
-                total={getFeaturedProjects().length}
-              />
-            ) : (
-              <div className={cardVariants()}>
-                <CardHeader>
-                  <CardLabel>featured</CardLabel>
-                </CardHeader>
-                <p
-                  className="text-body-md"
-                  style={{ color: "var(--fg-muted)", fontFamily: "var(--font-sans)" }}
-                >
-                  No featured projects yet.
-                </p>
-              </div>
-            )}
+            featured project stretched to the height of two cards with half of it empty.
 
-            {featuredPost && (
-              <FeaturedPostCard
-                post={{
-                  slug: featuredPost.slug,
-                  title: featuredPost.title,
-                  description: featuredPost.description,
-                  tags: featuredPost.tags,
-                  date: formatDate(featuredPost.date),
-                  minutes: estimateReadingTime(featuredPost.body),
-                }}
-              />
-            )}
-          </div>
+            The left tile holds both cards rather than giving each a tile of its own: `1fr` on
+            the project's row means it takes whatever height the shortlog leaves over, and the
+            post keeps its own. Two tiles would share that leftover between them, which is how
+            the post would end up taller than what it has to say. On a phone it is one column
+            in reading order: project, post, then the commits. */}
+        <BentoGrid>
+          <BentoItem colSpan={{ lg: 7 }} className={HALF_FROM_MD}>
+            <div className="grid grid-rows-[1fr_auto] gap-3">
+              {featuredProject ? (
+                <FeaturedProjectCard
+                  project={featuredProject}
+                  index={1}
+                  total={getFeaturedProjects().length}
+                />
+              ) : (
+                <div className={cardVariants()}>
+                  <CardHeader>
+                    <CardLabel>featured</CardLabel>
+                  </CardHeader>
+                  <p
+                    className="text-body-md"
+                    style={{ color: "var(--fg-muted)", fontFamily: "var(--font-sans)" }}
+                  >
+                    No featured projects yet.
+                  </p>
+                </div>
+              )}
 
-          <Suspense
-            fallback={<ShortlogCard state={{ kind: "loading" }} goal={goal} className="h-full" />}
-          >
-            <ShortlogSlot goal={goal} projects={projects} />
-          </Suspense>
-        </div>
+              {featuredPost && (
+                <FeaturedPostCard
+                  post={{
+                    slug: featuredPost.slug,
+                    title: featuredPost.title,
+                    description: featuredPost.description,
+                    tags: featuredPost.tags,
+                    date: formatDate(featuredPost.date),
+                    minutes: estimateReadingTime(featuredPost.body),
+                  }}
+                />
+              )}
+            </div>
+          </BentoItem>
+
+          <BentoItem colSpan={{ lg: 5 }} className={HALF_FROM_MD}>
+            <Suspense fallback={<ShortlogCard state={{ kind: "loading" }} goal={goal} />}>
+              <ShortlogSlot goal={goal} projects={projects} />
+            </Suspense>
+          </BentoItem>
+        </BentoGrid>
       </section>
 
       {/* ═══════════════ OFF THE CLOCK ═══════════════ */}
@@ -318,31 +349,40 @@ export default function Home() {
             The log and the roadmap are a third row of the same grid rather than a block of
             their own underneath. wristkit spans rows one and two, so auto-placement drops
             these two straight into the row below it, and they end up sharing a row height
-            the way every other pair on this page does. Both cards take `h-full` for that
-            reason: the taller one sets the row and the shorter one fills it, instead of
+            the way every other pair on this page does: a tile stretches whatever is inside
+            it, so the taller card sets the row and the shorter one fills it, instead of
             leaving a gap under whichever has less to say today. */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <NowPlayingWidget />
-          <Suspense
-            fallback={
-              <div className="md:row-span-2 md:h-full">
-                <TodayActivityCard state={{ kind: "loading" }} className="h-full" />
-              </div>
-            }
-          >
-            <WristkitSlot />
-          </Suspense>
-          <MiniPianoCard />
+        <BentoGrid>
+          <BentoItem colSpan={{ lg: 6 }} className={HALF_FROM_MD}>
+            <NowPlayingWidget />
+          </BentoItem>
 
-          <Suspense fallback={<LogShelfCard state={{ kind: "loading" }} className="h-full" />}>
-            <LogShelfSlot />
-          </Suspense>
-          <Suspense
-            fallback={<RoadmapChangelogCard state={{ kind: "loading" }} className="h-full" />}
+          <BentoItem
+            colSpan={{ lg: 6 }}
+            rowSpan={{ lg: 2 }}
+            className={cn(HALF_FROM_MD, "md:row-span-2")}
           >
-            <RoadmapSlot />
-          </Suspense>
-        </div>
+            <Suspense fallback={<TodayActivityCard state={{ kind: "loading" }} />}>
+              <WristkitSlot />
+            </Suspense>
+          </BentoItem>
+
+          <BentoItem colSpan={{ lg: 6 }} className={HALF_FROM_MD}>
+            <MiniPianoCard />
+          </BentoItem>
+
+          <BentoItem colSpan={{ lg: 6 }} className={HALF_FROM_MD}>
+            <Suspense fallback={<LogShelfCard state={{ kind: "loading" }} />}>
+              <LogShelfSlot />
+            </Suspense>
+          </BentoItem>
+
+          <BentoItem colSpan={{ lg: 6 }} className={HALF_FROM_MD}>
+            <Suspense fallback={<RoadmapChangelogCard state={{ kind: "loading" }} />}>
+              <RoadmapSlot />
+            </Suspense>
+          </BentoItem>
+        </BentoGrid>
       </section>
 
       {/* ═══════════════ GITHUB ═══════════════ */}
