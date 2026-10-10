@@ -54,6 +54,10 @@ const nextConfig: NextConfig = {
    */
   async redirects() {
     return [
+      // v3 renamed two sections. Permanent, so a crawler carries the old URL's history over.
+      { source: "/about", destination: "/person", permanent: true },
+      { source: "/blog", destination: "/notes", permanent: true },
+      { source: "/blog/:slug", destination: "/notes/:slug", permanent: true },
       {
         source: "/projects/anna-dev-br",
         destination: "/projects/annamaria-app",

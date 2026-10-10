@@ -14,12 +14,11 @@ module.exports = {
   siteUrl: resolveSiteUrl(),
   generateRobotsTxt: true,
   robotsTxtOptions: {
-    policies: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/admin/*", "/lab", "/lab/*"] }],
+    policies: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/admin/*"] }],
   },
   // /admin is already a 404 for anyone not on the allowlist, and its layout sends
   // noindex. This is the third layer, so it never reaches an index by accident.
-  // /lab is the local-only discovery area: it 404s outside development, and stays out of here too.
-  exclude: ["/api/*", "/admin", "/admin/*", "/lab", "/lab/*"],
+  exclude: ["/api/*", "/admin", "/admin/*"],
 
   /**
    * next-sitemap only walks what the build emitted as static or SSG, so every
@@ -30,5 +29,5 @@ module.exports = {
    * Anything that becomes force-dynamic from here needs a line added below.
    */
   additionalPaths: async (config) =>
-    Promise.all(["/", "/log", "/roadmap"].map((loc) => config.transform(config, loc))),
+    Promise.all(["/person", "/log", "/roadmap"].map((loc) => config.transform(config, loc))),
 }
