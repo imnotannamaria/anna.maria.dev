@@ -1,6 +1,6 @@
 import type { SiteData } from "../site-data"
 import { PAGES } from "../front/pages"
-import type { Folder, FileSystem } from "./shell"
+import type { Directory, FileSystem } from "./shell"
 
 /** The site as a file tree for the terminal, and the screen each file opens. */
 const ROUTES: [method: string, path: string, keep: string][] = [
@@ -84,7 +84,7 @@ const tagline = (id: string) => PAGES.find((page) => page.id === id)?.tagline ??
 export function buildFiles(data: SiteData): FileSystem {
   const { years, email, socials, jobs, stack, apps, posts, projects, log } = data
 
-  const root: Folder = {
+  const root: Directory = {
     "home.txt": page(
       "home",
       `Full-stack Software Engineer, ${years} years building things end to end.`,

@@ -2,7 +2,7 @@ import { BooksIcon } from "@phosphor-icons/react/dist/ssr"
 import { TYPE_PLURAL, type LogType } from "@/lib/log/constants"
 import type { LogEntry } from "@/lib/log/validation"
 import { ScreenLink } from "../screen-link"
-import { PageHeader } from "../page-header"
+import { PageHeader } from "@/components/site/page-header"
 import { Slips, ByType } from "./catalog"
 import "./log.css"
 

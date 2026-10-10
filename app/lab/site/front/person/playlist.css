@@ -1,0 +1,67 @@
+.st-player {
+  position: relative;
+  display: block;
+  width: 144px;
+  height: 92px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.st-player-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 92px;
+  height: 92px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 3px;
+  background: var(--bg-surface);
+  box-shadow: 2px 0 10px rgb(0 0 0 / 0.45);
+  transition: scale 160ms var(--ease-out);
+}
+.st-player-cover img {
+  object-fit: cover;
+}
+.st-player:active .st-player-cover {
+  scale: 0.97;
+}
+.st-player-vinyl {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 92px;
+  height: 92px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: var(--radius-full);
+  background:
+    radial-gradient(
+      circle,
+      var(--bg-card) 0 3.5%,
+      color-mix(in srgb, var(--fg-brand) 55%, #101014) 4% 17%,
+      transparent 17.5%
+    ),
+    conic-gradient(
+      from 20deg,
+      transparent 0 8%,
+      rgb(255 255 255 / 0.13) 13%,
+      transparent 18% 58%,
+      rgb(255 255 255 / 0.13) 63%,
+      transparent 68%
+    ),
+    repeating-radial-gradient(circle, #0c0c10 0 2px, #17171c 2px 3px);
+  translate: 20px 0;
+  transition: translate 500ms var(--ease-out);
+  animation: st-tilt 3.2s linear infinite paused;
+}
+.st-player:hover .st-player-vinyl,
+.st-player:focus-visible .st-player-vinyl {
+  translate: 30px 0;
+}
+.st-player[data-playing] .st-player-vinyl {
+  translate: 44px 0;
+  animation-play-state: running;
+}
+.st-player[data-playing]:hover .st-player-vinyl,
+.st-player[data-playing]:focus-visible .st-player-vinyl {
+  translate: 52px 0;
+}

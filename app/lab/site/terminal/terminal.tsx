@@ -7,6 +7,7 @@ import { pet } from "../abimaela/abimaela"
 import type { ScreenId } from "../front/pages"
 import { useNavigate } from "../site-frame"
 import { path, complete, execute, type Output, type FileSystem, type ItemKind } from "./shell"
+import "./terminal.css"
 
 type LogLine = Output & { id: number }
 
@@ -20,10 +21,10 @@ const WELCOME: Output = {
 const USER = "guest@annamaria.app"
 
 const COLOR: Record<ItemKind, string> = {
-  command: "text-[var(--t-comando)]",
-  folder: "text-[var(--t-pasta)]",
+  command: "text-[var(--t-command)]",
+  folder: "text-[var(--t-folder)]",
   file: "text-[var(--fg-primary)]",
-  link: "text-[var(--t-caminho)]",
+  link: "text-[var(--t-path)]",
 }
 
 const METHOD_COLOR: Record<string, string> = {
@@ -97,9 +98,9 @@ export function Terminal({ system, className }: { system: FileSystem; className?
             <i className="size-2.5 rounded-full bg-[var(--amber-500)]" />
             <i className="size-2.5 rounded-full bg-[var(--emerald-500)]" />
           </span>
-          <span className="truncate text-[var(--t-pasta)] normal-case">{USER}</span>
+          <span className="truncate text-[var(--t-folder)] normal-case">{USER}</span>
         </span>
-        <span className="truncate text-[var(--t-caminho)] normal-case">{path(cwd)}</span>
+        <span className="truncate text-[var(--t-path)] normal-case">{path(cwd)}</span>
       </CardTerminalBar>
 
       <CardTerminalBody className="flex min-h-0 flex-1 flex-col p-0">
@@ -135,7 +136,7 @@ export function Terminal({ system, className }: { system: FileSystem; className?
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck={false}
-              className="min-w-0 flex-1 bg-transparent text-[var(--fg-primary)] caret-[var(--t-pasta)] outline-none placeholder:text-[var(--fg-muted)]"
+              className="min-w-0 flex-1 bg-transparent text-[var(--fg-primary)] caret-[var(--t-folder)] outline-none placeholder:text-[var(--fg-muted)]"
               onChange={(event) => {
                 setEntry(event.target.value)
                 setRecalling(null)
@@ -162,7 +163,7 @@ export function Terminal({ system, className }: { system: FileSystem; className?
               key={shortcut}
               type="button"
               onClick={() => run(shortcut)}
-              className="focus-ring text-mono-sm cursor-pointer rounded-[var(--radius-sm)] border border-dashed border-[var(--border-strong)] px-2.5 py-1 text-[var(--t-comando)] transition-colors hover:border-[var(--t-comando)] hover:bg-[var(--bg-hover-soft)]"
+              className="focus-ring text-mono-sm cursor-pointer rounded-[var(--radius-sm)] border border-dashed border-[var(--border-strong)] px-2.5 py-1 text-[var(--t-command)] transition-colors hover:border-[var(--t-command)] hover:bg-[var(--bg-hover-soft)]"
             >
               {shortcut}
             </button>
@@ -173,11 +174,11 @@ export function Terminal({ system, className }: { system: FileSystem; className?
   )
 }
 
-function Prompt({ path: where }: { path: string }) {
+function Prompt({ path: shown }: { path: string }) {
   return (
     <>
-      <span className="text-[var(--t-caminho)]">{where}</span>{" "}
-      <span className="text-[var(--t-pasta)]">$</span>
+      <span className="text-[var(--t-path)]">{shown}</span>{" "}
+      <span className="text-[var(--t-folder)]">$</span>
     </>
   )
 }

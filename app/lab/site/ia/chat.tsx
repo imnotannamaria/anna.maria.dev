@@ -6,12 +6,13 @@ import { Button } from "@/app/components/entrepta/button"
 import { ChatThread, type ChatMessage } from "@/app/components/entrepta/chat-thread"
 import { PromptInput } from "@/app/components/entrepta/prompt-input"
 import type { SiteData } from "../site-data"
-import { Tile } from "../front/tile"
+import { Tile } from "@/components/site/tile"
 import { ICON, INNER_ICON } from "../front/icons"
 import { INNER_PAGES, PAGES } from "../front/pages"
 import type { Group } from "../front/professional/stack-data"
 import { useNavigate } from "../site-frame"
 import { QUESTIONS, answer } from "./answers"
+import "./chat.css"
 
 const ICONS: Record<string, Icon> = { ...ICON, ...INNER_ICON }
 

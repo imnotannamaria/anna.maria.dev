@@ -5,6 +5,15 @@ import { Cat, CatWalking, CatStopping } from "../../abimaela/abimaela"
 import type { Destination } from "../icons"
 import type { PageId } from "../pages"
 
+/**
+ * The footer as a game and as navigation: one sign per page, and the cat walks to the sign you
+ * point at. Clicking a sign goes to that page.
+ *
+ * The walk is a CSS transition on the cat's position. Its length grows with the distance (so many
+ * ms per sign, between a floor and a ceiling), and the timing is close to linear on purpose: an
+ * ease-out tail kept her legs moving while she was already standing still. When she arrives she
+ * plays the stopping frame for a moment, then sits.
+ */
 const PER_SIGN = 560
 const MIN = 560
 const MAX = 2400
@@ -23,7 +32,7 @@ export function DoorGame({
     0,
     destinations.findIndex((destination) => destination.id === current),
   )
-  const [where, setWhere] = useState(here)
+  const [at, setAt] = useState(here)
   const [looking, setLooking] = useState<"left" | "right">("right")
 
   const [trip, setTrip] = useState(0)
@@ -31,8 +40,8 @@ export function DoorGame({
   const [stopping, setStopping] = useState(false)
   const fallback = useRef<ReturnType<typeof setTimeout>>(undefined)
   const sit = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const destination = destinations[where]
-  const center = (where + 0.5) / destinations.length
+  const destination = destinations[at]
+  const center = (at + 0.5) / destinations.length
 
   useEffect(
     () => () => {
@@ -50,10 +59,10 @@ export function DoorGame({
     sit.current = setTimeout(() => setStopping(false), STOP)
   }
   const walk = (to: number) => {
-    if (to === where) return
-    const duration = Math.min(Math.max(Math.abs(to - where) * PER_SIGN, MIN), MAX)
-    setLooking(to < where ? "left" : "right")
-    setWhere(to)
+    if (to === at) return
+    const duration = Math.min(Math.max(Math.abs(to - at) * PER_SIGN, MIN), MAX)
+    setLooking(to < at ? "left" : "right")
+    setAt(to)
     setTrip(duration)
     setStopping(false)
     clearTimeout(sit.current)
@@ -112,13 +121,13 @@ export function DoorGame({
               aria-label={
                 item.id === current ? `${item.label}: you are here` : `Go to ${item.label}`
               }
-              data-target={index === where || undefined}
+              data-target={index === at || undefined}
               onPointerEnter={() => walk(index)}
               onFocus={() => walk(index)}
               onClick={() => onGo(item.id)}
             >
               <span className="st-ft-plate-icon">
-                <item.Icon aria-hidden size={18} weight={index === where ? "fill" : "regular"} />
+                <item.Icon aria-hidden size={18} weight={index === at ? "fill" : "regular"} />
               </span>
               <span className="st-ft-plate-name text-mono-xs font-mono">{item.label}</span>
             </button>

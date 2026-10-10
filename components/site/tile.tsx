@@ -1,8 +1,10 @@
 import type { ReactElement, ReactNode } from "react"
 import { CardHeader, CardLabel, CardMeta, cardVariants } from "@/app/components/entrepta/card"
 import { cn } from "@/lib/utils"
+import "./tile.css"
 
 /** The card of the new pages: entrepta's Card, dashed and unfilled, with an icon in its label. */
+
 export function Tile({
   label,
   icon,
@@ -47,3 +49,17 @@ export function Tile({
     </section>
   )
 }
+
+/**
+ * A card's classes with the dashed, unfilled surface. For a card that is not a `Tile` but sits
+ * among them (a post sheet, a log slip): `tileClass({ size: "sm" }, "my-class")`.
+ */
+export function tileClass(
+  options?: Parameters<typeof cardVariants>[0],
+  className?: string,
+): string {
+  return cn(cardVariants(options), TILE_SURFACE, className)
+}
+
+/** The surface alone, for a component that brings its own card (the wristkit rings). */
+export const TILE_SURFACE = "st-card"

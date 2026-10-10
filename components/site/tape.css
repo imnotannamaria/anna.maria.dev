@@ -1,0 +1,34 @@
+/* A strip of tape and a pushpin: what holds a sheet to the page. */
+
+.st-tape {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  z-index: 2;
+  width: 68px;
+  height: 18px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--fg-brand) 32%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  rotate: -3deg;
+  translate: -50% 0;
+}
+.st-pushpin {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  z-index: 3;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: radial-gradient(
+    circle at 36% 30%,
+    color-mix(in srgb, var(--fg-brand) 45%, white) 0 16%,
+    var(--fg-brand) 46%,
+    color-mix(in srgb, var(--fg-brand) 62%, black) 100%
+  );
+  box-shadow:
+    0 4px 5px rgb(0 0 0 / 0.35),
+    inset 0 -1px 1px rgb(0 0 0 / 0.2);
+  translate: -50% 0;
+}

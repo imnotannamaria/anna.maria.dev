@@ -1,0 +1,29 @@
+/* A sticker: the picture on a white backing with a soft shadow, or cut out along its outline
+   (a PNG with transparency). */
+
+.st-sticker {
+  display: block;
+  padding: 4px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.28);
+}
+.st-sticker[data-diecut] {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  filter: drop-shadow(2px 0 0 #ffffff) drop-shadow(-2px 0 0 #ffffff) drop-shadow(0 2px 0 #ffffff)
+    drop-shadow(0 -2px 0 #ffffff) drop-shadow(0 3px 5px rgb(0 0 0 / 0.28));
+}
+.st-sticker img {
+  display: block;
+  height: auto;
+
+  pointer-events: none;
+}
+.st-sticker svg {
+  display: block;
+  height: auto;
+  border-radius: 8px;
+}

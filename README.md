@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/images/og-cover.jpg" alt="annamaria.app: a personal site posed as a code editor" width="100%" />
+  <img src="public/images/og-cover.png" alt="annamaria.app: Anna Maria, full-stack software engineer, and Abimaela the cat" width="100%" />
 </p>
 
 <p align="center">
@@ -94,7 +94,7 @@ Everything else in `.env.example` is optional and switches on one feature: Spoti
 | `app/layout.tsx`             | Site title and description                  |
 | `app/api/contact/route.ts`   | The `from` and `to` of contact emails       |
 | `lib/metadata.ts`            | The `baseUrl` fallback                      |
-| `public/images/og-cover.jpg` | The share image                             |
+| `public/images/og-cover.png` | The share image                             |
 
 ### 4. Run
 

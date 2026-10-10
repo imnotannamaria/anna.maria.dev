@@ -1,5 +1,7 @@
 "use client"
 
+import { cn } from "@/lib/utils"
+import { POLAROID } from "@/components/site/polaroid"
 import { motion, useReducedMotion } from "motion/react"
 import Image, { type StaticImageData } from "next/image"
 import { useState } from "react"
@@ -10,6 +12,7 @@ import lunch from "./photos/04-lunch.jpg"
 import glasses from "./photos/05-glasses.jpg"
 import burger from "./photos/06-burger.jpg"
 import snout from "./photos/07-abimaela-close.jpg"
+import "./camera-roll.css"
 
 const PHOTOS: { src: StaticImageData; alt: string }[] = [
   { src: selfie, alt: "A selfie, in an Olivia Rodrigo t-shirt" },
@@ -39,7 +42,7 @@ export function CameraRoll() {
         {queue.slice(0, IN_PILE).map((n, position) => (
           <motion.span
             key={n}
-            className="st-photo absolute inset-0"
+            className={cn(POLAROID, "absolute inset-0")}
             initial={false}
             animate={{
               rotate: position === 0 ? -2 : TILTS[n],

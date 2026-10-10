@@ -12,7 +12,8 @@ import { useEffect, useRef, useState } from "react"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { Button } from "@/app/components/entrepta/button"
 import { useNowPlayingStore } from "@/store/nowPlayingStore"
-import { Tile } from "../tile"
+import { Tile } from "@/components/site/tile"
+import "./playlist.css"
 
 function minutes(ms: number): string {
   const total = Math.floor(ms / 1000)
@@ -34,7 +35,7 @@ export function Playlist() {
     load()
   }, [load])
 
-  const range = tracks[currentIndex]
+  const track = tracks[currentIndex]
 
   useEffect(() => {
     if (status !== "playing" || playing) return
@@ -44,12 +45,12 @@ export function Playlist() {
 
   useEffect(() => {
     const el = audioRef.current
-    if (!el || !range?.previewUrl || !armed) return
+    if (!el || !track?.previewUrl || !armed) return
     if (running) el.play().catch(() => setPlaying(false))
     else el.pause()
-  }, [running, armed, range?.previewUrl, currentIndex])
+  }, [running, armed, track?.previewUrl, currentIndex])
 
-  if (status !== "playing" || !range) {
+  if (status !== "playing" || !track) {
     return (
       <Tile label={LABEL} icon={<VinylRecordIcon />}>
         <div className="flex flex-1 flex-col items-center justify-center gap-2.5 text-center">
@@ -78,9 +79,9 @@ export function Playlist() {
     setArmed(true)
     action()
   }
-  const clipOf = playing && clip !== null && clip.index === currentIndex
-  const elapsed = clipOf ? clip.elapsed : elapsedMs
-  const total = clipOf ? clip.total : range.durationMs
+  const hasClip = playing && clip !== null && clip.index === currentIndex
+  const elapsed = hasClip ? clip.elapsed : elapsedMs
+  const total = hasClip ? clip.total : track.durationMs
   const progress = total > 0 ? Math.min(elapsed / total, 1) : 0
 
   return (
@@ -88,15 +89,15 @@ export function Playlist() {
       label={LABEL}
       icon={<VinylRecordIcon />}
       note={
-        <ArrowLink href={range.spotifyUrl} external className="text-mono-xs">
+        <ArrowLink href={track.spotifyUrl} external className="text-mono-xs">
           spotify
         </ArrowLink>
       }
     >
-      {range.previewUrl ? (
+      {track.previewUrl ? (
         <audio
           ref={audioRef}
-          src={range.previewUrl}
+          src={track.previewUrl}
           preload="none"
           className="hidden"
           onPlay={() => setPlaying(true)}
@@ -127,28 +128,28 @@ export function Playlist() {
         >
           <span aria-hidden className="st-player-vinyl" />
           <span className="st-player-cover">
-            {range.coverUrl && noCover !== range.id ? (
+            {track.coverUrl && noCover !== track.id ? (
               <Image
-                src={range.coverUrl}
+                src={track.coverUrl}
                 alt=""
                 fill
                 sizes="92px"
                 unoptimized
-                onError={() => setNoCover(range.id)}
+                onError={() => setNoCover(track.id)}
               />
             ) : null}
           </span>
         </button>
 
-        <div key={range.id} className="st-enter w-full min-w-0 text-center">
+        <div key={track.id} className="st-enter w-full min-w-0 text-center">
           <p className="text-heading-md truncate font-serif text-[var(--fg-primary)]">
-            {range.name}
+            {track.name}
           </p>
           <p className="text-mono-sm truncate font-mono text-[var(--fg-secondary)]">
-            {range.artist}
+            {track.artist}
           </p>
           <p className="sr-only">
-            {`From the album ${range.album}${range.year ? `, ${range.year}` : ""}`}
+            {`From the album ${track.album}${track.year ? `, ${track.year}` : ""}`}
           </p>
         </div>
 
@@ -197,7 +198,7 @@ export function Playlist() {
       <div
         className="absolute inset-x-0 bottom-0 h-0.5"
         role="progressbar"
-        aria-label={`Progress: ${range.name} by ${range.artist}`}
+        aria-label={`Progress: ${track.name} by ${track.artist}`}
         aria-valuenow={Math.round(progress * 100)}
         aria-valuemin={0}
         aria-valuemax={100}

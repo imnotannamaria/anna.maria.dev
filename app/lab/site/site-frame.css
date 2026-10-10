@@ -1,0 +1,100 @@
+/* The frame of the new site: the sidebar column, the switcher, the page area, and the base
+   classes every screen uses (`st-screen`, `st-room`). Unlayered on purpose, so it wins over
+   entrepta's layered classes: the hidden ◆ and the raised dialogs are overrides that belong
+   upstream in entrepta once this migrates. */
+
+.st {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  background: var(--bg-canvas);
+  color: var(--fg-primary);
+}
+body:has(.st) [data-theme-switcher] {
+  display: none;
+}
+.st > aside {
+  transition: width 240ms var(--ease-out);
+}
+.st-main {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+.st-switcher {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  z-index: 6;
+  width: min(100% - 32px, 340px);
+  translate: -50% 0;
+}
+.st-switcher [role="radiogroup"] {
+  width: 100%;
+  height: 44px;
+  padding: 4px;
+  border-color: var(--border-strong);
+  border-radius: var(--radius-full);
+  background: var(--bg-overlay);
+  box-shadow: var(--shadow-overlay);
+}
+.st-switcher [role="radiogroup"] > span {
+  inset-block: 4px;
+  left: 4px;
+  width: calc((100% - 8px) / var(--segments));
+  border-radius: var(--radius-full);
+}
+.st-switcher [role="radiogroup"] > label {
+  border-radius: var(--radius-full);
+}
+.st-page {
+  grid-row: 1;
+  grid-column: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+[data-page] {
+  --st-width: 1120px;
+}
+[data-page="person"],
+[data-page="professional"] {
+  --st-width: 1320px;
+}
+body:has(.st) > .fixed.z-50 {
+  z-index: 70;
+}
+body:has(.st) > [data-radix-popper-content-wrapper] {
+  z-index: 70 !important;
+}
+.st-screen {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: var(--st-width);
+  margin-inline: auto;
+}
+.st-room {
+  padding: 24px 16px 40px;
+}
+@media (min-width: 768px) {
+  .st-room {
+    padding-inline: 32px;
+  }
+}
+.st [data-spotlight] {
+  display: none;
+}
+.st [data-sidebar-mark],
+.st-ia li[data-message] > div > span > span[aria-hidden="true"],
+.st-screen [role="separator"] > span[aria-hidden="true"] {
+  display: none;
+}
+.st-screen [role="separator"] {
+  gap: 0;
+}

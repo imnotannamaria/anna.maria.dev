@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     default: "Anna Maria",
     template: "%s · Anna Maria",
   },
-  description: `Full-stack Software Engineer with ${calcYearsOfExp()} years shipping web products.`,
+  description: `I build things end to end, from the UI and the front, web or mobile, to shipping. About ${calcYearsOfExp()} years in.`,
   openGraph: {
     siteName: "Anna Maria",
     locale: "en_US",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     url: baseUrl,
     images: [
       {
-        url: "/images/og-cover.jpg",
+        url: "/images/og-cover.png",
         width: 1200,
         height: 630,
         alt: "Anna Maria — Full-stack Software Engineer",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    images: ["/images/og-cover.jpg"],
+    images: ["/images/og-cover.png"],
   },
 }
 

@@ -1,0 +1,85 @@
+.st-person {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: var(--st-width);
+  margin-inline: auto;
+}
+.st-me {
+  display: grid;
+  gap: 16px;
+}
+.st-me-avatar {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+}
+@container (min-width: 620px) {
+  .st-me {
+    grid-template-columns: 148px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 24px;
+  }
+}
+.st-bento {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "list" "rings" "favorites" "weather" "shelf" "things" "stickers";
+  gap: 12px;
+}
+@container (min-width: 620px) {
+  .st-bento {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-areas:
+      "list list favorites favorites"
+      "list list weather weather"
+      "rings rings rings rings"
+      "shelf shelf shelf shelf"
+      "things things things things"
+      "stickers stickers stickers stickers";
+  }
+}
+@container (min-width: 940px) {
+  .st-bento {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-areas:
+      "list list list rings rings rings rings rings favorites favorites favorites favorites"
+      "list list list rings rings rings rings rings weather weather weather weather"
+      "stickers stickers stickers stickers stickers stickers shelf shelf shelf shelf shelf shelf"
+      "stickers stickers stickers stickers stickers stickers things things things things things things";
+  }
+}
+.st-person .wk-activity-body {
+  gap: 20px;
+  min-height: 0;
+  padding: 12px 0;
+}
+.st-person .wk-rings {
+  max-width: 132px;
+}
+.st-person .wk-metric {
+  padding: 5px 0;
+}
+.st-person .wk-metric dd {
+  margin-top: 0;
+}
+.st-person .wk-metric-value {
+  font-size: var(--text-heading-lg);
+  line-height: var(--text-heading-lg--line-height, 1.3);
+}
+.st-person .wk-activity-footer {
+  min-height: 0;
+  padding-top: 10px;
+}
+.st-area {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.st-area > * {
+  flex: 1;
+}

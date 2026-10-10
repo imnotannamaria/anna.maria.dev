@@ -1,7 +1,7 @@
 /** The terminal's shell with no UI: a pure function from (cwd, line) to what to print. */
-export type Folder = { [name: string]: string | Folder }
+export type Directory = { [name: string]: string | Directory }
 
-export type FileSystem = { root: Folder; links: Record<string, string> }
+export type FileSystem = { root: Directory; links: Record<string, string> }
 
 export type ItemKind = "command" | "folder" | "file" | "link"
 
@@ -38,13 +38,13 @@ export const COMMANDS = [
 
 export const path = (cwd: string[]) => `~${cwd.length ? `/${cwd.join("/")}` : ""}`
 
-function go(root: Folder, parts: string[]): string | Folder | undefined {
-  let no: string | Folder | undefined = root
+function go(root: Directory, parts: string[]): string | Directory | undefined {
+  let node: string | Directory | undefined = root
   for (const part of parts) {
-    if (typeof no !== "object") return undefined
-    no = no[part]
+    if (typeof node !== "object") return undefined
+    node = node[part]
   }
-  return no
+  return node
 }
 
 function resolver(cwd: string[], target: string): string[] {
@@ -106,14 +106,14 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
       const all = args.includes("-a")
       const target = args.find((a) => !a.startsWith("-"))
       const destination = target ? resolver(cwd, target) : cwd
-      const no = go(root, destination)
-      if (typeof no !== "object") return ok(error(`ls: ${target}: not a folder`))
-      const names = Object.keys(no).filter((name) => all || !name.startsWith("."))
+      const node = go(root, destination)
+      if (typeof node !== "object") return ok(error(`ls: ${target}: not a folder`))
+      const names = Object.keys(node).filter((name) => all || !name.startsWith("."))
       if (names.length === 0) return ok(text("(empty)"))
       return ok({
         type: "items",
         items: names.map((name) => {
-          const folder = typeof no[name] === "object"
+          const folder = typeof node[name] === "object"
           const full = `~/${[...destination, name].join("/")}`
           return {
             label: folder ? `${name}/` : name,
@@ -142,9 +142,9 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
         }
       }
       const parts = resolver(cwd, args[0])
-      const no = go(root, parts)
-      if (typeof no !== "string") {
-        return ok(error(`cat: ${args[0]}: ${no ? "is a folder" : "no such file"}`))
+      const node = go(root, parts)
+      if (typeof node !== "string") {
+        return ok(error(`cat: ${args[0]}: ${node ? "is a folder" : "no such file"}`))
       }
 
       const href = links[parts.join("/")]
@@ -164,7 +164,7 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
         : []
       return {
         cwd,
-        output: [text(no), ...door],
+        output: [text(node), ...door],
         event: parts.includes(".secret") ? "secret" : undefined,
       }
     }

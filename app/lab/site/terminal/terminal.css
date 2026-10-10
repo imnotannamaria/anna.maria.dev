@@ -1,0 +1,18 @@
+.st-term {
+  --t-folder: var(--fg-brand-text);
+  --t-path: var(--status-success-fg);
+  --t-command: var(--status-warning-fg);
+  border: 0;
+  border-radius: 0;
+  background: var(--bg-canvas);
+  box-shadow: none;
+  color: var(--fg-primary);
+}
+.st-term-shortcuts {
+  padding-bottom: 76px;
+}
+@media (min-width: 768px) {
+  .st-term-shortcuts {
+    padding-right: 140px;
+  }
+}

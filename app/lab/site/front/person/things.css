@@ -1,0 +1,38 @@
+.st-things {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.st-thing {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 12px 8px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 200ms var(--ease-out);
+}
+.st-thing-img {
+  position: relative;
+  display: block;
+  height: 128px;
+  transition:
+    translate 260ms var(--ease-out),
+    scale 260ms var(--ease-out);
+}
+.st-thing-img img {
+  object-fit: contain;
+  filter: drop-shadow(0 4px 5px rgb(0 0 0 / 0.2));
+}
+.st-thing[aria-pressed="true"] {
+  background: var(--bg-hover-soft);
+}
+.st-thing[aria-pressed="true"] .st-thing-img {
+  translate: 0 -3px;
+  scale: 1.07;
+}

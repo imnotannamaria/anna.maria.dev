@@ -40,7 +40,7 @@
   left: 50%;
   margin: 0;
   color: var(--fg-muted);
-  letter-spacing: 0.4at;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
   translate: -50% 0;
 }
@@ -117,7 +117,7 @@
 }
 .st-ct-stamp > small {
   font-size: 9px;
-  letter-spacing: 0.2at;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
@@ -137,7 +137,7 @@
   stroke: none;
   font-family: var(--font-mono);
   font-size: 7.5px;
-  letter-spacing: 0.08at;
+  letter-spacing: 0.08em;
 }
 .st-ct-address {
   display: flex;
@@ -198,7 +198,7 @@
   color: var(--status-error);
   font-size: 24px;
   font-weight: 700;
-  letter-spacing: 0.14at;
+  letter-spacing: 0.14em;
   text-align: center;
   text-transform: uppercase;
   pointer-events: none;

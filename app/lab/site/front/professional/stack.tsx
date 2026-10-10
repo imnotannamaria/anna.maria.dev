@@ -1,8 +1,8 @@
 "use client"
 
 import { BrowsersIcon, HardDrivesIcon, SparkleIcon, StackIcon } from "@phosphor-icons/react"
-import { Tile } from "../tile"
-import { TechStickers } from "./tech-stickers"
+import { Tile } from "@/components/site/tile"
+import { TechStickers } from "@/components/site/tech-stickers"
 import type { Group } from "./stack-data"
 
 const PARTS = [
@@ -33,8 +33,8 @@ export function Stack({ groups }: { groups: Group[] }) {
 
       <div className="st-sk-parts">
         {PARTS.map((part) => {
-          const hers = groups.filter((group) => part.groups.includes(group.id))
-          const howMany = hers.reduce((sum, group) => sum + group.techs.length, 0)
+          const inPart = groups.filter((group) => part.groups.includes(group.id))
+          const howMany = inPart.reduce((sum, group) => sum + group.techs.length, 0)
           return (
             <section key={part.id} className="st-sk-part">
               <h3 className="flex items-center gap-2">
@@ -46,7 +46,7 @@ export function Stack({ groups }: { groups: Group[] }) {
                   {howMany}
                 </span>
               </h3>
-              {hers.map((group) => (
+              {inPart.map((group) => (
                 <div key={group.id} className="flex flex-col gap-2">
                   <h4 className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
                     {group.id}

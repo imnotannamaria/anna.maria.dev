@@ -1,0 +1,64 @@
+/* A dock of app icons: the icons grow toward the pointer, with a copy button under each. */
+
+.st-dock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  max-width: 100%;
+  margin: 0;
+
+  padding: 16px 14px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 22px;
+  background: var(--bg-surface-elevated);
+  list-style: none;
+}
+.st-dock > li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.st-app {
+  display: block;
+  border-radius: 14px;
+}
+.st-app-copy {
+  display: grid;
+  width: 24px;
+  height: 20px;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition:
+    color 150ms var(--ease-out),
+    background-color 150ms var(--ease-out);
+}
+.st-app-copy:hover {
+  background: var(--bg-hover-soft);
+  color: var(--fg-primary);
+}
+.st-app-copy[data-copied] {
+  color: var(--status-success-fg);
+}
+.st-app-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  transform-origin: 50% 100%;
+  transition:
+    scale 200ms var(--ease-out),
+    translate 200ms var(--ease-out);
+}
+.st-dock li:hover .st-app-icon,
+.st-dock li:has(:focus-visible) .st-app-icon {
+  scale: 1.2;
+}
+.st-dock li:hover + li .st-app-icon,
+.st-dock li:has(+ li:hover) .st-app-icon {
+  scale: 1.08;
+}

@@ -24,7 +24,6 @@ import { Chat } from "./ia/chat"
 import { SiteFrame } from "./site-frame"
 import { buildFiles } from "./terminal/files"
 import { Terminal } from "./terminal/terminal"
-import "./site.css"
 
 export const metadata: Metadata = { title: "lab · site" }
 

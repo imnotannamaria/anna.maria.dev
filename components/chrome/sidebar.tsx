@@ -6,9 +6,10 @@
  * The rail itself — the 56px column, the icon that fills, the ◆ that travels to the active item —
  * is entrepta's. What stays here is what only this site knows: which pages exist and in what order
  * (the same order as the titlebar and the palette, which `lib/nav-order.test.ts` holds it to),
- * when a route counts as active, and the gradient `a`.
+ * when a route counts as active, and the logo.
  */
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type { ComponentProps } from "react"
@@ -50,8 +51,7 @@ function SoundLink(props: ComponentProps<typeof Link>) {
   return <Link data-sound="click" {...props} />
 }
 
-/** Gradient mark, matches the favicon. Gradient stops derive from --fg-brand so it still follows
- *  the active theme; the 'a' is centred by its baseline (y=67.25 on a 100 box), not the em-box. */
+/** The mark, the same cat as the favicon. */
 const logo = (
   <Link
     href="/"
@@ -59,32 +59,15 @@ const logo = (
     data-sound="click"
     className="block h-8 w-8 transition-opacity hover:opacity-80"
   >
-    <svg viewBox="0 0 100 100" width={32} height={32} aria-hidden style={{ display: "block" }}>
-      <defs>
-        <linearGradient id="sidebar-logo-a" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" style={{ stopColor: "var(--fg-brand-hover)" }} />
-          <stop
-            offset="1"
-            style={{ stopColor: "color-mix(in srgb, var(--fg-brand) 55%, #09090b)" }}
-          />
-        </linearGradient>
-      </defs>
-      <rect width="100" height="100" rx="26" fill="url(#sidebar-logo-a)" />
-      <text
-        x="50"
-        y="67.25"
-        textAnchor="middle"
-        fill="var(--zinc-50)"
-        style={{
-          fontFamily: "var(--font-serif)",
-          fontStyle: "italic",
-          fontWeight: 500,
-          fontSize: "72px",
-        }}
-      >
-        a
-      </text>
-    </svg>
+    <Image
+      src="/brand/mark.png"
+      alt=""
+      width={32}
+      height={32}
+      sizes="32px"
+      priority
+      style={{ display: "block" }}
+    />
   </Link>
 )
 

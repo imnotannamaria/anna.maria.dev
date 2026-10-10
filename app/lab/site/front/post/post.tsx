@@ -1,12 +1,12 @@
 import { ArticleIcon } from "@phosphor-icons/react/dist/ssr"
+import { tileClass } from "@/components/site/tile"
 import { Badge } from "@/app/components/entrepta/badge"
-import { cardVariants } from "@/app/components/entrepta/card"
 import { MDXContent } from "@/components/blog/mdx-content"
-import { cn } from "@/lib/utils"
 import { getPostReadingStats, getPostToc, getPublishedPosts } from "@/lib/velite"
+import { Tape } from "@/components/site/tape"
 import { ScreenLink } from "../screen-link"
 import { readDate } from "../notes/note"
-import { PageHeader } from "../page-header"
+import { PageHeader } from "@/components/site/page-header"
 import "./post.css"
 
 export function Post({ slug }: { slug: string }) {
@@ -71,14 +71,14 @@ export function Post({ slug }: { slug: string }) {
           </>
         }
       />
-      <div className="st-ps-two">
-        <div className={cn(cardVariants({ size: "xl" }), "st-card st-ps-sheet")}>
+      <div className="st-ps-columns">
+        <div className={tileClass({ size: "xl" }, "st-ps-sheet")}>
           {head}
           {body}
         </div>
         <aside className="st-ps-slip">
-          <span aria-hidden className="st-nt-tape" />
-          <div className={cn(cardVariants({ size: "sm" }), "st-card gap-3")}>
+          <Tape />
+          <div className={tileClass({ size: "sm" }, "gap-3")}>
             <h3 className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
               in this note
             </h3>

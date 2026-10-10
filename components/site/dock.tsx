@@ -4,7 +4,14 @@ import { CheckIcon, CopyIcon } from "@phosphor-icons/react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { revealViewport } from "@/lib/motion"
+import "./dock.css"
+import "./enter.css"
 
+/**
+ * A dock: a row of icons that grow toward the pointer, and under it the name of the one in focus.
+ * An item is a link, or a button when it has no `href`; with `copy` it also gets a copy button.
+ * Used for the apps, and for the ways to reach me.
+ */
 export type DockItem = {
   name: string
   what: string
@@ -79,15 +86,18 @@ export function Dock({ items, label }: { items: DockItem[]; label: string }) {
                   <span className="st-app-icon">{entry.icon}</span>
                 </a>
               ) : (
-                <button
-                  type="button"
+                // No action, so not a button: an image with a name, still focusable so the
+                // keyboard reaches the label under the dock.
+                <span
+                  role="img"
+                  tabIndex={0}
                   className="st-app focus-ring"
                   aria-label={`${entry.name}: ${entry.what}`}
                   onPointerEnter={() => setActive(index)}
                   onFocus={() => setActive(index)}
                 >
                   <span className="st-app-icon">{entry.icon}</span>
-                </button>
+                </span>
               )}
               {entry.copy ? (
                 <button
@@ -123,26 +133,5 @@ export function Dock({ items, label }: { items: DockItem[]; label: string }) {
         </p>
       ) : null}
     </>
-  )
-}
-
-export function Plate({
-  tone = "light",
-  rear,
-  children,
-}: {
-  tone?: "light" | "dark"
-
-  rear?: string
-  children: ReactNode
-}) {
-  return (
-    <span
-      className="st-plate"
-      data-tone={rear ? "dark" : tone}
-      style={rear ? { background: rear } : undefined}
-    >
-      {children}
-    </span>
   )
 }

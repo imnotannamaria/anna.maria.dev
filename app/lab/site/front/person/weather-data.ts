@@ -1,6 +1,6 @@
 const CITY = { name: "Tamandaré", uf: "PE", lat: -8.76, lon: -35.1 }
 
-export type Weather = {
+export type WeatherReading = {
   city: string
   temperature: number
   feelsLike: number
@@ -12,7 +12,7 @@ export type Weather = {
   text: string
 }
 
-function readCode(code: number): Pick<Weather, "sky" | "text"> {
+function readCode(code: number): Pick<WeatherReading, "sky" | "text"> {
   if (code === 0) return { sky: "clear", text: "clear" }
   if (code === 1) return { sky: "clear", text: "mostly clear" }
   if (code === 2) return { sky: "clouds", text: "partly cloudy" }
@@ -24,7 +24,7 @@ function readCode(code: number): Pick<Weather, "sky" | "text"> {
   return { sky: "thunder", text: "stormy" }
 }
 
-export async function readWeather(): Promise<Weather | null> {
+export async function readWeather(): Promise<WeatherReading | null> {
   const url = new URL("https://api.open-meteo.com/v1/forecast")
   url.search = new URLSearchParams({
     latitude: String(CITY.lat),

@@ -9,6 +9,7 @@ import sleepingSheet from "./abimaela-sleeping.png"
 import sheet from "./abimaela-idle.png"
 import stopping from "./abimaela-stopping.png"
 import jumping from "./abimaela-jumping.png"
+import "./abimaela.css"
 
 /** Abimaela, the cat in the corner: CSS sprite sheets, and a tiny event bus the pages talk to. */
 const LINES = {
@@ -99,7 +100,7 @@ export function Abimaela() {
   const lastClick = useRef(0)
 
   useEffect(() => {
-    let some: ReturnType<typeof setTimeout> | undefined
+    let hideSpeech: ReturnType<typeof setTimeout> | undefined
     let sleep: ReturnType<typeof setTimeout> | undefined
 
     const wake = () => {
@@ -113,8 +114,8 @@ export function Abimaela() {
       const index = turn.current[event] ?? 0
       turn.current[event] = index + 1
       setSpeech(lines[index % lines.length])
-      clearTimeout(some)
-      some = setTimeout(() => setSpeech(null), SPEECH_MS)
+      clearTimeout(hideSpeech)
+      hideSpeech = setTimeout(() => setSpeech(null), SPEECH_MS)
       wake()
     }
 
@@ -138,7 +139,7 @@ export function Abimaela() {
     window.addEventListener("pointerdown", onPress)
     window.addEventListener("keydown", wake)
     return () => {
-      clearTimeout(some)
+      clearTimeout(hideSpeech)
       clearTimeout(sleep)
       clearTimeout(hello)
       clearTimeout(back.current)

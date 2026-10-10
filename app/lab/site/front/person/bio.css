@@ -1,0 +1,58 @@
+.st-lede-person {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+
+  max-width: none;
+  font-size: clamp(16px, 1.55cqw, 20px);
+  line-height: 1.6;
+  word-spacing: 0.18em;
+}
+.st-lede-person p {
+  margin: 0;
+}
+.st-word {
+  position: relative;
+  display: inline-block;
+  border-radius: 4px;
+  color: var(--fg-primary);
+  text-decoration: underline dotted var(--border-brand-strong);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+  cursor: default;
+}
+.st-word-pop {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 10;
+  margin-top: 6px;
+  pointer-events: none;
+  scale: 0;
+  rotate: -8deg;
+  translate: -50% 0;
+  transform-origin: top center;
+  transition:
+    scale 220ms var(--ease-out),
+    rotate 220ms var(--ease-out);
+}
+.st-word:hover > .st-word-pop,
+.st-word:focus-visible > .st-word-pop {
+  scale: 1;
+  rotate: 3deg;
+}
+.st-portrait {
+  width: 56px;
+  max-width: none;
+  height: 56px;
+  border: 3px solid #ffffff;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 0.25);
+  object-fit: cover;
+}
+.st-emoji {
+  display: block;
+  font-size: 36px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 5px rgb(0 0 0 / 0.25));
+}

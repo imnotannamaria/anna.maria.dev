@@ -1,0 +1,20 @@
+/* A dashed pill that says how something works. */
+
+.st-hint {
+  display: flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 12px 6px 10px;
+  border: 1px dashed var(--border-brand-strong);
+  border-radius: var(--radius-full);
+  color: var(--fg-secondary);
+}
+.st-hint > svg {
+  flex: none;
+  color: var(--fg-brand);
+}
+.st-hint strong {
+  color: var(--fg-primary);
+}

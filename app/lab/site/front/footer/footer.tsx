@@ -3,7 +3,7 @@
 import { ArrowRightIcon, SignpostIcon } from "@phosphor-icons/react"
 import { useEffect, useRef } from "react"
 import { Button } from "@/app/components/entrepta/button"
-import { Tile } from "../tile"
+import { Tile } from "@/components/site/tile"
 import { DESTINATIONS } from "../icons"
 import type { PageId } from "../pages"
 import { DoorGame } from "./door-game"

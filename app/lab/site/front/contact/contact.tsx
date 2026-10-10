@@ -1,6 +1,6 @@
 import { EnvelopeSimpleIcon } from "@phosphor-icons/react/dist/ssr"
 import { siteConfig } from "@/lib/site-config"
-import { PageHeader } from "../page-header"
+import { PageHeader } from "@/components/site/page-header"
 import { Postcard } from "./postcard"
 import "./contact.css"
 

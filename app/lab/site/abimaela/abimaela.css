@@ -1,0 +1,217 @@
+@media (max-width: 767px) {
+  .st-abi {
+    bottom: 72px;
+  }
+}
+.st-abi {
+  --st-abi-h: 128px;
+  position: absolute;
+  right: 20px;
+  bottom: 14px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  gap: 12px;
+  pointer-events: none;
+}
+.st-abi {
+  transition:
+    opacity 240ms var(--ease-out),
+    translate 240ms var(--ease-out);
+}
+.st-main[data-at-footer] .st-abi {
+  opacity: 0;
+  pointer-events: none;
+  translate: 0 16px;
+}
+.st-main[data-at-footer] .st-abi * {
+  pointer-events: none;
+}
+.st-abi-body {
+  display: block;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.st-abi-body > span {
+  display: block;
+}
+.st-abi-sprite {
+  --st-abi-w: calc(var(--st-abi-h, 128px) * 287 / 378);
+  display: block;
+  width: var(--st-abi-w);
+  height: var(--st-abi-h);
+  background-image: var(--st-abi-sheet);
+  background-size: calc(var(--st-abi-w) * 4) 100%;
+  background-repeat: no-repeat;
+
+  animation: st-abi-idle 1.92s step-end infinite;
+  transition: scale 180ms var(--ease-out);
+}
+.st-abi-walk {
+  --st-abi-w: calc(var(--st-abi-h, 70px) * 400 / 360);
+  display: block;
+  width: var(--st-abi-w);
+  height: var(--st-abi-h, 70px);
+  background-image: var(--st-abi-sheet);
+  background-size: calc(var(--st-abi-w) * 5) 100%;
+  background-repeat: no-repeat;
+  animation: st-abi-walk 680ms steps(5) infinite;
+}
+@keyframes st-abi-walk {
+  to {
+    background-position-x: calc(var(--st-abi-w) * -5);
+  }
+}
+.st-abi-stop {
+  --st-abi-w: var(--st-abi-h, 78px);
+  display: block;
+  width: var(--st-abi-w);
+  height: var(--st-abi-h, 78px);
+  background-image: var(--st-abi-sheet);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  background-position-x: 0;
+}
+.st-abi-stage {
+  position: relative;
+  display: block;
+  transition: scale 180ms var(--ease-out);
+}
+.st-abi-stage[data-looking="left"] {
+  scale: -1 1;
+}
+.st-abi-sprite[data-hidden] {
+  visibility: hidden;
+}
+.st-abi-jump {
+  --w: calc(var(--st-abi-h) * 400 / 378);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: var(--w);
+  height: calc(var(--st-abi-h) * 500 / 378);
+  margin-left: calc(var(--w) / -2);
+  background-image: var(--st-abi-sheet);
+  background-size: 500% 100%;
+  background-repeat: no-repeat;
+  background-position-x: 100%;
+  animation: st-abi-jump 720ms step-end;
+}
+@keyframes st-abi-jump {
+  0% {
+    background-position-x: 0%;
+  }
+  15% {
+    background-position-x: 25%;
+  }
+  30% {
+    background-position-x: 50%;
+  }
+  62% {
+    background-position-x: 75%;
+  }
+  80% {
+    background-position-x: 100%;
+  }
+}
+.st-abi-angry {
+  position: absolute;
+  inset: 0;
+  background-image: var(--st-abi-sheet);
+  background-size: 500% 100%;
+  background-repeat: no-repeat;
+  background-position-x: 100%;
+  animation: st-abi-angry 1400ms step-end;
+}
+@keyframes st-abi-angry {
+  0% {
+    background-position-x: 0%;
+  }
+  14% {
+    background-position-x: 25%;
+  }
+  26% {
+    background-position-x: 50%;
+  }
+  38% {
+    background-position-x: 75%;
+  }
+  50% {
+    background-position-x: 100%;
+  }
+}
+.st-abi-sleep {
+  --w: calc(var(--st-abi-h) * 380 / 378);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: var(--w);
+  height: var(--st-abi-h);
+  margin-left: calc(var(--w) / -2);
+  background-image: var(--st-abi-sheet);
+  background-size: 500% 100%;
+  background-repeat: no-repeat;
+  background-position-x: 50%;
+  animation:
+    st-abi-doze 1400ms step-end,
+    st-abi-sleep 4400ms step-end 1400ms infinite;
+}
+@keyframes st-abi-doze {
+  0% {
+    background-position-x: 0%;
+  }
+  55% {
+    background-position-x: 25%;
+  }
+}
+@keyframes st-abi-sleep {
+  0% {
+    background-position-x: 50%;
+  }
+  30% {
+    background-position-x: 75%;
+  }
+  60% {
+    background-position-x: 100%;
+  }
+  85% {
+    background-position-x: 75%;
+  }
+}
+@keyframes st-abi-idle {
+  0%,
+  50% {
+    background-position-x: 0;
+  }
+  12.5%,
+  37.5%,
+  62.5% {
+    background-position-x: calc(var(--st-abi-w) * -1);
+  }
+  25%,
+  75% {
+    background-position-x: calc(var(--st-abi-w) * -2);
+  }
+  87.5% {
+    background-position-x: calc(var(--st-abi-w) * -3);
+  }
+}
+.st-abi-speech {
+  max-width: 220px;
+  margin: 0 6px 0 0;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  border-bottom-right-radius: 3px;
+  opacity: 0;
+  translate: 0 4px;
+  transition:
+    opacity 160ms var(--ease-out),
+    translate 160ms var(--ease-out);
+}
+.st-abi-speech[data-visible] {
+  opacity: 1;
+  translate: 0 0;
+}

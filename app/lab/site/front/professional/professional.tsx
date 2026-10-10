@@ -1,4 +1,5 @@
 import { BriefcaseIcon } from "@phosphor-icons/react/dist/ssr"
+import { Lede, PageLabel } from "@/components/site/page-header"
 import { Suspense } from "react"
 import { Reveal } from "@/app/components/entrepta/reveal"
 import { calcYearsOfExp, yearsWord } from "@/lib/experience"
@@ -21,18 +22,18 @@ export function Professional() {
     <article className="st-room st-prof">
       <header className="st-prof-header">
         <div className="flex flex-col justify-center gap-4">
-          <h1 className="text-mono-sm flex items-center gap-2 font-mono tracking-[0.08em] text-[var(--fg-secondary)] uppercase">
-            <BriefcaseIcon aria-hidden size={13} weight="bold" className="text-[var(--fg-brand)]" />
-            anna, the professional
-          </h1>
+          <PageLabel
+            icon={<BriefcaseIcon aria-hidden size={13} weight="bold" />}
+            label="anna, the professional"
+          />
 
-          <p className="st-lede font-serif">
+          <Lede>
             I build things <span className="text-[var(--fg-primary)]">end to end</span>, from the UI
             and the front, web or mobile, all the way to shipping, and I&rsquo;ve been at it for
             about{" "}
             <span className="text-[var(--fg-primary)]">{yearsWord(years).toLowerCase()} years</span>{" "}
             across startups and bigger enterprise teams.
-          </p>
+          </Lede>
         </div>
 
         <dl className="st-prof-now text-mono-sm font-mono">

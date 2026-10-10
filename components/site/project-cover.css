@@ -1,0 +1,30 @@
+/* A project's cover image and the small icon links under it. */
+
+.st-cover {
+  position: relative;
+  display: grid;
+  aspect-ratio: 1.9;
+  place-items: center;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+}
+.st-cover img {
+  object-fit: cover;
+  object-position: top center;
+}
+.st-project-link {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  transition:
+    color 150ms var(--ease-out),
+    background-color 150ms var(--ease-out);
+}
+.st-project-link:hover {
+  background: var(--bg-hover-soft);
+  color: var(--fg-primary);
+}

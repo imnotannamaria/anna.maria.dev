@@ -1,23 +1,27 @@
 "use client"
 
+import { tileClass } from "@/components/site/tile"
 import { ClockCounterClockwiseIcon } from "@phosphor-icons/react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { useRef, useState, type CSSProperties, type PointerEvent } from "react"
-import {
-  CardComment,
-  CardFooter,
-  CardHeader,
-  CardLabel,
-  cardVariants,
-} from "@/app/components/entrepta/card"
+import { CardComment, CardFooter, CardHeader, CardLabel } from "@/app/components/entrepta/card"
 import { SegmentedControl } from "@/app/components/entrepta/segmented-control"
 import { TechBadge } from "@/components/about/tech-badge"
 import { EASE_OUT, revealViewport } from "@/lib/motion"
-import { cn } from "@/lib/utils"
 import { MONTHS, axis, period, type Entry } from "./career"
 
 type Mode = "timeline" | "list"
 
+/**
+ * Work and study on one axis of years: a bar per period, a line for now, and a line that follows
+ * the pointer and names the month under it. Solid is work, hatched is study. Clicking a bar opens
+ * what happened then; the switch turns the bars into a full-width list.
+ *
+ * Motion: the entrance belongs to the chart area, which has a real size, and the bars answer
+ * through variants, drawing left to right with a clip-path. Switching modes is `layout` on the
+ * bar's button, so the two never fight. The pointer line moves by a transform written straight
+ * on the element: nothing re-renders.
+ */
 export function History({
   entries,
   today,
@@ -67,7 +71,7 @@ export function History({
       }
 
   return (
-    <section className={cn(cardVariants(), "st-card st-hist")} data-mode={mode}>
+    <section className={tileClass(undefined, "st-hist")} data-mode={mode}>
       <CardHeader>
         <CardLabel as="h2" icon={<ClockCounterClockwiseIcon />}>
           work and academic history

@@ -3,11 +3,12 @@
 import { SmileyIcon } from "@phosphor-icons/react"
 import Image, { type StaticImageData } from "next/image"
 import { useState } from "react"
-import { Tile } from "../tile"
+import { Tile } from "@/components/site/tile"
 import nazareGif from "./gifs/nazare-confusa.gif"
 import nazare from "./gifs/nazare-confusa.png"
 import fineGif from "./gifs/this-is-fine.gif"
 import fine from "./gifs/this-is-fine.png"
+import "./favorites.css"
 
 const EMOJIS: { emoji: string; name: string; wide?: boolean }[] = [
   { emoji: "🫡", name: "saluting face" },
@@ -51,7 +52,7 @@ function Gif({ name, code, stopped, playing }: (typeof GIFS)[number]) {
 }
 
 export function Favorites() {
-  const [mine, setMine] = useState<Record<string, boolean>>({})
+  const [picked, setPicked] = useState<Record<string, boolean>>({})
 
   const [flights, setFlights] = useState<Record<string, number>>({})
 
@@ -59,7 +60,7 @@ export function Favorites() {
     <Tile label="emojis & gifs I overuse" icon={<SmileyIcon />}>
       <ul className="flex flex-wrap gap-1.5">
         {EMOJIS.map(({ emoji, name, wide }) => {
-          const on = mine[emoji] ?? false
+          const on = picked[emoji] ?? false
           return (
             <li key={emoji}>
               <button
@@ -68,7 +69,7 @@ export function Favorites() {
                 aria-label={`${name}, ${on ? 2 : 1} reactions`}
                 aria-pressed={on}
                 onClick={() => {
-                  setMine((before) => ({ ...before, [emoji]: !on }))
+                  setPicked((before) => ({ ...before, [emoji]: !on }))
                   if (!on) {
                     setFlights((before) => ({ ...before, [emoji]: (before[emoji] ?? 0) + 1 }))
                   }

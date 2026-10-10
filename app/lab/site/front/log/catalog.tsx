@@ -1,12 +1,11 @@
 import Image from "next/image"
+import { tileClass } from "@/components/site/tile"
 import type { ReactNode } from "react"
-import { cardVariants } from "@/app/components/entrepta/card"
 import { Reveal } from "@/app/components/entrepta/reveal"
 import { RollingNumber } from "@/app/components/entrepta/rolling-number"
 import { StarRating } from "@/components/log/star-rating"
 import { posterSrc } from "@/lib/log/poster-src"
 import type { LogEntry } from "@/lib/log/validation"
-import { cn } from "@/lib/utils"
 
 function LogCover({ entry, sizes }: { entry: LogEntry; sizes: string }) {
   return (
@@ -55,7 +54,7 @@ export function Slips({ items }: { items: LogEntry[] }) {
       {items.map((entry, index) => (
         <li key={entry.id}>
           <Reveal index={index} step={0.04} className="flex flex-1">
-            <article className={cn(cardVariants({ size: "sm" }), "st-card st-lg-slip")}>
+            <article className={tileClass({ size: "sm" }, "st-lg-slip")}>
               <Hidden entry={entry} />
               <LogCover entry={entry} sizes="96px" />
               <div className="flex min-w-0 flex-col gap-1.5">

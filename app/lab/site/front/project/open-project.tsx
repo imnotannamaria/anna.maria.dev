@@ -1,15 +1,15 @@
 import { FolderOpenIcon } from "@phosphor-icons/react/dist/ssr"
+import { tileClass } from "@/components/site/tile"
 import { Badge } from "@/app/components/entrepta/badge"
-import { cardVariants } from "@/app/components/entrepta/card"
 import { MDXContent } from "@/components/blog/mdx-content"
-import { cn } from "@/lib/utils"
 import { getPublishedProjects } from "@/lib/velite"
 import { ScreenLink } from "../screen-link"
 import { findBrand } from "../brand-data"
-import { TechStickers } from "../professional/tech-stickers"
-import { Cover, Links } from "../projects/parts"
+import { TechStickers } from "@/components/site/tech-stickers"
+import { Cover, ProjectLinks } from "@/components/site/project-cover"
+import { BrowserWindow } from "@/components/site/window"
 import { address, type Project } from "../projects/project"
-import { PageHeader } from "../page-header"
+import { PageHeader } from "@/components/site/page-header"
 import "./open-project.css"
 
 export function OpenProject({ slug }: { slug: string }) {
@@ -71,27 +71,19 @@ export function OpenProject({ slug }: { slug: string }) {
       />
       <div className="flex flex-col gap-8">
         {title}
-        <div className="st-pj-window">
-          <div className="st-pj-bar" aria-hidden>
-            <span className="st-pj-dots">
-              <i />
-              <i />
-              <i />
-            </span>
-            <span className="st-pj-address text-mono-xs font-mono">{address(project)}</span>
-          </div>
+        <BrowserWindow address={address(project)}>
           <Cover project={project} sizes="(min-width: 900px) 1100px, 100vw" />
-        </div>
-        <div className="st-pa-two">
+        </BrowserWindow>
+        <div className="st-pa-columns">
           {body}
-          <aside className={cn(cardVariants({ size: "sm" }), "st-card gap-4")}>
+          <aside className={tileClass({ size: "sm" }, "gap-4")}>
             <h3 className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
               built with
             </h3>
             {stickers}
             <div className="flex items-center justify-between gap-3 border-t border-dashed border-[var(--border-subtle)] pt-3">
               <span className="text-mono-xs font-mono text-[var(--fg-muted)]">links</span>
-              <Links project={project} />
+              <ProjectLinks project={project} />
             </div>
             <ul className="flex flex-wrap gap-1.5" aria-label="Tags">
               {project.tags.map((tag) => (

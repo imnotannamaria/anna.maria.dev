@@ -5,7 +5,7 @@ import { GithubCalendar } from "@/components/about/github-calendar"
 import { getContributions, type ContributionYear } from "@/lib/github/contributions"
 import type { CardState } from "@/lib/showcase/state"
 import { siteConfig } from "@/lib/site-config"
-import { Tile } from "../tile"
+import { Tile } from "@/components/site/tile"
 
 function Frame({ state }: { state: CardState<ContributionYear> }) {
   const user = siteConfig.githubUser

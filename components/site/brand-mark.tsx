@@ -10,9 +10,15 @@ import {
   VectorThreeIcon,
 } from "@phosphor-icons/react"
 import type { ReactNode } from "react"
-import { Plate } from "./dock"
-import type { Tech } from "./stack-data"
+import { Plate } from "./plate"
 
+/** A technology, and its logo when simple-icons has one: the path and the hex color. */
+export type Tech = { name: string; path?: string; color?: string }
+
+/**
+ * The logo of a technology on a plate. simple-icons has no logo for ten of them (C#, SQL, RAG…),
+ * and those get a stand-in below; anything else falls back to its first two letters.
+ */
 function Microsoft() {
   return (
     <svg viewBox="0 0 23 23" aria-hidden>
@@ -37,6 +43,7 @@ const SUBSTITUTES: Record<string, ReactNode> = {
   embeddings: <VectorThreeIcon aria-hidden weight="bold" />,
 }
 
+/** Whether a logo color is too light to read on a white plate: it gets the dark plate instead. */
 function colorLight(hex: string): boolean {
   const channel = (i: number) => {
     const v = parseInt(hex.slice(i, i + 2), 16) / 255

@@ -15,6 +15,7 @@ import type { CSSProperties, ReactNode } from "react"
 import { Reveal } from "@/app/components/entrepta/reveal"
 import { calcYearsOfExp, yearsWord } from "@/lib/experience"
 import { siteConfig } from "@/lib/site-config"
+import { cn } from "@/lib/utils"
 import { getPublishedPosts, getPublishedProjects } from "@/lib/velite"
 import { Cat } from "../../abimaela/abimaela"
 import { findBrand } from "../brand-data"
@@ -23,8 +24,11 @@ import selfie from "../person/photos/01-selfie.jpg"
 import cat from "../person/photos/02-abimaela.jpg"
 import palmTrees from "../person/photos/03-palm-trees.jpg"
 import { CAREER, axis } from "../professional/career"
-import { BrandMark } from "../professional/brand-mark"
-import { PageHeader } from "../page-header"
+import { Folder } from "@/components/site/folder"
+import { Hint } from "@/components/site/hint"
+import { Lede, PageHeader } from "@/components/site/page-header"
+import { POLAROID } from "@/components/site/polaroid"
+import { Pushpin, Tape } from "@/components/site/tape"
 import { LETTERS, featuredLetter } from "../wall/letters"
 import { Door } from "./door"
 import "./home.css"
@@ -65,7 +69,7 @@ export function Home() {
     person: (
       <span className="st-hm-photos">
         {[palmTrees, cat, selfie].map((photo, index) => (
-          <span key={photo.src} className="st-photo" style={{ "--i": index } as CSSProperties}>
+          <span key={photo.src} className={POLAROID} style={{ "--i": index } as CSSProperties}>
             <Image src={photo} alt="" width={84} height={84} sizes="100px" />
           </span>
         ))}
@@ -98,27 +102,22 @@ export function Home() {
     ),
     notes: (
       <span className="st-hm-slip">
-        <span className="st-nt-tape" />
+        <Tape />
         <span className="text-heading-md line-clamp-3 font-serif text-[var(--fg-primary)]">
           <span className="st-hm-stroke">{note?.title ?? "notes"}</span>
         </span>
       </span>
     ),
     projects: (
-      <span className="st-pj-grab st-hm-folder" data-featured>
-        <span className="st-pj-folder">
-          <span className="st-pj-folder-rear" />
-
-          {techs.map((tech, index) => (
-            <span key={tech.name} className="st-pj-tech" style={{ "--i": index } as CSSProperties}>
-              <BrandMark tech={tech} />
-            </span>
-          ))}
-          <span className="st-pj-cover st-pj-folder-photo">
-            {project?.cover ? <Image src={project.cover} alt="" fill sizes="160px" /> : null}
-          </span>
-          <span className="st-pj-folder-front" />
-        </span>
+      <span className="st-hm-folder">
+        <Folder
+          title={project?.title ?? "projects"}
+          cover={project?.cover ?? null}
+          techs={techs}
+          featured
+          badge={false}
+          sizes="160px"
+        />
       </span>
     ),
 
@@ -126,7 +125,7 @@ export function Home() {
       <span className="st-hm-letters">
         <span className="st-hm-letter" data-behind />
         <span className="st-hm-letter">
-          <span className="st-nt-pushpin" />
+          <Pushpin />
           <span className="flex min-w-0 items-center gap-2">
             <i className="text-mono-xs font-mono">{initials}</i>
             <span className="min-w-0">
@@ -166,32 +165,34 @@ export function Home() {
         <PageHeader icon={ICON.home} label="home" />
         <h2 className="st-hm-name font-serif text-[var(--fg-primary)]">{siteConfig.name}</h2>
 
-        <p className="st-lede font-serif">
+        <Lede>
           I build things <span className="text-[var(--fg-primary)]">end to end</span>, from the UI
           and the front, web or mobile, all the way to shipping, and I&rsquo;ve been at it for about{" "}
           <span className="text-[var(--fg-primary)]">{yearsWord(years).toLowerCase()} years</span>.
-        </p>
+        </Lede>
 
         <ul className="st-hm-hints">
-          <li className="st-pj-hint text-mono-xs font-mono">
-            <CursorClickIcon aria-hidden size={13} />
+          <Hint as="li" icon={<CursorClickIcon aria-hidden size={13} />}>
             <span>each card is a page, click one to know more</span>
-          </li>
-          <li className="st-pj-hint text-mono-xs font-mono">
-            <SwapIcon aria-hidden size={13} />
+          </Hint>
+          <Hint as="li" icon={<SwapIcon aria-hidden size={13} />}>
             <span>
               switch sides at the bottom: <strong className="font-medium">Front</strong> is the
               pages, <strong className="font-medium">Back</strong> is a terminal,{" "}
               <strong className="font-medium">IA</strong> is a chat
             </span>
-          </li>
+          </Hint>
         </ul>
       </header>
       <ul className="st-hm-doors">
         {PAGES.filter((page) => page.id !== "home").map((page, index) => (
           <li key={page.id} data-door={page.id}>
             <Reveal index={index} className="h-full">
-              <Door to={page.id} label={page.label} className="st-hm-door focus-ring">
+              <Door
+                to={page.id}
+                label={page.label}
+                className={cn("st-hm-door focus-ring", page.id === "projects" && "st-folder-host")}
+              >
                 <span className="st-hm-label text-mono-sm font-mono">
                   <span className="text-[var(--fg-brand)]">{ICON[page.id]}</span>
                   {page.label}

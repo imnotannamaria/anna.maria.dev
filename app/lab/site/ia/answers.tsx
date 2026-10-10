@@ -1,4 +1,5 @@
 import { ClockCounterClockwiseIcon, StackIcon } from "@phosphor-icons/react"
+import { topicOf } from "./topics"
 import Image from "next/image"
 import type { ReactElement, ReactNode } from "react"
 import { Badge } from "@/app/components/entrepta/badge"
@@ -6,8 +7,8 @@ import type { SiteData } from "../site-data"
 import { ScreenLink } from "../front/screen-link"
 import { dockChannels } from "../front/contact/postcard"
 import { PAGES, type ScreenId } from "../front/pages"
-import { TechStickers } from "../front/professional/tech-stickers"
-import { Dock } from "../front/professional/dock"
+import { TechStickers } from "@/components/site/tech-stickers"
+import { Dock } from "@/components/site/dock"
 import type { Group } from "../front/professional/stack-data"
 
 /** What the chat answers, for now: a script. Keyword routing over the site's own content, no model. */
@@ -52,10 +53,10 @@ const UNDERLINED =
 const tagline = (id: string) => PAGES.find((page) => page.id === id)?.tagline ?? ""
 
 export function answer(question: string, data: SiteData, stack: Group[]): Answer {
-  const q = question.toLowerCase()
+  const topic = topicOf(question)
   const { projects, jobs, posts, log, apps, years, email, socials } = data
 
-  if (/(wall|love letter|letter|testimonial|recommend|kind words|say about)/.test(q)) {
+  if (topic === "wall") {
     return {
       text: "There are no letters yet. The wall on the page is showing placeholders.",
       card: {
@@ -73,7 +74,7 @@ export function answer(question: string, data: SiteData, stack: Group[]): Answer
     }
   }
 
-  if (/(\blog\b|watch|read\b|reading|listen|film|movie|series|book|album|game|podcast)/.test(q)) {
+  if (topic === "log") {
     if (log === null) {
       return { text: "The log lives in Postgres, and Postgres did not answer just now." }
     }
@@ -111,7 +112,7 @@ export function answer(question: string, data: SiteData, stack: Group[]): Answer
     }
   }
 
-  if (/(writ|wrote|blog|post|note|article|essay)/.test(q)) {
+  if (topic === "notes") {
     const sorted = [...posts].sort((a, b) => Number(b.featured) - Number(a.featured))
     return {
       text: `${posts.length} notes so far. The featured one comes first.`,
@@ -139,7 +140,7 @@ export function answer(question: string, data: SiteData, stack: Group[]): Answer
     }
   }
 
-  if (/(buil[dt]|project|made|ship|portfolio|open source|demo|librar)/.test(q)) {
+  if (topic === "projects") {
     const sorted = [...projects].sort((a, b) => Number(b.featured) - Number(a.featured))
     return {
       text: `${projects.length} projects are published here: ${
@@ -178,7 +179,7 @@ export function answer(question: string, data: SiteData, stack: Group[]): Answer
     }
   }
 
-  if (/(stack|tech|tool|language|framework|\buse|app)/.test(q)) {
+  if (topic === "stack") {
     return {
       text: "Full-stack. Here it is by group, and under it the apps where the work happens.",
       card: {
@@ -205,7 +206,7 @@ export function answer(question: string, data: SiteData, stack: Group[]): Answer
     }
   }
 
-  if (/(work|job|career|experience|company|stud|school|degree|college|universit)/.test(q)) {
+  if (topic === "career") {
     return {
       text: `${years} years shipping, since March 2021. Work and study, on the same timeline.`,
       card: {
@@ -229,7 +230,7 @@ export function answer(question: string, data: SiteData, stack: Group[]): Answer
     }
   }
 
-  if (/(reach|contact|email|mail|hire|talk|linkedin|github|twitter)/.test(q)) {
+  if (topic === "contact") {
     return {
       text: "Here is every way in. Each one opens, and each one copies.",
       card: {
@@ -244,7 +245,7 @@ export function answer(question: string, data: SiteData, stack: Group[]): Answer
     }
   }
 
-  if (/(who|anna|about|person|she\b|her\b|cat|abimaela|live|from)/.test(q)) {
+  if (topic === "person") {
     return {
       text: "Anna is from Pernambuco and lives in Tamandaré, right by the beach. The gym is her daily reset button, five times a week. She is a big fan of horror films, Mike Flanagan and Drag Race, plays a few instruments, all of them mediocrely, loves every kind of music, mostly pop, and answers to Abimaela, the cat in the corner.",
       card: {

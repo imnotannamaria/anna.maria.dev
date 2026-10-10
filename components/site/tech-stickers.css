@@ -1,0 +1,58 @@
+/* A grid of technology stickers, each with its name under it. */
+
+.st-techs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  justify-items: center;
+  gap: 10px 4px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.st-techs[data-center] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.st-techs[data-center] > .st-tech {
+  width: 76px;
+}
+.st-tech {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-width: 0;
+  padding-top: 4px;
+}
+.st-tech-sticker {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 3px solid #ffffff;
+  border-radius: 27%;
+  background: #ffffff;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 0.28);
+  rotate: var(--tilt);
+  transition:
+    scale 240ms var(--ease-out),
+    box-shadow 240ms var(--ease-out);
+}
+.st-tech-name {
+  max-width: 100%;
+  color: var(--fg-secondary);
+  text-align: center;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  transition: color 200ms var(--ease-out);
+}
+.st-tech:hover .st-tech-sticker {
+  box-shadow: 0 8px 16px rgb(0 0 0 / 0.3);
+  scale: 1.08;
+}
+.st-tech:hover .st-tech-name {
+  color: var(--fg-primary);
+}

@@ -1,5 +1,7 @@
 "use client"
 
+import { Pushpin } from "@/components/site/tape"
+import { tileClass } from "@/components/site/tile"
 import { EnvelopeSimpleOpenIcon, LinkedinLogoIcon } from "@phosphor-icons/react"
 import type { CSSProperties } from "react"
 import { Avatar } from "@/app/components/entrepta/avatar"
@@ -9,7 +11,6 @@ import {
   CardHeader,
   CardLabel,
   CardMeta,
-  cardVariants,
 } from "@/app/components/entrepta/card"
 import {
   Dialog,
@@ -19,7 +20,6 @@ import {
   DialogTrigger,
 } from "@/app/components/entrepta/dialog"
 import { Reveal } from "@/app/components/entrepta/reveal"
-import { cn } from "@/lib/utils"
 import type { Letter } from "./letters"
 
 const LONG = 320
@@ -69,8 +69,8 @@ export function Mural({ letters }: { letters: Letter[] }) {
                 className="st-wl-letter"
                 style={{ "--tilt": `${ANGLES[index % ANGLES.length]}deg` } as CSSProperties}
               >
-                <span aria-hidden className="st-nt-pushpin" />
-                <div className={cn(cardVariants({ size: "sm" }), "st-card st-wl-sheet")}>
+                <Pushpin />
+                <div className={tileClass({ size: "sm" }, "st-wl-sheet")}>
                   <Who letter={letter} />
                   <blockquote
                     className="st-wl-text text-body-md font-sans"
@@ -88,8 +88,8 @@ export function Mural({ letters }: { letters: Letter[] }) {
                             read the whole letter
                           </DialogTrigger>
 
-                          <DialogContent className="st-wl-open max-w-2xl">
-                            <span aria-hidden className="st-nt-pushpin" />
+                          <DialogContent className="st-wl-dialog max-w-2xl">
+                            <Pushpin />
                             <DialogTitle className="sr-only">
                               A letter from {letter.name}
                             </DialogTitle>

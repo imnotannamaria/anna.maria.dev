@@ -13,8 +13,8 @@ import {
 import { StarRating } from "@/components/log/star-rating"
 import { TYPE_LABEL } from "@/lib/log/constants"
 import type { LogEntry } from "@/lib/log/validation"
-import { Tile } from "../tile"
-import { PageHeader } from "../page-header"
+import { Tile } from "@/components/site/tile"
+import { PageHeader } from "@/components/site/page-header"
 import "./admin.css"
 
 /** The admin with the new skin. Read-only here: the real one sits behind `requireAdmin()`. */

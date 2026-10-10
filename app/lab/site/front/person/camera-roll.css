@@ -1,0 +1,6 @@
+.st-roll {
+  display: grid;
+  min-width: 164px;
+  min-height: 172px;
+  place-items: center;
+}

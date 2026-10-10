@@ -1,4 +1,5 @@
 import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr"
+import { Lede, PageLabel } from "@/components/site/page-header"
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { getPostReadingStats, getPublishedPosts } from "@/lib/velite"
@@ -46,17 +47,17 @@ export function Notes() {
   return (
     <article className="st-room st-notes">
       <header className="flex flex-col gap-4">
-        <h1 className="text-mono-sm flex items-center gap-2 font-mono tracking-[0.08em] text-[var(--fg-secondary)] uppercase">
-          <NotePencilIcon aria-hidden size={13} weight="bold" className="text-[var(--fg-brand)]" />
-          notes
-          <span className="text-[var(--fg-muted)]">· {notes.length}</span>
-        </h1>
+        <PageLabel
+          icon={<NotePencilIcon aria-hidden size={13} weight="bold" />}
+          label="notes"
+          count={notes.length}
+        />
 
-        <p className="st-lede font-serif">
+        <Lede>
           Notes on development, architecture, and the tools I reach for.{" "}
           <span className="text-[var(--fg-primary)]">Long-form thinking</span>, build logs, and the
           occasional <span className="text-[var(--fg-primary)]">opinion</span>.
-        </p>
+        </Lede>
       </header>
 
       <NoteSlips notes={notes} />

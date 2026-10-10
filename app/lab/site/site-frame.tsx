@@ -1,6 +1,7 @@
 "use client"
 
 import { MoonIcon, SunIcon } from "@phosphor-icons/react"
+import Image from "next/image"
 import {
   createContext,
   useContext,
@@ -19,6 +20,8 @@ import { Abimaela, pet } from "./abimaela/abimaela"
 import { ICON } from "./front/icons"
 import { PAGES, innerPageOf, type PageId, type ScreenId } from "./front/pages"
 import { Footer } from "./front/footer/footer"
+import "./site-frame.css"
+import "@/components/site/enter.css"
 
 /**
  * The frame of the new site: the sidebar, the Front / Back / IA switcher, the cat, and the page
@@ -69,32 +72,15 @@ function SidebarLink({
 function BrandMark({ compact }: { compact: boolean }) {
   return (
     <span className="flex items-center gap-2.5">
-      <svg viewBox="0 0 100 100" width={28} height={28} aria-hidden className="shrink-0">
-        <defs>
-          <linearGradient id="st-brand" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" style={{ stopColor: "var(--fg-brand-hover)" }} />
-            <stop
-              offset="1"
-              style={{ stopColor: "color-mix(in srgb, var(--fg-brand) 55%, #09090b)" }}
-            />
-          </linearGradient>
-        </defs>
-        <rect width="100" height="100" rx="26" fill="url(#st-brand)" />
-        <text
-          x="50"
-          y="67.25"
-          textAnchor="middle"
-          fill="var(--zinc-50)"
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontWeight: 500,
-            fontSize: "72px",
-          }}
-        >
-          a
-        </text>
-      </svg>
+      <Image
+        src="/brand/mark.png"
+        alt=""
+        width={28}
+        height={28}
+        sizes="28px"
+        className="shrink-0"
+        priority
+      />
       {compact ? null : (
         <span className="flex min-w-0 flex-col font-mono leading-tight">
           <span className="text-mono-sm truncate text-[var(--fg-primary)]">Anna Maria</span>

@@ -1,15 +1,15 @@
-.st-ps-two {
+.st-ps-columns {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 28px;
 }
 @container (min-width: 900px) {
-  .st-ps-two {
+  .st-ps-columns {
     grid-template-columns: minmax(0, 1fr) 240px;
     align-items: start;
     gap: 36px;
   }
-  .st-ps-two > aside {
+  .st-ps-columns > aside {
     position: sticky;
     top: 24px;
   }
@@ -19,7 +19,7 @@
   max-width: 20ch;
   font-size: clamp(28px, 5cqw, 52px);
   line-height: 1.08;
-  letter-spacing: -0.02at;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -29,7 +29,6 @@
 
 .st-screen .st-ps-sheet {
   gap: 36px;
-  background: var(--bg-card);
 }
 
 .st-ps-slip {

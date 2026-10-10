@@ -1,14 +1,14 @@
 import Image from "next/image"
-import { cardVariants } from "@/app/components/entrepta/card"
-import { cn } from "@/lib/utils"
+import { tileClass } from "@/components/site/tile"
 import { readWeather } from "./weather-data"
 import beach from "./photos/beach.jpg"
+import "./weather.css"
 
 export async function Weather() {
   const weather = await readWeather()
 
   return (
-    <section className={cn(cardVariants({ size: "sm" }), "st-card st-weather h-full p-0")}>
+    <section className={tileClass({ size: "sm" }, "st-weather h-full p-0")}>
       <div className="st-weather-photo">
         <Image
           src={beach}

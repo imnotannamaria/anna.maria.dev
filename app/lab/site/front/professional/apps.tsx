@@ -1,7 +1,7 @@
 import { AppWindowIcon } from "@phosphor-icons/react/dist/ssr"
 import Image, { type StaticImageData } from "next/image"
 import type { ReactNode } from "react"
-import { Tile } from "../tile"
+import { Tile } from "@/components/site/tile"
 import { APP_LIST, type AppName } from "./app-list"
 import chatgpt from "./apps/chatgpt.png"
 import chrome from "./apps/chrome.png"
@@ -10,7 +10,8 @@ import cursor from "./apps/cursor.png"
 import notion from "./apps/notion.png"
 import spotify from "./apps/spotify.png"
 import warp from "./apps/warp.png"
-import { Dock, Plate, type DockItem } from "./dock"
+import { Dock, type DockItem } from "@/components/site/dock"
+import { Plate } from "@/components/site/plate"
 import { CalendarMark, FigmaMark, SlackMark } from "./marks"
 
 function Icon({ src }: { src: StaticImageData }) {

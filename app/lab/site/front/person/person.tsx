@@ -1,4 +1,7 @@
 import { UserIcon } from "@phosphor-icons/react/dist/ssr"
+import { PageLabel } from "@/components/site/page-header"
+import { TILE_SURFACE } from "@/components/site/tile"
+import { cn } from "@/lib/utils"
 import { Suspense } from "react"
 import Image from "next/image"
 import Link from "next/link"
@@ -14,6 +17,7 @@ import { Playlist } from "./playlist"
 import { CameraRoll } from "./camera-roll"
 import { Weather } from "./weather"
 import { Bio } from "./bio"
+import "./person.css"
 
 async function Rings() {
   const state = await loadTodayActivity({
@@ -28,7 +32,7 @@ async function Rings() {
       aria-label="View wristkit"
       className="flex h-full flex-col"
     >
-      <TodayActivityCard state={state} className="st-card flex-1 p-4 max-sm:p-4" />
+      <TodayActivityCard state={state} className={cn(TILE_SURFACE, "flex-1 p-4 max-sm:p-4")} />
     </Link>
   )
 }
@@ -46,10 +50,10 @@ export function Person({ log }: { log: LogEntry[] | null }) {
           className="st-me-avatar"
         />
         <div className="flex flex-col justify-center gap-4">
-          <h1 className="text-mono-sm flex items-center gap-2 font-mono tracking-[0.08em] text-[var(--fg-secondary)] uppercase">
-            <UserIcon aria-hidden size={13} weight="bold" className="text-[var(--fg-brand)]" />
-            anna, the person
-          </h1>
+          <PageLabel
+            icon={<UserIcon aria-hidden size={13} weight="bold" />}
+            label="anna, the person"
+          />
           <Bio />
         </div>
         <CameraRoll />
@@ -62,7 +66,10 @@ export function Person({ log }: { log: LogEntry[] | null }) {
         <Reveal index={1} className="st-area" style={{ gridArea: "rings" }}>
           <Suspense
             fallback={
-              <TodayActivityCard state={{ kind: "loading" }} className="st-card p-4 max-sm:p-4" />
+              <TodayActivityCard
+                state={{ kind: "loading" }}
+                className={cn(TILE_SURFACE, "p-4 max-sm:p-4")}
+              />
             }
           >
             <Rings />

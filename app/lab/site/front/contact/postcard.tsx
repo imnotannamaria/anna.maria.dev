@@ -6,7 +6,8 @@ import { useEffect, useRef, useState, type FormEvent } from "react"
 import { siGithub, siGmail, siX } from "simple-icons"
 import { Button } from "@/app/components/entrepta/button"
 import { Cat } from "../../abimaela/abimaela"
-import { Dock, Plate, type DockItem } from "../professional/dock"
+import { Dock, type DockItem } from "@/components/site/dock"
+import { Plate } from "@/components/site/plate"
 
 /**
  * The contact form as a postcard, and the channels as a dock. Nothing is sent yet: submitting
@@ -48,7 +49,7 @@ export function dockChannels(channels: Channels): DockItem[] {
       href: channels.linkedin,
       copy: channels.linkedin,
       icon: (
-        <Plate rear="#0a66c2">
+        <Plate background="#0a66c2">
           <LinkedinLogoIcon aria-hidden weight="fill" />
         </Plate>
       ),
@@ -78,6 +79,12 @@ export function dockChannels(channels: Channels): DockItem[] {
   ]
 }
 
+/**
+ * The card has four phases: writing, sending, sent and error. Sending stamps the postmark and
+ * flies the card away; sent shows a receipt with a drawn check; error shakes the card and stamps
+ * "return to sender". The error ending has no trigger yet, because nothing is sent: it is here
+ * for when the form is wired to the API.
+ */
 export function Postcard({ channels }: { channels: Channels }) {
   const reduce = useReducedMotion() ?? false
   const [phase, setPhase] = useState<Phase>("writing")

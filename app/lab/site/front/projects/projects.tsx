@@ -1,4 +1,5 @@
 import { FolderIcon } from "@phosphor-icons/react/dist/ssr"
+import { Lede, PageLabel } from "@/components/site/page-header"
 import { getPublishedProjects } from "@/lib/velite"
 import { findBrand } from "../brand-data"
 import { Explorer } from "./explorer"
@@ -33,16 +34,16 @@ export function Projects() {
   return (
     <article className="st-room st-projects">
       <header className="flex flex-col gap-4">
-        <h1 className="text-mono-sm flex items-center gap-2 font-mono tracking-[0.08em] text-[var(--fg-secondary)] uppercase">
-          <FolderIcon aria-hidden size={13} weight="bold" className="text-[var(--fg-brand)]" />
-          projects
-          <span className="text-[var(--fg-muted)]">· {projects.length}</span>
-        </h1>
+        <PageLabel
+          icon={<FolderIcon aria-hidden size={13} weight="bold" />}
+          label="projects"
+          count={projects.length}
+        />
 
-        <p className="st-lede font-serif">
+        <Lede>
           Open-source tools, libraries and side projects. The things I built because I{" "}
           <span className="text-[var(--fg-primary)]">wanted them to exist</span>.
-        </p>
+        </Lede>
       </header>
 
       <Explorer projects={projects} />

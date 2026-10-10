@@ -1,9 +1,9 @@
 import type { CSSProperties } from "react"
+import { tileClass } from "@/components/site/tile"
 import { ArrowAffordance } from "@/app/components/entrepta/arrow-link"
 import { Badge } from "@/app/components/entrepta/badge"
-import { cardVariants } from "@/app/components/entrepta/card"
 import { Reveal } from "@/app/components/entrepta/reveal"
-import { cn } from "@/lib/utils"
+import { Tape } from "@/components/site/tape"
 import { ScreenLink } from "../screen-link"
 import { FeaturedNote } from "./featured-note"
 import { shortDate, noteScreen, type Note } from "./note"
@@ -16,8 +16,8 @@ function Slip({ note, index }: { note: Note; index: number }) {
       className="st-nt-slip"
       style={{ "--tilt": `${ANGLES[index % ANGLES.length]}deg` } as CSSProperties}
     >
-      <span aria-hidden className="st-nt-tape" />
-      <article className={cn(cardVariants(), "st-card h-full gap-3")}>
+      <Tape />
+      <article className={tileClass(undefined, "h-full gap-3")}>
         <ScreenLink
           to={noteScreen(note)}
           className="focus-ring absolute inset-0 z-[1] rounded-[var(--radius-lg)]"
@@ -55,7 +55,7 @@ export function NoteSlips({ notes }: { notes: Note[] }) {
       {notes.map((note, index) => (
         <li
           key={note.slug}
-          className="st-nt-place group/arrow"
+          className="st-nt-cell group/arrow"
           data-featured={note.featured || undefined}
         >
           <Reveal index={index} className="h-full">

@@ -3,11 +3,12 @@
 import { BackpackIcon } from "@phosphor-icons/react"
 import Image, { type StaticImageData } from "next/image"
 import { useState } from "react"
-import { Tile } from "../tile"
+import { Tile } from "@/components/site/tile"
 import airpods from "./objects/airpods.png"
 import cup from "./objects/cup.png"
 import mac from "./objects/mac.png"
 import guitar from "./objects/guitar.png"
+import "./things.css"
 
 const THINGS: { name: string; tagline: string; img: StaticImageData }[] = [
   { name: "AirPods Pro 3", tagline: "practically my companions", img: airpods },

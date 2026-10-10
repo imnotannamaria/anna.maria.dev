@@ -5,12 +5,14 @@ import { motion, useMotionValue } from "motion/react"
 import Image, { type StaticImageData } from "next/image"
 import { useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react"
 import { Tip } from "@/components/ui/tip"
-import { Tile } from "../tile"
+import { STICKER } from "@/components/site/sticker"
+import { Tile } from "@/components/site/tile"
 import bosco from "./stickers/bosco.png"
 import cherry from "./stickers/cherry.png"
 import dany from "./stickers/dany.png"
 import galadriel from "./stickers/galadriel.png"
 import { Flag } from "./flag"
+import "./stickers.css"
 
 const cutout = (src: StaticImageData, width: number) => (
   <Image src={src} alt="" width={width} sizes={`${width}px`} draggable={false} />
@@ -85,7 +87,7 @@ function Sticker({
   front,
   onGrab,
   x: left,
-  y: header,
+  y: top,
   tilt,
 }: {
   caption: string
@@ -130,10 +132,10 @@ function Sticker({
           y.set(y.get() + step[1])
         }}
         className="st-grab focus-ring absolute cursor-grab touch-none active:cursor-grabbing"
-        style={{ x, y, left: left, top: header, zIndex: front }}
+        style={{ x, y, left, top, zIndex: front }}
       >
         <span
-          className="st-sticker"
+          className={STICKER}
           data-diecut={diecut || undefined}
           style={{ "--tilt": `${tilt}deg` } as CSSProperties}
         >
@@ -147,7 +149,7 @@ function Sticker({
 export function Stickers() {
   const stage = useRef<HTMLDivElement>(null)
   const [order, setOrder] = useState<Record<string, number>>({})
-  const header = useRef(1)
+  const topmost = useRef(1)
 
   return (
     <Tile label="stickers" icon={<StickerIcon />} note="drag them">
@@ -163,8 +165,8 @@ export function Stickers() {
             y={item.y}
             tilt={item.tilt}
             onGrab={() => {
-              header.current += 1
-              const z = header.current
+              topmost.current += 1
+              const z = topmost.current
               setOrder((before) => ({ ...before, [item.id]: z }))
             }}
           >

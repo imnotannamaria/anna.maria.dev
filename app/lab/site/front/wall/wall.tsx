@@ -1,5 +1,5 @@
 import { HeartIcon } from "@phosphor-icons/react/dist/ssr"
-import { PageHeader } from "../page-header"
+import { PageHeader } from "@/components/site/page-header"
 import { LETTERS } from "./letters"
 import { Mural } from "./mural"
 import "./wall.css"

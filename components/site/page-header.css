@@ -1,0 +1,9 @@
+/* The serif line under a page's title. */
+
+.st-lede {
+  max-width: 50ch;
+  font-size: clamp(18px, 2.1cqw, 26px);
+  line-height: 1.38;
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}

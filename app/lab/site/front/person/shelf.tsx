@@ -1,25 +1,20 @@
 "use client"
 
+import { tileClass } from "@/components/site/tile"
 import { BooksIcon } from "@phosphor-icons/react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import Image from "next/image"
 import { useState } from "react"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
-import {
-  CardFooter,
-  CardHeader,
-  CardLabel,
-  CardMeta,
-  cardVariants,
-} from "@/app/components/entrepta/card"
+import { CardFooter, CardHeader, CardLabel, CardMeta } from "@/app/components/entrepta/card"
 import { SegmentedControl } from "@/app/components/entrepta/segmented-control"
 import { StarRating } from "@/components/log/star-rating"
 import { TYPE_PLURAL, type LogType } from "@/lib/log/constants"
 import { posterSrc } from "@/lib/log/poster-src"
 import type { LogEntry } from "@/lib/log/validation"
 import { revealViewport } from "@/lib/motion"
-import { cn } from "@/lib/utils"
 import { ScreenLink } from "../screen-link"
+import "./shelf.css"
 
 const TYPES = 4
 const COVERS = 14
@@ -48,7 +43,7 @@ export function Shelf({ entries }: { entries: LogEntry[] | null }) {
   }
 
   return (
-    <section className={cn(cardVariants({ size: "sm" }), "st-card h-full")}>
+    <section className={tileClass({ size: "sm" }, "h-full")}>
       <CardHeader>
         <CardLabel as="h2" icon={<BooksIcon />}>
           log

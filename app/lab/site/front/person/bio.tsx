@@ -4,8 +4,15 @@ import Image from "next/image"
 import type { ReactNode } from "react"
 import { Cat, pet } from "../../abimaela/abimaela"
 import bosco from "./stickers/bosco.png"
+import { Lede } from "@/components/site/page-header"
+import { STICKER } from "@/components/site/sticker"
 import { Flag } from "./flag"
+import "./bio.css"
 
+/**
+ * A word that shows something when hovered. What pops out is decoration and hidden from screen
+ * readers, so the word is not a tab stop: a focus that announces nothing is worse than none.
+ */
 function Word({
   children,
   pop,
@@ -16,7 +23,7 @@ function Word({
   onEnter?: () => void
 }) {
   return (
-    <span tabIndex={0} className="st-word focus-ring" onPointerEnter={onEnter} onFocus={onEnter}>
+    <span className="st-word" onPointerEnter={onEnter}>
       {children}
       <span aria-hidden className="st-word-pop">
         {pop}
@@ -31,7 +38,7 @@ const WEIGHT = <Emoji>🏋️</Emoji>
 
 export function Bio() {
   return (
-    <div className="st-lede st-lede-person font-serif">
+    <Lede as="div" className="st-lede-person">
       <p>
         I&rsquo;m{" "}
         <Word
@@ -42,8 +49,8 @@ export function Bio() {
         >
           Anna
         </Word>
-        , from <Word pop={<Flag className="st-sticker w-[64px]" />}>Pernambuco</Word>, and I live in
-        Tamandaré, right by the <Word pop={<Emoji>🌊</Emoji>}>beach</Word>.
+        , from <Word pop={<Flag className={`${STICKER} w-[64px]`} />}>Pernambuco</Word>, and I live
+        in Tamandaré, right by the <Word pop={<Emoji>🌊</Emoji>}>beach</Word>.
       </p>
       <p>
         The <Word pop={WEIGHT}>gym</Word>&nbsp;is my daily reset button, five times a week, pretty
@@ -51,7 +58,7 @@ export function Bio() {
         <Word pop={<Emoji>👻</Emoji>}>horror films</Word>, Mike Flanagan and{" "}
         <Word
           pop={
-            <span className="st-sticker" data-diecut>
+            <span className={STICKER} data-diecut>
               <Image src={bosco} alt="" width={72} sizes="72px" />
             </span>
           }
@@ -68,6 +75,6 @@ export function Bio() {
         </Word>
         , the cat in the corner.
       </p>
-    </div>
+    </Lede>
   )
 }

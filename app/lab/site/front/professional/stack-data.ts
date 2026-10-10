@@ -1,7 +1,8 @@
 import * as icons from "simple-icons"
+import type { Tech } from "@/components/site/brand-mark"
 import { STACK_GROUPS, TECH_ICONS } from "@/lib/stack"
 
-export type Tech = { name: string; path?: string; color?: string }
+export type { Tech } from "@/components/site/brand-mark"
 export type Group = { id: string; techs: Tech[] }
 
 const pathColor = new Map<string, string>()

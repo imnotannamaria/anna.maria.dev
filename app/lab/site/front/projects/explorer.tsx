@@ -1,12 +1,14 @@
 "use client"
 
 import { FlaskIcon, PackageIcon, PushPinIcon, type Icon } from "@phosphor-icons/react"
-import { useState, type CSSProperties } from "react"
+import { useState } from "react"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { Badge } from "@/app/components/entrepta/badge"
 import { ScreenLink } from "../screen-link"
-import { BrandMark } from "../professional/brand-mark"
-import { Cover, Links } from "./parts"
+import { BrowserWindow } from "@/components/site/window"
+import { Folder } from "@/components/site/folder"
+import { Hint } from "@/components/site/hint"
+import { Cover, ProjectLinks } from "@/components/site/project-cover"
 import { address, projectScreen, type Project } from "./project"
 
 const GROUPS: { type: string; title: string; Icon: Icon }[] = [
@@ -30,8 +32,10 @@ export function Explorer({ projects }: { projects: Project[] }) {
   return (
     <div className="st-pj-explorer">
       <div className="flex min-w-0 flex-col gap-4">
-        <p className="st-pj-hint text-mono-xs font-mono" role="status">
-          <PushPinIcon aria-hidden size={13} weight={pinnedProject ? "fill" : "regular"} />
+        <Hint
+          icon={<PushPinIcon aria-hidden size={13} weight={pinnedProject ? "fill" : "regular"} />}
+          role="status"
+        >
           {pinnedProject ? (
             <span>
               pinned: <strong className="font-medium">{pinnedProject.title}</strong>. click it again
@@ -40,10 +44,10 @@ export function Explorer({ projects }: { projects: Project[] }) {
           ) : (
             <span>hover to peek, click a folder to pin it</span>
           )}
-        </p>
+        </Hint>
         {GROUPS.map((group) => {
-          const his = projects.filter((project) => project.type === group.type)
-          if (his.length === 0) return null
+          const inGroup = projects.filter((project) => project.type === group.type)
+          if (inGroup.length === 0) return null
           return (
             <section key={group.type} className="st-pj-group">
               <h2 className="flex items-center gap-2">
@@ -57,44 +61,32 @@ export function Explorer({ projects }: { projects: Project[] }) {
                   {group.title}
                 </span>
                 <span className="text-mono-xs ml-auto font-mono text-[var(--fg-muted)]">
-                  {his.length}
+                  {inGroup.length}
                 </span>
               </h2>
               <ul className="st-pj-folders">
-                {his.map((project) => (
+                {inGroup.map((project) => (
                   <li key={project.slug}>
                     <button
                       type="button"
-                      className="st-pj-grab focus-ring"
+                      className="st-pj-grab st-folder-host focus-ring"
                       aria-pressed={project.slug === pinned}
                       aria-controls={`pj-${project.slug}`}
                       aria-label={`${project.title}, ${project.type}, ${project.year}${
                         project.featured ? ", featured" : ""
                       }. ${project.slug === pinned ? "Pinned. Click to let go." : "Click to pin."}`}
                       data-open={project.slug === open || undefined}
-                      data-featured={project.featured || undefined}
                       onPointerEnter={() => setPeeked(project.slug)}
                       onFocus={() => setPeeked(project.slug)}
                       onClick={() => toggle(project.slug)}
                     >
-                      <span className="st-pj-folder" aria-hidden>
-                        <span className="st-pj-folder-rear" />
-
-                        {project.techs.map((tech, index) => (
-                          <span
-                            key={tech.name}
-                            className="st-pj-tech"
-                            style={{ "--i": index } as CSSProperties}
-                          >
-                            <BrandMark tech={tech} />
-                          </span>
-                        ))}
-                        <Cover project={project} sizes="160px" className="st-pj-folder-photo" />
-                        <span className="st-pj-folder-front" />
-                        {project.featured ? (
-                          <span className="st-pj-sticker text-mono-xs font-mono">featured</span>
-                        ) : null}
-                      </span>
+                      <Folder
+                        title={project.title}
+                        cover={project.cover}
+                        techs={project.techs}
+                        featured={project.featured}
+                        sizes="160px"
+                      />
                       <span aria-hidden className="text-mono-sm font-mono text-[var(--fg-primary)]">
                         {project.title}
                         <span className="text-mono-xs block text-[var(--fg-muted)]">
@@ -118,20 +110,14 @@ export function Explorer({ projects }: { projects: Project[] }) {
       <div className="st-pj-side">
         {projects.map((project) => (
           <div key={project.slug} id={`pj-${project.slug}`} hidden={project.slug !== open}>
-            <article className="st-pj-window st-enter">
-              <div className="st-pj-bar">
-                <span className="st-pj-dots" aria-hidden>
-                  <i />
-                  <i />
-                  <i />
-                </span>
-                <span aria-hidden className="st-pj-address text-mono-xs font-mono">
-                  {address(project)}
-                </span>
-
+            <BrowserWindow
+              as="article"
+              className="st-enter"
+              address={address(project)}
+              action={
                 <button
                   type="button"
-                  className="st-pj-pin focus-ring"
+                  className="st-window-pin focus-ring"
                   aria-pressed={project.slug === pinned}
                   aria-label={
                     project.slug === pinned ? `Unpin ${project.title}` : `Pin ${project.title}`
@@ -144,8 +130,8 @@ export function Explorer({ projects }: { projects: Project[] }) {
                     weight={project.slug === pinned ? "fill" : "regular"}
                   />
                 </button>
-              </div>
-
+              }
+            >
               <ScreenLink
                 to={projectScreen(project)}
                 className="focus-ring block"
@@ -182,10 +168,10 @@ export function Explorer({ projects }: { projects: Project[] }) {
                   <ArrowLink asChild className="text-[var(--fg-brand-text)]">
                     <ScreenLink to={projectScreen(project)}>open the case study</ScreenLink>
                   </ArrowLink>
-                  <Links project={project} />
+                  <ProjectLinks project={project} />
                 </div>
               </div>
-            </article>
+            </BrowserWindow>
           </div>
         ))}
       </div>
