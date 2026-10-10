@@ -1,0 +1,112 @@
+.st-wl-mural {
+  columns: 300px;
+  column-gap: 26px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.st-wl-mural > li {
+  margin-bottom: 20px;
+  padding-top: 14px;
+  break-inside: avoid;
+}
+
+.st-wl-letter {
+  position: relative;
+  rotate: var(--tilt);
+  transition:
+    rotate 260ms var(--ease-out),
+    translate 260ms var(--ease-out);
+}
+.st-wl-mural > li:hover .st-wl-letter,
+.st-wl-mural > li:focus-within .st-wl-letter {
+  rotate: 0deg;
+  translate: 0 -3px;
+}
+
+.st-screen .st-wl-sheet {
+  gap: 14px;
+  padding: 22px 18px 16px;
+  background: var(--bg-card);
+}
+
+.st-wl-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8at;
+  margin: 0;
+  color: var(--fg-secondary);
+}
+.st-wl-text > p:first-child::before {
+  content: "\201C";
+  margin-right: 2px;
+  color: var(--fg-brand);
+  font-family: var(--font-serif);
+  font-size: 2at;
+  line-height: 0;
+  vertical-align: -0.32at;
+}
+.st-wl-text[data-cut] {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
+}
+
+.st-wl-text[data-cut] > p {
+  display: inline;
+}
+.st-wl-text[data-cut] > p + p::before {
+  content: " ";
+}
+
+.st-wl-open {
+  color: var(--fg-brand-text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: underline dotted var(--border-brand-strong);
+  text-underline-offset: 0.25at;
+  transition: color 150ms var(--ease-out);
+}
+.st-wl-open:hover {
+  color: var(--fg-primary);
+}
+.st-wl-linkedin {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  transition:
+    color 150ms var(--ease-out),
+    background-color 150ms var(--ease-out);
+}
+.st-wl-linkedin:hover {
+  background: var(--bg-hover-soft);
+  color: var(--fg-primary);
+}
+
+.st-wl-open {
+  gap: 18px;
+  padding: 26px 26px 18px;
+  overflow: visible;
+  border: 1px dashed var(--border-strong);
+  background: var(--bg-card);
+}
+.st-wl-scroll {
+  max-height: min(52vh, 460px);
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.st-wl-open::after {
+  content: " →";
+  display: inline-block;
+  transition: translate 200ms var(--ease-out);
+}
+.st-wl-open:hover::after {
+  translate: 3px 0;
+}

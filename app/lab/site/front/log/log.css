@@ -1,0 +1,98 @@
+.st-lg-groups {
+  display: flex;
+  flex-direction: column;
+}
+.st-lg-groups > section {
+  padding-block: 22px;
+}
+.st-lg-groups > section:first-child {
+  padding-top: 0;
+}
+.st-lg-groups > section + section {
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.st-lg-cover {
+  position: relative;
+  display: grid;
+  flex: none;
+  aspect-ratio: 2 / 3;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  background: var(--bg-surface);
+  color: var(--fg-muted);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
+}
+.st-lg-cover[data-type="music"],
+.st-lg-cover[data-type="podcast"] {
+  aspect-ratio: 1;
+}
+.st-lg-cover img {
+  object-fit: cover;
+}
+
+.st-lg-grid {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.st-lg-grid[data-drawing="slips"] {
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+}
+.st-lg-grid[data-drawing="slips"] > li {
+  display: flex;
+}
+
+.st-screen .st-lg-slip {
+  flex: 1;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 14px;
+}
+.st-lg-slip > .st-lg-cover {
+  width: 72px;
+}
+
+.st-lg-slip > .st-lg-cover {
+  transform-origin: 50% 100%;
+  transition:
+    rotate 260ms var(--ease-out),
+    translate 260ms var(--ease-out),
+    box-shadow 260ms var(--ease-out);
+}
+.st-lg-slip:hover > .st-lg-cover,
+.st-lg-slip:focus-within > .st-lg-cover {
+  box-shadow: 0 8px 16px rgb(0 0 0 / 0.28);
+  rotate: -3deg;
+  translate: 0 -4px;
+}
+
+.st-lg-slip > .st-lg-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgb(255 255 255 / 0.32) 50%,
+    transparent 65%
+  );
+  translate: -110% 0;
+  transition: translate 0s;
+}
+.st-lg-slip:hover > .st-lg-cover::after {
+  translate: 110% 0;
+  transition: translate 620ms var(--ease-out);
+}
+
+.st-lg-slip h3 {
+  transition: color 180ms var(--ease-out);
+}
+.st-lg-slip:hover h3 {
+  color: var(--fg-brand-text);
+}

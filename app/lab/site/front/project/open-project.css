@@ -1,0 +1,26 @@
+.st-pa-title {
+  font-size: clamp(32px, 6cqw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.02at;
+}
+.st-pa-body {
+  min-width: 0;
+  max-width: 68ch;
+}
+
+.st-pa-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+}
+@container (min-width: 900px) {
+  .st-pa-two {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    align-items: start;
+    gap: 40px;
+  }
+  .st-pa-two > aside {
+    position: sticky;
+    top: 24px;
+  }
+}

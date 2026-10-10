@@ -1,0 +1,6 @@
+.st-ad-roll {
+  overflow-x: auto;
+}
+.st-ad-roll > table {
+  min-width: 640px;
+}

@@ -1,0 +1,59 @@
+.st-ps-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+}
+@container (min-width: 900px) {
+  .st-ps-two {
+    grid-template-columns: minmax(0, 1fr) 240px;
+    align-items: start;
+    gap: 36px;
+  }
+  .st-ps-two > aside {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.st-ps-title {
+  max-width: 20ch;
+  font-size: clamp(28px, 5cqw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.02at;
+  text-wrap: balance;
+}
+
+.st-ps-body {
+  max-width: 68ch;
+}
+
+.st-screen .st-ps-sheet {
+  gap: 36px;
+  background: var(--bg-card);
+}
+
+.st-ps-slip {
+  position: relative;
+  padding-top: 10px;
+  rotate: 1deg;
+}
+.st-screen .st-ps-slip > .st-card {
+  background: var(--bg-card);
+}
+
+.st-ps-toc {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.st-ps-toc a {
+  color: var(--fg-secondary);
+  border-radius: var(--radius-sm);
+  transition: color 150ms var(--ease-out);
+}
+.st-ps-toc a:hover {
+  color: var(--fg-brand-text);
+}

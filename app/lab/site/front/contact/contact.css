@@ -1,0 +1,236 @@
+.st-ct-stage {
+  display: grid;
+  min-height: 430px;
+  place-items: center;
+  overflow-x: clip;
+  padding-block: 6px;
+}
+.st-ct-postal {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+
+  width: 100%;
+  max-width: 980px;
+  padding: 44px 28px 28px;
+  border: 9px solid transparent;
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+    repeating-linear-gradient(
+        -45deg,
+        var(--fg-brand) 0 12px,
+        var(--bg-card) 12px 22px,
+        color-mix(in srgb, var(--fg-brand) 38%, var(--bg-card)) 22px 34px,
+        var(--bg-card) 34px 44px
+      )
+      border-box;
+  box-shadow: 0 16px 34px rgb(0 0 0 / 0.2);
+  rotate: -0.8deg;
+  transition: rotate 320ms var(--ease-out);
+}
+.st-ct-postal:focus-within {
+  rotate: 0deg;
+}
+
+.st-ct-title {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  margin: 0;
+  color: var(--fg-muted);
+  letter-spacing: 0.4at;
+  text-transform: uppercase;
+  translate: -50% 0;
+}
+
+.st-ct-front {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.st-ct-message {
+  flex: 1;
+  width: 100%;
+  min-height: 224px;
+  padding: 0 2px;
+  border: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 31px,
+    var(--border-strong) 31px 32px
+  );
+  color: var(--fg-primary);
+  font-size: 19px;
+  line-height: 32px;
+  outline: none;
+  resize: none;
+}
+.st-ct-message::placeholder {
+  color: var(--fg-muted);
+  font-style: italic;
+}
+.st-ct-message:focus-visible {
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 31px,
+    var(--border-brand-strong) 31px 32px
+  );
+}
+
+.st-ct-back {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.st-ct-corner {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  min-height: 96px;
+}
+
+.st-ct-stamp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 6px 4px;
+  background: #ffffff;
+  color: #16161a;
+  outline: 4px dotted #ffffff;
+  outline-offset: -2px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
+  rotate: 3deg;
+}
+.st-ct-stamp > span {
+  display: grid;
+  width: 62px;
+  height: 62px;
+  place-items: end center;
+  background: color-mix(in srgb, var(--fg-brand) 22%, #ffffff);
+}
+.st-ct-stamp > small {
+  font-size: 9px;
+  letter-spacing: 0.2at;
+  text-transform: uppercase;
+}
+
+.st-ct-postmark {
+  position: absolute;
+  top: 10px;
+
+  right: 66px;
+  z-index: 1;
+  width: 168px;
+  fill: none;
+  stroke: var(--fg-secondary);
+  stroke-width: 1.4;
+}
+.st-ct-postmark text {
+  fill: var(--fg-secondary);
+  stroke: none;
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: 0.08at;
+}
+.st-ct-address {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+}
+
+.st-ct-sender {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.st-ct-sender > input {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--border-strong);
+  background: none;
+  color: var(--fg-primary);
+  outline: none;
+  transition: border-color 150ms var(--ease-out);
+}
+.st-ct-sender > input::placeholder {
+  color: var(--fg-muted);
+}
+.st-ct-sender > input:focus-visible {
+  border-bottom-color: var(--fg-brand);
+}
+
+@container (min-width: 760px) {
+  .st-ct-postal {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 0;
+    padding: 48px 34px 30px;
+  }
+  .st-ct-front {
+    padding-right: 30px;
+  }
+  .st-ct-back {
+    padding-left: 30px;
+    border-left: 1px dashed var(--border-strong);
+    justify-content: space-between;
+  }
+}
+
+.st-ct-returned {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  margin: -32px 0 0 -170px;
+  width: 340px;
+  padding: 12px 0;
+  border: 4px double var(--status-error);
+  border-radius: 8px;
+  color: var(--status-error);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.14at;
+  text-align: center;
+  text-transform: uppercase;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+:root:not([data-mode="light"]) .st-ct-returned {
+  mix-blend-mode: normal;
+  opacity: 0.9;
+}
+
+.st-ct-receipt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 420px;
+  text-align: center;
+}
+.st-ct-seen {
+  width: 96px;
+  fill: none;
+  stroke: var(--status-success);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  rotate: -8deg;
+}
+.st-ct-seen > circle:nth-child(2) {
+  stroke-width: 1.2;
+  stroke-dasharray: 3 4;
+}
+.st-ct-seen > path {
+  stroke-width: 6;
+}

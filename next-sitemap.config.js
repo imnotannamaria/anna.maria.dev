@@ -14,11 +14,12 @@ module.exports = {
   siteUrl: resolveSiteUrl(),
   generateRobotsTxt: true,
   robotsTxtOptions: {
-    policies: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/admin/*"] }],
+    policies: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/admin/*", "/lab", "/lab/*"] }],
   },
   // /admin is already a 404 for anyone not on the allowlist, and its layout sends
   // noindex. This is the third layer, so it never reaches an index by accident.
-  exclude: ["/api/*", "/admin", "/admin/*"],
+  // /lab is the local-only discovery area: it 404s outside development, and stays out of here too.
+  exclude: ["/api/*", "/admin", "/admin/*", "/lab", "/lab/*"],
 
   /**
    * next-sitemap only walks what the build emitted as static or SSG, so every
