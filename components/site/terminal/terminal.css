@@ -16,3 +16,9 @@
     padding-right: 140px;
   }
 }
+/* A phone, typing: the switcher steps aside (abimaela.css), so the row gives its room back. */
+@media (max-width: 767px) and (pointer: coarse) {
+  .st-term:has(input:focus) .st-term-shortcuts {
+    padding-bottom: 12px;
+  }
+}

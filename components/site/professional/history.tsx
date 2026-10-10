@@ -1,10 +1,11 @@
 "use client"
 
+import { Hint } from "@/components/site/hint"
 import { tileClass } from "@/components/site/tile"
-import { ClockCounterClockwiseIcon } from "@phosphor-icons/react"
+import { ClockCounterClockwiseIcon, CursorClickIcon } from "@phosphor-icons/react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { useRef, useState, type CSSProperties, type PointerEvent } from "react"
-import { CardComment, CardFooter, CardHeader, CardLabel } from "@/app/components/entrepta/card"
+import { CardFooter, CardHeader, CardLabel } from "@/app/components/entrepta/card"
 import { SegmentedControl } from "@/app/components/entrepta/segmented-control"
 import { TechBadge } from "@/components/about/tech-badge"
 import { EASE_OUT, revealViewport } from "@/lib/motion"
@@ -229,7 +230,9 @@ export function History({
       </div>
 
       <CardFooter>
-        <CardComment>solid is work, hatched is academic. click a bar to read it</CardComment>
+        <Hint icon={<CursorClickIcon aria-hidden size={13} />}>
+          <span>solid is work, hatched is academic. click a bar to read it</span>
+        </Hint>
         <span className="text-[var(--fg-brand-text)]">{careerYears} years in</span>
       </CardFooter>
     </section>

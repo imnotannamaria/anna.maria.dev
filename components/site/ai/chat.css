@@ -16,9 +16,16 @@
     padding-left: max(16px, min(150px, calc(100% - 910px)));
   }
 }
+/* A phone: the column runs edge to edge. The foot keeps room for the switcher only; while a
+   touch keyboard is up the switcher steps aside (abimaela.css) and the room closes. */
 @media (max-width: 767px) {
   .st-ia {
-    padding-bottom: 210px;
+    padding: 16px 16px 76px;
+  }
+}
+@media (max-width: 767px) and (pointer: coarse) {
+  .st-ia:has(:is(textarea, input):focus) {
+    padding-bottom: 16px;
   }
 }
 .st-ia-answer {

@@ -5,9 +5,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState, type ReactNode } from "react"
+import { MobileNav } from "@/app/components/entrepta/mobile-nav"
 import { SegmentedControl } from "@/app/components/entrepta/segmented-control"
 import { Sidebar, type SidebarGroup } from "@/app/components/entrepta/sidebar"
-import { useMediaQuery } from "@/hooks/use-media-query"
 import { useMode } from "@/hooks/use-mode"
 import { NAV_ROW_IDLE } from "@/lib/nav"
 import { cn } from "@/lib/utils"
@@ -44,6 +44,14 @@ const NAV: SidebarGroup[] = [PAGES.slice(0, 1), PAGES.slice(1)].map((group) => (
     href: hrefOf(page.id),
     icon: ICON[page.id],
   })),
+}))
+
+/** The same pages for the phone's bottom bar: the first four in reach, the rest under More. */
+const BAR = PAGES.map((page) => ({
+  id: page.id,
+  label: page.short,
+  href: hrefOf(page.id),
+  icon: ICON[page.id],
 }))
 
 const partOf = (pathname: string): Part =>
@@ -129,8 +137,6 @@ export function SiteFrame({
 
   // with the footer on screen the corner cat steps out: she is in the game down there
   const [atFooter, setAtFooter] = useState(false)
-  // below 768px entrepta asks for another navigation (MobileNav); until it is in, the rail
-  const iconsOnly = useMediaQuery("(max-width: 767px)")
 
   const swap = (to: Part) => {
     if (to === part) return
@@ -168,8 +174,8 @@ export function SiteFrame({
   return (
     <div className="st">
       <Sidebar
-        variant={iconsOnly ? "rail" : "labeled"}
-        collapsible={!iconsOnly}
+        variant="labeled"
+        collapsible
         storageKey="site:sidebar"
         onCollapsedChange={(closed) => {
           if (closed) pet.notify("sidebar")
@@ -212,6 +218,18 @@ export function SiteFrame({
 
         <Abimaela />
       </div>
+
+      {/* Below 768px the sidebar is gone (CSS) and this takes over, in reach of the thumb. Both
+          are always rendered and CSS picks one, so the first paint is already right. */}
+      <MobileNav
+        position="static"
+        className="st-bar"
+        items={BAR}
+        active={part === "front" ? (listed ?? undefined) : undefined}
+        label="Site"
+        linkComponent={Link}
+        more={<ModeButton compact={false} />}
+      />
     </div>
   )
 }

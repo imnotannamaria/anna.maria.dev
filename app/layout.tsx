@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeScript } from "@/app/components/entrepta/theme-switcher"
 import { Toaster } from "@/app/components/entrepta/toast"
@@ -36,6 +36,13 @@ export const metadata: Metadata = {
     images: ["/images/og-cover.png"],
   },
 }
+
+/**
+ * With a keyboard open, the layout shrinks instead of the keyboard covering it: the terminal's
+ * prompt and the chat's field sit at the bottom of the screen. Chrome and Firefox on Android
+ * honour this; Safari on iOS does not, and scrolls the focused field into view instead.
+ */
+export const viewport: Viewport = { interactiveWidget: "resizes-content" }
 
 export default function RootLayout({
   children,

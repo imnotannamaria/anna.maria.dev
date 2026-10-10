@@ -1,44 +1,54 @@
-/** The pages of the Front, in sidebar order. Text only, so server files can read it. */
+/**
+ * The pages of the Front, in sidebar order. Text only, so server files can read it. `short` is
+ * the label under a thumb, in the phone's bottom bar, where the full one does not fit.
+ */
 export const PAGES = [
   {
     id: "home",
     label: "Home",
+    short: "Home",
     title: "Home",
     tagline: "Where it all starts.",
   },
   {
     id: "person",
     label: "Anna, the person",
+    short: "Person",
     title: "Anna, the person",
     tagline: "Who I am when the editor is closed.",
   },
   {
     id: "professional",
     label: "Anna, the professional",
+    short: "Work",
     title: "Anna, the professional",
     tagline: "Where I have worked, and what I work with.",
   },
   {
     id: "notes",
     label: "Notes",
+    short: "Notes",
     title: "Notes",
     tagline: "What I write down.",
   },
   {
     id: "projects",
     label: "Projects",
+    short: "Projects",
     title: "Projects",
     tagline: "What I have built.",
   },
   {
     id: "wall-of-love",
     label: "Wall of love",
+    short: "Wall of love",
     title: "Wall of love",
     tagline: "Kind words, by invitation.",
   },
   {
     id: "contact",
     label: "Contact",
+    short: "Contact",
     title: "Contact",
     tagline: "How to reach me.",
   },

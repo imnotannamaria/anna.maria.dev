@@ -21,6 +21,10 @@
     position: sticky;
     top: 24px;
   }
+  /* side by side, the window is in view: no need to say where it is */
+  .st-pj-explorer .st-pj-below {
+    display: none;
+  }
 }
 .st-pj-group {
   display: flex;

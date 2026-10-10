@@ -6,9 +6,10 @@
 .st {
   position: fixed;
   inset: 0;
-  z-index: 60;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  /* a phone: the page, and the bar under it */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
   background: var(--bg-canvas);
   color: var(--fg-primary);
 }
@@ -16,7 +17,21 @@ body:has(.st) [data-theme-switcher] {
   display: none;
 }
 .st > aside {
+  display: none;
   transition: width 240ms var(--ease-out);
+}
+/* from 768px: the sidebar beside the page, and no bar */
+@media (min-width: 768px) {
+  .st {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .st > aside {
+    display: flex;
+  }
+  .st > .st-bar {
+    display: none;
+  }
 }
 .st-main {
   position: relative;
@@ -32,6 +47,7 @@ body:has(.st) [data-theme-switcher] {
   z-index: 6;
   width: min(100% - 32px, 340px);
   translate: -50% 0;
+  transition: opacity 200ms var(--ease-out);
 }
 .st-switcher [role="radiogroup"] {
   width: 100%;
@@ -65,12 +81,6 @@ body:has(.st) [data-theme-switcher] {
 [data-page="professional"] {
   --st-width: 1320px;
 }
-body:has(.st) > .fixed.z-50 {
-  z-index: 70;
-}
-body:has(.st) > [data-radix-popper-content-wrapper] {
-  z-index: 70 !important;
-}
 .st-screen {
   container-type: inline-size;
   display: flex;
@@ -91,6 +101,7 @@ body:has(.st) > [data-radix-popper-content-wrapper] {
   display: none;
 }
 .st [data-sidebar-mark],
+.st [data-mobile-nav-mark],
 .st-ia li[data-message] > div > span > span[aria-hidden="true"],
 .st-screen [role="separator"] > span[aria-hidden="true"] {
   display: none;
@@ -106,4 +117,14 @@ body:has(.st) > [data-radix-popper-content-wrapper] {
 }
 .st-page:has([data-screen-state]) > div {
   height: 100%;
+}
+
+/* A phone: the switcher keeps to the left and leaves the corner to the cat. When she is away
+   (she is down in the footer game) it takes the middle back. */
+@media (max-width: 767px) {
+  .st-main:not([data-at-footer]) .st-switcher {
+    left: 16px;
+    width: calc(100% - 100px);
+    translate: none;
+  }
 }

@@ -1,6 +1,12 @@
 "use client"
 
-import { FlaskIcon, PackageIcon, PushPinIcon, type Icon } from "@phosphor-icons/react"
+import {
+  ArrowDownIcon,
+  FlaskIcon,
+  PackageIcon,
+  PushPinIcon,
+  type Icon,
+} from "@phosphor-icons/react"
 import { useState } from "react"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { Badge } from "@/app/components/entrepta/badge"
@@ -32,19 +38,27 @@ export function Explorer({ projects }: { projects: Project[] }) {
   return (
     <div className="st-pj-explorer">
       <div className="flex min-w-0 flex-col gap-4">
-        <Hint
-          icon={<PushPinIcon aria-hidden size={13} weight={pinnedProject ? "fill" : "regular"} />}
-          role="status"
-        >
-          {pinnedProject ? (
-            <span>
-              pinned: <strong className="font-medium">{pinnedProject.title}</strong>. click it again
-              to let go
-            </span>
-          ) : (
-            <span>hover to peek, click a folder to pin it</span>
-          )}
-        </Hint>
+        <div className="flex flex-wrap gap-2">
+          <Hint
+            icon={<PushPinIcon aria-hidden size={13} weight={pinnedProject ? "fill" : "regular"} />}
+            role="status"
+          >
+            {pinnedProject ? (
+              <span>
+                pinned: <strong className="font-medium">{pinnedProject.title}</strong>. click it
+                again to let go
+              </span>
+            ) : (
+              <span>hover to peek, click a folder to pin it</span>
+            )}
+          </Hint>
+          {/* Only when the folders and the window stack in one column (a phone, a narrow
+              window): there the window is below the fold, and pinning looks like nothing
+              happened. CSS shows it, from the same container query that stacks them. */}
+          <Hint className="st-pj-below" icon={<ArrowDownIcon aria-hidden size={13} />}>
+            <span>the preview of what you pin is further down</span>
+          </Hint>
+        </div>
         {GROUPS.map((group) => {
           const inGroup = projects.filter((project) => project.type === group.type)
           if (inGroup.length === 0) return null

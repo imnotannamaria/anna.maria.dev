@@ -1,6 +1,7 @@
-import { GithubLogoIcon } from "@phosphor-icons/react/dist/ssr"
+import { CalendarDotsIcon, GithubLogoIcon } from "@phosphor-icons/react/dist/ssr"
+import { Hint } from "@/components/site/hint"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
-import { CardComment, CardFooter } from "@/app/components/entrepta/card"
+import { CardFooter } from "@/app/components/entrepta/card"
 import { GithubCalendar } from "@/components/about/github-calendar"
 import { getContributions, type ContributionYear } from "@/lib/github/contributions"
 import type { CardState } from "@/lib/showcase/state"
@@ -14,7 +15,9 @@ function Frame({ state }: { state: CardState<ContributionYear> }) {
     <Tile label="contributions" icon={<GithubLogoIcon />} note={user} size="md">
       <GithubCalendar state={state} />
       <CardFooter className="border-t border-dashed border-[var(--border-subtle)] pt-3">
-        <CardComment>public activity · last 12 months</CardComment>
+        <Hint icon={<CalendarDotsIcon aria-hidden size={13} />}>
+          <span>public activity · last 12 months</span>
+        </Hint>
         <ArrowLink
           href={`https://github.com/${user}`}
           external

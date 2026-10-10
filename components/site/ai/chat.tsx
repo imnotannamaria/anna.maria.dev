@@ -1,7 +1,8 @@
 "use client"
 
+import { Hint } from "@/components/site/hint"
 import { useSiteData } from "@/components/site/frame/use-site-data"
-import { ArrowRightIcon, ChatCircleDotsIcon, type Icon } from "@phosphor-icons/react"
+import { ArrowRightIcon, ChatCircleDotsIcon, type Icon, RobotIcon } from "@phosphor-icons/react"
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/app/components/entrepta/button"
 import { ChatThread, type ChatMessage } from "@/app/components/entrepta/chat-thread"
@@ -108,12 +109,9 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
             <h1 className="text-display-md font-serif text-[var(--fg-primary)]">
               Ask me about <em className="text-[var(--fg-brand)]">Anna.</em>
             </h1>
-            <p className="text-mono-sm font-mono text-[var(--fg-muted)]">
-              <span aria-hidden className="opacity-60">
-                {"// "}
-              </span>
-              scripted answers from the site&rsquo;s own content, no model yet
-            </p>
+            <Hint className="self-center" icon={<RobotIcon aria-hidden size={13} />}>
+              <span>scripted answers from the site&rsquo;s own content, no model yet</span>
+            </Hint>
           </div>
         }
       />

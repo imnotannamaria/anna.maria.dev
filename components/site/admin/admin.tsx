@@ -1,7 +1,8 @@
 import { LockKeyIcon, PencilSimpleIcon, PlusIcon, TrashIcon } from "@phosphor-icons/react/dist/ssr"
+import { Hint } from "@/components/site/hint"
 import { Badge } from "@/app/components/entrepta/badge"
 import { Button } from "@/app/components/entrepta/button"
-import { CardComment, CardFooter } from "@/app/components/entrepta/card"
+import { CardFooter } from "@/app/components/entrepta/card"
 import {
   Table,
   TableBody,
@@ -102,11 +103,13 @@ export function Admin({ entries }: { entries: LogEntry[] | null }) {
           </Table>
         </div>
         <CardFooter>
-          <CardComment>
-            {entries === null
-              ? "the database did not answer"
-              : `showing ${lines.length} of ${entries.length}. nothing here is wired`}
-          </CardComment>
+          <Hint icon={<LockKeyIcon aria-hidden size={13} />}>
+            <span>
+              {entries === null
+                ? "the database did not answer"
+                : `showing ${lines.length} of ${entries.length}. nothing here is wired`}
+            </span>
+          </Hint>
         </CardFooter>
       </Tile>
     </article>

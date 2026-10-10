@@ -1,17 +1,12 @@
 "use client"
 
+import { Hint } from "@/components/site/hint"
 import { Pushpin } from "@/components/site/tape"
 import { tileClass } from "@/components/site/tile"
 import { EnvelopeSimpleOpenIcon, LinkedinLogoIcon } from "@phosphor-icons/react"
 import type { CSSProperties } from "react"
 import { Avatar } from "@/app/components/entrepta/avatar"
-import {
-  CardComment,
-  CardFooter,
-  CardHeader,
-  CardLabel,
-  CardMeta,
-} from "@/app/components/entrepta/card"
+import { CardFooter, CardHeader, CardLabel, CardMeta } from "@/app/components/entrepta/card"
 import {
   Dialog,
   DialogContent,
@@ -109,7 +104,9 @@ export function Mural({ letters }: { letters: Letter[] }) {
                               ))}
                             </blockquote>
                             <CardFooter className="border-t border-dashed border-[var(--border-subtle)] pt-3">
-                              <CardComment>kind words, by invitation</CardComment>
+                              <Hint icon={<EnvelopeSimpleOpenIcon aria-hidden size={13} />}>
+                                <span>kind words, by invitation</span>
+                              </Hint>
                               <Linkedin letter={letter} />
                             </CardFooter>
                           </DialogContent>
