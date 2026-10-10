@@ -1,18 +1,69 @@
 "use client"
 
-import { useEffect } from "react"
+import { ArrowCounterClockwiseIcon, HouseLineIcon } from "@phosphor-icons/react"
+import { useEffect, type ReactNode } from "react"
 import { Button } from "@/app/components/entrepta/button"
+import { CatAngry, CatSleeping, CatWalking } from "@/components/site/abimaela/abimaela"
+import { ScreenLink } from "@/components/site/screen-link"
+import "./screen-state.css"
 
-/** What a page that reads the database shows while it waits. */
-export function ScreenLoading() {
+/**
+ * The screens nobody plans to see: loading, not found, an error, and a page that was removed.
+ * Each one is Abimaela doing something about it, in the middle of the page area.
+ * `data-screen-state` is how the frame knows to give it the whole area and leave the footer
+ * out: a page that is not there yet has no "where to next".
+ */
+function State({ role, children }: { role?: "status" | "alert"; children: ReactNode }) {
   return (
-    <div className="st-room st-screen" role="status">
-      <p className="text-mono-sm font-mono text-[var(--fg-muted)]">loading…</p>
+    <div className="st-state" data-screen-state role={role}>
+      {children}
     </div>
   )
 }
 
-/** What it shows when it fails: an empty page would read as "nothing here", which is a lie. */
+const home = (
+  <ScreenLink to="home" className="st-state-link focus-ring text-mono-sm font-mono">
+    <HouseLineIcon aria-hidden size={14} weight="bold" />
+    take me home
+  </ScreenLink>
+)
+
+/** She walks a dashed line back and forth while a page that reads the database waits. */
+export function ScreenLoading() {
+  return (
+    <State role="status">
+      <div className="st-state-track">
+        <span className="st-state-walker">
+          <CatWalking height={84} />
+        </span>
+      </div>
+      <p className="text-mono-sm font-mono text-[var(--fg-muted)]">she is fetching it</p>
+    </State>
+  )
+}
+
+/** An address with nothing at it. */
+export function ScreenNotFound() {
+  return (
+    <State>
+      <div className="flex items-end gap-5">
+        <CatAngry height={110} />
+        <span aria-hidden className="st-state-slot text-display-md font-serif">
+          404
+        </span>
+      </div>
+      <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">
+        She pushed this page off the table.
+      </h1>
+      <p className="text-body-md max-w-[44ch] text-center font-sans text-[var(--fg-secondary)]">
+        Nothing lives at this address. It may have moved, or it never existed.
+      </p>
+      {home}
+    </State>
+  )
+}
+
+/** A page that broke. An empty page would read as "nothing here", which is a lie. */
 export function ScreenError({
   error,
   reset,
@@ -25,16 +76,32 @@ export function ScreenError({
   }, [error])
 
   return (
-    <div className="st-room st-screen" role="alert">
-      <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">
-        This page did not load.
-      </h1>
-      <p className="text-body-md font-sans text-[var(--fg-secondary)]">
-        It is on my side, not yours. Try again in a moment.
+    <State role="alert">
+      <CatAngry height={120} />
+      <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">Something broke.</h1>
+      <p className="text-body-md max-w-[44ch] text-center font-sans text-[var(--fg-secondary)]">
+        It was not you. It might have been her.
       </p>
-      <Button className="self-start" onClick={reset}>
+      <Button onClick={reset}>
+        <ArrowCounterClockwiseIcon aria-hidden size={14} weight="bold" />
         try again
       </Button>
-    </div>
+    </State>
+  )
+}
+
+/** A page that existed before v3 and does not any more. */
+export function ScreenRemoved({ name }: { name: string }) {
+  return (
+    <State>
+      <CatSleeping height={110} />
+      <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">
+        {name} was retired in v3.
+      </h1>
+      <p className="text-body-md max-w-[44ch] text-center font-sans text-[var(--fg-secondary)]">
+        She sleeps where it used to be. Everything that stayed is one click away.
+      </p>
+      {home}
+    </State>
   )
 }

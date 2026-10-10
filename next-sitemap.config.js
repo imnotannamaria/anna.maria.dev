@@ -18,7 +18,8 @@ module.exports = {
   },
   // /admin is already a 404 for anyone not on the allowlist, and its layout sends
   // noindex. This is the third layer, so it never reaches an index by accident.
-  exclude: ["/api/*", "/admin", "/admin/*"],
+  // /piano, /components and /roadmap answer only to say they were removed in v3.
+  exclude: ["/api/*", "/admin", "/admin/*", "/piano", "/roadmap", "/components", "/components/*"],
 
   /**
    * next-sitemap only walks what the build emitted as static or SSG, so every
@@ -29,5 +30,5 @@ module.exports = {
    * Anything that becomes force-dynamic from here needs a line added below.
    */
   additionalPaths: async (config) =>
-    Promise.all(["/person", "/log", "/roadmap"].map((loc) => config.transform(config, loc))),
+    Promise.all(["/person", "/log"].map((loc) => config.transform(config, loc))),
 }

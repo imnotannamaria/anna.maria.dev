@@ -87,6 +87,34 @@ export function CatStopping({ height = 78 }: { height?: number }) {
   )
 }
 
+/** She is angry: the sheet plays once and holds the last frame. */
+export function CatAngry({ height = 96 }: { height?: number }) {
+  return (
+    <span aria-hidden className="relative block" style={{ width: (height * 287) / 378, height }}>
+      <span
+        className="st-abi-angry"
+        style={{ "--st-abi-sheet": `url(${angry.src})` } as CSSProperties}
+      />
+    </span>
+  )
+}
+
+/** She falls asleep, and then breathes. */
+export function CatSleeping({ height = 96 }: { height?: number }) {
+  return (
+    <span
+      aria-hidden
+      className="relative block"
+      style={{ "--st-abi-h": `${height}px`, width: (height * 380) / 378, height } as CSSProperties}
+    >
+      <span
+        className="st-abi-sleep"
+        style={{ "--st-abi-sheet": `url(${sleepingSheet.src})` } as CSSProperties}
+      />
+    </span>
+  )
+}
+
 export function Abimaela() {
   const [speech, setSpeech] = useState<string | null>(null)
   const [looking, setLooking] = useState<"left" | "right">("left")

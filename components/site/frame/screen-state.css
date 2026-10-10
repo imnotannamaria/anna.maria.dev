@@ -1,0 +1,76 @@
+/* The state screens: alone in the middle of the page area. They bring every rule they need,
+   because two of them also render outside the frame. */
+.st-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  /* the whole page area, less the switcher that floats at its foot */
+  min-height: 100%;
+  padding: 24px 16px 96px;
+  text-align: center;
+}
+/* outside the frame (the root fallbacks) there is no page area to fill */
+body > .st-state {
+  min-height: 100dvh;
+}
+.st-state-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg-brand-text);
+  text-decoration: underline dotted var(--border-brand-strong);
+  text-underline-offset: 0.3em;
+}
+.st-state-link:hover {
+  color: var(--fg-primary);
+}
+
+/* loading: she walks along a dashed line, turns, and comes back */
+.st-state-track {
+  position: relative;
+  width: min(100%, 420px);
+  height: 96px;
+  border-bottom: 2px dashed var(--border-strong);
+}
+.st-state-walker {
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  animation: st-state-walk 5.2s linear infinite;
+}
+@keyframes st-state-walk {
+  0% {
+    left: 0;
+    scale: 1 1;
+  }
+  48% {
+    left: calc(100% - 94px);
+    scale: 1 1;
+  }
+  50% {
+    left: calc(100% - 94px);
+    scale: -1 1;
+  }
+  98% {
+    left: 0;
+    scale: -1 1;
+  }
+  100% {
+    left: 0;
+    scale: 1 1;
+  }
+}
+
+/* not found: the empty place where the page was */
+.st-state-slot {
+  display: grid;
+  width: 150px;
+  height: 110px;
+  place-items: center;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  color: var(--fg-muted);
+  rotate: 4deg;
+}

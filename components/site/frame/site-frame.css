@@ -98,3 +98,12 @@ body:has(.st) > [data-radix-popper-content-wrapper] {
 .st-screen [role="separator"] {
   gap: 0;
 }
+
+/* A page that is loading, missing or broken has no "where to next": the footer waits, and the
+   state screen gets the whole page area to sit in the middle of. */
+.st-page:has([data-screen-state]) .st-footer {
+  display: none;
+}
+.st-page:has([data-screen-state]) > div {
+  height: 100%;
+}

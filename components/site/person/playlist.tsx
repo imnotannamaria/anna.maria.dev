@@ -53,23 +53,32 @@ export function Playlist() {
   if (status !== "playing" || !track) {
     return (
       <Tile label={LABEL} icon={<VinylRecordIcon />}>
+        {/* The same three rows as the playing state (record, two lines, controls), so the card
+            does not change height when the songs arrive. */}
         <div className="flex flex-1 flex-col items-center justify-center gap-2.5 text-center">
           <span aria-hidden className="st-player opacity-50">
             <span className="st-player-vinyl" />
             <span className="st-player-cover" />
           </span>
-          <p className="text-mono-sm font-mono text-[var(--fg-muted)]" role="status">
-            {status === "error"
-              ? "spotify did not answer."
-              : status === "empty"
-                ? "nothing on the turntable."
-                : "putting a record on…"}
-          </p>
-          {status === "error" ? (
-            <Button variant="secondary" size="sm" onClick={() => load()}>
-              try again
-            </Button>
-          ) : null}
+          <div className="w-full min-w-0">
+            <p aria-hidden className="text-heading-md font-serif">
+              &nbsp;
+            </p>
+            <p className="text-mono-sm truncate font-mono text-[var(--fg-muted)]" role="status">
+              {status === "error"
+                ? "spotify did not answer."
+                : status === "empty"
+                  ? "nothing on the turntable."
+                  : "putting a record on…"}
+            </p>
+          </div>
+          <div className="flex h-10 items-center">
+            {status === "error" ? (
+              <Button variant="secondary" size="sm" onClick={() => load()}>
+                try again
+              </Button>
+            ) : null}
+          </div>
         </div>
       </Tile>
     )

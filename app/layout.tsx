@@ -1,39 +1,14 @@
 import type { Metadata } from "next"
-import { Newsreader, Inter, JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeScript } from "@/app/components/entrepta/theme-switcher"
 import { Toaster } from "@/app/components/entrepta/toast"
 import { TooltipProvider } from "@/app/components/entrepta/tooltip"
 import { ButtonSoundFeedback } from "@/components/ui/sound-feedback"
 import { calcYearsOfExp } from "@/lib/experience"
+import { fontVariables } from "./fonts"
 import "./globals.css"
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://annamaria.app"
-
-// Self-hosted via next/font — no render-blocking @import, no Google Fonts request.
-const serif = Newsreader({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--font-serif",
-  fallback: ["Times New Roman", "serif"],
-})
-
-const sans = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-sans",
-  fallback: ["-apple-system", "system-ui", "sans-serif"],
-})
-
-// Upright only. Every italic on the site is the serif, and the mono italic was a preloaded
-// font file on every page that nothing rendered.
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-mono",
-  fallback: ["SF Mono", "Menlo", "monospace"],
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -68,11 +43,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${serif.variable} ${sans.variable} ${mono.variable}`}
-    >
+    <html lang="en" suppressHydrationWarning className={fontVariables}>
       <head>
         <ThemeScript />
       </head>
