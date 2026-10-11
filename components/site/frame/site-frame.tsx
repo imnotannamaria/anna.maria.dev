@@ -1,39 +1,30 @@
 "use client"
 
-import { MoonIcon, SunIcon } from "@phosphor-icons/react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { MobileNav } from "@/app/components/entrepta/mobile-nav"
-import { SegmentedControl } from "@/app/components/entrepta/segmented-control"
 import { Sidebar, type SidebarGroup } from "@/app/components/entrepta/sidebar"
-import { useMode } from "@/hooks/use-mode"
-import { NAV_ROW_IDLE } from "@/lib/nav"
-import { cn } from "@/lib/utils"
 import { Abimaela, pet } from "@/components/site/abimaela/abimaela"
+import { ClickBurst } from "@/components/site/click-burst"
 import { Footer } from "@/components/site/footer/footer"
 import { ICON } from "@/components/site/icons"
 import { useNavigate } from "@/components/site/navigation"
 import { PAGES, hrefOf, listedPageOf, screenOf } from "@/components/site/pages"
+import { Island, PARTS, type Part } from "./island"
 import "./site-frame.css"
 import "@/components/site/enter.css"
 
 /**
- * The frame of the site, as the layout of its routes: the sidebar, the Front / Back / IA
- * switcher, the cat, and the page in between.
+ * The frame of the site, as the layout of its routes: the sidebar, the header (an island with
+ * the Front / Back / IA switcher and the actions), the cat, and the page in between.
  *
  * The side comes from the address: `/back` is the terminal, `/ai` is the chat, anything else is
  * a page of the Front. The terminal and the chat are handed in once and stay mounted, hidden
  * while another side shows, so a session and a conversation survive a trip to the other side.
  */
-export type Part = "front" | "back" | "ia"
-
-const PARTS: { value: Part; label: string }[] = [
-  { value: "front", label: "Front" },
-  { value: "back", label: "Back" },
-  { value: "ia", label: "IA" },
-]
+export type { Part }
 
 const PART_HREF: Record<Exclude<Part, "front">, string> = { back: "/back", ia: "/ai" }
 
@@ -79,32 +70,6 @@ function BrandMark({ compact }: { compact: boolean }) {
   )
 }
 
-function ModeButton({ compact }: { compact: boolean }) {
-  const { mode, toggleMode } = useMode()
-  const label = mode === "dark" ? "Light mode" : "Dark mode"
-  return (
-    <button
-      type="button"
-      aria-label={compact ? label : undefined}
-      onClick={toggleMode}
-      className={cn(
-        "focus-ring flex cursor-pointer items-center transition-colors",
-        compact
-          ? "size-9 justify-center rounded-[var(--radius-md)]"
-          : "text-mono-sm h-8 w-full gap-2.5 rounded-[var(--radius-sm)] px-2.5 font-mono",
-        NAV_ROW_IDLE,
-      )}
-    >
-      {mode === "dark" ? (
-        <SunIcon aria-hidden size={compact ? 18 : 16} className="shrink-0" />
-      ) : (
-        <MoonIcon aria-hidden size={compact ? 18 : 16} className="shrink-0" />
-      )}
-      {compact ? null : <span className="truncate">{label}</span>}
-    </button>
-  )
-}
-
 export function SiteFrame({
   back,
   ia,
@@ -124,7 +89,7 @@ export function SiteFrame({
   const listed = screen ? listedPageOf(screen) : null
   // Two places where the side switcher and the corner cat only get in the way: an invite, which
   // is one person writing one letter (and she is already on the page, walking the steps), and
-  // the admin, which is a tool and not part of the visit.
+  // the admin, which is a tool and not part of the visit. The header keeps its actions there.
   const focused =
     pathname.startsWith("/invite/") || pathname === "/admin" || pathname.startsWith("/admin/")
 
@@ -178,6 +143,7 @@ export function SiteFrame({
 
   return (
     <div className="st">
+      <ClickBurst />
       <Sidebar
         variant="labeled"
         collapsible
@@ -190,7 +156,6 @@ export function SiteFrame({
         label="Site"
         linkComponent={Link}
         logo={({ collapsed }) => <BrandMark compact={collapsed} />}
-        footer={({ collapsed }) => <ModeButton compact={collapsed} />}
       />
 
       {/* the skip link lands here: always visible, whichever side is showing */}
@@ -213,14 +178,7 @@ export function SiteFrame({
           </div>
         ))}
 
-        <nav className="st-switcher" aria-label="Side of the site">
-          <SegmentedControl
-            aria-label="Side of the site"
-            options={PARTS}
-            value={part}
-            onValueChange={(value) => swap(value as Part)}
-          />
-        </nav>
+        <Island part={part} onSwap={swap} sides={!focused} />
 
         <Abimaela />
       </div>
@@ -234,7 +192,6 @@ export function SiteFrame({
         active={part === "front" ? (listed ?? undefined) : undefined}
         label="Site"
         linkComponent={Link}
-        more={<ModeButton compact={false} />}
       />
     </div>
   )

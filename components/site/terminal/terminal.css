@@ -8,17 +8,57 @@
   box-shadow: none;
   color: var(--fg-primary);
 }
+/* the top is the island's */
+.st-term {
+  padding-top: 56px;
+}
+/* Warp's way round: what ran stacks up from the foot, and the input stays under it. The first
+   line takes the free room above it, so a short session sits just over the input instead of
+   hanging from the top. `margin-top: auto` rather than `justify-content: end`, which would
+   make the overflow unreachable by scroll. */
+.st-term-output > :first-child {
+  margin-top: auto;
+}
+/* each command opens a block */
+.st-term-block {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-subtle);
+}
+.st-term-output > .st-term-block:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.st-term-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 16px 16px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  transition: border-color 150ms var(--ease-out);
+}
+.st-term-input:focus-within {
+  border-color: var(--t-folder);
+}
+/* the corner is the cat's */
+.st-term-shortcuts,
+.st-term-input {
+  margin-right: 84px;
+}
 .st-term-shortcuts {
-  padding-bottom: 76px;
+  padding-right: 0;
 }
 @media (min-width: 768px) {
-  .st-term-shortcuts {
-    padding-right: 140px;
+  .st-term-shortcuts,
+  .st-term-input {
+    margin-right: 140px;
   }
 }
-/* A phone, typing: the switcher steps aside (abimaela.css), so the row gives its room back. */
+/* A phone, typing: she steps aside (abimaela.css), so the foot gives its room back. */
 @media (max-width: 767px) and (pointer: coarse) {
-  .st-term:has(input:focus) .st-term-shortcuts {
-    padding-bottom: 12px;
+  .st-term:has(input:focus) :is(.st-term-shortcuts, .st-term-input) {
+    margin-right: 16px;
   }
 }

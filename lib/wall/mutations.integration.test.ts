@@ -1,6 +1,13 @@
 import postgres from "postgres"
 import { describe, expect, it } from "vitest"
-import { createInvite, decide, deleteEntry, renewInvite, submitTestimonial } from "./mutations"
+import {
+  createInvite,
+  decide,
+  deleteEntry,
+  react,
+  renewInvite,
+  submitTestimonial,
+} from "./mutations"
 import { getApprovedTestimonials, getEntryById, getInviteByToken } from "./queries"
 import type { SubmissionInput } from "./validation"
 
@@ -95,5 +102,44 @@ describe("an invite, from link to wall", () => {
     const deleted = await deleteEntry(id)
     expect(deleted?.avatarUrl).toContain("/wall/avatars/")
     expect(await getEntryById(id)).toBeNull()
+  })
+})
+
+describe("reactions", () => {
+  const zero = { heart: 0, clap: 0, party: 0, up: 0 }
+
+  it("counts on a letter that is on the wall, and shows on the wall", async () => {
+    const { id, token } = await invite()
+    await submitTestimonial(token, written, null)
+    await decide(id, "approved")
+    expect((await getApprovedTestimonials())[0].reactions).toEqual(zero)
+
+    expect(await react(id, "heart", true)).toEqual({ ...zero, heart: 1 })
+    expect(await react(id, "up", true)).toEqual({ ...zero, heart: 1, up: 1 })
+    expect((await getApprovedTestimonials())[0].reactions).toEqual({ ...zero, heart: 1, up: 1 })
+  })
+
+  it("takes a reaction back, and never goes below zero", async () => {
+    const { id, token } = await invite()
+    await submitTestimonial(token, written, null)
+    await decide(id, "approved")
+    await react(id, "clap", true)
+    expect(await react(id, "clap", false)).toEqual(zero)
+    expect(await react(id, "clap", false)).toEqual(zero)
+  })
+
+  it("loses no click when several land at once", async () => {
+    const { id, token } = await invite()
+    await submitTestimonial(token, written, null)
+    await decide(id, "approved")
+    await Promise.all(Array.from({ length: 12 }, () => react(id, "party", true)))
+    expect((await getApprovedTestimonials())[0].reactions.party).toBe(12)
+  })
+
+  it("does not count on a letter that is not on the wall, or on no letter", async () => {
+    const { id, token } = await invite()
+    await submitTestimonial(token, written, null)
+    expect(await react(id, "heart", true)).toBeNull()
+    expect(await react("not-a-uuid", "heart", true)).toBeNull()
   })
 })

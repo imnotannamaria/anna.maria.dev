@@ -2,11 +2,11 @@ import { HeartIcon } from "@phosphor-icons/react/dist/ssr"
 import { ScreenNotice } from "@/components/site/frame/screen-state"
 import { PageHeader } from "@/components/site/page-header"
 import type { Letter } from "./letters"
-import { Mural } from "./mural"
+import { Channel } from "./channel"
 import "./wall.css"
 
 /**
- * The wall of love: every approved letter, newest first. `letters` is null when the database
+ * The wall of love: every approved letter as a message in a channel, newest first. `letters` is null when the database
  * did not answer, which is not the same as an empty wall and does not say the same thing.
  */
 export function Wall({ letters }: { letters: Letter[] | null }) {
@@ -33,7 +33,7 @@ export function Wall({ letters }: { letters: Letter[] | null }) {
           body="The first invitations are out. She is keeping the spot warm until the letters come in."
         />
       ) : (
-        <Mural letters={letters} />
+        <Channel letters={letters} />
       )}
     </article>
   )

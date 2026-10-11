@@ -11,6 +11,7 @@ import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
 import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { Button } from "@/app/components/entrepta/button"
+import { useMuted } from "@/lib/sound-muted"
 import { useNowPlayingStore } from "@/store/nowPlayingStore"
 import { Tile } from "@/components/site/tile"
 import "./playlist.css"
@@ -26,6 +27,7 @@ export function Playlist() {
   const { tracks, currentIndex, elapsedMs, status, running, load, tick, toggle, next, prev } =
     useNowPlayingStore()
   const audioRef = useRef<HTMLAudioElement>(null)
+  const silenced = useMuted()
   const [armed, setArmed] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [clip, setClip] = useState<{ index: number; elapsed: number; total: number } | null>(null)
@@ -108,6 +110,7 @@ export function Playlist() {
           ref={audioRef}
           src={track.previewUrl}
           preload="none"
+          muted={silenced}
           className="hidden"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}

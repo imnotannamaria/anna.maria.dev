@@ -1,0 +1,42 @@
+/* The burst a click leaves on the screen. Over everything, and in nobody's way. */
+
+.st-burst-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  pointer-events: none;
+}
+.st-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+/* each line leaves along its own angle */
+.st-burst > i {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 9px;
+  margin: -4px 0 0 -1px;
+  border-radius: 1px;
+  background: var(--fg-brand);
+  rotate: var(--turn);
+  animation: st-burst 420ms var(--ease-out) both;
+}
+@keyframes st-burst {
+  from {
+    opacity: 1;
+    transform: translateY(-6px) scaleY(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-24px) scaleY(0.3);
+  }
+}
+@media print {
+  .st-burst-layer {
+    display: none;
+  }
+}

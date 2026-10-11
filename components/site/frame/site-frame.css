@@ -40,32 +40,83 @@ body:has(.st) [data-theme-switcher] {
   min-width: 0;
   min-height: 0;
 }
-.st-switcher {
+/* The header: one pill floating over the page, with the sides and the actions in it. */
+.st-island {
   position: absolute;
-  bottom: 16px;
-  left: 50%;
+  top: 12px;
+  /* Centred with auto margins, not `left: 50%`: an absolute box pinned at the middle may only
+     grow into the half to its right, and on a phone that squeezed the sides down to nothing. */
+  right: 0;
+  left: 0;
   z-index: 6;
-  width: min(100% - 32px, 340px);
-  translate: -50% 0;
-  transition: opacity 200ms var(--ease-out);
-}
-.st-switcher [role="radiogroup"] {
-  width: 100%;
-  height: 44px;
-  padding: 4px;
-  border-color: var(--border-strong);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  margin-inline: auto;
+  padding: 4px 6px 4px 4px;
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-full);
   background: var(--bg-overlay);
   box-shadow: var(--shadow-overlay);
 }
-.st-switcher [role="radiogroup"] > span {
-  inset-block: 4px;
-  left: 4px;
-  width: calc((100% - 8px) / var(--segments));
+/* nothing in the pill gives up its width: the sides keep their names, the icons their size */
+.st-island > nav,
+.st-island [role="radiogroup"],
+.st-island [role="radiogroup"] > label,
+.st-island-actions,
+.st-island-actions > * {
+  flex: none;
+}
+/* entrepta's segments truncate, so their smallest width is zero; here it is the word */
+.st-island [role="radiogroup"] > label {
+  min-width: max-content;
+}
+.st-island > i {
+  flex: none;
+  width: 1px;
+  height: 18px;
+  background: var(--border-strong);
+}
+.st-island [role="radiogroup"],
+.st-island [role="radiogroup"] > span,
+.st-island [role="radiogroup"] > label {
   border-radius: var(--radius-full);
 }
-.st-switcher [role="radiogroup"] > label {
+.st-island-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.st-island-actions > :is(a, button) {
   border-radius: var(--radius-full);
+}
+/* the narrowest phones: the same pill, closer together */
+@media (max-width: 359px) {
+  .st-island {
+    gap: 2px;
+  }
+  .st-island > i {
+    display: none;
+  }
+  .st-island-actions {
+    gap: 0;
+  }
+}
+/* on a page with no sides the pill is the actions alone, in the corner */
+.st-main[data-focused] > .st-island {
+  right: 16px;
+  left: auto;
+  margin-inline: 0;
+  padding-left: 6px;
+}
+/* every side leaves the top of its first screen to the island */
+.st-page {
+  --st-island-room: 60px;
+}
+.st-page[data-part="front"] > div {
+  padding-top: var(--st-island-room);
 }
 .st-page {
   grid-row: 1;
@@ -123,18 +174,28 @@ body:has(.st) [data-theme-switcher] {
   height: 100%;
 }
 
-/* A phone: the switcher keeps to the left and leaves the corner to the cat. When she is away
-   (she is down in the footer game) it takes the middle back. */
-@media (max-width: 767px) {
-  .st-main:not([data-at-footer]) .st-switcher {
-    left: 16px;
-    width: calc(100% - 100px);
-    translate: none;
-  }
-}
-
-/* A page that asks for the visitor's whole attention (an invite): no switcher, no corner cat. */
-.st-main[data-focused] > .st-switcher,
+/* A page that asks for the visitor's whole attention (an invite): no corner cat. */
 .st-main[data-focused] > .st-abi {
   display: none;
+}
+
+/* Light to dark. entrepta wraps a mode change in a view transition and crossfades it; for the
+   length of a switch started from the header, `data-st-switch` on <html> makes the new mode
+   come down from the top instead. */
+html[data-st-switch]::view-transition-old(root),
+html[data-st-switch]::view-transition-new(root) {
+  mix-blend-mode: normal;
+  animation: none;
+}
+html[data-st-switch]::view-transition-new(root) {
+  z-index: 2;
+  animation: st-curtain 620ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+@keyframes st-curtain {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
 }

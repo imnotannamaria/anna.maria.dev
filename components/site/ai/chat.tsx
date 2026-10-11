@@ -14,7 +14,7 @@ import { INNER_PAGES, PAGES } from "@/components/site/pages"
 import type { Group } from "@/components/site/professional/stack-data"
 import { useNavigate } from "@/components/site/navigation"
 import { screenQuestion } from "@/lib/ai/guard"
-import { MAX_QUESTION } from "@/lib/ai/limits"
+import { questionSchema } from "@/lib/ai/validation"
 import { QUESTIONS, answer, answerOf, type Answer } from "./answers"
 import { askModel, endsTheDay, isAboutTheQuestion, isLive } from "./ask"
 import { ChatNotice, type NoticeKind } from "./notice"
@@ -117,8 +117,12 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
     }
   }
 
-  async function ask(question: string) {
+  async function ask(raw: string) {
     if (stop.current) return
+    const question = raw.trim()
+    if (!question) return
+    // the same schema the server holds the question to; too long is the one way it fails here
+    const fits = questionSchema.safeParse(question).success
     const id = `m${(count.current += 1)}`
     const hour = new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
 
@@ -138,7 +142,7 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
     const earlier = asked.current
     asked.current = [...earlier, question]
 
-    if (question.length > MAX_QUESTION) return type(id, "", undefined, "long")
+    if (!fits) return type(id, "", undefined, "long")
     if (!live) return type(id, scripted.text, scripted.card)
 
     const controller = new AbortController()

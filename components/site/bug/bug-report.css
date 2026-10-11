@@ -1,0 +1,95 @@
+/* The bug report. The dialog as one of the site's cards: dashed, with no fill beyond the canvas
+   it needs to be read over a page. entrepta's dialog is a filled, sheened overlay; this is the
+   override that goes upstream as a variant. */
+
+.st-bug.st-bug {
+  gap: 20px;
+  max-height: calc(100dvh - 32px);
+  padding: 24px;
+  overflow-y: auto;
+  border: 1px dashed var(--border-strong);
+  background: var(--bg-canvas);
+  box-shadow: none;
+}
+.st-bug::before,
+.st-bug::after {
+  display: none;
+}
+/* entrepta's ◆ on a field label, where it draws one */
+.st-bug span[aria-hidden="true"].leading-none[style*="font-size"] {
+  display: none;
+}
+.st-bug-split {
+  display: grid;
+  gap: 24px;
+}
+.st-bug-cat,
+.st-bug-sent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.st-bug-sent {
+  align-items: center;
+  padding-block: 24px;
+  text-align: center;
+}
+.st-bug-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 14px 16px;
+  border: 1px dashed var(--border-brand-strong);
+  border-radius: var(--radius-lg);
+  color: var(--fg-secondary);
+  line-height: 1.6;
+}
+.st-bug-note > svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--fg-brand);
+}
+.st-bug-note a {
+  color: var(--fg-primary);
+  text-decoration: underline dotted var(--border-strong);
+  text-underline-offset: 4px;
+}
+.st-bug-note a:hover {
+  text-decoration-color: var(--fg-brand);
+}
+.st-bug-attach {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--fg-secondary);
+  cursor: pointer;
+  transition: border-color 150ms var(--ease-out);
+}
+.st-bug-attach:hover,
+.st-bug-attach:focus-within {
+  border-color: var(--fg-brand);
+}
+@media (min-width: 720px) {
+  .st-bug-split {
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 28px;
+  }
+  .st-bug-cat {
+    padding-right: 28px;
+    border-right: 1px dashed var(--border-subtle);
+  }
+}
+/* a phone: the cat gives her room to the form */
+@media (max-width: 719px) {
+  .st-bug-cat > span:first-child {
+    display: none;
+  }
+}

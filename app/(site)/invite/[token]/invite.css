@@ -37,7 +37,7 @@
   text-align: center;
 }
 .st-iv-pinned {
-  width: min(100%, 420px);
+  width: min(100%, 620px);
   text-align: left;
 }
 /* a hint pill keeps to the left by default; on this centred screen it sits in the middle */

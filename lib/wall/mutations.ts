@@ -1,8 +1,14 @@
 import "server-only"
-import { and, eq, gt, isNotNull } from "drizzle-orm"
+import { and, eq, gt, isNotNull, sql } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
 import { isUuid } from "@/lib/format"
-import { INVITE_TTL_MS, type Decision } from "./constants"
+import {
+  INVITE_TTL_MS,
+  reactionCounts,
+  type Decision,
+  type ReactionCounts,
+  type WallReaction,
+} from "./constants"
 import { wallTestimonials } from "./schema"
 import { generateToken, hashToken, isTokenShape } from "./token"
 import type { InviteInput, SubmissionInput } from "./validation"
@@ -134,4 +140,31 @@ export async function deleteEntry(id: string) {
     .returning({ id: wallTestimonials.id, avatarUrl: wallTestimonials.avatarUrl })
 
   return row ?? null
+}
+
+/**
+ * One reaction added to a letter, or taken back. The count moves in a single statement, so two
+ * people clicking at once both count, and it never goes below zero. Only a letter that is on
+ * the wall can be reacted to. Returns the new counts, or null when there is no such letter.
+ */
+export async function react(
+  id: string,
+  reaction: WallReaction,
+  on: boolean,
+): Promise<ReactionCounts | null> {
+  if (!isUuid(id)) return null
+  const step = on ? 1 : -1
+  const [row] = await db()
+    .update(wallTestimonials)
+    .set({
+      reactions: sql`jsonb_set(
+        ${wallTestimonials.reactions},
+        array[${reaction}]::text[],
+        to_jsonb(greatest(0, coalesce((${wallTestimonials.reactions} ->> ${reaction})::int, 0) + ${step}))
+      )`,
+    })
+    .where(and(eq(wallTestimonials.id, id), eq(wallTestimonials.status, "approved")))
+    .returning({ reactions: wallTestimonials.reactions })
+
+  return row ? reactionCounts(row.reactions) : null
 }

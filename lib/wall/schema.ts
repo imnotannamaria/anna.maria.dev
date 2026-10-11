@@ -1,4 +1,4 @@
-import { index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core"
+import { index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core"
 
 /**
  * Mirrors docs/sql/004-wall-testimonials.sql. The CHECK constraints live only in the
@@ -20,6 +20,8 @@ export const wallTestimonials = pgTable(
     message: text("message"),
     lang: text("lang"),
     avatarUrl: text("avatar_url"),
+    /** A count per reaction. See docs/sql/006-wall-reactions.sql. */
+    reactions: jsonb("reactions").$type<Record<string, number>>().notNull().default({}),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     submittedAt: timestamp("submitted_at", { withTimezone: true }),
     decidedAt: timestamp("decided_at", { withTimezone: true }),

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation"
 import { WallEntryActions } from "@/components/admin/wall-entry-actions"
 import { WallStatusBadge } from "@/components/admin/wall-status-badge"
 import { toLetter } from "@/components/site/wall/letters"
-import { Mural } from "@/components/site/wall/mural"
+import { Channel } from "@/components/site/wall/channel"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { LANG_LABEL } from "@/lib/wall/constants"
 import { formatInstant, statusOf } from "@/lib/wall/describe"
@@ -53,7 +53,8 @@ export default async function WallEntryPage({ params }: { params: Promise<{ id: 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,280px)]">
         <div className="flex min-w-0 flex-col gap-6">
           {written ? (
-            <Mural
+            <Channel
+              preview
               letters={[
                 toLetter({
                   id: entry.id,
@@ -65,6 +66,7 @@ export default async function WallEntryPage({ params }: { params: Promise<{ id: 
                   message: entry.message ?? "",
                   lang: entry.lang ?? entry.formLang,
                   avatarUrl: entry.avatarUrl,
+                  reactions: entry.reactions,
                 }),
               ]}
             />

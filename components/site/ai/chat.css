@@ -4,7 +4,8 @@
   gap: 12px;
   height: 100%;
 
-  padding: 16px 16px 76px;
+  /* the top is the island's */
+  padding: 64px 16px 16px;
 }
 .st-ia-column {
   width: min(100%, 760px);
@@ -16,11 +17,11 @@
     padding-left: max(16px, min(150px, calc(100% - 910px)));
   }
 }
-/* A phone: the column runs edge to edge. The foot keeps room for the switcher only; while a
-   touch keyboard is up the switcher steps aside (abimaela.css) and the room closes. */
+/* A phone: the cat sits in the corner, so the prompt keeps clear of her; while a touch keyboard
+   is up she steps aside (abimaela.css) and the room closes. */
 @media (max-width: 767px) {
   .st-ia {
-    padding: 16px 16px 76px;
+    padding-bottom: 72px;
   }
 }
 @media (max-width: 767px) and (pointer: coarse) {

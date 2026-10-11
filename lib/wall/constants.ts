@@ -53,3 +53,30 @@ export const STATUS_LABEL: Record<WallStatus | "expired", string> = {
   approved: "on the wall",
   rejected: "rejected",
 }
+
+/**
+ * What a letter on the wall can be answered with. The id is what the database counts under, so
+ * an emoji can be swapped for another without losing the count.
+ */
+export const WALL_REACTIONS = [
+  { id: "heart", emoji: "\u{1FAF6}", name: "heart hands" },
+  { id: "clap", emoji: "\u{1F44F}", name: "clapping hands" },
+  { id: "party", emoji: "\u{1F389}", name: "party popper" },
+  { id: "up", emoji: "\u{1F44D}", name: "thumbs up" },
+] as const
+export type WallReaction = (typeof WALL_REACTIONS)[number]["id"]
+export const WALL_REACTION_IDS = WALL_REACTIONS.map((reaction) => reaction.id) as [
+  WallReaction,
+  ...WallReaction[],
+]
+export type ReactionCounts = Record<WallReaction, number>
+
+/** The counts as stored, read safely: only the four known reactions, never below zero. */
+export function reactionCounts(stored: unknown): ReactionCounts {
+  const raw = stored && typeof stored === "object" ? (stored as Record<string, unknown>) : {}
+  const count = (id: WallReaction) => {
+    const value = Number(raw[id])
+    return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0
+  }
+  return { heart: count("heart"), clap: count("clap"), party: count("party"), up: count("up") }
+}

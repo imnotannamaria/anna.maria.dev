@@ -1,4 +1,11 @@
+import { z } from "zod"
 /** The terminal's shell with no UI: a pure function from (cwd, line) to what to print. */
+/** A command as typed: one line, trimmed, and short enough to be a command and not a paste. */
+export const commandSchema = z
+  .string()
+  .max(200)
+  .transform((raw) => raw.replace(/[\r\n]+/g, " ").trim())
+
 export type Directory = { [name: string]: string | Directory }
 
 export type FileSystem = { root: Directory; links: Record<string, string> }

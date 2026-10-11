@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 import { pet } from "@/components/site/abimaela/abimaela"
 import type { ScreenId } from "@/components/site/pages"
 import { useNavigate } from "@/components/site/navigation"
-import { path, complete, execute, type Output, type ItemKind } from "./shell"
+import { commandSchema, path, complete, execute, type Output, type ItemKind } from "./shell"
 import "./terminal.css"
 
 type LogLine = Output & { id: number }
@@ -52,6 +52,7 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
   const id = useId()
   const navigate = useNavigate()
 
+  // the newest block is always the one in view, just above the input
   useEffect(() => {
     if (output.current) output.current.scrollTop = output.current.scrollHeight
   }, [lines])
@@ -67,7 +68,9 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
   }, [])
 
   function run(raw: string) {
-    const line = raw.trim()
+    // what the field may send: one line, trimmed, of a sane length
+    const checked = commandSchema.safeParse(raw)
+    const line = checked.success ? checked.data : ""
     const result = execute(system, cwd, line)
     const added: Output[] = [{ type: "echo", path: path(cwd), text: line }, ...result.output]
     const withId = added.map((line) => ({ ...line, id: count.current++ }))
@@ -113,7 +116,7 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
           ref={output}
           role="log"
           aria-label="Terminal output"
-          className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto overscroll-y-contain p-5"
+          className="st-term-output flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto overscroll-y-contain p-5"
           onClick={(event) => {
             if (!(event.target as Element).closest("button, a")) field.current?.focus()
           }}
@@ -121,17 +124,37 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
           {lines.map((line) => (
             <Line key={line.id} line={line} onRun={run} />
           ))}
+        </div>
 
-          <form
-            className="flex items-center gap-2"
-            onSubmit={(event) => {
-              event.preventDefault()
-              run(entry)
-            }}
-          >
-            <label htmlFor={id} className="shrink-0">
-              <Prompt path={path(cwd)} />
-            </label>
+        <div className="st-term-shortcuts flex flex-wrap gap-1.5 px-4 pt-3">
+          {SHORTCUTS.map((shortcut) => (
+            <button
+              key={shortcut}
+              type="button"
+              onClick={() => run(shortcut)}
+              className="focus-ring text-mono-sm cursor-pointer rounded-[var(--radius-sm)] border border-dashed border-[var(--border-strong)] px-2.5 py-1 text-[var(--t-command)] transition-colors hover:border-[var(--t-command)] hover:bg-[var(--bg-hover-soft)]"
+            >
+              {shortcut}
+            </button>
+          ))}
+        </div>
+        {/* The input lives at the foot, the way Warp does it: the path on a line of its own,
+            the command under it, and everything that ran stacking up above. */}
+        <form
+          className="st-term-input"
+          onSubmit={(event) => {
+            event.preventDefault()
+            run(entry)
+          }}
+        >
+          <label htmlFor={id} className="text-mono-sm flex items-center gap-2">
+            <span className="text-[var(--t-folder)]">{USER}</span>
+            <span className="text-[var(--t-path)]">{path(cwd)}</span>
+          </label>
+          <div className="flex items-center gap-2">
+            <span aria-hidden className="text-[var(--t-folder)]">
+              $
+            </span>
             <input
               id={id}
               ref={field}
@@ -159,21 +182,8 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
                 }
               }}
             />
-          </form>
-        </div>
-
-        <div className="st-term-shortcuts flex flex-wrap gap-1.5 border-t border-[var(--border-subtle)] px-4 py-3">
-          {SHORTCUTS.map((shortcut) => (
-            <button
-              key={shortcut}
-              type="button"
-              onClick={() => run(shortcut)}
-              className="focus-ring text-mono-sm cursor-pointer rounded-[var(--radius-sm)] border border-dashed border-[var(--border-strong)] px-2.5 py-1 text-[var(--t-command)] transition-colors hover:border-[var(--t-command)] hover:bg-[var(--bg-hover-soft)]"
-            >
-              {shortcut}
-            </button>
-          ))}
-        </div>
+          </div>
+        </form>
       </CardTerminalBody>
     </Card>
   )
@@ -191,7 +201,7 @@ function Prompt({ path: shown }: { path: string }) {
 function Line({ line, onRun }: { line: Output; onRun: (command: string) => void }) {
   if (line.type === "echo") {
     return (
-      <p className="mt-2.5 first:mt-0">
+      <p className="st-term-block">
         <Prompt path={line.path} /> <span className="text-[var(--fg-primary)]">{line.text}</span>
       </p>
     )

@@ -1,7 +1,9 @@
 import { z } from "zod"
 import { MAX_EARLIER, MAX_QUESTION } from "./limits"
 
-const question = z.string().trim().min(1).max(MAX_QUESTION)
+/** One question. The page checks it with this before asking, and the server checks it again. */
+export const questionSchema = z.string().trim().min(1).max(MAX_QUESTION)
+const question = questionSchema
 
 /**
  * What the browser may send: a question, and the few questions before it. There is no role to

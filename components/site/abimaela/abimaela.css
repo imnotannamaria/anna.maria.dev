@@ -16,8 +16,8 @@
     opacity 240ms var(--ease-out),
     translate 240ms var(--ease-out);
 }
-/* On a phone she is small and sits beside the switcher, which gives up the room: above it she
-   stood on top of the page. This has to come after the base rule: the two weigh the same. */
+/* On a phone she is small, in the corner. This has to come after the base rule: the two weigh
+   the same. */
 @media (max-width: 767px) {
   .st-abi {
     --st-abi-h: 56px;
@@ -26,13 +26,10 @@
   }
 }
 /* A touch keyboard covers the foot of the screen, so while someone types (the terminal, the
-   chat, the postcard) she and the switcher step aside. Touch only: with a mouse the terminal
-   keeps its prompt focused, and they would never come back. */
+   chat, the postcard) she steps aside. Touch only: with a mouse the terminal keeps its prompt
+   focused, and she would never come back. */
 @media (max-width: 767px) and (pointer: coarse) {
-  /* fields inside a page only: the switcher is made of radio inputs, and tapping it must not
-     count as typing, or it hides itself */
-  .st-main:has(.st-page :is(input, textarea):focus) .st-abi,
-  .st-main:has(.st-page :is(input, textarea):focus) .st-switcher {
+  .st-main:has(.st-page :is(input, textarea):focus) .st-abi {
     opacity: 0;
     pointer-events: none;
   }

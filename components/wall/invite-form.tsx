@@ -39,7 +39,7 @@ import { Hint } from "@/components/site/hint"
 import { ScreenLink } from "@/components/site/screen-link"
 import { tileClass } from "@/components/site/tile"
 import { toLetter } from "@/components/site/wall/letters"
-import { Mural } from "@/components/site/wall/mural"
+import { Channel } from "@/components/site/wall/channel"
 
 /** What the server knows about the invite before anyone types: what I filled in. */
 export interface InviteSeed {
@@ -272,7 +272,7 @@ export function InviteForm({
           {copy.sentBody}
         </p>
         <div className="st-iv-pinned">
-          <Mural letters={[preview]} pinned={false} />
+          <Channel letters={[preview]} preview />
         </div>
         <Comment>{copy.review}</Comment>
         <div className="flex flex-wrap justify-center gap-2">
@@ -479,7 +479,7 @@ export function InviteForm({
               <span className="text-mono-xs font-mono tracking-[0.08em] text-[var(--fg-muted)] uppercase">
                 {copy.preview}
               </span>
-              <Mural letters={[preview]} pinned={false} />
+              <Channel letters={[preview]} preview />
             </div>
 
             <Comment>{copy.review}</Comment>

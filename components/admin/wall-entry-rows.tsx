@@ -29,6 +29,8 @@ export interface WallRow {
   company: string
   lang: WallLang
   status: StatusKey
+  /** The counts above zero, as text: "🫶 3  👏 1". Empty when there are none. */
+  reactions: string
   /** Formatted on the server. */
   when: string
 }
@@ -95,6 +97,10 @@ export function WallEntryRows({ rows }: { rows: WallRow[] }) {
 
             <TableCell className="text-[var(--fg-muted)]">
               <LangTag lang={row.lang} />
+            </TableCell>
+
+            <TableCell className="whitespace-nowrap text-[var(--fg-secondary)] tabular-nums">
+              {row.reactions || <span className="text-[var(--fg-muted)]">none</span>}
             </TableCell>
 
             <TableCell className="text-[var(--fg-muted)]">{row.when}</TableCell>

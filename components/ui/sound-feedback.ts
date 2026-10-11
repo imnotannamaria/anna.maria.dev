@@ -2,6 +2,7 @@
 
 import { useEffect } from "react"
 import { SOUND_EFFECTS, soundEffectSrc, type SoundEffectName } from "@/lib/sound-effects"
+import { muted } from "@/lib/sound-muted"
 
 /**
  * Sound is supplementary feedback, never the only confirmation of an action. Keeping this
@@ -63,6 +64,7 @@ function decoded(effect: SoundEffectName): Promise<AudioBuffer | null> {
 
 export async function tryPlaySoundEffect(effect: SoundEffectName): Promise<boolean> {
   try {
+    if (muted()) return false
     const ctx = audioContext()
     if (!ctx) return false
     // Called from a click, this is what unlocks audio on iOS. `!== "running"` rather than

@@ -28,7 +28,7 @@ import { Folder } from "@/components/site/folder"
 import { Hint } from "@/components/site/hint"
 import { Lede, PageHeader } from "@/components/site/page-header"
 import { POLAROID } from "@/components/site/polaroid"
-import { Pushpin, Tape } from "@/components/site/tape"
+import { Tape } from "@/components/site/tape"
 import { Door } from "./door"
 import "./home.css"
 
@@ -114,16 +114,23 @@ export function Home() {
       </span>
     ),
 
-    // The home is static and reads no database, so this is the gesture of a letter, not one of
-    // the real ones: those are on the page.
+    // The home is static and reads no database, so this is the gesture of a message in the
+    // channel, not one of the real ones: those are on the page.
     "wall-of-love": (
-      <span className="st-hm-letters">
-        <span className="st-hm-letter" data-behind />
-        <span className="st-hm-letter">
-          <Pushpin />
+      <span className="st-hm-channel">
+        <span className="st-hm-channel-head text-mono-xs font-mono"># wall-of-love</span>
+        <span className="st-hm-msg">
+          <i>
+            <HeartIcon size={12} weight="fill" />
+          </i>
           <span className="st-hm-excerpt text-mono-xs font-sans">
             what people I have worked with wrote about working with me
           </span>
+        </span>
+        <span className="st-hm-reacts">
+          {["\u{1FAF6}", "\u{1F44F}", "\u{1F389}"].map((emoji) => (
+            <b key={emoji}>{emoji}</b>
+          ))}
         </span>
       </span>
     ),

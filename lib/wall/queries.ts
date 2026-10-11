@@ -1,7 +1,7 @@
 import { desc, eq } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
 import { isUuid } from "@/lib/format"
-import type { WallLang, WallStatus } from "./constants"
+import { reactionCounts, type WallLang, type WallStatus } from "./constants"
 import { wallTestimonials } from "./schema"
 import { hashToken, isTokenShape } from "./token"
 import type { Testimonial, WallEntry } from "./validation"
@@ -31,6 +31,7 @@ export function toEntry(row: Row, now: Date = new Date()): WallEntry {
     message: row.message,
     lang: row.lang as WallLang | null,
     avatarUrl: row.avatarUrl,
+    reactions: reactionCounts(row.reactions),
     createdAt: row.createdAt.toISOString(),
     submittedAt: iso(row.submittedAt),
     decidedAt: iso(row.decidedAt),
@@ -74,6 +75,7 @@ export async function getApprovedTestimonials(): Promise<Testimonial[]> {
             message: row.message,
             lang: row.lang as WallLang,
             avatarUrl: row.avatarUrl,
+            reactions: reactionCounts(row.reactions),
             month: monthOf(row.decidedAt ?? row.createdAt),
           },
         ]

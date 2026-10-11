@@ -22,6 +22,11 @@ const ALLOWED = new Set([
   "components/admin/roadmap-item-form.tsx",
   "components/admin/wall-invite-form.tsx",
   "components/wall/invite-form.tsx",
+  // the chat is a form too: its question is held to the server's own schema. It loads with
+  // /ai only, never with the home page.
+  "components/site/ai/chat.tsx",
+  // loaded on the first click of the bug button, not with the frame (see island.tsx)
+  "components/site/bug/bug-report.tsx",
 ])
 
 function sourceFiles(dir: string): string[] {
@@ -38,7 +43,7 @@ function sourceFiles(dir: string): string[] {
  * semicolons, so anything looser runs across lines into the next import.
  */
 const VALUE_IMPORT =
-  /^import (?!type\b)(?:\{[^}]*\}|[\w*][^\n{]*?) from "(zod|@\/lib\/[a-z-]+\/validation|@\/lib\/contact-schema)"/m
+  /^import (?!type\b)(?:\{[^}]*\}|[\w*][^\n{]*?) from "(zod|@\/lib\/[a-z-]+\/validation|@\/lib\/contact-schema|@\/lib\/bug-schema)"/m
 
 describe("client bundles", () => {
   it("never import zod outside the forms that validate on the client", () => {
@@ -48,6 +53,12 @@ describe("client bundles", () => {
       return source.startsWith('"use client"') && VALUE_IMPORT.test(source)
     })
     expect(offenders).toEqual([])
+  })
+
+  it("loads the bug report on demand, since the header is on every page", () => {
+    const island = readFileSync("components/site/frame/island.tsx", "utf8")
+    expect(island).not.toMatch(/^import .*bug-report"/m)
+    expect(island).toMatch(/dynamic\(\s*\(\) => import\("@\/components\/site\/bug\/bug-report"\)/)
   })
 
   it("keeps the shared constants free of zod", () => {

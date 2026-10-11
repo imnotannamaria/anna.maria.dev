@@ -208,45 +208,58 @@
   padding: 52px 0 0;
   zoom: 1.15;
 }
-.st-hm-letters {
-  position: relative;
-  display: block;
-  width: min(100%, 228px);
-  height: 132px;
-}
-.st-hm-letter {
-  position: absolute;
-  inset: 10px 0 0;
+/* the wall of love, as one message in its channel */
+.st-hm-channel {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 16px 12px 10px;
-  overflow: hidden;
+  width: min(100%, 228px);
+  padding: 10px 12px 12px;
   border: 1px dashed var(--border-strong);
   border-radius: var(--radius-md);
   background: var(--bg-card);
-  rotate: -2.5deg;
   text-align: left;
-  transition:
-    rotate 320ms var(--ease-out),
-    translate 320ms var(--ease-out);
+  transition: translate 320ms var(--ease-out);
 }
-.st-hm-letter:not([data-behind]) {
-  overflow: visible;
+.st-hm-channel-head {
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-subtle);
+  color: var(--fg-muted);
 }
-.st-hm-letter[data-behind] {
-  rotate: 2.5deg;
+.st-hm-msg {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
 }
-.st-hm-letter i {
+.st-hm-msg > i {
   display: grid;
   flex: none;
   width: 24px;
   height: 24px;
   place-items: center;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-sm);
   background: var(--bg-surface-brand);
   color: var(--fg-brand-text);
   font-style: normal;
+}
+.st-hm-reacts {
+  display: flex;
+  gap: 4px;
+  padding-left: 32px;
+}
+.st-hm-reacts > b {
+  display: grid;
+  width: 28px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1;
+  transition:
+    translate 260ms var(--ease-out),
+    border-color 260ms var(--ease-out);
 }
 .st-hm-excerpt {
   display: -webkit-box;
@@ -256,28 +269,26 @@
   -webkit-line-clamp: 3;
   line-clamp: 3;
 }
-.st-hm-excerpt::before {
-  content: "\201C";
-  margin-right: 1px;
-  color: var(--fg-brand);
-  font-family: var(--font-serif);
-  font-size: 16px;
-  line-height: 0;
-}
 .st-hm-lines {
   flex: 1;
   min-height: 30px;
   background: repeating-linear-gradient(to bottom, var(--border-strong) 0 1px, transparent 1px 9px);
 }
-.st-hm-door:hover .st-hm-letter,
-.st-hm-door:focus-visible .st-hm-letter {
-  rotate: 0deg;
-  translate: -8px -3px;
+.st-hm-door:hover .st-hm-channel,
+.st-hm-door:focus-visible .st-hm-channel {
+  translate: 0 -3px;
 }
-.st-hm-door:hover .st-hm-letter[data-behind],
-.st-hm-door:focus-visible .st-hm-letter[data-behind] {
-  rotate: 6deg;
-  translate: 20px 4px;
+/* the reactions land one after the other */
+.st-hm-door:hover .st-hm-reacts > b,
+.st-hm-door:focus-visible .st-hm-reacts > b {
+  border-color: var(--border-brand-strong);
+  translate: 0 -2px;
+}
+.st-hm-reacts > b:nth-child(2) {
+  transition-delay: 60ms;
+}
+.st-hm-reacts > b:nth-child(3) {
+  transition-delay: 120ms;
 }
 .st-hm-postal {
   position: relative;

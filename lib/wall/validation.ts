@@ -1,5 +1,13 @@
 import { z } from "zod"
-import { MESSAGE_MAX, WALL_LANGS, WALL_STATUSES, type WallLang, type WallStatus } from "./constants"
+import {
+  MESSAGE_MAX,
+  WALL_LANGS,
+  WALL_REACTION_IDS,
+  WALL_STATUSES,
+  type ReactionCounts,
+  type WallLang,
+  type WallStatus,
+} from "./constants"
 
 export const WallLangSchema = z.enum(WALL_LANGS)
 
@@ -75,10 +83,16 @@ export interface WallEntry {
   message: string | null
   lang: WallLang | null
   avatarUrl: string | null
+  reactions: ReactionCounts
   createdAt: string
   submittedAt: string | null
   decidedAt: string | null
 }
+
+/** One reaction, added or taken back. */
+export const reactSchema = z
+  .object({ reaction: z.enum(WALL_REACTION_IDS), on: z.boolean() })
+  .strict()
 
 /** What a card on the wall needs, and nothing it does not. */
 export interface Testimonial {
@@ -92,6 +106,7 @@ export interface Testimonial {
   avatarUrl: string | null
   /** `YYYY-MM`, the month it went up. */
   month: string
+  reactions: ReactionCounts
 }
 
 export { WALL_LANGS, WALL_STATUSES }

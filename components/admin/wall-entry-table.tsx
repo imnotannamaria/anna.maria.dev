@@ -1,9 +1,10 @@
 import { Table, TableHead, TableHeader, TableRow } from "@/app/components/entrepta/table"
+import { WALL_REACTIONS } from "@/lib/wall/constants"
 import { statusOf, whenOf } from "@/lib/wall/describe"
 import type { WallEntry } from "@/lib/wall/validation"
 import { WallEntryRows, type WallRow } from "./wall-entry-rows"
 
-const COLUMNS = ["status", "who", "language", "when", ""]
+const COLUMNS = ["status", "who", "language", "reactions", "when", ""]
 
 /**
  * Every invite and testimonial, newest first, in entrepta's `Table` like the log and the
@@ -26,6 +27,13 @@ export function WallEntryTable({ entries }: { entries: WallEntry[] }) {
     company: entry.company,
     lang: entry.lang ?? entry.formLang,
     status: statusOf(entry),
+    // only a letter on the wall can be reacted to; the rest have nothing to count
+    reactions:
+      entry.status === "approved"
+        ? WALL_REACTIONS.filter(({ id }) => entry.reactions[id] > 0)
+            .map(({ id, emoji }) => `${emoji} ${entry.reactions[id]}`)
+            .join("  ")
+        : "",
     when: whenOf(entry),
   }))
 
