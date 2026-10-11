@@ -1,0 +1,96 @@
+---
+title: "entrepta"
+description: "Um design system dark first pra sites que parecem feitos por uma engenheira."
+date: "2026-05-18"
+tags:
+  ["nextjs", "react", "typescript", "tailwindcss", "design-system", "components", "cli", "radix-ui"]
+published: true
+---
+
+## Visão geral
+
+O entrepta é um design system dark first pra sites que parecem ter sido feitos por alguém de engenharia. Abas, uma paleta de comandos, uma status bar, prompts de shell, serifa em itálico do lado de mono.
+
+Os componentes são copiados pro seu repositório como código-fonte, no modelo do shadcn. Sem SDK, sem runtime. O código é seu.
+
+```bash
+npx @entrepta/cli@latest init
+npx @entrepta/cli@latest add button card command-palette
+```
+
+## O que vem
+
+33 componentes em 6 seções, em React 19, Tailwind v4 e variáveis CSS.
+
+| Seção       | Componentes                                                        |
+| ----------- | ------------------------------------------------------------------ |
+| Primitivos  | Button, Badge, Card, Dialog, Dropdown, Tooltip, Kbd, Tabs          |
+| Formulários | Input, Textarea, Checkbox, Switch, Field, FilterPill               |
+| Layout      | StatusBar, TopNav, ThemeSwitcher, ModeToggle, Sidebar, PageOutline |
+| Conteúdo    | CodeBlock, SectHead, doc parts                                     |
+| Feedback    | Toast, Skeleton, CommandPalette, ChromeMessage, PageLoading        |
+| Movimento   | Reveal, TypeIn, RollingNumber, Spotlight, ArrowLink                |
+
+Seis temas prontos: `entrepta`, `blossom`, `marmalade`, `julia`, `ivy` e `bosco`. Escolha um, ou instale os seis e troque em runtime. Toda cor de texto passa no WCAG AA nas 12 combinações de tema e modo, e um teste mede isso a cada mudança.
+
+## Feito pra agentes de código
+
+O entrepta foi pensado pra ser instalado e usado pelo Claude Code, pelo Cursor ou pelo Codex tanto quanto por pessoas.
+
+- **Um AGENTS.md pro seu projeto.** O botão AGENTS.md do site monta um: você escolhe o framework, o tema e os componentes, e ele diz como instalar, onde as coisas ficam, qual token vai onde e como cada componente é usado.
+- **Toda página da documentação em Markdown.** Coloque `.md` em qualquer URL da documentação, como `/docs/components/button.md`.
+- **`/llms.txt`** indexa todas as páginas, e **`/llms-full.txt`** é o site inteiro num arquivo só.
+
+## Instalação
+
+```bash
+npx @entrepta/cli@latest init --theme=ivy
+
+# all six themes, switchable at runtime
+npx @entrepta/cli@latest init --theme=ivy --themes=all
+
+npx @entrepta/cli@latest add button card field
+```
+
+O `init` escreve os tokens, o helper `cn` e o `entrepta.json`. O `add` copia cada componente com tudo o que ele importa e instala os pacotes npm dele. Funciona em Next.js (App ou Pages Router) e em Vite, e nunca sobrescreve um arquivo sem `--overwrite`.
+
+Toda página de componente na documentação também tem uma aba **Manual**, com as dependências e o código-fonte, já com os imports reescritos.
+
+## Como usar
+
+```tsx
+import { Button } from "@/components/entrepta/button"
+import { Card, CardHeader, CardLabel, CardTitle } from "@/components/entrepta/card"
+
+export function Launch() {
+  return (
+    <Card variant="featured">
+      <CardHeader>
+        <CardLabel>launch</CardLabel>
+      </CardHeader>
+      <CardTitle>
+        Ship it <em>tonight.</em>
+      </CardTitle>
+      <Button>deploy</Button>
+    </Card>
+  )
+}
+```
+
+## Feito com entrepta
+
+Esse site roda nele. O entrepta começou aqui, e a v2 foi construída aqui primeiro, antes de ir pro design system.
+
+## Stack
+
+React 19, Next.js 15 como setup de referência, Tailwind v4, Radix UI, variáveis CSS, TypeScript strict, class-variance-authority, ícones Phosphor, e `motion` pros componentes que animam por JavaScript.
+
+## Licença
+
+MIT.
+
+## Links
+
+https://entrepta.vercel.app
+
+https://github.com/imnotannamaria/entrepta

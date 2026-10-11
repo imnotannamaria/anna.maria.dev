@@ -10,10 +10,11 @@ import {
   SwapIcon,
   UserIcon,
 } from "@phosphor-icons/react/dist/ssr"
+import { useLocale, useTranslations } from "next-intl"
 import Image from "next/image"
 import type { CSSProperties, ReactNode } from "react"
 import { Reveal } from "@/app/components/entrepta/reveal"
-import { calcYearsOfExp, yearsWord } from "@/lib/experience"
+import { CAREER_START_YEAR } from "@/lib/experience"
 import { siteConfig } from "@/lib/site-config"
 import { cn } from "@/lib/utils"
 import { getPublishedPosts, getPublishedProjects } from "@/lib/velite"
@@ -43,12 +44,18 @@ const ICON: Record<PageId, ReactNode> = {
 }
 
 export function Home() {
+  const t = useTranslations("home")
+  const pages = useTranslations("pages")
+  const wall = useTranslations("wall")
+  const strong = (words: ReactNode) => (
+    <span className="st-lede-keep text-[var(--fg-primary)]">{words}</span>
+  )
   const now = new Date()
-  const years = calcYearsOfExp(now)
   const ruler = axis(CAREER, [now.getFullYear(), now.getMonth() + 1, now.getDate()])
-  const posts = getPublishedPosts()
+  const locale = useLocale()
+  const posts = getPublishedPosts(locale)
   const note = posts.find((post) => post.featured) ?? posts[0]
-  const projects = getPublishedProjects()
+  const projects = getPublishedProjects(locale)
   const project = projects.find((item) => item.featured) ?? projects[0]
 
   const techs = (project?.tags ?? [])
@@ -97,14 +104,14 @@ export function Home() {
       <span className="st-hm-slip">
         <Tape />
         <span className="text-heading-md line-clamp-3 font-serif text-[var(--fg-primary)]">
-          <span className="st-hm-stroke">{note?.title ?? "notes"}</span>
+          <span className="st-hm-stroke">{note?.title ?? t("notesFallback")}</span>
         </span>
       </span>
     ),
     projects: (
       <span className="st-hm-folder">
         <Folder
-          title={project?.title ?? "projects"}
+          title={project?.title ?? t("projectsFallback")}
           cover={project?.cover ?? null}
           techs={techs}
           featured
@@ -118,14 +125,12 @@ export function Home() {
     // channel, not one of the real ones: those are on the page.
     "wall-of-love": (
       <span className="st-hm-channel">
-        <span className="st-hm-channel-head text-mono-xs font-mono"># wall-of-love</span>
+        <span className="st-hm-channel-head text-mono-xs font-mono"># {wall("channel")}</span>
         <span className="st-hm-msg">
           <i>
             <HeartIcon size={12} weight="fill" />
           </i>
-          <span className="st-hm-excerpt text-mono-xs font-sans">
-            what people I have worked with wrote about working with me
-          </span>
+          <span className="st-hm-excerpt text-mono-xs font-sans">{t("wallExcerpt")}</span>
         </span>
         <span className="st-hm-reacts">
           {["\u{1FAF6}", "\u{1F44F}", "\u{1F389}"].map((emoji) => (
@@ -154,24 +159,29 @@ export function Home() {
   return (
     <article className="st-room st-screen">
       <header className="flex flex-col gap-4">
-        <PageHeader icon={ICON.home} label="home" />
+        <PageHeader icon={ICON.home} label={t("label")} />
         <h2 className="st-hm-name font-serif text-[var(--fg-primary)]">{siteConfig.name}</h2>
 
-        <Lede>
-          I build things <span className="text-[var(--fg-primary)]">end to end</span>, from the UI
-          and the front, web or mobile, all the way to shipping, and I&rsquo;ve been at it for about{" "}
-          <span className="text-[var(--fg-primary)]">{yearsWord(years).toLowerCase()} years</span>.
+        {/* the years are left as the sum, on purpose: the joke is that you do the maths */}
+        <Lede className="st-lede-wide">
+          {t.rich("lede", {
+            b: strong,
+            // the chain of arrows stays on one line: broken in the middle it stops reading as a path
+            flow: (words) => <span className="st-lede-flow">{words}</span>,
+            now: String(now.getFullYear()),
+            since: String(CAREER_START_YEAR),
+          })}
         </Lede>
 
         <ul className="st-hm-hints">
           <Hint as="li" icon={<CursorClickIcon aria-hidden size={13} />}>
-            <span>each card is a page, click one to know more</span>
+            <span>{t("hintCards")}</span>
           </Hint>
           <Hint as="li" icon={<SwapIcon aria-hidden size={13} />}>
             <span>
-              switch sides at the bottom: <strong className="font-medium">Front</strong> is the
-              pages, <strong className="font-medium">Back</strong> is a terminal,{" "}
-              <strong className="font-medium">IA</strong> is a chat
+              {t.rich("hintSides", {
+                b: (words) => <strong className="font-medium">{words}</strong>,
+              })}
             </span>
           </Hint>
         </ul>
@@ -182,17 +192,19 @@ export function Home() {
             <Reveal index={index} className="h-full">
               <Door
                 to={page.id}
-                label={page.label}
+                label={t("goTo", { page: pages(`${page.id}.label`) })}
                 className={cn("st-hm-door focus-ring", page.id === "projects" && "st-folder-host")}
               >
                 <span className="st-hm-label text-mono-sm font-mono">
                   <span className="text-[var(--fg-brand)]">{ICON[page.id]}</span>
-                  {page.label}
+                  {pages(`${page.id}.label`)}
                 </span>
                 <span className="st-hm-mini" aria-hidden>
                   {thumb[page.id as Exclude<PageId, "home">]}
                 </span>
-                <span className="st-hm-tagline text-body-md font-sans">{page.tagline}</span>
+                <span className="st-hm-tagline text-body-md font-sans">
+                  {pages(`${page.id}.tagline`)}
+                </span>
                 <span className="st-hm-arrow" aria-hidden>
                   <ArrowRightIcon size={14} weight="bold" />
                 </span>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { BackpackIcon } from "@phosphor-icons/react"
 import Image, { type StaticImageData } from "next/image"
 import { useState } from "react"
@@ -10,26 +11,34 @@ import mac from "@/components/site/person/objects/mac.png"
 import guitar from "@/components/site/person/objects/guitar.png"
 import "./things.css"
 
-const THINGS: { name: string; tagline: string; img: StaticImageData }[] = [
-  { name: "AirPods Pro 3", tagline: "practically my companions", img: airpods },
-  { name: "Thermal cup", tagline: "coffee, usually", img: cup },
-  { name: "MacBook Pro", tagline: "where most of this gets made", img: mac },
-  { name: "Guitar", tagline: "badly, but happily", img: guitar },
-]
+/** `id` is the key of the thing's line in the messages. A brand's name stays as it is. */
+const THINGS: { id: "airpods" | "cup" | "mac" | "guitar"; brand?: string; img: StaticImageData }[] =
+  [
+    { id: "airpods", brand: "AirPods Pro 3", img: airpods },
+    { id: "cup", img: cup },
+    { id: "mac", brand: "MacBook Pro", img: mac },
+    { id: "guitar", img: guitar },
+  ]
 
 export function Things() {
   const [active, setActive] = useState(0)
-  const thing = THINGS[active]
+  const t = useTranslations("person.things")
+  const things = THINGS.map((item) => ({
+    ...item,
+    name: item.brand ?? t(item.id === "cup" ? "cupName" : "guitarName"),
+    tagline: t(item.id),
+  }))
+  const thing = things[active]
 
   return (
-    <Tile label="everyday things" icon={<BackpackIcon />}>
+    <Tile label={t("label")} icon={<BackpackIcon />}>
       <ul className="st-things">
-        {THINGS.map((item, index) => (
+        {things.map((item, index) => (
           <li key={item.name}>
             <button
               type="button"
               className="st-thing focus-ring"
-              aria-label={`${item.name}: ${item.tagline}`}
+              aria-label={t("aria", { name: item.name, tagline: item.tagline })}
               aria-pressed={index === active}
               onPointerEnter={() => setActive(index)}
               onFocus={() => setActive(index)}

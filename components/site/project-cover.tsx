@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { ArrowSquareOutIcon, GithubLogoIcon } from "@phosphor-icons/react/dist/ssr"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
@@ -29,6 +30,7 @@ export function Cover({
 
 /** The GitHub and live links of a project, as two small icon buttons. */
 export function ProjectLinks({ project }: { project: LinkedProject }) {
+  const t = useTranslations("projects")
   return (
     <span className="relative z-[2] flex items-center gap-1">
       {project.github ? (
@@ -37,7 +39,7 @@ export function ProjectLinks({ project }: { project: LinkedProject }) {
           target="_blank"
           rel="noopener noreferrer"
           className="st-project-link focus-ring"
-          aria-label={`${project.title} on GitHub`}
+          aria-label={t("onGithub", { title: project.title })}
         >
           <GithubLogoIcon aria-hidden size={15} />
         </a>
@@ -48,7 +50,7 @@ export function ProjectLinks({ project }: { project: LinkedProject }) {
           target="_blank"
           rel="noopener noreferrer"
           className="st-project-link focus-ring"
-          aria-label={`${project.title}, live`}
+          aria-label={t("live", { title: project.title })}
         >
           <ArrowSquareOutIcon aria-hidden size={15} />
         </a>

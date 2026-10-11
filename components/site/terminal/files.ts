@@ -1,6 +1,6 @@
 import type { SiteData } from "@/components/site/frame/site-data"
-import { PAGES } from "@/components/site/pages"
-import type { Directory, FileSystem } from "./shell"
+import { PAGES, type PageId } from "@/components/site/pages"
+import type { Directory, FileSystem, ShellWords } from "./shell"
 
 /** The site as a file tree for the terminal, and the screen each file opens. */
 const ROUTES: [method: string, path: string, keep: string][] = [
@@ -11,9 +11,10 @@ const ROUTES: [method: string, path: string, keep: string][] = [
   ["POST", "/api/v1/admin/log", "authkit + allowlist · zod"],
   ["PATCH", "/api/v1/admin/log/:id", "authkit + allowlist · zod"],
   ["DELETE", "/api/v1/admin/log/:id", "authkit + allowlist"],
-  ["POST", "/api/v1/admin/roadmap", "authkit + allowlist · zod"],
-  ["PATCH", "/api/v1/admin/roadmap/:id", "authkit + allowlist · zod"],
-  ["DELETE", "/api/v1/admin/roadmap/:id", "authkit + allowlist"],
+  ["POST", "/api/v1/admin/wall", "authkit + allowlist · zod"],
+  ["POST", "/api/v1/invite/:token", "one use · 24h · zod · photo checked by its bytes"],
+  ["POST", "/api/v1/wall/:id/react", "rate limit 40/10min · zod · approved letters only"],
+  ["POST", "/api/v1/bug", "rate limit 5/10min · honeypot · zod → resend"],
   ["POST", "/api/contact", "honeypot · zod → resend"],
   ["GET", "/api/now-playing", "spotify client credentials"],
   ["GET", "/api/og", "@vercel/og"],
@@ -73,63 +74,70 @@ function page(title: string, description: string, ...body: string[]): string {
   return [title.toUpperCase(), description, ...(body.length ? ["", ...body] : [])].join("\n")
 }
 
-const NO_DB = "this one lives in postgres, and postgres did not answer just now."
-
 function count(values: string[]): string {
   const total = new Map<string, number>()
   for (const value of values) total.set(value, (total.get(value) ?? 0) + 1)
   return [...total].map(([name, n]) => `${name} ${n}`).join(" · ")
 }
 
-const tagline = (id: string) => PAGES.find((page) => page.id === id)?.tagline ?? ""
+/**
+ * The words the files are written with, in the page's language: what `useTranslations("terminal")`
+ * and `useTranslations("pages")` return, plus the shell's own sentences.
+ */
+export type FileWords = {
+  files: (key: string, values?: Record<string, string | number>) => string
+  page: (id: PageId, part: "label" | "tagline") => string
+  shell: ShellWords
+}
 
-export function buildFiles(data: SiteData): FileSystem {
+export function buildFiles(data: SiteData, words: FileWords): FileSystem {
+  const t = words.files
+  const tagline = (id: PageId) => words.page(id, "tagline")
   const { years, email, socials, jobs, stack, apps, posts, projects, log } = data
 
   const root: Directory = {
     "home.txt": page(
-      "home",
-      `Full-stack Software Engineer, ${years} years building things end to end.`,
-      "six doors, one per page:",
+      words.page("home", "label"),
+      t("home", { years }),
+      t("doors"),
       table(
-        PAGES.filter((item) => item.id !== "home").map((item) => [`  ${item.id}`, item.tagline]),
+        PAGES.filter((item) => item.id !== "home").map((item) => [
+          `  ${item.id}`,
+          tagline(item.id),
+        ]),
       ),
     ),
 
     "person.txt": page(
-      "anna, the person",
+      words.page("person", "label"),
       tagline("person"),
-      "I'm Anna, from Pernambuco, and I live in Tamandaré, right by the beach.",
-      "The gym is my daily reset button, five times a week, pretty much non negotiable.",
-      "I'm a big fan of horror films, Mike Flanagan and Drag Race. I play a few",
-      "instruments, all of them mediocrely, and I love every kind of music, mostly pop.",
-      "I also answer to Abimaela, the cat in the corner.",
+      ...[0, 1, 2, 3, 4].map((line) => t(`person.${line}`)),
       "",
-      "on the page:",
-      "  camera roll · me, as a playlist · wristkit rings · emojis & gifs I overuse",
-      "  the weather in Tamandaré · stickers · the log shelf · everyday things",
+      t("onThePage"),
+      t("personItems1"),
+      t("personItems2"),
     ),
 
     "professional.txt": page(
-      "anna, the professional",
+      words.page("professional", "label"),
       tagline("professional"),
-      "I build things end to end, from the UI and the front, web or mobile, to shipping.",
-      `About ${years} years across startups and bigger enterprise teams.`,
+      t("professional1"),
+      t("professional2", { years }),
       "",
-      "work and academic history:",
+      t("history"),
       table(
-        jobs.map((t) => [
-          `  ${t.current ? "now" : "before"}`,
-          t.type,
-          `${t.org} · ${t.role}`,
-          `${t.from}–${t.current && t.type === "work" ? "" : t.until}`,
+        jobs.map((job) => [
+          `  ${job.current ? t("now") : t("before")}`,
+          t(job.type === "work" ? "work" : "study"),
+          `${job.org} · ${job.role}`,
+          `${job.from}–${job.current && job.type === "work" ? "" : job.until}`,
         ]),
       ),
       "",
-      "stack:",
+      t("stack"),
       table(stack.map((group) => [`  ${group.key}`, group.items.join(", ")])),
       "",
-      "apps:",
+      t("apps"),
       `  ${apps.map((app) => app.name).join(" · ")}`,
     ),
 
@@ -140,8 +148,8 @@ export function buildFiles(data: SiteData): FileSystem {
           post.title,
           post.description,
           table([
-            ["date", post.date.slice(0, 10)],
-            ["tags", post.tags.join(", ")],
+            [t("date"), post.date.slice(0, 10)],
+            [t("tags"), post.tags.join(", ")],
           ]),
         ),
       ]),
@@ -154,34 +162,34 @@ export function buildFiles(data: SiteData): FileSystem {
           project.title,
           project.description,
           table([
-            ["kind", project.type === "library" ? "open source" : project.type],
-            ["date", project.date.slice(0, 10)],
-            ["tags", project.tags.join(", ")],
-            ...(project.github ? [["code", project.github]] : []),
-            ...(project.live ? [["live", project.live]] : []),
+            [t("kind"), project.type === "library" ? t("openSource") : project.type],
+            [t("date"), project.date.slice(0, 10)],
+            [t("tags"), project.tags.join(", ")],
+            ...(project.github ? [[t("code"), project.github]] : []),
+            ...(project.live ? [[t("live"), project.live]] : []),
           ]),
         ),
       ]),
     ),
 
     "wall-of-love.txt": page(
-      "wall of love",
+      words.page("wall-of-love", "label"),
       tagline("wall-of-love"),
-      "letters from people I have worked with. each one came from a link I sent,",
-      "and was read before it went up. open the page to read them.",
+      t("wall1"),
+      t("wall2"),
     ),
 
     "log.txt": page(
       "log",
-      "Everything I finish: films, series, books, albums, podcasts and games. Rated when my heart demands.",
+      t("log"),
       ...(log === undefined
-        ? ["still loading. run it again in a second."]
+        ? [t("logLoading")]
         : log === null
-          ? [NO_DB]
+          ? [t("noDb")]
           : [
-              `${log.length} entries: ${count(log.map((entry) => entry.type))}`,
+              t("entries", { count: log.length, byType: count(log.map((entry) => entry.type)) }),
               "",
-              "latest:",
+              t("latest"),
               table(
                 [...log]
                   .sort((a, b) => b.loggedAt.localeCompare(a.loggedAt))
@@ -189,15 +197,15 @@ export function buildFiles(data: SiteData): FileSystem {
                   .map((entry) => [
                     `  ${entry.loggedAt}`,
                     entry.type,
-                    entry.creator ? `${entry.title} — ${entry.creator}` : entry.title,
+                    entry.creator ? `${entry.title} · ${entry.creator}` : entry.title,
                   ]),
               ),
             ]),
     ),
 
     "contact.txt": page(
-      "contact",
-      "Get in touch. Open to OSS collaborations and tech conversations.",
+      words.page("contact", "label"),
+      t("contact"),
       table([
         ["email", email],
         ["github", socials.github],
@@ -205,11 +213,11 @@ export function buildFiles(data: SiteData): FileSystem {
         ["x", socials.x],
       ]),
       "",
-      "the postcard is on the page. this terminal does not send mail yet.",
+      t("postcard"),
     ),
 
     api: {
-      "routes.txt": table([["METHOD", "PATH", "WHAT STANDS IN FRONT OF IT"], ...ROUTES]),
+      "routes.txt": table([[0, 1, 2].map((column) => t(`routesHead.${column}`)), ...ROUTES]),
     },
 
     db: Object.fromEntries(
@@ -217,7 +225,7 @@ export function buildFiles(data: SiteData): FileSystem {
     ),
 
     ".secret": {
-      "secret.txt": "you found it. nothing here yet, but the cat knows you looked.",
+      "secret.txt": t("secret"),
     },
   }
 
@@ -240,5 +248,5 @@ export function buildFiles(data: SiteData): FileSystem {
     admin: "tela:admin",
   }
 
-  return { root, links }
+  return { root, links, words: words.shell }
 }

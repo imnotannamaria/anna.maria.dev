@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Hint } from "@/components/site/hint"
 import { tileClass } from "@/components/site/tile"
 import { ClockCounterClockwiseIcon, CursorClickIcon } from "@phosphor-icons/react"
@@ -34,6 +35,11 @@ export function History({
   careerYears: number
 }) {
   const reduce = useReducedMotion() ?? false
+  const t = useTranslations("professional")
+  const career = useTranslations("career")
+  const date = useTranslations("date")
+  const monthName = (index: number) =>
+    date(`months.${(index + 1) as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12}`)
   const [mode, setMode] = useState<Mode>("timeline")
   const [open, setOpen] = useState(
     entries.find((entry) => entry.current && entry.type === "work")?.id ?? entries[0]?.id,
@@ -53,7 +59,10 @@ export function History({
     line.dataset.active = ""
     const month = Math.min(Math.floor((x / box.width) * ruler.months), ruler.months - 1)
     if (pointerMonth.current) {
-      pointerMonth.current.textContent = `${MONTHS[month % 12]} ${ruler.start + Math.floor(month / 12)}`
+      pointerMonth.current.textContent = date("monthYear", {
+        month: monthName(month % 12),
+        year: String(ruler.start + Math.floor(month / 12)),
+      })
     }
   }
   const release = () => {
@@ -75,15 +84,15 @@ export function History({
     <section className={tileClass(undefined, "st-hist")} data-mode={mode}>
       <CardHeader>
         <CardLabel as="h2" icon={<ClockCounterClockwiseIcon />}>
-          work and academic history
+          {t("history")}
         </CardLabel>
         <SegmentedControl
           size="sm"
-          aria-label="View"
+          aria-label={t("view")}
           className="st-hist-mode"
           options={[
-            { value: "timeline", label: "timeline" },
-            { value: "list", label: "list" },
+            { value: "timeline", label: t("timeline") },
+            { value: "list", label: t("list") },
           ]}
           value={mode}
           onValueChange={(value) => setMode(value as Mode)}
@@ -143,7 +152,7 @@ export function History({
                       layout={reduce ? false : "position"}
                       className="st-hist-role min-w-0 flex-1 truncate text-left text-[var(--fg-secondary)]"
                     >
-                      {entry.role}
+                      {career(`${entry.id}.role`)}
                     </motion.span>
                     <motion.span
                       layout={reduce ? false : "position"}
@@ -153,7 +162,8 @@ export function History({
                         period(entry)
                       ) : (
                         <>
-                          {entry.from[0]} – <span className="text-[var(--fg-brand-text)]">now</span>
+                          {entry.from[0]} –{" "}
+                          <span className="text-[var(--fg-brand-text)]">{t("now")}</span>
                         </>
                       )}
                     </motion.span>
@@ -168,7 +178,7 @@ export function History({
             style={{ left: `${(ruler.now / ruler.months) * 100}%` }}
             aria-hidden
           >
-            <span className="text-mono-xs font-mono">now</span>
+            <span className="text-mono-xs font-mono">{t("now")}</span>
           </div>
 
           <div ref={pointer} className="st-hist-pointer" aria-hidden>
@@ -183,7 +193,7 @@ export function History({
             key={entry.id}
             id={`hist-${entry.id}`}
             hidden={entry.id !== open}
-            aria-label={`${entry.org}, ${entry.role}`}
+            aria-label={t("entryLabel", { org: entry.org, role: career(`${entry.id}.role`) })}
           >
             <div className="st-enter st-hist-body">
               <div className="flex min-w-0 flex-col gap-3">
@@ -192,17 +202,17 @@ export function History({
                     {entry.org}
                   </span>
                   <span className="text-mono-sm font-mono text-[var(--fg-secondary)]">
-                    {entry.role}
+                    {career(`${entry.id}.role`)}
                   </span>
                   <span className="text-mono-sm font-mono text-[var(--fg-muted)]">
-                    {period(entry, "present")}
+                    {period(entry, t("present"))}
                   </span>
                 </h3>
                 <p className="text-body-md max-w-[70ch] font-sans text-[var(--fg-secondary)]">
-                  {entry.text}
+                  {career(`${entry.id}.text`)}
                 </p>
                 {entry.tags.length ? (
-                  <ul className="flex flex-wrap gap-1.5" aria-label="Stack">
+                  <ul className="flex flex-wrap gap-1.5" aria-label={t("stack")}>
                     {entry.tags.map((tag) => (
                       <li key={tag}>
                         <TechBadge name={tag} />
@@ -214,9 +224,13 @@ export function History({
 
               {entry.stats.length ? (
                 <dl className="st-hist-stats">
-                  {entry.stats.map((stat) => (
+                  {entry.stats.map((stat, index) => (
                     <div key={stat.what}>
-                      <dt className="text-mono-xs font-mono text-[var(--fg-muted)]">{stat.what}</dt>
+                      <dt className="text-mono-xs font-mono text-[var(--fg-muted)]">
+                        {entry.id === "cesar" || entry.id === "avanade"
+                          ? career(`${entry.id}.stats.${index as 0 | 1 | 2}`)
+                          : stat.what}
+                      </dt>
                       <dd className="text-heading-lg font-serif text-[var(--fg-primary)]">
                         {stat.value}
                       </dd>
@@ -231,9 +245,9 @@ export function History({
 
       <CardFooter>
         <Hint icon={<CursorClickIcon aria-hidden size={13} />}>
-          <span>solid is work, hatched is academic. click a bar to read it</span>
+          <span>{t("legend")}</span>
         </Hint>
-        <span className="text-[var(--fg-brand-text)]">{careerYears} years in</span>
+        <span className="text-[var(--fg-brand-text)]">{t("yearsIn", { years: careerYears })}</span>
       </CardFooter>
     </section>
   )

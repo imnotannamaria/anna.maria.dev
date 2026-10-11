@@ -1,4 +1,7 @@
-.st-lede-person {
+/* `.st-lede` (page-header.css) sets the same font-size and max-width with the same weight, so
+   which one won depended on the order the two stylesheets reached the page, and that changes with
+   the page you came from. Two classes make this one win every time. */
+.st-lede.st-lede-person {
   display: flex;
   flex-direction: column;
   gap: 0.7em;

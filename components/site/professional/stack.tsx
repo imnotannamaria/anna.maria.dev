@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { BrowsersIcon, HardDrivesIcon, SparkleIcon, StackIcon } from "@phosphor-icons/react"
 import { Tile } from "@/components/site/tile"
 import { TechStickers } from "@/components/site/tech-stickers"
@@ -16,16 +17,36 @@ const PARTS = [
   { id: "ia", title: "IA", Icon: SparkleIcon, groups: ["ai / llm"] },
 ]
 
+/** A group's id, as written in the data, to the key of its name in the messages. */
+const GROUP_KEY = {
+  languages: "languages",
+  frontend: "frontend",
+  backend: "backend",
+  databases: "databases",
+  "ai / llm": "ai",
+  "devops · cloud": "devops",
+  "testing · quality": "testing",
+  "email · design": "email",
+} as const
+
 export function Stack({ groups }: { groups: Group[] }) {
+  const t = useTranslations("professional")
+  const groupName = (id: string) =>
+    id in GROUP_KEY ? t(`groups.${GROUP_KEY[id as keyof typeof GROUP_KEY]}`) : id
   const languages = groups.find((group) => group.id === "languages")
   const total = groups.reduce((sum, group) => sum + group.techs.length, 0)
 
   return (
-    <Tile label="stack" icon={<StackIcon />} note={`${total} tools`} size="md">
+    <Tile
+      label={t("stackLabel")}
+      icon={<StackIcon />}
+      note={t("tools", { count: total })}
+      size="md"
+    >
       {languages ? (
         <div className="st-sk-languages">
           <h3 className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
-            written in
+            {t("writtenIn")}
           </h3>
           <TechStickers techs={languages.techs} center />
         </div>
@@ -49,7 +70,7 @@ export function Stack({ groups }: { groups: Group[] }) {
               {inPart.map((group) => (
                 <div key={group.id} className="flex flex-col gap-2">
                   <h4 className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
-                    {group.id}
+                    {groupName(group.id)}
                   </h4>
                   <TechStickers techs={group.techs} />
                 </div>

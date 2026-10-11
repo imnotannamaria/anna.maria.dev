@@ -3,6 +3,7 @@
 import { contactSchema } from "@/lib/contact-schema"
 import { LinkedinLogoIcon, PaperPlaneTiltIcon } from "@phosphor-icons/react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { useTranslations } from "next-intl"
 import { useState, type FormEvent } from "react"
 import { siGithub, siGmail, siX } from "simple-icons"
 import { Button } from "@/app/components/entrepta/button"
@@ -87,10 +88,15 @@ export function dockChannels(channels: Channels): DockItem[] {
  * message stays in the card either way.
  */
 export function Postcard({ channels }: { channels: Channels }) {
+  const t = useTranslations("contact")
   const reduce = useReducedMotion() ?? false
   const [phase, setPhase] = useState<Phase>("writing")
   // what to say under the card: a field to fix, or why it came back
   const [problem, setProblem] = useState<string | null>(null)
+
+  // the schema and the server say which field is wrong; the words for it are in the page's language
+  const worded = (field: string | undefined) =>
+    field === "name" || field === "email" || field === "message" ? t(`errors.${field}`) : null
 
   const onSend = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -102,7 +108,7 @@ export function Postcard({ channels }: { channels: Channels }) {
       message: form.get("message"),
     })
     if (!parsed.success) {
-      setProblem(parsed.error.issues[0]?.message ?? "check the card and try again")
+      setProblem(worded(String(parsed.error.issues[0]?.path[0])) ?? t("check"))
       setPhase("writing")
       return
     }
@@ -124,15 +130,15 @@ export function Postcard({ channels }: { channels: Channels }) {
       await stamp
       if (res.ok) return setPhase("sent")
       if (res.status === 400) {
-        const first = Object.values(body.fieldErrors ?? {}).find((list) => list?.length)
-        setProblem(first?.[0] ?? "something on the card is not right")
+        const first = Object.entries(body.fieldErrors ?? {}).find(([, list]) => list?.length)
+        setProblem(worded(first?.[0]) ?? t("notRight"))
         return setPhase("writing")
       }
-      setProblem("it came back: my side failed. your message is still here.")
+      setProblem(t("failed"))
       setPhase("error")
     } catch {
       await stamp
-      setProblem("it came back: no connection. your message is still here.")
+      setProblem(t("offline"))
       setPhase("error")
     }
   }
@@ -178,10 +184,10 @@ export function Postcard({ channels }: { channels: Channels }) {
                   transition={{ duration: reduce ? 0 : 0.5, delay: reduce ? 0 : 0.25 }}
                 />
               </svg>
-              <p className="text-display-md font-serif text-[var(--fg-primary)]">Posted.</p>
-              <p className="text-body-md font-sans text-[var(--fg-secondary)]">
-                It is on its way to my inbox. I answer every one.
+              <p className="text-display-md font-serif text-[var(--fg-primary)]">
+                {t("sentTitle")}
               </p>
+              <p className="text-body-md font-sans text-[var(--fg-secondary)]">{t("sentBody")}</p>
               <Button
                 variant="secondary"
                 onClick={() => {
@@ -189,7 +195,7 @@ export function Postcard({ channels }: { channels: Channels }) {
                   setPhase("writing")
                 }}
               >
-                write another one
+                {t("another")}
               </Button>
             </motion.div>
           ) : (
@@ -219,7 +225,7 @@ export function Postcard({ channels }: { channels: Channels }) {
               }
             >
               <p aria-hidden className="st-ct-title text-mono-xs font-mono">
-                post card
+                {t("postCard")}
               </p>
 
               <div className="st-ct-front">
@@ -227,12 +233,12 @@ export function Postcard({ channels }: { channels: Channels }) {
                   htmlFor="postal-message"
                   className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase"
                 >
-                  greetings from wherever you are
+                  {t("greetings")}
                 </label>
                 <textarea
                   id="postal-message"
                   name="message"
-                  placeholder="a postcard is short. so is this side."
+                  placeholder={t("messagePlaceholder")}
                   required
                   className="st-ct-message font-serif"
                   onInput={() => {
@@ -257,8 +263,14 @@ export function Postcard({ channels }: { channels: Channels }) {
                       <circle cx="38" cy="38" r="34" />
                       <circle cx="38" cy="38" r="24" />
                       <path d="M76 22q9-7 18 0t18 0 18 0 18 0M76 38q9-7 18 0t18 0 18 0 18 0M76 54q9-7 18 0t18 0 18 0 18 0" />
-                      <text x="38" y="35" textAnchor="middle">
-                        TAMANDARÉ
+                      <text
+                        x="38"
+                        y="35"
+                        textAnchor="middle"
+                        textLength="40"
+                        lengthAdjust="spacingAndGlyphs"
+                      >
+                        PERNAMBUCO
                       </text>
                       <text x="38" y="47" textAnchor="middle">
                         PE · BR
@@ -270,21 +282,23 @@ export function Postcard({ channels }: { channels: Channels }) {
                     <span>
                       <Cat height={52} />
                     </span>
-                    <small className="font-mono">brasil</small>
+                    <small className="font-mono">{t("stampCountry")}</small>
                   </span>
                 </div>
 
                 <p className="st-ct-address">
                   <span className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
-                    to
+                    {t("to")}
                   </span>
                   <span className="text-heading-lg font-serif text-[var(--fg-primary)]">
                     Anna Maria
                   </span>
                   <span className="text-mono-sm font-mono text-[var(--fg-secondary)]">
-                    Tamandaré, Pernambuco
+                    Pernambuco
                   </span>
-                  <span className="text-mono-sm font-mono text-[var(--fg-secondary)]">Brazil</span>
+                  <span className="text-mono-sm font-mono text-[var(--fg-secondary)]">
+                    {t("country")}
+                  </span>
                 </p>
 
                 {/* the honeypot: off-screen and out of the tab order, so only a bot fills it */}
@@ -298,20 +312,20 @@ export function Postcard({ channels }: { channels: Channels }) {
                 />
                 <div className="st-ct-sender">
                   <span className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
-                    from
+                    {t("from")}
                   </span>
                   <input
                     name="name"
-                    aria-label="Your name"
-                    placeholder="your name"
+                    aria-label={t("yourName")}
+                    placeholder={t("namePlaceholder")}
                     required
                     className="text-mono-md font-mono"
                   />
                   <input
                     name="email"
                     type="email"
-                    aria-label="Your email"
-                    placeholder="your email, so I can answer"
+                    aria-label={t("yourEmail")}
+                    placeholder={t("emailPlaceholder")}
                     required
                     className="text-mono-md font-mono"
                   />
@@ -324,7 +338,7 @@ export function Postcard({ channels }: { channels: Channels }) {
                     ) : null}
                   </p>
                   <Button type="submit" loading={phase === "sending"}>
-                    {phase === "error" ? "try again" : "post it"}
+                    {phase === "error" ? t("tryAgain") : t("post")}
                     <PaperPlaneTiltIcon aria-hidden size={15} weight="bold" />
                   </Button>
                 </div>
@@ -345,7 +359,7 @@ export function Postcard({ channels }: { channels: Channels }) {
                         : { type: "spring", stiffness: 460, damping: 17, delay: 0.3 }
                     }
                   >
-                    return to sender
+                    {t("returned")}
                   </motion.span>
                 ) : null}
               </AnimatePresence>
@@ -356,9 +370,9 @@ export function Postcard({ channels }: { channels: Channels }) {
 
       <div className="flex flex-col gap-3">
         <h2 className="text-mono-xs text-center font-mono tracking-widest text-[var(--fg-muted)] uppercase">
-          or find me here
+          {t("orHere")}
         </h2>
-        <Dock label="Channels" items={dockChannels(channels)} />
+        <Dock label={t("channels")} items={dockChannels(channels)} />
       </div>
     </div>
   )

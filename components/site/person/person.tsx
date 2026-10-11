@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 import { UserIcon } from "@phosphor-icons/react/dist/ssr"
 import { PageLabel } from "@/components/site/page-header"
 import { TILE_SURFACE } from "@/components/site/tile"
@@ -9,6 +11,7 @@ import { Reveal } from "@/app/components/entrepta/reveal"
 import { TodayActivityCard } from "@/components/wristkit/today-activity-card"
 import { loadTodayActivity } from "@/components/wristkit/today-activity-card/load"
 import type { LogEntry } from "@/lib/log/validation"
+import { Bio } from "./bio"
 import { Stickers } from "./stickers"
 import { Things } from "./things"
 import { Shelf } from "./shelf"
@@ -16,10 +19,10 @@ import { Favorites } from "./favorites"
 import { Playlist } from "./playlist"
 import { CameraRoll } from "./camera-roll"
 import { Weather } from "./weather"
-import { Bio } from "./bio"
 import "./person.css"
 
 async function Rings() {
+  const t = await getTranslations("person")
   const state = await loadTodayActivity({
     tz: "America/Sao_Paulo",
     goals: { exerciseMinutes: 90 },
@@ -29,7 +32,7 @@ async function Rings() {
       href="https://wristkit-web.vercel.app/"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="View wristkit"
+      aria-label={t("wristkit")}
       className="flex h-full flex-col"
     >
       <TodayActivityCard state={state} className={cn(TILE_SURFACE, "flex-1 p-4 max-sm:p-4")} />
@@ -38,22 +41,20 @@ async function Rings() {
 }
 
 export function Person({ log }: { log: LogEntry[] | null }) {
+  const t = useTranslations("person")
   return (
     <article className="st-room st-person">
       <header className="st-me">
         <Image
           src="/images/avatar.png"
-          alt="Anna Maria"
+          alt={t("avatarAlt")}
           width={280}
           height={280}
           sizes="280px"
           className="st-me-avatar"
         />
         <div className="flex flex-col justify-center gap-4">
-          <PageLabel
-            icon={<UserIcon aria-hidden size={13} weight="bold" />}
-            label="anna, the person"
-          />
+          <PageLabel icon={<UserIcon aria-hidden size={13} weight="bold" />} label={t("label")} />
           <Bio />
         </div>
         <CameraRoll />

@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { useSitePath } from "@/components/site/i18n"
 import { useEffect, useState } from "react"
 import type { LogSummary, SiteData } from "./site-data"
 
@@ -23,7 +23,7 @@ const loadLog = () =>
  * /ai) has actually been opened.
  */
 export function useSiteData(data: SiteData): SiteData {
-  const pathname = usePathname()
+  const pathname = useSitePath()
   const wanted = pathname === "/back" || pathname === "/ai"
   const [log, setLog] = useState<LogSummary[] | null>()
 

@@ -26,8 +26,8 @@ published: true
 ## Overview
 
 A reference webhook receiver for the [Stable](https://www.usestable.com) API. Stable is a
-virtual mailbox service — it receives physical mail for US companies, scans it, extracts the
-data, and deposits any checks found inside — and tells integrators about all of it through
+virtual mailbox service: it receives physical mail for US companies, scans it, extracts the
+data, and deposits any checks found inside. It tells integrators about all of it through
 webhooks delivered by Svix. mailroom is the receiving end, plus a UI that lets you trigger each
 failure mode on purpose and watch the system absorb it.
 
@@ -46,7 +46,7 @@ has four properties that corrupt state if you insert and update blindly:
   twice. A blind insert double-counts money.
 - **Out-of-order arrival.** `mailItem.scan.ocrCompleted` can land before
   `mailItem.scan.completed`. A blind update lets a stale event overwrite fresh state.
-- **Reversal.** A check can move from `completed` to `failed` — never the reverse — and that
+- **Reversal.** A check can move from `completed` to `failed`, never the reverse, and that
   transition means funds were already deducted. It's an accounting event, not a status change.
 - **Skipped states.** If a deposit is requested before a check is transcribed, `check.processing`
   is never emitted; the state jumps straight from `created` to `completed` or `failed`.
@@ -58,17 +58,17 @@ and shows the result live.
 
 Three tables, on purpose:
 
-- `webhook_events` — the source of truth. Append-only, the body stored exactly as received,
+- `webhook_events`: the source of truth. Append-only, the body stored exactly as received,
   deduplicated by a `UNIQUE` constraint on `svix_id`, not an `if exists` check in application
   code.
-- `mail_items` — a projection, derived and rebuildable from the log. A `state_rank` integer
+- `mail_items`: a projection, derived and rebuildable from the log. A `state_rank` integer
   enforces the monotonic guard, so a late event can't roll state backwards.
-- `check_entries` — an append-only ledger. One row per transition, signed `amount_cents`.
+- `check_entries`: an append-only ledger. One row per transition, signed `amount_cents`.
   There's no mutable status column on a check; a settled check that later fails becomes a new
   `reversed` row, never a mutation of the settled one.
 
 What Stable sends is fact. What I conclude from it is interpretation, and the two are stored
-separately. If the projection logic has a bug, I fix it and replay `webhook_events` — the
+separately. If the projection logic has a bug, I fix it and replay `webhook_events`. The
 original event was never destroyed.
 
 ## Stack
@@ -84,7 +84,7 @@ original event was never destroyed.
 
 Nine events across two pipelines: mail (`created`, `scan.processing`, `scan.completed`,
 `scan.ocrCompleted`, `summary.created`) and checks (`created`, `processing`, `completed`,
-`failed`). Forwarding, shredding, deposits, and OCR results are out of scope on purpose — they
+`failed`). Forwarding, shredding, deposits, and OCR results are out of scope on purpose: they
 add event volume, not new problems.
 
 ## Running locally

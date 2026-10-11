@@ -3,6 +3,7 @@
 import { Hint } from "@/components/site/hint"
 import { useSiteData } from "@/components/site/frame/use-site-data"
 import { ArrowRightIcon, ChatCircleDotsIcon, type Icon, CatIcon } from "@phosphor-icons/react"
+import { useTranslations } from "next-intl"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Button } from "@/app/components/entrepta/button"
 import { ChatThread, type ChatMessage } from "@/app/components/entrepta/chat-thread"
@@ -10,9 +11,9 @@ import { PromptInput } from "@/app/components/entrepta/prompt-input"
 import type { SiteData } from "@/components/site/frame/site-data"
 import { Tile } from "@/components/site/tile"
 import { ICON, INNER_ICON } from "@/components/site/icons"
-import { INNER_PAGES, PAGES } from "@/components/site/pages"
 import type { Group } from "@/components/site/professional/stack-data"
 import { useNavigate } from "@/components/site/navigation"
+import { PAGES, type PageId } from "@/components/site/pages"
 import { screenQuestion } from "@/lib/ai/guard"
 import { questionSchema } from "@/lib/ai/validation"
 import { QUESTIONS, answer, answerOf, type Answer } from "./answers"
@@ -22,9 +23,6 @@ import "./chat.css"
 
 const ICONS: Record<string, Icon> = { ...ICON, ...INNER_ICON }
 const NOTICE_KINDS: readonly string[] = ["budget", "visitor", "slow", "scope", "blocked"]
-
-const pageName = (id: string) =>
-  [...PAGES, ...INNER_PAGES].find((page) => page.id === id)?.label ?? id
 
 /**
  * The chat. A model answers when there is one and the limits allow it; the script answers the
@@ -37,6 +35,15 @@ const pageName = (id: string) =>
 export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group[] }) {
   const data = useSiteData(staticData)
   const navigate = useNavigate()
+  const t = useTranslations("chat")
+  const pages = useTranslations("pages")
+  const words = { chat: t, pages }
+  // a screen's name on the button under a card: a page of the sidebar, or one reached from it
+  const pageName = (screen: string) => {
+    const id = screen.split(":")[0]
+    if (id === "log" || id === "post" || id === "project" || id === "admin") return t(`inner.${id}`)
+    return PAGES.some((page) => page.id === id) ? pages(`${id as PageId}.label`) : id
+  }
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [writing, setWriting] = useState(false)
   // null until the server says whether a model is answering
@@ -79,7 +86,7 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
                 className="self-start"
                 onClick={() => navigate(page)}
               >
-                open {pageName(page)}
+                {t("open", { page: pageName(page) })}
                 <ArrowRightIcon aria-hidden size={13} weight="bold" />
               </Button>
             ) : null}
@@ -138,7 +145,7 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
     const screened = screenQuestion(question)
     if (screened !== "ok") return type(id, "", undefined, screened === "task" ? "scope" : "blocked")
 
-    const scripted = answer(question, data, stack)
+    const scripted = answer(question, data, stack, words)
     const earlier = asked.current
     asked.current = [...earlier, question]
 
@@ -148,14 +155,14 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
     const controller = new AbortController()
     stop.current = () => {
       controller.abort()
-      finish(id, "Stopped.")
+      finish(id, t("stopped"))
     }
     const reply = await askModel(earlier, question, controller.signal)
     if (controller.signal.aborted) return
     stop.current = null
 
     if (reply.ok) {
-      const card = reply.topic ? answerOf(reply.topic, data, stack).card : undefined
+      const card = reply.topic ? answerOf(reply.topic, data, stack, words).card : undefined
       return type(id, reply.text, card)
     }
     if (endsTheDay(reply.reason)) setLive(false)
@@ -171,18 +178,16 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
       <ChatThread
         className="st-ia-column min-h-0"
         messages={messages}
-        labels={{ assistant: "abimaela.ia", you: "you" }}
+        labels={{ assistant: t("assistant"), you: t("you") }}
         empty={
           <div className="flex max-w-[44ch] flex-col gap-3 text-center">
             <h1 className="text-display-md font-serif text-[var(--fg-primary)]">
-              Ask me about <em className="text-[var(--fg-brand)]">Anna.</em>
+              {t.rich("title", {
+                em: (words) => <em className="text-[var(--fg-brand)]">{words}</em>,
+              })}
             </h1>
             <Hint className="self-center" icon={<CatIcon aria-hidden size={13} />}>
-              <span>
-                {live
-                  ? "Abimaela answers, only about Anna and this site, a few questions a day"
-                  : "Abimaela answers from the site’s own content"}
-              </span>
+              <span>{live ? t("hintLive") : t("hintScript")}</span>
             </Hint>
           </div>
         }
@@ -192,8 +197,8 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
         onSubmit={ask}
         streaming={writing}
         onStop={() => stop.current?.()}
-        placeholder="Ask who she is, where she worked, her stack, projects, notes or contact"
-        suggestions={QUESTIONS}
+        placeholder={t("placeholder")}
+        suggestions={QUESTIONS.map((key) => t(`questions.${key}`))}
       />
     </div>
   )

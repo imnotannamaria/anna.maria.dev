@@ -40,3 +40,18 @@ describe("a request for work is about no page", () => {
     expect(topicOf(question)).toBeNull()
   })
 })
+
+describe("questions in Portuguese", () => {
+  it.each([
+    ["Quem é a Anna?", "person"],
+    ["Onde ela já trabalhou?", "career"],
+    ["Qual é a stack dela?", "stack"],
+    ["O que ela já construiu?", "projects"],
+    ["Sobre o que ela escreve?", "notes"],
+    ["Como eu falo com ela?", "contact"],
+    ["Quais filmes ela assistiu?", "log"],
+    ["O que dizem sobre ela?", "wall"],
+  ])("%s is about %s", (question, topic) => {
+    expect(topicOf(question)).toBe(topic)
+  })
+})

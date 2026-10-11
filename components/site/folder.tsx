@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import type { CSSProperties } from "react"
 import { BrandMark, type Tech } from "./brand-mark"
 import { Cover } from "./project-cover"
@@ -24,6 +25,7 @@ export function Folder({
   badge?: boolean
   sizes: string
 }) {
+  const t = useTranslations("projects")
   return (
     <span className="st-folder" data-featured={featured || undefined} aria-hidden>
       <span className="st-folder-rear" />
@@ -34,7 +36,9 @@ export function Folder({
       ))}
       <Cover project={{ title, cover }} sizes={sizes} className="st-folder-photo" />
       <span className="st-folder-front" />
-      {badge ? <span className="st-folder-sticker text-mono-xs font-mono">featured</span> : null}
+      {badge ? (
+        <span className="st-folder-sticker text-mono-xs font-mono">{t("featured")}</span>
+      ) : null}
     </span>
   )
 }

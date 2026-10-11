@@ -1,0 +1,110 @@
+---
+title: "wristkit"
+description: "Componentes React de copiar e colar que mostram dados do Apple Health em qualquer projeto Next.js, em cima do seu próprio Supabase."
+date: "2026-07-19"
+tags:
+  ["nextjs", "react", "typescript", "supabase", "drizzle-orm", "zod", "tailwindcss", "apple-health"]
+published: true
+---
+
+## Visão geral
+
+![A landing page do wristkit: "Apple Health, with a little personality." ao lado da prévia interativa do Activity Card, com seus cinco estados em abas](/projects/wristkit.png)
+
+O wristkit é um conjunto de componentes React de copiar e colar pra mostrar dados do Apple Health em qualquer projeto Next.js. Você traz o seu próprio Supabase, então os seus dados vão direto do seu iPhone pro seu banco. Eu nunca vejo, nunca guardo e não tenho nenhum acesso a eles. Sem analytics, sem log no servidor, sem nuvem de terceiros.
+
+## O que ele faz
+
+- Você copia os arquivos dos componentes pro seu projeto
+- Roda uma migration SQL no Supabase
+- Importa o Atalho do iOS no seu iPhone, coloca a sua URL e a sua API key, pronto
+- Os anéis do seu Apple Watch aparecem no seu site, ao vivo, direto do seu banco
+
+## Começo rápido
+
+1. Instale as peer dependencies
+
+   `pnpm add drizzle-orm postgres zod`
+
+2. Adicione as variáveis de ambiente
+
+   ```
+   WRISTKIT_DATABASE_URL=postgresql://postgres.PROJECT_REF:PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres
+   WRISTKIT_API_KEY=replace-with-32-random-bytes
+   ```
+
+   Use a URL do Transaction pooler do Supabase (Project Settings, Database, Connect). A conexão direta não funciona na Vercel.
+
+   Gere uma API key com:
+
+   `node -e 'console.log(require("crypto").randomBytes(32).toString("base64url"))'`
+
+3. Rode a migration SQL no Supabase
+
+   Vá na documentação de instalação e copie os dois blocos de SQL pro SQL Editor do Supabase.
+
+4. Copie os arquivos dos componentes
+
+   Vá na documentação de instalação e copie o route handler e os arquivos dos componentes pro seu projeto.
+
+5. Use num Server Component
+
+   ```tsx
+   import { TodayActivityCard, loadTodayActivity } from "@/components/wristkit/today-activity-card"
+
+   export default async function Dashboard() {
+     const state = await loadTodayActivity()
+     return <TodayActivityCard state={state} />
+   }
+   ```
+
+6. Configure o Atalho do iOS
+
+   Baixe na página do atalho, abra no app Atalhos, e preencha a URL do seu site e a sua API key.
+
+## Requisitos
+
+- Next.js 15+ (App Router)
+- Um projeto no Supabase (o plano gratuito serve)
+- Node.js 20+
+
+## Documentação
+
+A documentação completa está em wristkit-web.vercel.app/docs
+
+- Instalação
+- Configuração do Atalho do iOS
+- TodayActivityCard
+- Estados do componente
+
+## Stack
+
+- Next.js (App Router)
+- TypeScript
+- Drizzle ORM
+- Zod
+- Supabase (você traz o seu)
+- Tailwind CSS
+
+## Desenvolvimento
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+## Licença
+
+MIT.
+
+## Links
+
+https://wristkit-web.vercel.app
+
+https://github.com/imnotannamaria/wristkit
+
+## Contato
+
+Se quiser conversar, me manda um email em [**anna.maria.dev.br@gmail.com**](mailto:anna.maria.dev.br@gmail.com).

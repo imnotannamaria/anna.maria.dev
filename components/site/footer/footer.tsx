@@ -1,6 +1,7 @@
 "use client"
 
 import { ArrowRightIcon, SignpostIcon } from "@phosphor-icons/react"
+import { useTranslations } from "next-intl"
 import { useEffect, useRef } from "react"
 import { Button } from "@/app/components/entrepta/button"
 import { Tile } from "@/components/site/tile"
@@ -19,9 +20,17 @@ export function Footer({
 
   onVisible: (visible: boolean) => void
 }) {
+  const t = useTranslations("footer")
+  const pages = useTranslations("pages")
   const root = useRef<HTMLElement>(null)
-  const index = DESTINATIONS.findIndex((destination) => destination.id === page)
-  const next = DESTINATIONS[(index + 1) % DESTINATIONS.length]
+  // the signs, named in the page's language
+  const destinations = DESTINATIONS.map((destination) => ({
+    ...destination,
+    label: pages(`${destination.id}.label`),
+    tagline: pages(`${destination.id}.tagline`),
+  }))
+  const index = destinations.findIndex((destination) => destination.id === page)
+  const next = destinations[(index + 1) % destinations.length]
 
   useEffect(() => {
     const el = root.current
@@ -39,12 +48,12 @@ export function Footer({
 
   return (
     <footer ref={root} className="st-footer">
-      <Tile label="where to next" icon={<SignpostIcon />} note="point, she walks" size="md">
-        <DoorGame key={page} destinations={DESTINATIONS} current={page} onGo={onGo} />
+      <Tile label={t("label")} icon={<SignpostIcon />} note={t("note")} size="md">
+        <DoorGame key={page} destinations={destinations} current={page} onGo={onGo} />
 
         <div className="st-ft-nav">
           <Button onClick={() => onGo(next.id)}>
-            <span className="font-normal opacity-80">next:</span> {next.label}
+            <span className="font-normal opacity-80">{t("next")}</span> {next.label}
             <ArrowRightIcon aria-hidden size={14} weight="bold" />
           </Button>
         </div>

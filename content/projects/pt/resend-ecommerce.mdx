@@ -1,0 +1,173 @@
+---
+title: "resend-ecommerce"
+description: "Um starter kit de templates de email transacional pra e-commerce, feito com Resend + React Email."
+date: "2026-04-04"
+tags:
+  [
+    "react",
+    "typescript",
+    "reactjs",
+    "nextjs",
+    "biome",
+    "husky",
+    "resend",
+    "hono",
+    "lint-staged",
+    "tailwindcss",
+    "zod",
+    "react-hook-form",
+    "radix-ui",
+    "react-email",
+    "vitest",
+  ]
+published: true
+---
+
+## Visão geral
+
+![resend-ecomemerce](/blog/resend-ecomemerce.webp)
+
+Esse projeto é um starter kit de templates de email transacional pra e-commerce, feito com Resend + React Email.
+
+A ideia veio de uma observação simples: toda compra dispara uma sequência previsível de emails (pedido criado, pagamento confirmado, enviado, entregue). Procurei um template pronto pra esse fluxo e não achei, então eu construí.
+
+## Atualizações
+
+**Abril de 2026: migrado pro React Email 6**
+
+O React Email 6 saiu com uma estrutura de pacote unificada. Todos os componentes que antes eram importados de `@react-email/components` agora vêm direto de `react-email`. Esse projeto foi atualizado pra refletir essa mudança.
+
+```bash
+# before
+import { Button, Html, Head, render } from "@react-email/components"
+
+# after
+import { Button, Html, Head, render } from "react-email"
+```
+
+## O que vem
+
+- 4 templates transacionais (o fluxo principal de compra)
+- UI pra configurar e pré-visualizar os emails
+- Uma ação pra mandar um email de teste pela API do Resend
+- Testes automatizados pros utilitários e pra renderização dos templates
+
+## Como começar
+
+1. Clone o repositório
+
+   `git clone https://github.com/imnotannamaria/resend-ecommerce.git`
+
+2. Instale as dependências
+
+   `npm install`
+
+3. Configure a API key
+
+   Crie ou edite o `.env.local`:
+
+   `RESEND_API_KEY=re_xxxxxxxxx`
+
+4. Rode o projeto
+
+   `npm run dev`
+
+5. Abra no navegador
+
+   Vá em `http://localhost:3000` pra pré-visualizar, customizar e enviar os templates.
+
+## Stack
+
+A maior parte das tecnologias usadas aqui é a mesma da stack interna do Resend.
+
+Referência:
+
+http://resend.com/handbook/engineering/what-is-our-tech-stack
+
+- **Next.js 15**
+- **React 19**
+- **TypeScript**
+- **React Email**
+- **Resend**
+- **Hono**
+  Rotas de API (com `hono/vercel`).
+- **Radix UI Themes**
+  Componentes da UI de configuração.
+- **Tailwind CSS v4**
+  Estilo.
+- **React Hook Form + Zod**
+  Formulários e validação.
+- **Sonner**
+  Toasts de feedback.
+- **Lucide React**
+  Ícones.
+- **Geist**
+  Fonte.
+- **Vitest**
+  Testes unitários e de integração.
+- **Biome**
+  Lint e formatação.
+- **Husky + lint-staged**
+  Hooks de pre-commit.
+
+## Prototipação
+
+Antes de implementar, eu rascunhei o fluxo e o wireframe da UI no Excalidraw.
+
+Layout da tela:
+
+- Painel de configuração (esquerda)
+- Prévia do email ao vivo (centro)
+- Painel de estilo e design (direita)
+
+![resend-ecomemerce-draw](/blog/resend-ecomemerce-draw.webp)
+
+## Design
+
+O visual é baseado na marca do Resend.
+
+Referências:
+
+https://resend.com/brand
+
+## Uso de IA
+
+As decisões de produto e a prototipação foram minhas. Usei IA pra acelerar as partes repetitivas, principalmente:
+
+- os 4 templates
+- as 4 páginas de prévia, que seguem a mesma estrutura
+
+## Demo
+
+https://resend-ecommerce.vercel.app/
+
+## Roadmap (direção de produto)
+
+Esse starter kit cobre o fluxo transacional principal. A oportunidade é fazer ele crescer até virar uma base completa de email pra e-commerce.
+
+### Novos templates
+
+- **Carrinho abandonado**
+- **Série de boas-vindas**
+- **Pedido de avaliação do produto**
+
+### Como isso pode ajudar o Resend
+
+- **Reduz o tempo de engenharia** de times que precisam de emails de e-commerce prontos pra produção
+- **Atrai novos usuários** (por exemplo, Shopify/BigCommerce e lojas próprias)
+- **Reduz o churn**, melhorando o time-to-value e a qualidade dos emails
+- **Reforça o posicionamento** no segmento de e-commerce
+
+## Conclusão
+
+O Resend E-commerce é um starter kit voltado pra produção que eu construí pra prototipar e desenvolver uma experiência de email de e-commerce de ponta a ponta, dos templates a uma UI de customização e um fluxo de envio de verdade.
+
+Também é um jeito prático de aprender com a forma como o Resend trata developer experience e qualidade de produto, que eu admiro de verdade.
+
+https://resend-ecommerce.vercel.app/
+
+https://github.com/imnotannamaria/resend-ecommerce
+
+## Contato
+
+Se quiser conversar, me manda um email em [**anna.maria.dev.br@gmail.com**](mailto:anna.maria.dev.br@gmail.com).

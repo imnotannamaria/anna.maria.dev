@@ -1,4 +1,8 @@
 import type { NextConfig } from "next"
+import createNextIntlPlugin from "next-intl/plugin"
+
+/** Points next-intl at where the language and the messages of a page come from. */
+const withNextIntl = createNextIntlPlugin("./lib/i18n/request.ts")
 
 const nextConfig: NextConfig = {
   /**
@@ -58,6 +62,14 @@ const nextConfig: NextConfig = {
       { source: "/about", destination: "/person", permanent: true },
       { source: "/blog", destination: "/notes", permanent: true },
       { source: "/blog/:slug", destination: "/notes/:slug", permanent: true },
+      // Two notes were taken down in v3. Their addresses go to the list instead of to a 404.
+      ...[
+        "accessibility-of-a-hosted-auth-ui",
+        "auditing-accessibility-in-a-codebase-that-already-cares",
+      ].flatMap((slug) => [
+        { source: `/notes/${slug}`, destination: "/notes", permanent: true },
+        { source: `/pt/notes/${slug}`, destination: "/pt/notes", permanent: true },
+      ]),
       {
         source: "/projects/anna-dev-br",
         destination: "/projects/annamaria-app",
@@ -67,4 +79,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+export default withNextIntl(nextConfig)

@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl"
+import { useShortDate } from "@/components/site/dates"
 import type { CSSProperties } from "react"
 import { tileClass } from "@/components/site/tile"
 import { ArrowAffordance } from "@/app/components/entrepta/arrow-link"
@@ -6,11 +8,13 @@ import { Reveal } from "@/app/components/entrepta/reveal"
 import { Tape } from "@/components/site/tape"
 import { ScreenLink } from "@/components/site/screen-link"
 import { FeaturedNote } from "./featured-note"
-import { shortDate, noteScreen, type Note } from "./note"
+import { noteScreen, type Note } from "./note"
 
 const ANGLES = [-1.4, 1, -0.6, 1.5, -1]
 
 function Slip({ note, index }: { note: Note; index: number }) {
+  const t = useTranslations("notes")
+  const shortDate = useShortDate()
   return (
     <div
       className="st-nt-slip"
@@ -21,10 +25,11 @@ function Slip({ note, index }: { note: Note; index: number }) {
         <ScreenLink
           to={noteScreen(note)}
           className="focus-ring absolute inset-0 z-[1] rounded-[var(--radius-lg)]"
-          aria-label={`${note.title}: read the note`}
+          aria-label={t("readLabel", { title: note.title })}
         />
         <p className="text-mono-xs font-mono text-[var(--fg-muted)]">
-          <time dateTime={note.date}>{shortDate(note)}</time> · {note.minutes} min
+          <time dateTime={note.date}>{shortDate(note.date)}</time> ·{" "}
+          {t("minutes", { minutes: note.minutes })}
         </p>
         <h2 className="text-heading-lg font-serif text-[var(--fg-primary)] transition-colors group-hover/arrow:text-[var(--fg-brand-text)]">
           {note.title}
@@ -41,7 +46,7 @@ function Slip({ note, index }: { note: Note; index: number }) {
             ))}
           </span>
           <span className="text-mono-sm font-mono text-[var(--fg-brand-text)]">
-            <ArrowAffordance>read</ArrowAffordance>
+            <ArrowAffordance>{t("read")}</ArrowAffordance>
           </span>
         </div>
       </article>

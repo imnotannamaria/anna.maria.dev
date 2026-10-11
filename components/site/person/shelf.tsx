@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { tileClass } from "@/components/site/tile"
 import { BooksIcon } from "@phosphor-icons/react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
@@ -21,6 +22,8 @@ const COVERS = 14
 
 export function Shelf({ entries }: { entries: LogEntry[] | null }) {
   const reduce = useReducedMotion() ?? false
+  const t = useTranslations("person.shelf")
+  const log = useTranslations("log")
 
   const groups = new Map<LogType, LogEntry[]>()
   for (const entry of entries ?? []) {
@@ -46,14 +49,14 @@ export function Shelf({ entries }: { entries: LogEntry[] | null }) {
     <section className={tileClass({ size: "sm" }, "h-full")}>
       <CardHeader>
         <CardLabel as="h2" icon={<BooksIcon />}>
-          log
+          {t("label")}
         </CardLabel>
         {types.length > 1 ? (
           <SegmentedControl
             size="sm"
-            aria-label="Kind"
+            aria-label={t("kind")}
             className="st-shelf-types"
-            options={types.map((t) => ({ value: t, label: TYPE_PLURAL[t] }))}
+            options={types.map((kind) => ({ value: kind, label: log(`types.${kind}`) }))}
             value={type}
             onValueChange={(value) => {
               const picked = value as LogType
@@ -62,15 +65,13 @@ export function Shelf({ entries }: { entries: LogEntry[] | null }) {
             }}
           />
         ) : (
-          <CardMeta>{entries ? `${entries.length} finished` : "offline"}</CardMeta>
+          <CardMeta>{entries ? t("finished", { count: entries.length }) : t("offline")}</CardMeta>
         )}
       </CardHeader>
 
       {items.length === 0 ? (
         <p className="text-body-md flex-1 font-sans text-[var(--fg-secondary)]">
-          {entries === null
-            ? "The log lives in Postgres, and Postgres did not answer just now."
-            : "Nothing logged yet."}
+          {entries === null ? log("down") : log("empty")}
         </p>
       ) : (
         <motion.ul
@@ -97,7 +98,9 @@ export function Shelf({ entries }: { entries: LogEntry[] | null }) {
               <button
                 type="button"
                 className="st-spine-button focus-ring"
-                aria-label={`${item.title}${item.creator ? `, ${item.creator}` : ""}`}
+                aria-label={
+                  item.creator ? t("by", { title: item.title, creator: item.creator }) : item.title
+                }
                 aria-pressed={item.id === inHand?.id}
                 onFocus={() => setInHand(item)}
               >
@@ -141,11 +144,11 @@ export function Shelf({ entries }: { entries: LogEntry[] | null }) {
             {inHand.favorite ? (
               <span className="text-[var(--fg-brand)]">
                 <span aria-hidden>♥</span>
-                <span className="sr-only">favourite</span>
+                <span className="sr-only">{log("favourite")}</span>
               </span>
             ) : null}
             <ArrowLink asChild>
-              <ScreenLink to="log">the log</ScreenLink>
+              <ScreenLink to="log">{t("theLog")}</ScreenLink>
             </ArrowLink>
           </div>
         </CardFooter>

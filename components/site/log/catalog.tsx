@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import Image from "next/image"
 import { tileClass } from "@/components/site/tile"
 import type { ReactNode } from "react"
@@ -20,13 +21,14 @@ function LogCover({ entry, sizes }: { entry: LogEntry; sizes: string }) {
 }
 
 function Note({ entry, size = 13 }: { entry: LogEntry; size?: number }) {
+  const t = useTranslations("log")
   return (
     <span className="flex shrink-0 items-center gap-2">
       <StarRating rating={entry.rating} size={size} />
       {entry.favorite ? (
         <span className="text-[var(--fg-brand)]">
           <span aria-hidden>♥</span>
-          <span className="sr-only">favourite</span>
+          <span className="sr-only">{t("favourite")}</span>
         </span>
       ) : null}
     </span>
@@ -34,6 +36,7 @@ function Note({ entry, size = 13 }: { entry: LogEntry; size?: number }) {
 }
 
 function Hidden({ entry }: { entry: LogEntry }) {
+  const t = useTranslations("log")
   if (!entry.externalUrl) return null
   return (
     <a
@@ -41,7 +44,7 @@ function Hidden({ entry }: { entry: LogEntry }) {
       target="_blank"
       rel="noopener noreferrer"
       className="focus-ring absolute inset-0 z-[1] rounded-[var(--radius-md)]"
-      aria-label={`${entry.title}: open the link`}
+      aria-label={t("openLink", { title: entry.title })}
     />
   )
 }

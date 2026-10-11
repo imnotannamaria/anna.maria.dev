@@ -199,3 +199,37 @@ html[data-st-switch]::view-transition-new(root) {
     clip-path: inset(0 0 0 0);
   }
 }
+
+/* A tooltip, and anything else that opens from a trigger, follows the page's mode. entrepta draws
+   them on its always-dark surface (`data-surface="dark"` redeclares every token that differs
+   between modes), which in light mode left a black bubble on a white page. A redeclared
+   property can be handed back with `inherit`: it takes the value of the parent, which is the
+   page's own. To go upstream as an option on the tooltip. */
+[data-surface="dark"][data-side] {
+  --bg-canvas: inherit;
+  --bg-surface: inherit;
+  --bg-surface-elevated: inherit;
+  --bg-card: inherit;
+  --bg-card-hover: inherit;
+  --bg-overlay: inherit;
+  --bg-field: inherit;
+  --fg-primary: inherit;
+  --fg-secondary: inherit;
+  --fg-muted: inherit;
+  --border-subtle: inherit;
+  --border-strong: inherit;
+  --bg-hover-soft: inherit;
+  --bg-hover-strong: inherit;
+  --bg-chrome: inherit;
+  --bg-spotlight: inherit;
+  --shadow-card-hover: inherit;
+  --sheen-tint: inherit;
+  --edge-light: inherit;
+  --shadow-card: inherit;
+  --shadow-overlay: inherit;
+  --status-success-fg: inherit;
+  --status-warning-fg: inherit;
+  --status-error-fg: inherit;
+  --status-info-fg: inherit;
+  color-scheme: inherit;
+}

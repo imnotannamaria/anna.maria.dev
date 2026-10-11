@@ -1,0 +1,157 @@
+---
+title: "from anna"
+description: "Cartas escritas à mão, fotografadas e publicadas num link feito pra uma pessoa só, com uma transcrição que qualquer um consegue ler. A metade dos destaques é um pacote npm."
+date: "2026-09-10"
+tags:
+  [
+    "nextjs",
+    "typescript",
+    "tailwindcss",
+    "unified",
+    "remark",
+    "markdown",
+    "rehype-sanitize",
+    "postgres",
+    "drizzle",
+    "vercel-blob",
+    "openrouter",
+    "vision-models",
+    "clerk",
+    "accessibility",
+    "npm-package",
+    "vitest",
+    "web-animations",
+  ]
+kind: "library"
+published: true
+---
+
+**Leia uma:** [annamaria.app, as a letter](https://from-anna.vercel.app/annamariaapp-as-a-letter).
+Meu portfólio, escrito à mão numa folha só, fotografado e publicado aqui. (rs)
+
+## Visão geral
+
+Uma carta chega fechada, num envelope endereçado. Abrir rasga o selo e desdobra as folhas.
+
+Eu escrevo uma carta à mão, tiro uma foto de cada página e faço o upload. Um modelo de visão lê
+a letra e devolve markdown. Eu corrijo comparando com a foto, marco o que quero que seja lido
+primeiro, e publico num link feito pra uma pessoa só.
+
+A foto é o que você vê. A transcrição é o que você consegue ler de verdade, e ela é o conteúdo
+da carta, não uma legenda. Uma foto de letra à mão é invisível pra um leitor de tela.
+
+A metade dos destaques é publicada sozinha, como
+[remark-scanned-page](https://www.npmjs.com/package/remark-scanned-page). O resto é um app com
+um usuário e sem cadastro. O código é MIT, então o jeito de ter o seu é clonar.
+
+## O problema que ele resolve
+
+- **Uma foto de uma carta não é uma carta na web.** Não dá pra ler em voz alta, buscar nem
+  copiar dela. Uma transcrição atrás de um botão "mostrar texto" faz da versão legível a opcional.
+- **Destaques guardados como posição de caractere quebram na primeira vírgula que você corrige**,
+  e uma transcrição de letra à mão é corrigida o tempo todo.
+- **Uma carta que você manda ou é aberta ou não é, e você nunca fica sabendo qual.** Nem se a
+  pessoa parou no primeiro parágrafo.
+
+## Destaques dentro do markdown
+
+```md
+Inline: :mark[text worth reading first]{c=important}
+
+:::theme{label="a name for the block"}
+A group of paragraphs, drawn as a bracket with the name beside it.
+:::
+```
+
+O arquivo `.md` carrega tudo. Sem join, sem sincronização, e uma correção leva o destaque junto
+com o texto, porque o destaque é o texto. O pacote não define vocabulário nenhum, só o mecanismo
+e três espaços de cor. A transcrição é saída de modelo, então passa por um schema de sanitização
+que restringe `href` a `https:` e `mailto:` e bloqueia scripts, iframes e todo handler `on*`.
+
+Escrever uma acontece numa mesa de três passos: fotos, escrever e marcar, compartilhar. Dá pra
+adicionar destaques direto nas palavras renderizadas: o pacote anota a prévia com as posições
+do código-fonte depois de sanitizar, então uma palavra repetida aponta pro lugar exato dela no
+markdown, e não pra primeira ocorrência.
+
+## O que ele prova
+
+- **A transcrição vai no HTML do servidor.** Uma carta chega num envelope e abre num maço de
+  folhas, com a foto no verso de cada uma. Qual face aparece é uma decisão de CSS, nunca de
+  montagem, e sem JavaScript o envelope é só um cabeçalho com todas as folhas legíveis embaixo.
+- **Cor nunca carrega significado sozinha.** Cada tag tem o seu próprio sublinhado, sólido,
+  pontilhado ou ondulado. O contraste é medido contra o preenchimento do destaque, não contra a
+  página, por um teste que lê a folha de estilo.
+- **Despublicar tira a foto do ar também.** O Blob store é privado e toda foto passa por uma
+  rota que confere o status da carta. Uma URL pública ia viver mais que a carta.
+- **Um link errado, um rascunho, uma carta expirada e a carta de outra pessoa recebem o mesmo
+  404**, status e corpo.
+- **Estar logada não é estar autorizada.** Uma allowlist decide, e uma vazia nega todo mundo.
+- **Duas marcas, não uma.** Uma visualização quando a carta abre, registrada depois da resposta,
+  e uma segunda quando o fim entra na tela. A mesa mostra aberta, lida até o fim e largada no
+  meio. Uma linha por sessão, prévias de link filtradas, nenhum IP guardado.
+
+## A transcrição
+
+Todas as páginas vão pro modelo numa chamada só, separadas por `---`, e a resposta é dividida
+de volta por página. Se a contagem não bate, o texto inteiro é salvo na página 1: perder a
+divisão tem conserto, perder a transcrição não. O que não dá pra ler volta como `[?]` em vez de
+um chute, e o editor pula de um pro outro. A saída crua fica guardada separada do texto editado.
+
+## Um achado que eu deixei quieto
+
+Uma carta escrita em letra de forma volta em letra de forma. Está certo: o modelo está
+transcrevendo. Consertar a caixa no prompt ia fazer do texto cru outra coisa que não um registro
+da página. Então existe um botão "Convert ALL CAPS to sentence case", que roda só no texto
+editado, e avisa toda vez que não sabe dizer quais palavras são nomes.
+
+## Stack
+
+- Next.js 16, TypeScript, Tailwind v4, entrepta no modo claro
+- unified, remark-directive e rehype-sanitize, por meio do pacote
+- Postgres na Neon com Drizzle, Vercel Blob privado
+- Um modelo de visão pelo OpenRouter, Clerk pra única porta de entrada
+- Fotos redimensionadas no navegador pra 2400px e 1200px, HEIC convertido no caminho
+- Sons de papel gerados offline, sem chamada de API em runtime
+
+## Rodando local
+
+```bash
+git clone https://github.com/imnotannamaria/from-anna
+cd from-anna
+npm install
+cp .env.example .env.local
+npm run db:migrate
+npm run dev
+```
+
+Você vai precisar de Postgres, um Vercel Blob store **privado**, uma chave do OpenRouter e um
+app no Clerk. Restrinja o OpenRouter a provedores que não treinam com os seus dados antes da
+primeira chamada.
+
+## Testes
+
+O Vitest cobre o que quebra em silêncio: o contraste de cada tag contra o seu preenchimento, o
+schema de sanitização, o divisor de páginas, o portão do admin, o filtro de bots e os helpers do
+editor. O workflow de release instala o tarball do pacote num diretório vazio e roda antes de
+publicar.
+
+O que os testes não viram: o import do Google Fonts foi descartado pelo build, e o site ficou em
+Times New Roman até eu abrir o inspetor. As fontes vêm do `next/font` agora.
+
+A primeira versão do maço registrava uma leitura completa pra um leitor que nunca saiu da folha
+um: o fim estava posicionado atrás do envelope, então o observer disparava na chegada. Nada deu
+erro, e a tabela se encheu de linhas plausíveis. Isso foi achado num navegador de verdade,
+contra o banco, não lendo o diff.
+
+## Licença
+
+MIT, o app e o pacote. Os dois sons de papel são a exceção: foram gerados no elevenlabs.io no
+plano gratuito, então são creditados e ficam fora da licença MIT.
+
+## Links
+
+https://from-anna.vercel.app/annamariaapp-as-a-letter
+
+https://github.com/imnotannamaria/from-anna
+
+https://www.npmjs.com/package/remark-scanned-page

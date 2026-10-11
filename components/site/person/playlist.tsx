@@ -1,7 +1,9 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import {
   PauseIcon,
+  MusicNotesIcon,
   PlayIcon,
   SkipBackIcon,
   SkipForwardIcon,
@@ -21,17 +23,18 @@ function minutes(ms: number): string {
   return `${Math.floor(total / 60)}:${(total % 60).toString().padStart(2, "0")}`
 }
 
-const LABEL = "me, as a playlist"
-
 export function Playlist() {
   const { tracks, currentIndex, elapsedMs, status, running, load, tick, toggle, next, prev } =
     useNowPlayingStore()
+  const t = useTranslations("person.playlist")
   const audioRef = useRef<HTMLAudioElement>(null)
   const silenced = useMuted()
   const [armed, setArmed] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [clip, setClip] = useState<{ index: number; elapsed: number; total: number } | null>(null)
   const [noCover, setNoCover] = useState<string | null>(null)
+  // the track whose cover has finished loading
+  const [coverIn, setCoverIn] = useState<string | null>(null)
 
   useEffect(() => {
     load()
@@ -53,35 +56,83 @@ export function Playlist() {
   }, [running, armed, track?.previewUrl, currentIndex])
 
   if (status !== "playing" || !track) {
+    const failed = status === "error"
+    // The same rows, sizes and controls as the playing state, drawn empty: the card keeps its
+    // shape while the songs come in, and only fills.
     return (
-      <Tile label={LABEL} icon={<VinylRecordIcon />}>
-        {/* The same three rows as the playing state (record, two lines, controls), so the card
-            does not change height when the songs arrive. */}
-        <div className="flex flex-1 flex-col items-center justify-center gap-2.5 text-center">
-          <span aria-hidden className="st-player opacity-50">
-            <span className="st-player-vinyl" />
-            <span className="st-player-cover" />
+      <Tile
+        label={t("label")}
+        icon={<VinylRecordIcon />}
+        note={
+          <span aria-hidden className="text-mono-xs invisible">
+            spotify
           </span>
-          <div className="w-full min-w-0">
-            <p aria-hidden className="text-heading-md font-serif">
-              &nbsp;
+        }
+      >
+        <div
+          className="flex flex-1 flex-col items-center justify-center gap-2.5"
+          aria-busy={status === "loading"}
+        >
+          <span aria-hidden className="st-player">
+            <span className="st-player-vinyl" />
+            <span className="st-player-cover" data-empty>
+              <MusicNotesIcon aria-hidden size={28} />
+            </span>
+          </span>
+
+          <div className="w-full min-w-0 text-center">
+            {/* where the title will be, as a bar: it has the title's own height */}
+            <p aria-hidden className="text-heading-md flex justify-center py-[0.3em] font-serif">
+              <span className="st-player-bar" style={{ width: "58%" }} />
             </p>
             <p className="text-mono-sm truncate font-mono text-[var(--fg-muted)]" role="status">
-              {status === "error"
-                ? "spotify did not answer."
-                : status === "empty"
-                  ? "nothing on the turntable."
-                  : "putting a record on…"}
+              {failed ? t("error") : status === "empty" ? t("empty") : t("loading")}
             </p>
           </div>
-          <div className="flex h-10 items-center">
-            {status === "error" ? (
+
+          {failed ? (
+            <div className="flex h-10 w-full items-center justify-center">
               <Button variant="secondary" size="sm" onClick={() => load()}>
-                try again
+                {t("retry")}
               </Button>
-            ) : null}
-          </div>
+            </div>
+          ) : (
+            <div className="flex w-full items-center justify-between gap-2" aria-hidden>
+              <span className="text-mono-xs w-9 font-mono text-[var(--fg-muted)] tabular-nums">
+                0:00
+              </span>
+              <div className="flex items-center gap-1.5 opacity-45">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="rounded-full"
+                  disabled
+                  tabIndex={-1}
+                >
+                  <SkipBackIcon aria-hidden size={14} weight="fill" />
+                </Button>
+                <Button size="icon-md" className="rounded-full" disabled tabIndex={-1}>
+                  <PlayIcon aria-hidden size={16} weight="fill" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="rounded-full"
+                  disabled
+                  tabIndex={-1}
+                >
+                  <SkipForwardIcon aria-hidden size={14} weight="fill" />
+                </Button>
+              </div>
+              <span className="text-mono-xs w-9 text-right font-mono text-[var(--fg-muted)] tabular-nums">
+                0:00
+              </span>
+            </div>
+          )}
         </div>
+
+        {/* the progress line, empty */}
+        <div aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 bg-[var(--border-subtle)]" />
       </Tile>
     )
   }
@@ -97,7 +148,7 @@ export function Playlist() {
 
   return (
     <Tile
-      label={LABEL}
+      label={t("label")}
       icon={<VinylRecordIcon />}
       note={
         <ArrowLink href={track.spotifyUrl} external className="text-mono-xs">
@@ -135,18 +186,23 @@ export function Playlist() {
           type="button"
           className="st-player focus-ring"
           data-playing={running || undefined}
-          aria-label={running ? "Pause" : "Play"}
+          aria-label={running ? t("pause") : t("play")}
           onClick={arm(toggle)}
         >
           <span aria-hidden className="st-player-vinyl" />
-          <span className="st-player-cover">
+          {/* the note is what shows until the cover has come in, or when there is none: the
+              box is never an empty white square */}
+          <span className="st-player-cover" data-empty={coverIn !== track.id || undefined}>
+            <MusicNotesIcon aria-hidden size={28} />
             {track.coverUrl && noCover !== track.id ? (
               <Image
+                key={track.id}
                 src={track.coverUrl}
                 alt=""
                 fill
                 sizes="92px"
                 unoptimized
+                onLoad={() => setCoverIn(track.id)}
                 onError={() => setNoCover(track.id)}
               />
             ) : null}
@@ -161,7 +217,9 @@ export function Playlist() {
             {track.artist}
           </p>
           <p className="sr-only">
-            {`From the album ${track.album}${track.year ? `, ${track.year}` : ""}`}
+            {track.year
+              ? t("albumYear", { album: track.album, year: track.year })
+              : t("album", { album: track.album })}
           </p>
         </div>
 
@@ -174,7 +232,7 @@ export function Playlist() {
               variant="ghost"
               size="icon-sm"
               className="rounded-full"
-              aria-label="Previous song"
+              aria-label={t("previous")}
               onClick={arm(prev)}
             >
               <SkipBackIcon aria-hidden size={14} weight="fill" />
@@ -182,7 +240,7 @@ export function Playlist() {
             <Button
               size="icon-md"
               className="rounded-full"
-              aria-label={running ? "Pause" : "Play"}
+              aria-label={running ? t("pause") : t("play")}
               onClick={arm(toggle)}
             >
               {running ? (
@@ -195,7 +253,7 @@ export function Playlist() {
               variant="ghost"
               size="icon-sm"
               className="rounded-full"
-              aria-label="Next song"
+              aria-label={t("next")}
               onClick={arm(next)}
             >
               <SkipForwardIcon aria-hidden size={14} weight="fill" />
@@ -210,7 +268,7 @@ export function Playlist() {
       <div
         className="absolute inset-x-0 bottom-0 h-0.5"
         role="progressbar"
-        aria-label={`Progress: ${track.name} by ${track.artist}`}
+        aria-label={t("progress", { song: track.name, artist: track.artist })}
         aria-valuenow={Math.round(progress * 100)}
         aria-valuemin={0}
         aria-valuemax={100}

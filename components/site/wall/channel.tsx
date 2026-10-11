@@ -4,6 +4,7 @@ import {
   LockSimpleIcon,
   SmileyIcon,
 } from "@phosphor-icons/react/dist/ssr"
+import { useTranslations } from "next-intl"
 import { Avatar } from "@/app/components/entrepta/avatar"
 import type { Letter } from "./letters"
 import { Reactions } from "./reactions"
@@ -11,6 +12,7 @@ import "./wall.css"
 
 /** One letter as one message: who wrote it, where they are from, the words, the reactions. */
 function Message({ letter, readOnly }: { letter: Letter; readOnly: boolean }) {
+  const t = useTranslations("wall")
   return (
     <article className="st-wl-msg" lang={letter.lang}>
       <Avatar name={letter.name || "?"} src={letter.photo} size="lg" shape="square" />
@@ -28,7 +30,7 @@ function Message({ letter, readOnly }: { letter: Letter; readOnly: boolean }) {
               target="_blank"
               rel="noopener noreferrer"
               className="st-wl-linkedin focus-ring"
-              aria-label={`${letter.name} on LinkedIn`}
+              aria-label={t("onLinkedin", { name: letter.name })}
             >
               <LinkedinLogoIcon aria-hidden size={15} weight="fill" />
             </a>
@@ -54,17 +56,16 @@ function Message({ letter, readOnly }: { letter: Letter; readOnly: boolean }) {
  * show, and a head that does not count letters.
  */
 export function Channel({ letters, preview = false }: { letters: Letter[]; preview?: boolean }) {
+  const t = useTranslations("wall")
   return (
-    <section className="st-wl-channel" aria-label="wall-of-love">
+    <section className="st-wl-channel" aria-label={t("channel")}>
       <header className="st-wl-channel-head">
         <p className="text-mono-md flex items-center gap-1.5 font-mono text-[var(--fg-primary)]">
           <HashIcon aria-hidden size={15} weight="bold" className="text-[var(--fg-brand)]" />
-          wall-of-love
+          {t("channel")}
         </p>
         <p className="text-mono-sm min-w-0 truncate font-mono text-[var(--fg-muted)]">
-          {preview
-            ? "how it will look on the wall"
-            : `${letters.length} ${letters.length === 1 ? "letter" : "letters"} · kind words, by invitation`}
+          {preview ? t("preview") : t("count", { count: letters.length })}
         </p>
       </header>
 
@@ -79,9 +80,7 @@ export function Channel({ letters, preview = false }: { letters: Letter[]; previ
       {preview ? null : (
         <footer className="st-wl-composer">
           <LockSimpleIcon aria-hidden size={15} />
-          <span className="text-mono-sm min-w-0 flex-1 truncate font-mono">
-            only people with an invitation can write here
-          </span>
+          <span className="text-mono-sm min-w-0 flex-1 truncate font-mono">{t("locked")}</span>
           <SmileyIcon aria-hidden size={16} />
         </footer>
       )}

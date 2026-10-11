@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { BooksIcon } from "@phosphor-icons/react/dist/ssr"
 import { TYPE_PLURAL, type LogType } from "@/lib/log/constants"
 import type { LogEntry } from "@/lib/log/validation"
@@ -7,11 +8,12 @@ import { Slips, ByType } from "./catalog"
 import "./log.css"
 
 export function Log({ entries }: { entries: LogEntry[] | null }) {
+  const t = useTranslations("log")
   const byType = new Map<LogType, LogEntry[]>()
   for (const entry of entries ?? []) {
     byType.set(entry.type, [...(byType.get(entry.type) ?? []), entry])
   }
-  const groups = [...byType].map(([type, items]) => ({ type: TYPE_PLURAL[type], items }))
+  const groups = [...byType].map(([type, items]) => ({ type: t(`types.${type}`), items }))
 
   return (
     <article className="st-room st-screen">
@@ -23,22 +25,21 @@ export function Log({ entries }: { entries: LogEntry[] | null }) {
               to="person"
               className="focus-ring underline decoration-[var(--border-strong)] decoration-dotted underline-offset-4 transition-colors hover:text-[var(--fg-brand-text)] hover:decoration-current"
             >
-              anna, the person
+              {t("parent")}
             </ScreenLink>{" "}
-            / log
+            / {t("label")}
           </>
         }
         count={entries?.length}
       >
-        A single feed for <span className="text-[var(--fg-primary)]">everything</span> I finish:
-        films, series, books, albums, podcasts and games.
+        {t.rich("lede", {
+          b: (words) => <span className="text-[var(--fg-primary)]">{words}</span>,
+        })}
       </PageHeader>
 
       {groups.length === 0 ? (
         <p className="text-body-md font-sans text-[var(--fg-secondary)]">
-          {entries === null
-            ? "The log lives in Postgres, and Postgres did not answer just now."
-            : "Nothing logged yet."}
+          {entries === null ? t("down") : t("empty")}
         </p>
       ) : (
         <ByType groups={groups} draw={(items) => <Slips items={items} />} />

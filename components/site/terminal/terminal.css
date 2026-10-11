@@ -29,18 +29,47 @@
   padding-top: 0;
   border-top: 0;
 }
+/* The foot: chips that say where you are, and the command under them. No box around it, as in
+   Warp: a line above, and the page's own background. */
 .st-term-input {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
   margin: 12px 16px 16px;
-  padding: 12px 14px;
-  border: 1px dashed var(--border-strong);
-  border-radius: var(--radius-lg);
-  transition: border-color 150ms var(--ease-out);
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
 }
-.st-term-input:focus-within {
-  border-color: var(--t-folder);
+.st-term-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.st-term-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 3px 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--fg-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.st-term-chip > svg {
+  flex: none;
+}
+.st-term-chip[data-kind="folder"] {
+  color: var(--t-folder);
+}
+.st-term-chip[data-kind="branch"] {
+  color: var(--t-path);
+}
+.st-term-input input {
+  /* a command reads a size up from the chips above it */
+  font-size: var(--text-mono-md);
 }
 /* the corner is the cat's */
 .st-term-shortcuts,
@@ -61,4 +90,14 @@
   .st-term:has(input:focus) :is(.st-term-shortcuts, .st-term-input) {
     margin-right: 16px;
   }
+}
+
+/* The terminal fills its side exactly and scrolls in one place, the log. The page area around
+   it scrolls for the Front's pages; here that would be a second scrollbar beside the first. */
+.st-page[data-part="back"] {
+  overflow: hidden;
+}
+.st-term {
+  min-height: 0;
+  max-height: 100%;
 }

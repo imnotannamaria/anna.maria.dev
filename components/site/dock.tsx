@@ -2,6 +2,7 @@
 
 import { CheckIcon, CopyIcon } from "@phosphor-icons/react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
+import { useTranslations } from "next-intl"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { revealViewport } from "@/lib/motion"
 import "./dock.css"
@@ -24,6 +25,7 @@ export type DockItem = {
 
 export function Dock({ items, label }: { items: DockItem[]; label: string }) {
   const reduce = useReducedMotion() ?? false
+  const t = useTranslations("contact")
   const [active, setActive] = useState(0)
 
   const [copied, setCopied] = useState<number | null>(null)
@@ -104,7 +106,7 @@ export function Dock({ items, label }: { items: DockItem[]; label: string }) {
                   type="button"
                   className="st-app-copy focus-ring"
                   data-copied={copied === index || undefined}
-                  aria-label={`Copy ${entry.name}: ${entry.copy}`}
+                  aria-label={t("copy", { name: entry.name, value: entry.copy ?? "" })}
                   onClick={() => copy(index, entry.copy ?? "")}
                 >
                   {copied === index ? (
@@ -127,7 +129,7 @@ export function Dock({ items, label }: { items: DockItem[]; label: string }) {
           <span className="ml-2.5 text-[var(--fg-muted)]">{item.what}</span>
           {copied === active ? (
             <span className="ml-2.5 text-[var(--status-success-fg)]" role="status">
-              copied
+              {t("copied")}
             </span>
           ) : null}
         </p>

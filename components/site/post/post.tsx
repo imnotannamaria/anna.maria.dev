@@ -1,3 +1,5 @@
+import { useLocale, useTranslations } from "next-intl"
+import { useShortDate } from "@/components/site/dates"
 import { ArticleIcon } from "@phosphor-icons/react/dist/ssr"
 import { tileClass } from "@/components/site/tile"
 import { Badge } from "@/app/components/entrepta/badge"
@@ -10,26 +12,26 @@ import { PageHeader } from "@/components/site/page-header"
 import "./post.css"
 
 export function Post({ slug }: { slug: string }) {
-  const post = getPublishedPosts().find((item) => item.slug === slug)
+  const t = useTranslations("notes")
+  const shortDate = useShortDate()
+  const locale = useLocale()
+  const post = getPublishedPosts(locale).find((item) => item.slug === slug)
   if (!post) return null
 
-  const reading = getPostReadingStats(post.slug)
-  const toc = getPostToc(post.slug).filter((item) => item.level === 2)
-  const { year, month, day } = readDate(post.date)
+  const reading = getPostReadingStats(post.slug, locale)
+  const toc = getPostToc(post.slug, locale).filter((item) => item.level === 2)
 
   const head = (
     <header className="flex flex-col gap-4">
       <p className="text-mono-xs font-mono text-[var(--fg-muted)]">
-        <time dateTime={post.date}>
-          {month} {day}, {year}
-        </time>{" "}
-        · {reading.minutes} min · {reading.words} words
+        <time dateTime={post.date}>{shortDate(post.date)}</time> ·{" "}
+        {t("minutes", { minutes: reading.minutes })} · {t("words", { words: reading.words })}
       </p>
       <h2 className="st-ps-title font-serif text-[var(--fg-primary)]">{post.title}</h2>
       <p className="text-body-lg max-w-[60ch] font-sans text-[var(--fg-secondary)]">
         {post.description}
       </p>
-      <ul className="flex flex-wrap gap-1.5" aria-label="Tags">
+      <ul className="flex flex-wrap gap-1.5" aria-label={t("tags")}>
         {post.tags.map((tag) => (
           <li key={tag}>
             <Badge color="brand">{tag}</Badge>
@@ -65,9 +67,9 @@ export function Post({ slug }: { slug: string }) {
               to="notes"
               className="focus-ring underline decoration-[var(--border-strong)] decoration-dotted underline-offset-4 transition-colors hover:text-[var(--fg-brand-text)] hover:decoration-current"
             >
-              notes
+              {t("label")}
             </ScreenLink>{" "}
-            / a note
+            / {t("aNote")}
           </>
         }
       />
@@ -80,7 +82,7 @@ export function Post({ slug }: { slug: string }) {
           <Tape />
           <div className={tileClass({ size: "sm" }, "gap-3")}>
             <h3 className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
-              in this note
+              {t("inThisNote")}
             </h3>
             {list}
           </div>

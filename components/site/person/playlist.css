@@ -15,12 +15,38 @@
   overflow: hidden;
   border: 1px solid var(--border-subtle);
   border-radius: 3px;
-  background: var(--bg-surface);
+  /* a tint of the brand over the card, not the page's surface colour, which is white in light mode */
+  background: color-mix(in srgb, var(--fg-brand) 12%, var(--bg-card));
   box-shadow: 2px 0 10px rgb(0 0 0 / 0.45);
   transition: scale 160ms var(--ease-out);
 }
+.st-player-cover > svg {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  color: var(--fg-brand-text);
+  opacity: 0.55;
+}
+.st-player-cover[data-empty] > svg {
+  animation: st-player-breathe 1.6s ease-in-out infinite;
+}
+@keyframes st-player-breathe {
+  50% {
+    opacity: 0.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-player-cover[data-empty] > svg {
+    animation: none;
+  }
+}
 .st-player-cover img {
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 240ms var(--ease-out);
+}
+.st-player-cover:not([data-empty]) img {
+  opacity: 1;
 }
 .st-player:active .st-player-cover {
   scale: 0.97;
@@ -64,4 +90,23 @@
 .st-player[data-playing]:hover .st-player-vinyl,
 .st-player[data-playing]:focus-visible .st-player-vinyl {
   translate: 52px 0;
+}
+
+/* the title, before there is one */
+.st-player-bar {
+  display: block;
+  height: 0.8em;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--fg-brand) 14%, var(--bg-card));
+  animation: st-player-breathe-bar 1.6s ease-in-out infinite;
+}
+@keyframes st-player-breathe-bar {
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .st-player-bar {
+    animation: none;
+  }
 }

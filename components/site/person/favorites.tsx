@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { SmileyIcon } from "@phosphor-icons/react"
 import Image, { type StaticImageData } from "next/image"
 import { useState } from "react"
@@ -10,32 +11,41 @@ import fineGif from "@/components/site/person/gifs/this-is-fine.gif"
 import fine from "@/components/site/person/gifs/this-is-fine.png"
 import "./favorites.css"
 
-const EMOJIS: { emoji: string; name: string; wide?: boolean }[] = [
-  { emoji: "🫡", name: "saluting face" },
-  { emoji: "🤪", name: "zany face" },
-  { emoji: "🫣", name: "face with peeking eye" },
-  { emoji: "🫢", name: "face with hand over mouth" },
-  { emoji: "🤨", name: "face with raised eyebrow" },
+type EmojiKey = "salute" | "zany" | "peek" | "oops" | "brow" | "eyes"
+
+/** `name` is the key of the emoji's spoken name in the messages. */
+const EMOJIS: { emoji: string; name: EmojiKey; wide?: boolean }[] = [
+  { emoji: "🫡", name: "salute" },
+  { emoji: "🤪", name: "zany" },
+  { emoji: "🫣", name: "peek" },
+  { emoji: "🫢", name: "oops" },
+  { emoji: "🤨", name: "brow" },
 
   {
     emoji: "\u{1F441}\u{FE0F}\u{1F444}\u{1F441}\u{FE0F}",
-    name: "eye, mouth, eye",
+    name: "eyes",
     wide: true,
   },
 ]
 
-const GIFS: { name: string; code: string; stopped: StaticImageData; playing: StaticImageData }[] = [
-  { name: "confused math lady", code: "nazareconfusa", stopped: nazare, playing: nazareGif },
-  { name: "this is fine", code: "this-is-fine", stopped: fine, playing: fineGif },
+const GIFS: {
+  name: "nazare" | "fine"
+  code: string
+  stopped: StaticImageData
+  playing: StaticImageData
+}[] = [
+  { name: "nazare", code: "nazareconfusa", stopped: nazare, playing: nazareGif },
+  { name: "fine", code: "this-is-fine", stopped: fine, playing: fineGif },
 ]
 
 function Gif({ name, code, stopped, playing }: (typeof GIFS)[number]) {
   const [player, setPlayer] = useState(false)
+  const t = useTranslations("person.favorites")
   return (
     <button
       type="button"
       className="st-gif focus-ring"
-      aria-label={`${name}, a gif. It plays while you hover or focus it.`}
+      aria-label={t("gif", { name: t(`gifs.${name}`) })}
       onPointerEnter={() => setPlayer(true)}
       onPointerLeave={() => setPlayer(false)}
       onFocus={() => setPlayer(true)}
@@ -55,9 +65,10 @@ export function Favorites() {
   const [picked, setPicked] = useState<Record<string, boolean>>({})
 
   const [flights, setFlights] = useState<Record<string, number>>({})
+  const t = useTranslations("person.favorites")
 
   return (
-    <Tile label="emojis & gifs I overuse" icon={<SmileyIcon />}>
+    <Tile label={t("label")} icon={<SmileyIcon />}>
       <ul className="flex flex-wrap gap-1.5">
         {EMOJIS.map(({ emoji, name, wide }) => {
           const on = picked[emoji] ?? false
@@ -66,7 +77,7 @@ export function Favorites() {
               <button
                 type="button"
                 className="st-reaction focus-ring text-mono-xs font-mono"
-                aria-label={`${name}, ${on ? 2 : 1} reactions`}
+                aria-label={t("reactions", { name: t(`emoji.${name}`), count: on ? 2 : 1 })}
                 aria-pressed={on}
                 onClick={() => {
                   setPicked((before) => ({ ...before, [emoji]: !on }))

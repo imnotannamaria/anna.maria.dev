@@ -7,3 +7,22 @@
   color: var(--fg-muted);
   text-wrap: pretty;
 }
+
+/* The sentence at the top of the home and of the professional page: one line of thought with a
+   chain of arrows and a sum in it, so it takes the page's whole width and a size that fits.
+   Two classes, so it beats `.st-lede` whatever order the stylesheets load in. */
+.st-lede.st-lede-wide {
+  max-width: none;
+  font-size: clamp(16px, 1.75cqw, 22px);
+}
+/* neither the arrows nor the sum break in the middle */
+.st-lede-flow,
+.st-lede-wide .st-lede-keep {
+  white-space: nowrap;
+}
+/* a phone: smaller, so the arrows fit in one line of the page and the sentence takes fewer */
+@media (max-width: 639px) {
+  .st-lede.st-lede-wide {
+    font-size: 16px;
+  }
+}

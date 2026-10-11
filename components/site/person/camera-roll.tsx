@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { POLAROID } from "@/components/site/polaroid"
 import { motion, useReducedMotion } from "motion/react"
@@ -14,28 +15,33 @@ import burger from "@/components/site/person/photos/06-burger.jpg"
 import snout from "@/components/site/person/photos/07-abimaela-close.jpg"
 import "./camera-roll.css"
 
-const PHOTOS: { src: StaticImageData; alt: string }[] = [
-  { src: selfie, alt: "A selfie, in an Olivia Rodrigo t-shirt" },
-  { src: abimaela, alt: "Abimaela, the cat, being petted" },
-  { src: palms, alt: "Two people smiling under palm trees" },
-  { src: lunch, alt: "A very full plate at lunch" },
-  { src: glasses, alt: "A selfie with blue-light glasses" },
-  { src: burger, alt: "A burger on a checkered paper" },
-  { src: snout, alt: "Abimaela's nose, far too close to the camera" },
-]
-
+/** The photos, and the key of each one's description in the messages. */
+const PHOTOS = [
+  { src: selfie, alt: "selfie" },
+  { src: abimaela, alt: "abimaela" },
+  { src: palms, alt: "palms" },
+  { src: lunch, alt: "lunch" },
+  { src: glasses, alt: "glasses" },
+  { src: burger, alt: "burger" },
+  { src: snout, alt: "snout" },
+] as const satisfies { src: StaticImageData; alt: string }[]
 const TILTS = [-7, 5, -3, 8, -5, 6, -4]
 const IN_PILE = 4
 
 export function CameraRoll() {
   const [queue, setQueue] = useState(() => PHOTOS.map((_, index) => index))
   const reduce = useReducedMotion()
+  const t = useTranslations("person")
 
   return (
     <div className="st-roll">
       <button
         type="button"
-        aria-label={`Camera roll. ${PHOTOS[queue[0]].alt}. Photo ${queue[0] + 1} of ${queue.length}; click for the next one.`}
+        aria-label={t("roll", {
+          alt: t(`photos.${PHOTOS[queue[0]].alt}`),
+          n: queue[0] + 1,
+          total: queue.length,
+        })}
         className="focus-ring relative h-[156px] w-[124px] cursor-pointer rounded-[4px]"
         onClick={() => setQueue(([first, ...rest]) => [...rest, first])}
       >

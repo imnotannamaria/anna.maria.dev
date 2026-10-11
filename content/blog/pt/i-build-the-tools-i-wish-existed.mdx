@@ -1,0 +1,57 @@
+---
+title: "Eu construo as ferramentas que eu queria que existissem"
+description: "O wristkit, o entrepta e a API de finanças que estou construindo agora começaram do mesmo jeito. Um post curto sobre o que developer experience significa de verdade pra mim."
+date: "2026-07-20"
+tags: ["dx", "developer-experience", "building", "open-source"]
+published: true
+---
+
+Eu tenho um padrão. Toda vez que eu quero uma coisa e não acho, acabo construindo eu mesma. Já aconteceu vezes o bastante pra eu parar de chamar de coincidência.
+
+Aqui vão três delas.
+
+## wristkit: eu queria um anel
+
+Refazendo meu portfólio, eu me apaixonei pelo anel do Apple Fitness, aquele círculo que vai enchendo com a sua atividade. Eu queria ele no meu site, puxando os dados reais do meu Apple Watch.
+
+Procurei alguma coisa pronta. Nada. Nenhuma biblioteca, nenhum widget, nada que simplesmente me entregasse o anel preenchido com os meus números.
+
+Então eu construí. O wristkit usa um Atalho da Apple pra mandar meus dados pra um endpoint, e o endpoint atualiza um anel na minha home todo dia. A coisa que eu queria agora existe, porque eu fiz ela existir.
+
+## entrepta: eu queria um design system com a minha cara
+
+Esse foi menos sobre uma feature que faltava e mais sobre identidade. Eu sempre quis um design system, mas não um genérico. Um com a minha cara. Dark first, meus tokens, meus componentes, minhas opiniões embutidas.
+
+Os design systems que existem são bons. Só não são meus. Então eu construí o entrepta do jeito que eu ia querer usar. Você copia os componentes pro seu projeto e o código é seu, sem SDK em runtime, sem caixa preta, um comando só pra configurar tudo. Essas escolhas não são aleatórias. Cada uma é uma pequena opinião sobre como uma ferramenta deveria tratar quem usa.
+
+## pinggy: eu queria que meus dados financeiros fossem meus
+
+Esse é o que estou construindo agora, então considera um pequeno spoiler.
+
+Eu queria acompanhar minhas finanças pessoais. Todo app que eu achei era um produto fechado, onde meus dados moram no servidor de outra pessoa, nos termos de outra pessoa. Eu não queria isso.
+
+Então o pinggy é o contrário. É uma API de finanças self hosted. Você traz o seu próprio banco no Supabase, faz o deploy onde quiser, e conecta o que quiser em cima: um dashboard, um app mobile, ou uma automação da Apple.
+
+A automação é a minha parte favorita. Toda vez que eu pago com Apple Pay, um Atalho dispara sozinho e registra o pagamento no meu banco como despesa ou receita. Se eu estiver a fim, ele me faz umas perguntas rápidas ali na hora, a categoria, o tipo, esse tipo de coisa. Se eu estiver com pressa, eu pulo e preencho depois. De qualquer jeito o pagamento já está salvo. O registro acontece enquanto eu vivo o meu dia, não no fim do mês, quando eu já esqueci metade.
+
+Tem um detalhe que eu gosto muito. Essa automação não é uma pessoa. Não tem ninguém ali pra digitar uma senha ou clicar num botão de login, então ela não consegue entrar do jeito normal. Em vez disso ela carrega um token secreto só dela, que basicamente diz "essa é a automação da Anna, deixa entrar", separado de como um usuário de verdade faz login. Isso me fez encarar uma pergunta que eu nunca tinha enfrentado de verdade. Quando quem chama a sua API não é um humano, como ele prova quem é?
+
+## Nunca foi sobre os projetos
+
+Bota os três lado a lado e o padrão não é "eu gosto de construir". É posse. O wristkit são os meus dados no meu site. O entrepta é o meu código, que é meu de verdade. O pinggy são as minhas finanças no meu próprio banco.
+
+É isso que developer experience significa pra mim. Não o polimento por cima, a posse por baixo. Uma boa ferramenta pertence a quem usa. Ela não faz os seus dados de refém, não esconde o próprio código, nem te obriga a depender dela pra sempre. A melhor DX é aquela em que você continua no controle.
+
+## Construir pra si mesma não é desculpa pra fazer de qualquer jeito
+
+Aqui mora a armadilha. Quando você constrói pra você, é fácil deixar a qualidade escorregar, porque quem é que vai reclamar.
+
+Eu tento não deixar. Quando alguma coisa parece lenta, eu não finjo que não vi. Abro o Lighthouse, ou sinto na mão mesmo, acho a parte que está arrastando e conserto. Um skeleton aqui, geração estática ali. Quando refiz meu portfólio, levei a nota de acessibilidade de 85 pra 100, o que significou consertar de verdade o contraste, os estados de foco e os labels, não correr atrás de um número.
+
+Porque se eu vou construir a coisa que eu queria que existisse, o mínimo é fazer dela algo que eu ficaria feliz de usar.
+
+## A versão curta
+
+Todo projeto que importa pra mim começou com a mesma frase. Eu queria que isso existisse. Aí, em vez de esperar alguém construir, eu abri um editor.
+
+Essa é a developer experience em que eu acredito. A que você constrói pra você, e depois pode compartilhar.

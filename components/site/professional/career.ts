@@ -1,7 +1,10 @@
 export type Month = readonly [year: number, month: number]
 
+/** The ids, which are also the keys of each entry's words in the messages (`career.<id>`). */
+export type EntryId = "cesar" | "avanade" | "fiap" | "descomplica"
+
 export type Entry = {
-  id: string
+  id: EntryId
   type: "work" | "study"
   org: string
   role: string

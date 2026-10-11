@@ -16,3 +16,9 @@
   padding-top: 16px;
   border-top: 1px dashed var(--border-subtle);
 }
+
+/* Under a card's head, her speech needs headroom: a page's name and its line can run to three
+   lines, and at the track's own height they reached the title above. */
+.st-footer .st-track-ground {
+  height: 172px;
+}

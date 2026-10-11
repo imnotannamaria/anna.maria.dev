@@ -2,26 +2,29 @@
 
 import type { SiteData } from "@/components/site/frame/site-data"
 import { useSiteData } from "@/components/site/frame/use-site-data"
-import { buildFiles } from "./files"
+import { buildFiles, type FileWords } from "./files"
+import { useTranslations } from "next-intl"
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from "react"
-import { Card, CardTerminalBar, CardTerminalBody } from "@/app/components/entrepta/card"
+import { FileIcon, FolderIcon, GitBranchIcon } from "@phosphor-icons/react"
+import { Card, CardTerminalBody } from "@/app/components/entrepta/card"
 import { cn } from "@/lib/utils"
 import { pet } from "@/components/site/abimaela/abimaela"
 import type { ScreenId } from "@/components/site/pages"
 import { useNavigate } from "@/components/site/navigation"
-import { commandSchema, path, complete, execute, type Output, type ItemKind } from "./shell"
+import {
+  SHELL_WORDS,
+  commandSchema,
+  path,
+  complete,
+  execute,
+  type Output,
+  type ItemKind,
+} from "./shell"
 import "./terminal.css"
 
 type LogLine = Output & { id: number }
 
 const SHORTCUTS = ["help", "ls", "cat person.txt", "cat professional.txt", "routes", "open notes"]
-
-const WELCOME: Output = {
-  type: "text",
-  text: "the back of annamaria.app. the whole site is in here, as text.\ntype a command and press enter, or click one below.",
-}
-
-const USER = "guest@annamaria.app"
 
 const COLOR: Record<ItemKind, string> = {
   command: "text-[var(--t-command)]",
@@ -39,8 +42,29 @@ const METHOD_COLOR: Record<string, string> = {
 
 export function Terminal({ data, className }: { data: SiteData; className?: string }) {
   const withLog = useSiteData(data)
-  const system = useMemo(() => buildFiles(withLog), [withLog])
-  const [lines, setLines] = useState<LogLine[]>([{ ...WELCOME, id: 0 }])
+  const t = useTranslations("terminal")
+  const pages = useTranslations("pages")
+  const system = useMemo(() => {
+    // the shell is a plain function: it gets its sentences already in the page's language
+    const shell = structuredClone(SHELL_WORDS)
+    for (const key of Object.keys(shell.does) as (keyof typeof shell.does)[]) {
+      shell.does[key] = t.raw(`shell.does.${key}`)
+    }
+    for (const key of Object.keys(shell) as (keyof typeof shell)[]) {
+      if (key !== "does") shell[key] = t.raw(`shell.${key}`)
+    }
+    const words: FileWords = {
+      // `t.raw` hands back the sentence as written, slots and all; the files fill them
+      files: (key, values = {}) =>
+        String(t.raw(`files.${key}` as "files.home")).replace(/\{(\w+)\}/g, (_, name: string) =>
+          String(values[name] ?? ""),
+        ),
+      page: (id, part) => pages(`${id}.${part}`),
+      shell,
+    }
+    return buildFiles(withLog, words)
+  }, [withLog, t, pages])
+  const [lines, setLines] = useState<LogLine[]>(() => [{ type: "text", text: t("welcome"), id: 0 }])
   const [cwd, setCwd] = useState<string[]>([])
   const [entry, setEntry] = useState("")
   const [recalling, setRecalling] = useState<number | null>(null)
@@ -66,6 +90,15 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
     observer.observe(target)
     return () => observer.disconnect()
   }, [])
+
+  // how many things are in the folder you are in, hidden ones left out
+  const here = useMemo(() => {
+    let node: unknown = system.root
+    for (const part of cwd) node = (node as Record<string, unknown> | undefined)?.[part]
+    return node && typeof node === "object"
+      ? Object.keys(node).filter((name) => !name.startsWith(".")).length
+      : 0
+  }, [system, cwd])
 
   function run(raw: string) {
     // what the field may send: one line, trimmed, of a sane length
@@ -99,23 +132,11 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
 
   return (
     <Card ref={pane} className={cn("st-term gap-0 p-0 font-mono max-sm:p-0", className)}>
-      <CardTerminalBar>
-        <span className="flex min-w-0 items-center gap-2.5">
-          <span aria-hidden className="flex gap-1.5">
-            <i className="size-2.5 rounded-full bg-[var(--rose-500)]" />
-            <i className="size-2.5 rounded-full bg-[var(--amber-500)]" />
-            <i className="size-2.5 rounded-full bg-[var(--emerald-500)]" />
-          </span>
-          <span className="truncate text-[var(--t-folder)] normal-case">{USER}</span>
-        </span>
-        <span className="truncate text-[var(--t-path)] normal-case">{path(cwd)}</span>
-      </CardTerminalBar>
-
       <CardTerminalBody className="flex min-h-0 flex-1 flex-col p-0">
         <div
           ref={output}
           role="log"
-          aria-label="Terminal output"
+          aria-label={t("output")}
           className="st-term-output flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto overscroll-y-contain p-5"
           onClick={(event) => {
             if (!(event.target as Element).closest("button, a")) field.current?.focus()
@@ -138,8 +159,8 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
             </button>
           ))}
         </div>
-        {/* The input lives at the foot, the way Warp does it: the path on a line of its own,
-            the command under it, and everything that ran stacking up above. */}
+        {/* The input lives at the foot, the way Warp and fish do it: a row of chips saying where
+            you are, the command under it, and everything that ran stacking up above. */}
         <form
           className="st-term-input"
           onSubmit={(event) => {
@@ -147,19 +168,31 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
             run(entry)
           }}
         >
-          <label htmlFor={id} className="text-mono-sm flex items-center gap-2">
-            <span className="text-[var(--t-folder)]">{USER}</span>
-            <span className="text-[var(--t-path)]">{path(cwd)}</span>
+          {/* where you are, as chips: the folder, the branch the site ships from, and what is in
+              the folder. They are the input's label, so a screen reader hears them with it. */}
+          <label htmlFor={id} className="st-term-chips text-mono-sm">
+            <span className="st-term-chip" data-kind="folder">
+              <FolderIcon aria-hidden size={14} />
+              {path(cwd)}
+            </span>
+            <span className="st-term-chip" data-kind="branch">
+              <GitBranchIcon aria-hidden size={14} />
+              main
+            </span>
+            <span className="st-term-chip" data-kind="files">
+              <FileIcon aria-hidden size={14} />
+              {t("items", { count: here })}
+            </span>
           </label>
           <div className="flex items-center gap-2">
             <span aria-hidden className="text-[var(--t-folder)]">
-              $
+              ❯
             </span>
             <input
               id={id}
               ref={field}
               value={entry}
-              placeholder="type a command"
+              placeholder={t("placeholder")}
               autoComplete="off"
               autoCapitalize="off"
               autoCorrect="off"
@@ -213,7 +246,9 @@ function Line({ line, onRun }: { line: Output; onRun: (command: string) => void 
 
   if (line.type === "text") {
     return (
-      <pre className="m-0 overflow-x-auto font-mono whitespace-pre text-[var(--fg-secondary)]">
+      // Wraps instead of scrolling sideways. Each block used to be its own scroller, so a long
+      // line put a scrollbar in the middle of the output; the only scroll here is the log's own.
+      <pre className="m-0 font-mono [overflow-wrap:anywhere] whitespace-pre-wrap text-[var(--fg-secondary)]">
         {line.text.split("\n").map((excerpt, index) => (
           <Fragment key={index}>
             {index > 0 ? "\n" : null}

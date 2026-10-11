@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { AppWindowIcon } from "@phosphor-icons/react/dist/ssr"
 import Image, { type StaticImageData } from "next/image"
 import type { ReactNode } from "react"
@@ -43,12 +44,22 @@ const ICON: Record<AppName, ReactNode> = {
   ),
 }
 
-const APPS: DockItem[] = APP_LIST.map((app) => ({ ...app, icon: ICON[app.name] }))
-
 export function Apps() {
+  const t = useTranslations("professional")
+  // what each app is for, in the page's language; its name is a brand and stays
+  const apps: DockItem[] = APP_LIST.map((app) => ({
+    name: app.name,
+    what: t(`app.${app.name}`),
+    icon: ICON[app.name],
+  }))
   return (
-    <Tile label="apps" icon={<AppWindowIcon />} note={`${APPS.length} in the dock`} size="md">
-      <Dock items={APPS} label="Apps" />
+    <Tile
+      label={t("appsLabel")}
+      icon={<AppWindowIcon />}
+      note={t("inDock", { count: apps.length })}
+      size="md"
+    >
+      <Dock items={apps} label={t("apps")} />
     </Tile>
   )
 }

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { StickerIcon } from "@phosphor-icons/react"
 import { motion, useMotionValue } from "motion/react"
 import Image, { type StaticImageData } from "next/image"
@@ -19,9 +20,9 @@ const cutout = (src: StaticImageData, width: number) => (
 )
 
 type Sticker = {
-  id: string
+  /** Also the key of its caption in the messages. */
+  id: "pe" | "galadriel" | "dany" | "bosco" | "cherry"
 
-  caption: string
   art: ReactNode
 
   diecut?: boolean
@@ -33,7 +34,6 @@ type Sticker = {
 const STICKERS: Sticker[] = [
   {
     id: "pe",
-    caption: 'Pernambuco, my "country"',
     art: <Flag className="w-[104px]" />,
     x: "4%",
     y: "4%",
@@ -41,7 +41,6 @@ const STICKERS: Sticker[] = [
   },
   {
     id: "galadriel",
-    caption: "Galadriel",
     art: cutout(galadriel, 118),
     diecut: true,
     x: "56%",
@@ -50,7 +49,6 @@ const STICKERS: Sticker[] = [
   },
   {
     id: "dany",
-    caption: "Daenerys Targaryen, Queen of the Seven Kingdoms",
     art: cutout(dany, 118),
     diecut: true,
     x: "30%",
@@ -59,7 +57,6 @@ const STICKERS: Sticker[] = [
   },
   {
     id: "bosco",
-    caption: "Bosco, from Drag Race",
     art: cutout(bosco, 118),
     diecut: true,
     x: "2%",
@@ -68,7 +65,6 @@ const STICKERS: Sticker[] = [
   },
   {
     id: "cherry",
-    caption: "Cheryl Blossom",
     art: cutout(cherry, 118),
     diecut: true,
     x: "60%",
@@ -103,12 +99,13 @@ function Sticker({
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const [inHand, setInHand] = useState(false)
+  const t = useTranslations("person.stickers")
 
   return (
     <Tip label={caption}>
       <motion.button
         type="button"
-        aria-label={`Sticker: ${caption}. Drag it, or use the arrow keys.`}
+        aria-label={t("aria", { caption })}
         drag
         dragConstraints={bounds}
         dragMomentum={false}
@@ -150,14 +147,15 @@ export function Stickers() {
   const stage = useRef<HTMLDivElement>(null)
   const [order, setOrder] = useState<Record<string, number>>({})
   const topmost = useRef(1)
+  const t = useTranslations("person.stickers")
 
   return (
-    <Tile label="stickers" icon={<StickerIcon />} note="drag them">
+    <Tile label={t("label")} icon={<StickerIcon />} note={t("note")}>
       <div ref={stage} className="relative min-h-[320px] flex-1">
         {STICKERS.map((item) => (
           <Sticker
             key={item.id}
-            caption={item.caption}
+            caption={t(item.id)}
             diecut={item.diecut}
             bounds={stage}
             front={order[item.id] ?? 1}

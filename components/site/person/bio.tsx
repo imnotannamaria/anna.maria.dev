@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import Image from "next/image"
 import type { ReactNode } from "react"
 import { Cat, pet } from "@/components/site/abimaela/abimaela"
@@ -37,43 +38,52 @@ const Emoji = ({ children }: { children: string }) => <span className="st-emoji"
 const WEIGHT = <Emoji>🏋️</Emoji>
 
 export function Bio() {
+  const t = useTranslations("person")
   return (
     <Lede as="div" className="st-lede-person">
       <p>
-        I&rsquo;m{" "}
-        <Word
-          pop={
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src="/images/avatar.png" alt="" className="st-portrait" loading="lazy" />
-          }
-        >
-          Anna
-        </Word>
-        , from <Word pop={<Flag className={`${STICKER} w-[64px]`} />}>Pernambuco</Word>, and I live
-        in Tamandaré, right by the <Word pop={<Emoji>🌊</Emoji>}>beach</Word>.
+        {t.rich("bio1", {
+          anna: (word) => (
+            <Word
+              pop={
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src="/images/avatar.png" alt="" className="st-portrait" loading="lazy" />
+              }
+            >
+              {word}
+            </Word>
+          ),
+          pe: (word) => <Word pop={<Flag className={`${STICKER} w-[64px]`} />}>{word}</Word>,
+          beach: (word) => <Word pop={<Emoji>🌊</Emoji>}>{word}</Word>,
+        })}
       </p>
       <p>
-        The <Word pop={WEIGHT}>gym</Word>&nbsp;is my daily reset button, five times a week, pretty
-        much non negotiable. I&rsquo;m a big fan of{" "}
-        <Word pop={<Emoji>👻</Emoji>}>horror films</Word>, Mike Flanagan and{" "}
-        <Word
-          pop={
-            <span className={STICKER} data-diecut>
-              <Image src={bosco} alt="" width={72} sizes="72px" />
-            </span>
-          }
-        >
-          Drag Race
-        </Word>
-        .
+        {t.rich("bio2", {
+          gym: (word) => <Word pop={WEIGHT}>{word}</Word>,
+          horror: (word) => <Word pop={<Emoji>👻</Emoji>}>{word}</Word>,
+          drag: (word) => (
+            <Word
+              pop={
+                <span className={STICKER} data-diecut>
+                  <Image src={bosco} alt="" width={72} sizes="72px" />
+                </span>
+              }
+            >
+              {word}
+            </Word>
+          ),
+        })}
       </p>
       <p>
-        I play a few <Word pop={<Emoji>🎸</Emoji>}>instruments</Word>, all of them mediocrely, and I
-        love every kind of <Word pop={<Emoji>🎧</Emoji>}>music</Word>, mostly pop. I also answer to
-        <Word pop={<Cat height={64} />} onEnter={() => pet.notify("meow")}>
-          Abimaela
-        </Word>
-        , the cat in the corner.
+        {t.rich("bio3", {
+          instruments: (word) => <Word pop={<Emoji>🎸</Emoji>}>{word}</Word>,
+          music: (word) => <Word pop={<Emoji>🎧</Emoji>}>{word}</Word>,
+          abi: (word) => (
+            <Word pop={<Cat height={64} />} onEnter={() => pet.notify("meow")}>
+              {word}
+            </Word>
+          ),
+        })}
       </p>
     </Lede>
   )

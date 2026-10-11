@@ -2,13 +2,16 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { MobileNav } from "@/app/components/entrepta/mobile-nav"
 import { Sidebar, type SidebarGroup } from "@/app/components/entrepta/sidebar"
 import { Abimaela, pet } from "@/components/site/abimaela/abimaela"
 import { ClickBurst } from "@/components/site/click-burst"
 import { Footer } from "@/components/site/footer/footer"
+import { useSitePath } from "@/components/site/i18n"
+import { localePath } from "@/lib/i18n/locales"
 import { ICON } from "@/components/site/icons"
 import { useNavigate } from "@/components/site/navigation"
 import { PAGES, hrefOf, listedPageOf, screenOf } from "@/components/site/pages"
@@ -28,27 +31,11 @@ export type { Part }
 
 const PART_HREF: Record<Exclude<Part, "front">, string> = { back: "/back", ia: "/ai" }
 
-const NAV: SidebarGroup[] = [PAGES.slice(0, 1), PAGES.slice(1)].map((group) => ({
-  items: group.map((page) => ({
-    id: page.id,
-    label: page.label,
-    href: hrefOf(page.id),
-    icon: ICON[page.id],
-  })),
-}))
-
-/** The same pages for the phone's bottom bar: the first four in reach, the rest under More. */
-const BAR = PAGES.map((page) => ({
-  id: page.id,
-  label: page.short,
-  href: hrefOf(page.id),
-  icon: ICON[page.id],
-}))
-
 const partOf = (pathname: string): Part =>
   pathname === "/back" ? "back" : pathname === "/ai" ? "ia" : "front"
 
 function BrandMark({ compact }: { compact: boolean }) {
+  const t = useTranslations("frame")
   return (
     <span className="flex items-center gap-2.5">
       <Image
@@ -63,7 +50,7 @@ function BrandMark({ compact }: { compact: boolean }) {
       {compact ? null : (
         <span className="flex min-w-0 flex-col font-mono leading-tight">
           <span className="text-mono-sm truncate text-[var(--fg-primary)]">Anna Maria</span>
-          <span className="text-mono-xs truncate text-[var(--fg-muted)]">software engineer</span>
+          <span className="text-mono-xs truncate text-[var(--fg-muted)]">{t("role")}</span>
         </span>
       )}
     </span>
@@ -80,8 +67,28 @@ export function SiteFrame({
   /** The page of the Front the address points at. */
   children: ReactNode
 }) {
-  const pathname = usePathname()
+  const pathname = useSitePath()
   const router = useRouter()
+  const t = useTranslations("frame")
+  const pages = useTranslations("pages")
+  const locale = useLocale()
+
+  // the pages, named in the page's language: grouped for the sidebar, flat for the phone's bar
+  // (the first four in reach of the thumb, the rest under More)
+  const nav: SidebarGroup[] = [PAGES.slice(0, 1), PAGES.slice(1)].map((group) => ({
+    items: group.map((page) => ({
+      id: page.id,
+      label: pages(`${page.id}.label`),
+      href: localePath(locale, hrefOf(page.id)),
+      icon: ICON[page.id],
+    })),
+  }))
+  const bar = PAGES.map((page) => ({
+    id: page.id,
+    label: pages(`${page.id}.short`),
+    href: localePath(locale, hrefOf(page.id)),
+    icon: ICON[page.id],
+  }))
   const navigate = useNavigate()
   const part = partOf(pathname)
   const screen = screenOf(pathname)
@@ -110,7 +117,7 @@ export function SiteFrame({
 
   const swap = (to: Part) => {
     if (to === part) return
-    router.push(to === "front" ? lastFront.current : PART_HREF[to])
+    router.push(localePath(locale, to === "front" ? lastFront.current : PART_HREF[to]))
     pet.notify(to)
   }
 
@@ -151,9 +158,10 @@ export function SiteFrame({
         onCollapsedChange={(closed) => {
           if (closed) pet.notify("sidebar")
         }}
-        groups={NAV}
+        groups={nav}
         active={part === "front" ? (listed ?? undefined) : undefined}
-        label="Site"
+        label={t("site")}
+        labels={{ collapse: t("collapse"), expand: t("expand") }}
         linkComponent={Link}
         logo={({ collapsed }) => <BrandMark compact={collapsed} />}
       />
@@ -188,9 +196,10 @@ export function SiteFrame({
       <MobileNav
         position="static"
         className="st-bar"
-        items={BAR}
+        items={bar}
         active={part === "front" ? (listed ?? undefined) : undefined}
-        label="Site"
+        label={t("site")}
+        labels={{ more: t("more") }}
         linkComponent={Link}
       />
     </div>

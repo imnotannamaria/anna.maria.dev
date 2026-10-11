@@ -19,7 +19,26 @@ module.exports = {
   // /admin is already a 404 for anyone not on the allowlist, and its layout sends
   // noindex. This is the third layer, so it never reaches an index by accident.
   // /piano, /components and /roadmap answer only to say they were removed in v3.
-  exclude: ["/api/*", "/admin", "/admin/*", "/piano", "/roadmap", "/components", "/components/*"],
+  // Every page is built once per language, under /en and /pt. Portuguese keeps its /pt in the
+  // address; English is served at the root (see proxy.ts), so its entries lose the /en below.
+  exclude: [
+    "/api/*",
+    "/admin",
+    "/admin/*",
+    ...["/en", "/pt"].flatMap((lang) => [
+      `${lang}/piano`,
+      `${lang}/roadmap`,
+      `${lang}/components`,
+      `${lang}/components/*`,
+      `${lang}/invite/*`,
+    ]),
+  ],
+  transform: async (config, path) => ({
+    loc: path.replace(/^\/en(?=\/|$)/, "") || "/",
+    changefreq: config.changefreq,
+    priority: config.priority,
+    lastmod: config.autoLastmod ? new Date().toISOString() : undefined,
+  }),
 
   /**
    * next-sitemap only walks what the build emitted as static or SSG, so every
@@ -30,5 +49,9 @@ module.exports = {
    * Anything that becomes force-dynamic from here needs a line added below.
    */
   additionalPaths: async (config) =>
-    Promise.all(["/person", "/log"].map((loc) => config.transform(config, loc))),
+    Promise.all(
+      ["/person", "/log", "/wall-of-love", "/pt/person", "/pt/log", "/pt/wall-of-love"].map((loc) =>
+        config.transform(config, loc),
+      ),
+    ),
 }

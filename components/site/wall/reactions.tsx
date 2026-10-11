@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { WALL_REACTIONS, type ReactionCounts, type WallReaction } from "@/lib/wall/constants"
 import "@/components/site/person/favorites.css"
@@ -45,6 +46,7 @@ export function Reactions({
   counts: ReactionCounts
   readOnly?: boolean
 }) {
+  const t = useTranslations("wall")
   const [counts, setCounts] = useState(initial)
   const [mine, setMine] = useState<WallReaction[]>([])
   const [flights, setFlights] = useState<Record<string, number>>({})
@@ -80,8 +82,8 @@ export function Reactions({
   }
 
   return (
-    <ul className="flex flex-wrap gap-1.5" aria-label={`Reactions to ${who}'s letter`}>
-      {WALL_REACTIONS.map(({ id: reaction, emoji, name }) => {
+    <ul className="flex flex-wrap gap-1.5" aria-label={t("reactionsTo", { name: who })}>
+      {WALL_REACTIONS.map(({ id: reaction, emoji }) => {
         const on = mine.includes(reaction)
         const count = counts[reaction]
         return (
@@ -89,7 +91,7 @@ export function Reactions({
             <button
               type="button"
               className="st-reaction focus-ring text-mono-xs font-mono"
-              aria-label={`${name}, ${count} ${count === 1 ? "reaction" : "reactions"}`}
+              aria-label={t("reactionCount", { reaction: t(`reactions.${reaction}`), count })}
               aria-pressed={on}
               disabled={readOnly}
               onClick={() => void toggle(reaction)}

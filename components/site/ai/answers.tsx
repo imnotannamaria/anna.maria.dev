@@ -1,12 +1,14 @@
 import { ClockCounterClockwiseIcon, StackIcon } from "@phosphor-icons/react"
 import { topicOf, type Topic } from "./topics"
 import Image from "next/image"
+import type { useTranslations } from "next-intl"
+import type en from "@/messages/en.json"
 import type { ReactElement, ReactNode } from "react"
 import { Badge } from "@/app/components/entrepta/badge"
 import type { SiteData } from "@/components/site/frame/site-data"
 import { ScreenLink } from "@/components/site/screen-link"
 import { dockChannels } from "@/components/site/contact/postcard"
-import { PAGES, type ScreenId } from "@/components/site/pages"
+import type { ScreenId } from "@/components/site/pages"
 import { TechStickers } from "@/components/site/tech-stickers"
 import { Dock } from "@/components/site/dock"
 import type { Group } from "@/components/site/professional/stack-data"
@@ -25,14 +27,13 @@ export type Answer = {
   }
 }
 
-export const QUESTIONS = [
-  "Who is Anna?",
-  "Where has she worked?",
-  "What is her stack?",
-  "What has she built?",
-  "What does she write about?",
-  "How do I reach her?",
-] as const
+/** The suggested questions, as keys of `chat.questions` in the messages. */
+export const QUESTIONS = ["who", "work", "stack", "built", "write", "reach"] as const
+
+/** The chat's words, in the page's language: what `useTranslations("chat")` returns. */
+export type ChatWords = ReturnType<typeof useTranslations<"chat">>
+type PageWords = ReturnType<typeof useTranslations<"pages">>
+type AnswerKey = keyof (typeof en)["chat"]["answers"]
 
 function List({ lines }: { lines: [key: ReactNode, value: ReactNode][] }) {
   return (
@@ -50,28 +51,38 @@ function List({ lines }: { lines: [key: ReactNode, value: ReactNode][] }) {
 const UNDERLINED =
   "focus-ring underline decoration-[var(--border-strong)] decoration-dotted underline-offset-4 hover:decoration-[var(--fg-brand)]"
 
-const tagline = (id: string) => PAGES.find((page) => page.id === id)?.tagline ?? ""
-
 /** The scripted answer to a question: the page its keywords point at, if any. */
-export function answer(question: string, data: SiteData, stack: Group[]): Answer {
-  return answerOf(topicOf(question), data, stack)
+export function answer(
+  question: string,
+  data: SiteData,
+  stack: Group[],
+  words: { chat: ChatWords; pages: PageWords },
+): Answer {
+  return answerOf(topicOf(question), data, stack, words)
 }
 
 /** What the script has to say about a page, and the card that goes with it. */
-export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): Answer {
+export function answerOf(
+  topic: Topic | null,
+  data: SiteData,
+  stack: Group[],
+  words: { chat: ChatWords; pages: PageWords },
+): Answer {
+  const t = (key: AnswerKey, values?: Record<string, string | number>) =>
+    words.chat(`answers.${key}`, values)
   const { projects, jobs, posts, log, apps, years, email, socials } = data
 
   if (topic === "wall") {
     return {
-      text: "The wall of love holds letters from people she has worked with. Each one came from a link she sent, and she read it before it went up.",
+      text: t("wall"),
       card: {
-        name: "wall of love",
+        name: t("wallCard"),
         page: "wall-of-love",
         body: (
           <List
             lines={[
-              ["how they get in", "by invitation"],
-              ["where", "on the page"],
+              [t("wallHow"), t("wallHowValue")],
+              [t("wallWhere"), t("wallWhereValue")],
             ]}
           />
         ),
@@ -81,18 +92,18 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
 
   if (topic === "log") {
     if (log === undefined) {
-      return { text: "The log is still loading. Ask me again in a second." }
+      return { text: t("logLoading") }
     }
     if (log === null) {
-      return { text: "The log lives in Postgres, and Postgres did not answer just now." }
+      return { text: t("logDown") }
     }
     const byType = new Map<string, number>()
     for (const entry of log) byType.set(entry.type, (byType.get(entry.type) ?? 0) + 1)
     const latest = [...log].sort((a, b) => b.loggedAt.localeCompare(a.loggedAt)).slice(0, 5)
     return {
-      text: `${log.length} things finished and logged so far. These are the latest.`,
+      text: t("log", { count: log.length }),
       card: {
-        name: "log",
+        name: t("logCard"),
         page: "log",
         body: (
           <div className="flex flex-col gap-3">
@@ -123,9 +134,9 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
   if (topic === "notes") {
     const sorted = [...posts].sort((a, b) => Number(b.featured) - Number(a.featured))
     return {
-      text: `${posts.length} notes so far. The featured one comes first.`,
+      text: t("notes", { count: posts.length }),
       card: {
-        name: "notes",
+        name: t("notesCard"),
         page: "notes",
         body: (
           <List
@@ -137,7 +148,7 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
                 </ScreenLink>
                 {post.featured ? (
                   <span className="ml-2 align-middle">
-                    <Badge color="brand">featured</Badge>
+                    <Badge color="brand">{t("featured")}</Badge>
                   </span>
                 ) : null}
               </>,
@@ -151,11 +162,13 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
   if (topic === "projects") {
     const sorted = [...projects].sort((a, b) => Number(b.featured) - Number(a.featured))
     return {
-      text: `${projects.length} projects are published here: ${
-        projects.filter((p) => p.type === "library").length
-      } open source, ${projects.filter((p) => p.type !== "library").length} demos.`,
+      text: t("projects", {
+        count: projects.length,
+        libraries: projects.filter((p) => p.type === "library").length,
+        demos: projects.filter((p) => p.type !== "library").length,
+      }),
       card: {
-        name: "projects",
+        name: t("projectsCard"),
         page: "projects",
         body: (
           <ul className="st-ia-projects">
@@ -170,9 +183,9 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
                       {project.title}
                     </span>
                     <span className="text-mono-xs block truncate font-mono text-[var(--fg-muted)]">
-                      {project.type === "library" ? "open source" : project.type} ·{" "}
+                      {project.type === "library" ? t("openSource") : project.type} ·{" "}
                       {project.date.slice(0, 4)}
-                      {project.featured ? " · featured" : ""}
+                      {project.featured ? ` · ${t("featured")}` : ""}
                     </span>
                     <span className="text-body-md line-clamp-2 font-sans text-[var(--fg-secondary)]">
                       {project.description}
@@ -189,9 +202,9 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
 
   if (topic === "stack") {
     return {
-      text: "Full-stack. Here it is by group, and under it the apps where the work happens.",
+      text: t("stack"),
       card: {
-        name: "stack",
+        name: t("stackCard"),
         icon: <StackIcon />,
         page: "professional",
         body: (
@@ -205,7 +218,7 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
               </section>
             ))}
             <p className="text-mono-sm border-t border-dashed border-[var(--border-subtle)] pt-3 font-mono text-[var(--fg-secondary)]">
-              <span className="text-[var(--fg-muted)]">apps </span>
+              <span className="text-[var(--fg-muted)]">{t("apps")} </span>
               {apps.map((app) => app.name).join(" · ")}
             </p>
           </div>
@@ -216,19 +229,21 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
 
   if (topic === "career") {
     return {
-      text: `${years} years shipping, since March 2021. Work and study, on the same timeline.`,
+      text: t("career", { years }),
       card: {
-        name: "work and academic history",
+        name: t("careerCard"),
         icon: <ClockCounterClockwiseIcon />,
         page: "professional",
         body: (
           <List
-            lines={jobs.map((t) => [
-              `${t.from}–${t.current && t.type === "work" ? "now" : t.until}`,
+            lines={jobs.map((job) => [
+              `${job.from}–${job.current && job.type === "work" ? t("now") : job.until}`,
               <>
-                <span className="text-[var(--fg-primary)]">{t.org}</span> · {t.role}
+                <span className="text-[var(--fg-primary)]">{job.org}</span> · {job.role}
                 <span className="ml-2 align-middle">
-                  <Badge color={t.type === "work" ? "brand" : "neutral"}>{t.type}</Badge>
+                  <Badge color={job.type === "work" ? "brand" : "neutral"}>
+                    {t(job.type === "work" ? "work" : "study")}
+                  </Badge>
                 </span>
               </>,
             ])}
@@ -240,13 +255,13 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
 
   if (topic === "contact") {
     return {
-      text: "Here is every way in. Each one opens, and each one copies.",
+      text: t("contact"),
       card: {
-        name: "contact",
+        name: t("contactCard"),
         page: "contact",
         body: (
           <div className="flex flex-col gap-2 pb-1">
-            <Dock label="Channels" items={dockChannels({ email, ...socials })} />
+            <Dock label={t("channels")} items={dockChannels({ email, ...socials })} />
           </div>
         ),
       },
@@ -255,18 +270,15 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
 
   if (topic === "person") {
     return {
-      text: "Anna is from Pernambuco and lives in Tamandaré, right by the beach. The gym is her daily reset button, five times a week. She is a big fan of horror films, Mike Flanagan and Drag Race, plays a few instruments, all of them mediocrely, loves every kind of music, mostly pop, and answers to Abimaela, the cat in the corner.",
+      text: t("person"),
       card: {
-        name: "anna, the person",
+        name: t("personCard"),
         page: "person",
         body: (
           <List
             lines={[
-              ["the page", tagline("person")],
-              [
-                "on it",
-                "camera roll, me as a playlist, wristkit, the weather in Tamandaré, stickers, the log, everyday things",
-              ],
+              [t("thePage"), words.pages("person.tagline")],
+              [t("onIt"), t("onItValue")],
             ]}
           />
         ),
@@ -275,6 +287,6 @@ export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): A
   }
 
   return {
-    text: "I answer from my notes here, and that one is not in them. I know who Anna is, where she has worked, her stack, her projects, her notes, her log and how to reach her. Try one of those.",
+    text: t("none"),
   }
 }

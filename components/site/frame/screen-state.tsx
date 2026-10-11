@@ -1,6 +1,7 @@
 "use client"
 
 import { ArrowCounterClockwiseIcon, HouseLineIcon } from "@phosphor-icons/react"
+import { useTranslations } from "next-intl"
 import { useEffect, type ReactNode } from "react"
 import { Button } from "@/app/components/entrepta/button"
 import { CatAngry, CatSleeping, CatWalking } from "@/components/site/abimaela/abimaela"
@@ -35,15 +36,19 @@ function State({
   )
 }
 
-const home = (
-  <ScreenLink to="home" className="st-state-link focus-ring text-mono-sm font-mono">
-    <HouseLineIcon aria-hidden size={14} weight="bold" />
-    take me home
-  </ScreenLink>
-)
+function Home() {
+  const t = useTranslations("state")
+  return (
+    <ScreenLink to="home" className="st-state-link focus-ring text-mono-sm font-mono">
+      <HouseLineIcon aria-hidden size={14} weight="bold" />
+      {t("home")}
+    </ScreenLink>
+  )
+}
 
 /** She walks a dashed line back and forth while a page that reads the database waits. */
 export function ScreenLoading() {
+  const t = useTranslations("state")
   return (
     <State role="status">
       <div className="st-state-track">
@@ -51,13 +56,14 @@ export function ScreenLoading() {
           <CatWalking height={84} />
         </span>
       </div>
-      <p className="text-mono-sm font-mono text-[var(--fg-muted)]">she is fetching it</p>
+      <p className="text-mono-sm font-mono text-[var(--fg-muted)]">{t("loading")}</p>
     </State>
   )
 }
 
 /** An address with nothing at it. */
 export function ScreenNotFound() {
+  const t = useTranslations("state")
   return (
     <State>
       <div className="flex items-end gap-5">
@@ -66,13 +72,11 @@ export function ScreenNotFound() {
           404
         </span>
       </div>
-      <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">
-        She pushed this page off the table.
-      </h1>
+      <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">{t("notFoundTitle")}</h1>
       <p className="text-body-md max-w-[44ch] text-center font-sans text-[var(--fg-secondary)]">
-        Nothing lives at this address. It may have moved, or it never existed.
+        {t("notFoundBody")}
       </p>
-      {home}
+      <Home />
     </State>
   )
 }
@@ -85,6 +89,7 @@ export function ScreenError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const t = useTranslations("state")
   useEffect(() => {
     console.error("[site] page failed", error)
   }, [error])
@@ -92,13 +97,13 @@ export function ScreenError({
   return (
     <State role="alert">
       <CatAngry height={120} />
-      <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">Something broke.</h1>
+      <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">{t("errorTitle")}</h1>
       <p className="text-body-md max-w-[44ch] text-center font-sans text-[var(--fg-secondary)]">
-        It was not you. It might have been her.
+        {t("errorBody")}
       </p>
       <Button onClick={reset}>
         <ArrowCounterClockwiseIcon aria-hidden size={14} weight="bold" />
-        try again
+        {t("retry")}
       </Button>
     </State>
   )
@@ -106,16 +111,17 @@ export function ScreenError({
 
 /** A page that existed before v3 and does not any more. */
 export function ScreenRemoved({ name }: { name: string }) {
+  const t = useTranslations("state")
   return (
     <State>
       <CatSleeping height={110} />
       <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">
-        {name} was retired in v3.
+        {t("removedTitle", { name })}
       </h1>
       <p className="text-body-md max-w-[44ch] text-center font-sans text-[var(--fg-secondary)]">
-        She sleeps where it used to be. Everything that stayed is one click away.
+        {t("removedBody")}
       </p>
-      {home}
+      <Home />
     </State>
   )
 }

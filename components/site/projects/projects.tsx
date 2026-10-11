@@ -1,3 +1,4 @@
+import { useLocale, useTranslations } from "next-intl"
 import { FolderIcon } from "@phosphor-icons/react/dist/ssr"
 import { Lede, PageLabel } from "@/components/site/page-header"
 import { getPublishedProjects } from "@/lib/velite"
@@ -7,7 +8,8 @@ import type { Project } from "./project"
 import "./projects.css"
 
 export function Projects() {
-  const projects: Project[] = getPublishedProjects()
+  const t = useTranslations("projects")
+  const projects: Project[] = getPublishedProjects(useLocale())
     .map((project) => ({
       slug: project.slug,
       title: project.title,
@@ -36,13 +38,14 @@ export function Projects() {
       <header className="flex flex-col gap-4">
         <PageLabel
           icon={<FolderIcon aria-hidden size={13} weight="bold" />}
-          label="projects"
+          label={t("label")}
           count={projects.length}
         />
 
         <Lede>
-          Open-source tools, libraries and side projects. The things I built because I{" "}
-          <span className="text-[var(--fg-primary)]">wanted them to exist</span>.
+          {t.rich("lede", {
+            b: (words) => <span className="text-[var(--fg-primary)]">{words}</span>,
+          })}
         </Lede>
       </header>
 

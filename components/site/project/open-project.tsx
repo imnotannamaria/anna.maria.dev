@@ -1,3 +1,4 @@
+import { useLocale, useTranslations } from "next-intl"
 import { FolderOpenIcon } from "@phosphor-icons/react/dist/ssr"
 import { tileClass } from "@/components/site/tile"
 import { Badge } from "@/app/components/entrepta/badge"
@@ -13,7 +14,8 @@ import { PageHeader } from "@/components/site/page-header"
 import "./open-project.css"
 
 export function OpenProject({ slug }: { slug: string }) {
-  const raw = getPublishedProjects().find((item) => item.slug === slug)
+  const t = useTranslations("projects")
+  const raw = getPublishedProjects(useLocale()).find((item) => item.slug === slug)
   if (!raw) return null
 
   const project: Project = {
@@ -35,7 +37,7 @@ export function OpenProject({ slug }: { slug: string }) {
     featured: raw.featured,
   }
 
-  const stickers = <TechStickers techs={project.techs} label="Stack" />
+  const stickers = <TechStickers techs={project.techs} label={t("stack")} />
   const body = (
     <div className="st-pa-body">
       <MDXContent code={raw.body} />
@@ -44,7 +46,10 @@ export function OpenProject({ slug }: { slug: string }) {
   const title = (
     <div className="flex min-w-0 flex-col gap-3">
       <p className="text-mono-xs font-mono text-[var(--fg-muted)]">
-        {project.type} · {project.year}
+        {project.type === "library" || project.type === "demo"
+          ? t(`kind.${project.type}`)
+          : project.type}{" "}
+        · {project.year}
       </p>
       <h2 className="st-pa-title font-serif text-[var(--fg-primary)]">{project.title}</h2>
       <p className="text-body-lg max-w-[56ch] font-sans text-[var(--fg-secondary)]">
@@ -63,9 +68,9 @@ export function OpenProject({ slug }: { slug: string }) {
               to="projects"
               className="focus-ring underline decoration-[var(--border-strong)] decoration-dotted underline-offset-4 transition-colors hover:text-[var(--fg-brand-text)] hover:decoration-current"
             >
-              projects
+              {t("label")}
             </ScreenLink>{" "}
-            / a project
+            / {t("aProject")}
           </>
         }
       />
@@ -78,14 +83,14 @@ export function OpenProject({ slug }: { slug: string }) {
           {body}
           <aside className={tileClass({ size: "sm" }, "gap-4")}>
             <h3 className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
-              built with
+              {t("builtWith")}
             </h3>
             {stickers}
             <div className="flex items-center justify-between gap-3 border-t border-dashed border-[var(--border-subtle)] pt-3">
-              <span className="text-mono-xs font-mono text-[var(--fg-muted)]">links</span>
+              <span className="text-mono-xs font-mono text-[var(--fg-muted)]">{t("links")}</span>
               <ProjectLinks project={project} />
             </div>
-            <ul className="flex flex-wrap gap-1.5" aria-label="Tags">
+            <ul className="flex flex-wrap gap-1.5" aria-label={t("tags")}>
               {project.tags.map((tag) => (
                 <li key={tag}>
                   <Badge color="brand">{tag}</Badge>

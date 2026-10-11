@@ -1,7 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { usePathname } from "next/navigation"
+import { useSitePath } from "@/components/site/i18n"
 import { useState } from "react"
 import type { Group } from "@/components/site/professional/stack-data"
 import type { SiteData } from "./site-data"
@@ -13,7 +13,7 @@ const Chat = dynamic(() => import("@/components/site/ai/chat").then((mod) => mod
 
 /** True from the first visit to an address on: what opened once stays mounted. */
 function useOpened(path: string): boolean {
-  const here = usePathname() === path
+  const here = useSitePath() === path
   const [opened, setOpened] = useState(here)
   if (here && !opened) setOpened(true)
   return opened

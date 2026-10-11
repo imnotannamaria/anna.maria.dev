@@ -1,0 +1,87 @@
+---
+title: "Construindo um portfólio que não parece feito com IA em 30 minutos"
+description: "Meu processo pra refatorar meu portfólio até ele ter a minha cara de verdade. Um design system, o wristkit e uma UI nova."
+date: "2026-06-09"
+tags: ["portfolio", "design-system", "ui", "process"]
+featured: true
+published: true
+---
+
+Ora ora ora, se você está lendo isso, eu já terminei a refatoração, e espero que você esteja pensando "uau." agora.
+
+## Como eu cheguei aqui
+
+Eu terminei meu portfólio. Quando olhei pra ele, notei uma coisa. Ele parecia genérico. O tipo de site que parece ter sido "feito com IA em 30 minutos".
+
+Ele tinha coisas divertidas, como o piano, mas a UI não era eu. Eu queria algo mais único. Algo que tivesse saído de mim de verdade.
+
+Então comecei a refatorar. Dividi o trabalho em 3 partes.
+
+## 1. Um design system
+
+A primeira parte é uma coisa que estava na minha cabeça fazia muito tempo: o entrepta.
+
+O entrepta é um design system dark first. Você copia os componentes pro seu projeto e o código é seu. Sem SDK, sem caixa preta. Ele vem com 14 componentes, 6 temas prontos e uma CLI pra configurar tudo com um comando.
+
+Se quiser dar uma olhada: https://entrepta.vercel.app
+
+## 2. Wrist kit
+
+Procurando inspiração pro meu portfólio novo, encontrei um site pessoal que me fez parar e pensar "uau". É essa reação que eu quero que as pessoas tenham quando chegam no meu.
+
+Duas coisas em especial chamaram minha atenção.
+
+1. O bento grid. Eu nunca tinha visto esse layout. É uma grade de cards de tamanhos diferentes que se encaixam como caixinhas. Acabei usando algo parecido na minha própria home.
+2. O anel do Apple Fitness. Aquele anelzinho do Apple Watch com os dados da sua atividade.
+
+Procurei uma solução pronta que entregasse esse anel da Apple preenchido com os dados do Apple Watch, e não achei. Então eu construí. Foi assim que o wristkit nasceu.
+
+A ideia é simples. Eu uso os Atalhos da Apple pra mandar meus dados pra um endpoint. Todo dia o endpoint atualiza um componente de anel que mora no meu site.
+
+Tanto o design system quanto o wristkit já estão no ar. Dá pra ver o wristkit funcionando na minha home, embaixo de `$ cat ./off-the-clock`, ao lado do widget do Spotify e do mini piano.
+
+Se quiser usar no seu site: https://wristkit-web.vercel.app/
+
+## 3. Prototipação e UI
+
+Nessa parte eu usei o Claude pra transformar minhas ideias em algo visual antes de escrever uma linha de código. O plano: um bento grid na home, um chrome com metáfora de editor (titlebar, sidebar, status bar) em volta de toda página, e o mesmo conteúdo em todo lugar, só de roupa nova. Blog, projetos, sobre, contato e piano receberam o mesmo tratamento.
+
+## Antes e depois
+
+Aqui está a comparação de verdade. Esses quatro prints são do site antigo, logo antes da refatoração. O "depois" é o que você está vendo agora, já que você já está no novo.
+
+![Home antiga](/blog/ui-refactor/before-1.png)
+
+_Antes: home_
+
+![Página de projetos antiga](/blog/ui-refactor/before-2.png)
+
+_Antes: página de projetos_
+
+![Página de contato antiga](/blog/ui-refactor/before-3.png)
+
+_Antes: página de contato_
+
+![Página do piano antiga](/blog/ui-refactor/before-4.png)
+
+_Antes: página do piano_
+
+## Notas do Lighthouse
+
+Também rodei o PageSpeed Insights antes e depois, só pra ter certeza de que a UI nova não derrubou a performance.
+
+![Relatório do Lighthouse antes da refatoração](/blog/ui-refactor/lighthouse/before.png)
+
+_Antes: 100 de performance, 85 de acessibilidade, 100 de boas práticas, 100 de SEO_
+
+![Relatório do Lighthouse depois da refatoração](/blog/ui-refactor/lighthouse/after.png)
+
+_Depois: 100 de performance, 100 de acessibilidade, 100 de boas práticas, 100 de SEO_
+
+A acessibilidade foi de 85 pra 100. Todo o resto já estava em 100 e continuou lá.
+
+## O que vem agora
+
+A página de log ainda está no meu roadmap. Algo tipo um Letterboxd, mas pra tudo: filmes, séries, álbuns, lugares que eu fui.
+
+Além disso, quero colocar mais coisas pessoais no site. Não só o meu lado dev, mas quem eu sou de verdade fora do código também.

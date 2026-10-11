@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
  * are assembled once.
  *
  * The child must be something that takes a ref and a focus, a button or a link: `asChild` hands
- * the trigger's props straight to it. The provider is in `app/layout.tsx`.
+ * the trigger's props straight to it. The provider is in `app/root-shell.tsx`.
  *
  * It is not the child's accessible name. Radix points `aria-describedby` at the content while
  * it is open; an icon-only control still needs its own `aria-label`.

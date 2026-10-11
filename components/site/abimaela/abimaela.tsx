@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import { OVERLAY_SURFACE } from "@/lib/overlay"
 import { cn } from "@/lib/utils"
@@ -12,27 +13,23 @@ import jumping from "./abimaela-jumping.png"
 import "./abimaela.css"
 
 /** Abimaela, the cat in the corner: CSS sprite sheets, and a tiny event bus the pages talk to. */
-const LINES = {
-  day: ["morning. or whatever this is.", "you're up. so am I, technically."],
-  night: ["it's late. I'm only awake because you are."],
-  click: ["mrrp.", "what.", "I was sitting here.", "fine. hi."],
-  clickAgain: ["again?", "that's enough.", "you can stop now.", "…okay, one more."],
-  page: [
-    "new page. I checked it first.",
-    "following you.",
-    "this one's still empty.",
-    "keep going.",
-  ],
-  front: ["back to the part with the pictures."],
-  back: ["this is where the terminal lives."],
-  ia: ["ask. I'm listening. mostly."],
-  sidebar: ["more room for me."],
-  meow: ["...meow.", "I heard that."],
-  secret: ["you weren't supposed to find that."],
-  snake: ["no snake yet. I would have caught it."],
-} as const
+/** What she can react to. Her lines for each are in the messages, under `cat.lines`. */
+const EVENTS = [
+  "day",
+  "night",
+  "click",
+  "clickAgain",
+  "page",
+  "front",
+  "back",
+  "ia",
+  "sidebar",
+  "meow",
+  "secret",
+  "snake",
+] as const
 
-export type PetEvent = keyof typeof LINES
+export type PetEvent = (typeof EVENTS)[number]
 
 const CHANNEL = "abimaela"
 const target = typeof window === "undefined" ? null : new EventTarget()
@@ -116,6 +113,7 @@ export function CatSleeping({ height = 96 }: { height?: number }) {
 }
 
 export function Abimaela() {
+  const t = useTranslations("cat")
   const [speech, setSpeech] = useState<string | null>(null)
   const [looking, setLooking] = useState<"left" | "right">("left")
   const [sleeping, setSleeping] = useState(false)
@@ -138,7 +136,10 @@ export function Abimaela() {
     }
 
     const say = (event: PetEvent) => {
-      const lines = LINES[event]
+      // her lines for this, as the messages list them
+      const lines = Object.values(
+        (t.raw as (key: string) => unknown)(`lines.${event}`) as Record<string, string>,
+      )
       const index = turn.current[event] ?? 0
       turn.current[event] = index + 1
       setSpeech(lines[index % lines.length])
@@ -194,11 +195,7 @@ export function Abimaela() {
         ref={body}
         type="button"
         className="st-abi-body focus-ring"
-        aria-label={
-          sleeping
-            ? "Abimaela, the cat, asleep. Click to wake her."
-            : "Abimaela, the cat. Click to say hi."
-        }
+        aria-label={sleeping ? t("asleep") : t("awake")}
         onClick={() => {
           const now = Date.now()
           const again = now - lastClick.current < AGAIN_MS

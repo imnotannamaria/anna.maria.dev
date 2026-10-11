@@ -8,7 +8,50 @@ export const commandSchema = z
 
 export type Directory = { [name: string]: string | Directory }
 
-export type FileSystem = { root: Directory; links: Record<string, string> }
+/**
+ * What the shell says, in English. A translation has the same shape; `{name}` is a slot. The
+ * file system carries its words, so the shell stays a plain function with nothing to look up.
+ */
+export const SHELL_WORDS = {
+  does: {
+    help: "this list",
+    ls: "what is in here (-a shows everything)",
+    cd: "go into a folder",
+    cat: "read the short version of a page",
+    open: "go to the real page",
+    routes: "every endpoint, and what stands in front of it",
+    whoami: "who built this",
+    pwd: "where you are",
+    clear: "wipe the screen",
+  },
+  helpTop: "these run when you click them, too:",
+  helpEnd: "not everything is on this list.",
+  empty: "(empty)",
+  notFolder: "ls: {target}: not a folder",
+  noFolder: "cd: {target}: no such folder",
+  whichFile: "cat: which file? (the other cat is in the corner)",
+  isFolder: "cat: {target}: is a folder",
+  noFile: "cat: {target}: no such file",
+  whichPage: "open: which page? try `open person`",
+  nothing: "open: {target}: nothing to open there",
+  opening: "opening {name} …",
+  open: "open {name}",
+  aNote: "{slug}, the note",
+  aProject: "{slug}, the project",
+  aPage: "the {page} page",
+  meow: "she heard that.",
+  snake: "not built yet. it is on the list.",
+  sudo: "permission denied. nice try.",
+  unknown: "{command}: command not found. try help",
+}
+
+export type ShellWords = typeof SHELL_WORDS
+
+export type FileSystem = { root: Directory; links: Record<string, string>; words?: ShellWords }
+
+/** Fills the `{slots}` of a sentence. */
+const say = (sentence: string, values: Record<string, string> = {}) =>
+  sentence.replace(/\{(\w+)\}/g, (_, name: string) => values[name] ?? "")
 
 export type ItemKind = "command" | "folder" | "file" | "link"
 
@@ -32,15 +75,15 @@ export type Result = {
 }
 
 export const COMMANDS = [
-  { name: "help", does: "this list" },
-  { name: "ls", does: "what is in here (-a shows everything)" },
-  { name: "cd", does: "go into a folder" },
-  { name: "cat", does: "read the short version of a page" },
-  { name: "open", does: "go to the real page" },
-  { name: "routes", does: "every endpoint, and what stands in front of it" },
-  { name: "whoami", does: "who built this" },
-  { name: "pwd", does: "where you are" },
-  { name: "clear", does: "wipe the screen" },
+  { name: "help" },
+  { name: "ls" },
+  { name: "cd" },
+  { name: "cat" },
+  { name: "open" },
+  { name: "routes" },
+  { name: "whoami" },
+  { name: "pwd" },
+  { name: "clear" },
 ] as const
 
 export const path = (cwd: string[]) => `~${cwd.length ? `/${cwd.join("/")}` : ""}`
@@ -64,10 +107,10 @@ function resolver(cwd: string[], target: string): string[] {
   return parts
 }
 
-const destinationName = (href: string) => {
+const destinationName = (href: string, words: ShellWords) => {
   const [type, slug] = href.replace(/^tela:/, "").split(":")
-  if (slug) return `${slug}, the ${type === "post" ? "note" : "project"}`
-  return `the ${type.replaceAll("-", " ")} page`
+  if (slug) return say(type === "post" ? words.aNote : words.aProject, { slug })
+  return say(words.aPage, { page: type.replaceAll("-", " ") })
 }
 
 const text = (t: string): Output => ({ type: "text", text: t })
@@ -75,6 +118,7 @@ const error = (t: string): Output => ({ type: "error", text: t })
 
 export function execute(system: FileSystem, cwd: string[], line: string): Result {
   const { root, links } = system
+  const words = system.words ?? SHELL_WORDS
   const [cmd = "", ...args] = line.trim().split(/\s+/)
   const ok = (...output: Output[]): Result => ({ cwd, output })
 
@@ -87,24 +131,24 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
 
     case "help":
       return ok(
-        text("these run when you click them, too:"),
+        text(words.helpTop),
         {
           type: "items",
           items: COMMANDS.map((c) => ({
             label: c.name,
             command: c.name,
             kind: "command",
-            note: c.does,
+            note: words.does[c.name],
           })),
         },
-        text("not everything is on this list."),
+        text(words.helpEnd),
       )
 
     case "pwd":
       return ok(text(path(cwd)))
 
     case "whoami":
-      return ok(...execute(system, [], "cat about.txt").output)
+      return ok(...execute(system, [], "cat person.txt").output)
 
     case "routes":
       return ok(...execute(system, [], "cat api/routes.txt").output)
@@ -114,9 +158,9 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
       const target = args.find((a) => !a.startsWith("-"))
       const destination = target ? resolver(cwd, target) : cwd
       const node = go(root, destination)
-      if (typeof node !== "object") return ok(error(`ls: ${target}: not a folder`))
+      if (typeof node !== "object") return ok(error(say(words.notFolder, { target: target ?? "" })))
       const names = Object.keys(node).filter((name) => all || !name.startsWith("."))
-      if (names.length === 0) return ok(text("(empty)"))
+      if (names.length === 0) return ok(text(words.empty))
       return ok({
         type: "items",
         items: names.map((name) => {
@@ -134,7 +178,7 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
     case "cd": {
       const destination = resolver(cwd, args[0] ?? "~")
       if (typeof go(root, destination) !== "object") {
-        return ok(error(`cd: ${args[0]}: no such folder`))
+        return ok(error(say(words.noFolder, { target: args[0] })))
       }
 
       return { cwd: destination, output: execute(system, destination, "ls").output }
@@ -144,14 +188,14 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
       if (!args[0]) {
         return {
           cwd,
-          output: [error("cat: which file? (the other cat is in the corner)")],
+          output: [error(words.whichFile)],
           event: "meow",
         }
       }
       const parts = resolver(cwd, args[0])
       const node = go(root, parts)
       if (typeof node !== "string") {
-        return ok(error(`cat: ${args[0]}: ${node ? "is a folder" : "no such file"}`))
+        return ok(error(say(node ? words.isFolder : words.noFile, { target: args[0] })))
       }
 
       const href = links[parts.join("/")]
@@ -161,7 +205,7 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
               type: "items",
               items: [
                 {
-                  label: `open ${destinationName(href)}`,
+                  label: say(words.open, { name: destinationName(href, words) }),
                   command: `open ~/${parts.join("/")}`,
                   kind: "link",
                 },
@@ -177,27 +221,31 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
     }
 
     case "open": {
-      if (!args[0]) return ok(error("open: which page? try `open person`"))
+      if (!args[0]) return ok(error(words.whichPage))
       const key = resolver(cwd, args[0]).join("/")
 
       const href = links[key] ?? links[`${key}.txt`] ?? (key === "" ? "tela:home" : undefined)
-      if (!href) return ok(error(`open: ${args[0]}: nothing to open there`))
-      return { cwd, output: [text(`opening ${destinationName(href)} …`)], open: href }
+      if (!href) return ok(error(say(words.nothing, { target: args[0] })))
+      return {
+        cwd,
+        output: [text(say(words.opening, { name: destinationName(href, words) }))],
+        open: href,
+      }
     }
 
     case "meow":
     case "abimaela":
     case "pspsps":
-      return { cwd, output: [text("she heard that.")], event: "meow" }
+      return { cwd, output: [text(words.meow)], event: "meow" }
 
     case "snake":
-      return { cwd, output: [text("not built yet. it is on the list.")], event: "snake" }
+      return { cwd, output: [text(words.snake)], event: "snake" }
 
     case "sudo":
-      return ok(error("permission denied. nice try."))
+      return ok(error(words.sudo))
 
     default:
-      return ok(error(`${cmd}: command not found. try help`))
+      return ok(error(say(words.unknown, { command: cmd })))
   }
 }
 

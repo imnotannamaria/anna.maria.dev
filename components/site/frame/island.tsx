@@ -7,13 +7,24 @@ import {
   SpeakerSlashIcon,
   SunIcon,
 } from "@phosphor-icons/react"
+import { useLocale, useTranslations } from "next-intl"
 import dynamic from "next/dynamic"
 import { useState } from "react"
 import { Button } from "@/app/components/entrepta/button"
 import { SegmentedControl } from "@/app/components/entrepta/segmented-control"
 import { Tip } from "@/components/ui/tip"
 import { setMuted, useMuted } from "@/lib/sound-muted"
+import { useSitePath } from "@/components/site/i18n"
+import { Flag } from "@/components/wall/flag"
 import { useMode } from "@/hooks/use-mode"
+import {
+  LOCALE_COOKIE,
+  LOCALE_COOKIE_MAX_AGE,
+  LOCALE_NAME,
+  localePath,
+  nextLocale,
+  type Locale,
+} from "@/lib/i18n/locales"
 
 // The report brings zod and the form with it, and most visits never open it: it loads on the
 // first click, not with every page.
@@ -35,6 +46,18 @@ function dropCurtain(toggle: () => void) {
   window.setTimeout(() => delete root.dataset.stSwitch, 1100)
 }
 
+/**
+ * The language, changed by hand: the choice goes in a cookie, so the next plain address opens
+ * in it too, and the browser goes to the same page in the other language. A full load and not a
+ * client navigation: the whole document changes language, `<html lang>` included.
+ */
+function switchLocale(to: Locale, path: string) {
+  document.cookie = `${LOCALE_COOKIE}=${to}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`
+  window.location.assign(localePath(to, path) + window.location.search + window.location.hash)
+}
+
+const FLAG = { en: "en", pt: "pt-BR" } as const
+
 export type Part = "front" | "back" | "ia"
 
 export const PARTS: { value: Part; label: string }[] = [
@@ -44,9 +67,9 @@ export const PARTS: { value: Part; label: string }[] = [
 ]
 
 /**
- * The header of the site: one pill floating over the page, with the three sides and three
+ * The header of the site: one pill floating over the page, with the three sides and four
  * actions, each an icon with its name in a tooltip. Report a bug opens the form, mute silences
- * the site, and the mode comes down like a curtain.
+ * the site, the flag changes the language, and the mode comes down like a curtain.
  *
  * `sides={false}` is for a page that is not part of the visit (an invite, the admin): the
  * actions stay, the switcher does not.
@@ -65,16 +88,20 @@ export function Island({
   const [bugLoaded, setBugLoaded] = useState(false)
   const silenced = useMuted()
   const { mode, toggleMode } = useMode()
-  const modeLabel = mode === "dark" ? "Light mode" : "Dark mode"
+  const t = useTranslations("island")
+  const locale = useLocale()
+  const other = nextLocale(locale)
+  const path = useSitePath()
+  const modeLabel = mode === "dark" ? t("light") : t("dark")
 
   return (
     <>
       <header className="st-island">
         {sides ? (
           <>
-            <nav aria-label="Side of the site">
+            <nav aria-label={t("sides")}>
               <SegmentedControl
-                aria-label="Side of the site"
+                aria-label={t("sides")}
                 size="sm"
                 options={PARTS}
                 value={part}
@@ -86,11 +113,11 @@ export function Island({
         ) : null}
 
         <div className="st-island-actions">
-          <Tip label="Report a bug" side="bottom">
+          <Tip label={t("bug")} side="bottom">
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label="Report a bug"
+              aria-label={t("bug")}
               onClick={() => {
                 setBugLoaded(true)
                 setBugOpen(true)
@@ -99,11 +126,11 @@ export function Island({
               <BugBeetleIcon aria-hidden size={16} />
             </Button>
           </Tip>
-          <Tip label={silenced ? "Sound on" : "Mute"} side="bottom">
+          <Tip label={silenced ? t("soundOn") : t("mute")} side="bottom">
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label="Mute the site"
+              aria-label={t("muteLabel")}
               aria-pressed={silenced}
               onClick={() => setMuted(!silenced)}
             >
@@ -112,6 +139,17 @@ export function Island({
               ) : (
                 <SpeakerHighIcon aria-hidden size={16} />
               )}
+            </Button>
+          </Tip>
+          {/* the flag is the language the page is in; a click goes to the next one */}
+          <Tip label={LOCALE_NAME[locale]} side="bottom">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={t("language", { current: LOCALE_NAME[locale], next: LOCALE_NAME[other] })}
+              onClick={() => switchLocale(other, path)}
+            >
+              <Flag lang={FLAG[locale]} size={17} decorative />
             </Button>
           </Tip>
           <Tip label={modeLabel} side="bottom">
