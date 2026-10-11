@@ -13,9 +13,23 @@ import "./screen-state.css"
  * `data-screen-state` is how the frame knows to give it the whole area and leave the footer
  * out: a page that is not there yet has no "where to next".
  */
-function State({ role, children }: { role?: "status" | "alert"; children: ReactNode }) {
+function State({
+  role,
+  inline = false,
+  children,
+}: {
+  role?: "status" | "alert"
+  /** Under a page's own header, instead of alone in the page area: the footer stays. */
+  inline?: boolean
+  children: ReactNode
+}) {
   return (
-    <div className="st-state" data-screen-state role={role}>
+    <div
+      className="st-state"
+      data-screen-state={inline ? undefined : true}
+      data-inline={inline || undefined}
+      role={role}
+    >
       {children}
     </div>
   )
@@ -102,6 +116,32 @@ export function ScreenRemoved({ name }: { name: string }) {
         She sleeps where it used to be. Everything that stayed is one click away.
       </p>
       {home}
+    </State>
+  )
+}
+
+/** A notice with her in it, for a state that is not one of the four above (a closed invite). */
+export function ScreenNotice({
+  mood,
+  title,
+  body,
+  action,
+  inline,
+}: {
+  mood: "angry" | "asleep"
+  title: string
+  body: string
+  action?: ReactNode
+  inline?: boolean
+}) {
+  return (
+    <State inline={inline}>
+      {mood === "angry" ? <CatAngry height={110} /> : <CatSleeping height={110} />}
+      <h1 className="text-heading-lg font-serif text-[var(--fg-primary)]">{title}</h1>
+      <p className="text-body-md max-w-[44ch] text-center font-sans text-[var(--fg-secondary)]">
+        {body}
+      </p>
+      {action}
     </State>
   )
 }

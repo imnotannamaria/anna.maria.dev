@@ -166,7 +166,8 @@ export function buildFiles(data: SiteData): FileSystem {
     "wall-of-love.txt": page(
       "wall of love",
       tagline("wall-of-love"),
-      "no letters yet. the wall on the page is showing placeholders.",
+      "letters from people I have worked with. each one came from a link I sent,",
+      "and was read before it went up. open the page to read them.",
     ),
 
     "log.txt": page(

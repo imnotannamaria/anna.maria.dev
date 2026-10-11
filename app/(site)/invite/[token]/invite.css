@@ -1,0 +1,46 @@
+/* The invite: one question at a time, in the middle of the page, and the track of steps under it. */
+.st-iv-walk {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: min(100%, 680px);
+  margin-inline: auto;
+  padding-top: 3dvh;
+}
+.st-iv-walk > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.st-iv-question {
+  font-size: clamp(30px, 6cqw, 52px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-wrap: balance;
+}
+.st-iv-failed {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* sent: she is pleased, the letter is pinned, and there is a way on */
+.st-iv-end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 60dvh;
+  text-align: center;
+}
+.st-iv-pinned {
+  width: min(100%, 420px);
+  text-align: left;
+}
+/* a hint pill keeps to the left by default; on this centred screen it sits in the middle */
+.st-iv-end > .st-hint {
+  align-self: center;
+}

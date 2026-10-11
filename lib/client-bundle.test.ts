@@ -17,8 +17,11 @@ const ROOTS = ["app", "components", "hooks"]
 /** The forms whose whole point is validating on the client, and nothing else. */
 const ALLOWED = new Set([
   "components/contact/contact-form.tsx",
+  "components/site/contact/postcard.tsx",
   "components/admin/log-entry-form.tsx",
   "components/admin/roadmap-item-form.tsx",
+  "components/admin/wall-invite-form.tsx",
+  "components/wall/invite-form.tsx",
 ])
 
 function sourceFiles(dir: string): string[] {

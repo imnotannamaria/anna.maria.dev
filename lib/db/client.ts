@@ -3,12 +3,13 @@ import postgres, { type Sql } from "postgres"
 import * as logSchema from "@/lib/log/schema"
 import * as roadmapSchema from "@/lib/roadmap/schema"
 import * as wristkitSchema from "@/lib/wristkit/schema"
+import * as wallSchema from "@/lib/wall/schema"
 
 /**
  * Every feature that talks to Postgres goes through here. wristkit, /log and /roadmap share
- * one Supabase database, so they should also share one connection pool.
+ * one Supabase database, so they should also share one connection pool. So does the wall.
  */
-const schema = { ...wristkitSchema, ...logSchema, ...roadmapSchema }
+const schema = { ...wristkitSchema, ...logSchema, ...roadmapSchema, ...wallSchema }
 
 export type AppDb = {
   db: PostgresJsDatabase<typeof schema>

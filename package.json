@@ -53,6 +53,7 @@
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.6",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "^2.8.1",
     "@vercel/og": "^0.11.1",
     "@workos-inc/authkit-nextjs": "^4.3.1",
     "@xyflow/react": "^12.11.2",

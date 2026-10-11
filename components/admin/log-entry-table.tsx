@@ -21,7 +21,7 @@ export function LogEntryTable({ entries }: { entries: LogEntry[] }) {
   if (entries.length === 0) {
     return (
       <p className="text-mono-md mt-12 text-center font-mono" style={{ color: "var(--fg-muted)" }}>
-        {"// nothing logged yet."}
+        nothing logged yet.
       </p>
     )
   }

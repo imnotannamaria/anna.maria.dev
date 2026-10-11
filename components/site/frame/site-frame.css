@@ -100,6 +100,10 @@ body:has(.st) [data-theme-switcher] {
 .st [data-spotlight] {
   display: none;
 }
+/* entrepta's Diamond wherever a piece draws it with no way to turn it off (a field label, the
+   stepper, a dialog label): it is the one hidden span that is `leading-none` with an inline
+   font size. */
+.st span[aria-hidden="true"].leading-none[style*="font-size"],
 .st [data-sidebar-mark],
 .st [data-mobile-nav-mark],
 .st-ia li[data-message] > div > span > span[aria-hidden="true"],
@@ -127,4 +131,10 @@ body:has(.st) [data-theme-switcher] {
     width: calc(100% - 100px);
     translate: none;
   }
+}
+
+/* A page that asks for the visitor's whole attention (an invite): no switcher, no corner cat. */
+.st-main[data-focused] > .st-switcher,
+.st-main[data-focused] > .st-abi {
+  display: none;
 }

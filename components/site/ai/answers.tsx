@@ -58,15 +58,15 @@ export function answer(question: string, data: SiteData, stack: Group[]): Answer
 
   if (topic === "wall") {
     return {
-      text: "There are no letters yet. The wall on the page is showing placeholders.",
+      text: "The wall of love holds letters from people she has worked with. Each one came from a link she sent, and she read it before it went up.",
       card: {
         name: "wall of love",
         page: "wall-of-love",
         body: (
           <List
             lines={[
-              ["letters", "0"],
               ["how they get in", "by invitation"],
+              ["where", "on the page"],
             ]}
           />
         ),

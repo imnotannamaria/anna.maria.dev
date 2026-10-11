@@ -6,8 +6,10 @@
   align-items: center;
   justify-content: center;
   gap: 14px;
-  /* the whole page area, less the switcher that floats at its foot */
-  min-height: 100%;
+  /* the whole page area; inside a page that has no height of its own (the admin), most of
+     the screen */
+  flex: 1;
+  min-height: max(100%, 60dvh);
   padding: 24px 16px 96px;
   text-align: center;
 }
@@ -73,4 +75,11 @@ body > .st-state {
   border-radius: var(--radius-lg);
   color: var(--fg-muted);
   rotate: 4deg;
+}
+
+/* inline, under a page's own header: the page keeps its footer and its scroll */
+.st-state[data-inline] {
+  flex: none;
+  min-height: 46dvh;
+  padding-bottom: 24px;
 }

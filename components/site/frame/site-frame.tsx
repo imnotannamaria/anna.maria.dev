@@ -122,6 +122,11 @@ export function SiteFrame({
   const screen = screenOf(pathname)
   // the page of the sidebar this screen belongs to: lit in the nav, and where the footer starts
   const listed = screen ? listedPageOf(screen) : null
+  // Two places where the side switcher and the corner cat only get in the way: an invite, which
+  // is one person writing one letter (and she is already on the page, walking the steps), and
+  // the admin, which is a tool and not part of the visit.
+  const focused =
+    pathname.startsWith("/invite/") || pathname === "/admin" || pathname.startsWith("/admin/")
 
   // where the Front was last, so the switcher goes back to that page and not to the home
   const lastFront = useRef("/")
@@ -194,6 +199,7 @@ export function SiteFrame({
         tabIndex={-1}
         className="st-main outline-none"
         data-at-footer={(part === "front" && atFooter) || undefined}
+        data-focused={focused || undefined}
       >
         {PARTS.map(({ value }) => (
           <div

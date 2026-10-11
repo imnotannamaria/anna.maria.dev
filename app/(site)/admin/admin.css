@@ -1,0 +1,27 @@
+/* The admin, in the site's frame. Only its own layout: the tables and forms are entrepta's. */
+.st-admin-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--border-strong);
+}
+.st-admin-nav {
+  display: flex;
+  gap: 8px;
+}
+.st-admin-nav a {
+  padding: 4px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-full);
+  color: var(--fg-secondary);
+  transition:
+    color 150ms var(--ease-out),
+    border-color 150ms var(--ease-out);
+}
+.st-admin-nav a:hover {
+  border-color: var(--border-brand-strong);
+  color: var(--fg-primary);
+}

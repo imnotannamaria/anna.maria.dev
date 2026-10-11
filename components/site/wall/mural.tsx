@@ -51,7 +51,14 @@ function Linkedin({ letter }: { letter: Letter }) {
   )
 }
 
-export function Mural({ letters }: { letters: Letter[] }) {
+export function Mural({
+  letters,
+  pinned = true,
+}: {
+  letters: Letter[]
+  /** The pushpin on each letter. Off for a letter that is still a preview, not on the wall. */
+  pinned?: boolean
+}) {
   return (
     <ul className="st-wl-mural">
       {letters.map((letter, index) => {
@@ -64,7 +71,7 @@ export function Mural({ letters }: { letters: Letter[] }) {
                 className="st-wl-letter"
                 style={{ "--tilt": `${ANGLES[index % ANGLES.length]}deg` } as CSSProperties}
               >
-                <Pushpin />
+                {pinned ? <Pushpin /> : null}
                 <div className={tileClass({ size: "sm" }, "st-wl-sheet")}>
                   <Who letter={letter} />
                   <blockquote

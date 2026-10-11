@@ -1,19 +1,16 @@
 "use client"
 
+import { contactSchema } from "@/lib/contact-schema"
 import { LinkedinLogoIcon, PaperPlaneTiltIcon } from "@phosphor-icons/react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
-import { useEffect, useRef, useState, type FormEvent } from "react"
+import { useState, type FormEvent } from "react"
 import { siGithub, siGmail, siX } from "simple-icons"
 import { Button } from "@/app/components/entrepta/button"
 import { Cat } from "@/components/site/abimaela/abimaela"
 import { Dock, type DockItem } from "@/components/site/dock"
 import { Plate } from "@/components/site/plate"
 
-/**
- * The contact form as a postcard, and the channels as a dock. Nothing is sent yet: submitting
- * only plays the "posted" ending. Wire it to /api/contact (Resend) before it is published, and
- * keep the error ending for a real failure.
- */
+/** The contact form as a postcard, and the channels as a dock. */
 export type Channels = { email: string; github: string; linkedin: string; x: string }
 
 type Phase = "writing" | "sending" | "sent" | "error"
@@ -82,24 +79,62 @@ export function dockChannels(channels: Channels): DockItem[] {
 /**
  * The card has four phases: writing, sending, sent and error. Sending stamps the postmark and
  * flies the card away; sent shows a receipt with a drawn check; error shakes the card and stamps
- * "return to sender". The error ending has no trigger yet, because nothing is sent: it is here
- * for when the form is wired to the API.
+ * "return to sender".
+ *
+ * It posts to /api/contact (Resend). Three things can come back, and the card tells them apart:
+ * a field the server refused goes back to writing with the reason; a failure on my side and a
+ * failure of the network both end in "return to sender", each with its own line, and the
+ * message stays in the card either way.
  */
 export function Postcard({ channels }: { channels: Channels }) {
   const reduce = useReducedMotion() ?? false
   const [phase, setPhase] = useState<Phase>("writing")
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  // what to say under the card: a field to fix, or why it came back
+  const [problem, setProblem] = useState<string | null>(null)
 
-  useEffect(() => () => clearTimeout(timer.current), [])
-
-  const send = (final: "sent" | "error") => {
-    clearTimeout(timer.current)
-    setPhase("sending")
-    timer.current = setTimeout(() => setPhase(final), WAIT)
-  }
-  const onSend = (event: FormEvent) => {
+  const onSend = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    send("sent")
+    if (phase === "sending") return
+    const form = new FormData(event.currentTarget)
+    const parsed = contactSchema.safeParse({
+      name: form.get("name"),
+      email: form.get("email"),
+      message: form.get("message"),
+    })
+    if (!parsed.success) {
+      setProblem(parsed.error.issues[0]?.message ?? "check the card and try again")
+      setPhase("writing")
+      return
+    }
+
+    setProblem(null)
+    setPhase("sending")
+    // the stamp gets its moment even when the answer is instant
+    const stamp = new Promise((done) => setTimeout(done, WAIT))
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // `website` is the honeypot: a person never sees the field, a bot fills it
+        body: JSON.stringify({ ...parsed.data, website: form.get("website") ?? "" }),
+      })
+      const body = (await res.json().catch(() => ({}))) as {
+        fieldErrors?: Record<string, string[] | undefined>
+      }
+      await stamp
+      if (res.ok) return setPhase("sent")
+      if (res.status === 400) {
+        const first = Object.values(body.fieldErrors ?? {}).find((list) => list?.length)
+        setProblem(first?.[0] ?? "something on the card is not right")
+        return setPhase("writing")
+      }
+      setProblem("it came back: my side failed. your message is still here.")
+      setPhase("error")
+    } catch {
+      await stamp
+      setProblem("it came back: no connection. your message is still here.")
+      setPhase("error")
+    }
   }
   const stamped = phase !== "writing"
 
@@ -145,9 +180,15 @@ export function Postcard({ channels }: { channels: Channels }) {
               </svg>
               <p className="text-display-md font-serif text-[var(--fg-primary)]">Posted.</p>
               <p className="text-body-md font-sans text-[var(--fg-secondary)]">
-                Thanks for writing.
+                It is on its way to my inbox. I answer every one.
               </p>
-              <Button variant="secondary" onClick={() => setPhase("writing")}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setProblem(null)
+                  setPhase("writing")
+                }}
+              >
                 write another one
               </Button>
             </motion.div>
@@ -196,6 +237,7 @@ export function Postcard({ channels }: { channels: Channels }) {
                   className="st-ct-message font-serif"
                   onInput={() => {
                     if (phase === "error") setPhase("writing")
+                    setProblem(null)
                   }}
                 />
               </div>
@@ -245,6 +287,15 @@ export function Postcard({ channels }: { channels: Channels }) {
                   <span className="text-mono-sm font-mono text-[var(--fg-secondary)]">Brazil</span>
                 </p>
 
+                {/* the honeypot: off-screen and out of the tab order, so only a bot fills it */}
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden
+                  className="sr-only"
+                />
                 <div className="st-ct-sender">
                   <span className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
                     from
@@ -267,11 +318,9 @@ export function Postcard({ channels }: { channels: Channels }) {
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-mono-sm min-h-5 font-mono" role="status">
-                    {phase === "error" ? (
-                      <span className="text-[var(--status-error-fg)]">
-                        it came back. your message is still here.
-                      </span>
+                  <p className="text-mono-sm min-h-5 font-mono" role="alert">
+                    {problem && phase !== "sending" ? (
+                      <span className="text-[var(--status-error-fg)]">{problem}</span>
                     ) : null}
                   </p>
                   <Button type="submit" loading={phase === "sending"}>

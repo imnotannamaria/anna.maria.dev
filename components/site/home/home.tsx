@@ -29,7 +29,6 @@ import { Hint } from "@/components/site/hint"
 import { Lede, PageHeader } from "@/components/site/page-header"
 import { POLAROID } from "@/components/site/polaroid"
 import { Pushpin, Tape } from "@/components/site/tape"
-import { LETTERS, featuredLetter } from "@/components/site/wall/letters"
 import { Door } from "./door"
 import "./home.css"
 
@@ -58,12 +57,6 @@ export function Home() {
       return brand ? [{ name: tag, ...brand }] : []
     })
     .slice(0, 3)
-  const letter = featuredLetter(LETTERS)
-  const initials = (letter?.name ?? "")
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
 
   const thumb: Record<Exclude<PageId, "home">, ReactNode> = {
     person: (
@@ -121,27 +114,19 @@ export function Home() {
       </span>
     ),
 
+    // The home is static and reads no database, so this is the gesture of a letter, not one of
+    // the real ones: those are on the page.
     "wall-of-love": (
       <span className="st-hm-letters">
         <span className="st-hm-letter" data-behind />
         <span className="st-hm-letter">
           <Pushpin />
-          <span className="flex min-w-0 items-center gap-2">
-            <i className="text-mono-xs font-mono">{initials}</i>
-            <span className="min-w-0">
-              <span className="text-mono-xs block truncate font-mono text-[var(--fg-primary)]">
-                {letter?.name}
-              </span>
-              <span className="text-mono-xs block truncate font-mono text-[var(--fg-muted)]">
-                {letter?.company}
-              </span>
-            </span>
+          <span className="st-hm-excerpt text-mono-xs font-sans">
+            what people I have worked with wrote about working with me
           </span>
-          <span className="st-hm-excerpt text-mono-xs font-sans">{letter?.text}</span>
         </span>
       </span>
     ),
-
     contact: (
       <span className="st-hm-postal">
         <span className="st-hm-lines" />

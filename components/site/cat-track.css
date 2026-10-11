@@ -1,0 +1,114 @@
+/* A row of signs, and Abimaela walking between them. */
+.st-track {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+}
+
+.st-track-ground {
+  position: relative;
+  height: 116px;
+  border-bottom: 1px dashed var(--border-strong);
+}
+.st-track-cat {
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  translate: -50% 0;
+  transition: left 520ms var(--ease-out);
+}
+.st-track-flip {
+  display: block;
+}
+
+.st-track-flip[data-looking="left"] {
+  scale: -1 1;
+}
+.st-track-speech {
+  width: max-content;
+  max-width: min(260px, 60cqw);
+  margin: 0;
+  padding: 5px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-overlay);
+  color: var(--fg-primary);
+  text-align: center;
+  translate: var(--offset, 0) 0;
+  transition: translate 520ms var(--ease-out);
+  animation: st-track-appear 220ms var(--ease-out);
+}
+
+@keyframes st-track-appear {
+  from {
+    opacity: 0;
+  }
+}
+
+.st-track-plates {
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.st-track-plate {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 14px 2px 8px;
+  border-radius: var(--radius-md);
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition: color 180ms var(--ease-out);
+}
+
+.st-track-plate::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 12px;
+  background: var(--border-strong);
+}
+.st-track-plate-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  transition:
+    border-color 180ms var(--ease-out),
+    background-color 180ms var(--ease-out);
+}
+.st-track-plate-name {
+  max-width: 100%;
+  text-align: center;
+  text-wrap: balance;
+}
+.st-track-plate[data-target] {
+  color: var(--fg-primary);
+}
+.st-track-plate[data-target] .st-track-plate-icon {
+  border-style: solid;
+  border-color: var(--border-brand-strong);
+  background: var(--bg-surface-brand);
+  color: var(--fg-brand-text);
+}
+span.st-track-plate {
+  cursor: default;
+}
+
+@container (max-width: 619px) {
+  .st-track-plate-name {
+    display: none;
+  }
+}
