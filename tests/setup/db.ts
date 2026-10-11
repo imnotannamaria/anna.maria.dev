@@ -10,14 +10,14 @@ if (!url) {
   )
 }
 
-// The `beforeEach` below TRUNCATEs four tables with no undo. "never the real one" as
+// The `beforeEach` below TRUNCATEs six tables with no undo. "never the real one" as
 // advice is not a guard, and .env.local holds a real connection string one `source` away.
 assertDisposableDatabase(url, "TRUNCATE")
 
 const sql = postgres(url, { prepare: false })
 
 beforeEach(async () => {
-  await sql`truncate log_entries, roadmap_items, wristkit_samples, wall_testimonials restart identity cascade`
+  await sql`truncate log_entries, roadmap_items, wristkit_samples, wall_testimonials, ai_usage, ai_visitors restart identity cascade`
 })
 
 afterAll(async () => {

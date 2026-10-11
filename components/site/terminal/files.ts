@@ -7,6 +7,7 @@ const ROUTES: [method: string, path: string, keep: string][] = [
   ["POST", "/api/v1/wristkit/sync", "rate limit 30/5min · api key · zod"],
   ["GET", "/api/v1/poster/:id", "stored urls only, never an open proxy"],
   ["GET", "/api/v1/site/log", "rate limit 30/min · public, what /log shows"],
+  ["POST", "/api/v1/ai/chat", "zod · 10/day per visitor · daily budget · no tools"],
   ["POST", "/api/v1/admin/log", "authkit + allowlist · zod"],
   ["PATCH", "/api/v1/admin/log/:id", "authkit + allowlist · zod"],
   ["DELETE", "/api/v1/admin/log/:id", "authkit + allowlist"],

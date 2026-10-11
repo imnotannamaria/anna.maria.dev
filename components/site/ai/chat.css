@@ -89,3 +89,39 @@
   object-fit: cover;
   object-position: top center;
 }
+
+/* Abimaela's face beside her name. entrepta's ChatThread draws a ◆ there and takes no avatar,
+   so the hidden mark is shown again as a picture (to go upstream: an `avatar` on the thread). */
+.st .st-ia li[data-message] > div > span > span[aria-hidden="true"].leading-none {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: url("/brand/mark.png") center / cover no-repeat;
+  /* the glyph stays in the DOM and out of sight */
+  font-size: 0 !important;
+  color: transparent;
+}
+
+.st-ia-notice {
+  height: auto;
+}
+.st-ia-notice-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.st-ia-notice-cat {
+  display: grid;
+  flex: none;
+  place-items: end center;
+  width: 84px;
+}
+@media (max-width: 479px) {
+  .st-ia-notice-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

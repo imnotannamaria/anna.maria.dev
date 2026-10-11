@@ -1,3 +1,5 @@
+import { screenQuestion } from "@/lib/ai/guard"
+
 export type Topic =
   | "wall"
   | "log"
@@ -25,6 +27,8 @@ const ROUTES: [Topic, RegExp][] = [
 ]
 
 export function topicOf(question: string): Topic | null {
+  // a request for work is about no page, whatever words it borrows: "a log in javascript"
+  if (screenQuestion(question) !== "ok") return null
   const q = question.toLowerCase()
   return ROUTES.find(([, pattern]) => pattern.test(q))?.[0] ?? null
 }

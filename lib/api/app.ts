@@ -2,6 +2,7 @@ import { Hono } from "hono"
 import { adminLog } from "./routes/admin-log"
 import { adminRoadmap } from "./routes/admin-roadmap"
 import { adminWall } from "./routes/admin-wall"
+import { ai } from "./routes/ai"
 import { poster } from "./routes/poster"
 import { site } from "./routes/site"
 import { wallInvite } from "./routes/wall-invite"
@@ -18,6 +19,7 @@ export const app = new Hono().basePath("/api/v1")
 app.route("/wristkit", wristkit)
 app.route("/poster", poster)
 app.route("/site", site)
+app.route("/ai", ai)
 app.route("/admin/log", adminLog)
 app.route("/admin/roadmap", adminRoadmap)
 app.route("/admin/wall", adminWall)

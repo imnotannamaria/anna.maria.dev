@@ -1,5 +1,5 @@
 import { ClockCounterClockwiseIcon, StackIcon } from "@phosphor-icons/react"
-import { topicOf } from "./topics"
+import { topicOf, type Topic } from "./topics"
 import Image from "next/image"
 import type { ReactElement, ReactNode } from "react"
 import { Badge } from "@/app/components/entrepta/badge"
@@ -52,8 +52,13 @@ const UNDERLINED =
 
 const tagline = (id: string) => PAGES.find((page) => page.id === id)?.tagline ?? ""
 
+/** The scripted answer to a question: the page its keywords point at, if any. */
 export function answer(question: string, data: SiteData, stack: Group[]): Answer {
-  const topic = topicOf(question)
+  return answerOf(topicOf(question), data, stack)
+}
+
+/** What the script has to say about a page, and the card that goes with it. */
+export function answerOf(topic: Topic | null, data: SiteData, stack: Group[]): Answer {
   const { projects, jobs, posts, log, apps, years, email, socials } = data
 
   if (topic === "wall") {
@@ -270,6 +275,6 @@ export function answer(question: string, data: SiteData, stack: Group[]): Answer
   }
 
   return {
-    text: "There is no model behind this yet, so I answer from a script. I know who she is, where she has worked, her stack, her projects, her notes, her log and how to reach her. Try one of those.",
+    text: "I answer from my notes here, and that one is not in them. I know who Anna is, where she has worked, her stack, her projects, her notes, her log and how to reach her. Try one of those.",
   }
 }
