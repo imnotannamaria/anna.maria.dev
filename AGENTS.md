@@ -1,7 +1,12 @@
 # anna.maria.dev
 
 Personal portfolio and open source template for full-stack devs.
-Stack: Next.js 16, MDX, Resend, entrepta design system. Dark first. Editor metaphor.
+Stack: Next.js 16, MDX, Postgres, entrepta design system. Dark first. Two languages.
+
+This is the third version of the site (v3). The second one posed as a code editor, with a
+titlebar of tabs and a status bar; none of that is here any more. If a doc, a comment or a test
+still talks about the editor chrome, the bento home, `/about`, `/blog`, `/roadmap` or `/piano`,
+it is describing the old site.
 
 For setup, fork instructions, and how to add content, see [README.md](README.md). This file covers conventions to follow when writing code here.
 
@@ -9,30 +14,30 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 
 ## Stack
 
-| Layer            | Tech                                                               |
-| ---------------- | ------------------------------------------------------------------ |
-| Framework        | Next.js 16 (App Router)                                            |
-| Language         | TypeScript (strict)                                                |
-| Styling          | Tailwind CSS v4 + entrepta tokens                                  |
-| Design system    | entrepta 3.0, copied in by its CLI, no SDK, dark first             |
-| Content          | MDX via Velite                                                     |
-| State            | Zustand                                                            |
-| Animation        | Motion v12                                                         |
-| Graph / diagram  | @xyflow/react (React Flow) — the stack graph on /about, lazy       |
-| Email (send)     | Resend SDK                                                         |
-| Email (template) | React Email                                                        |
-| Syntax highlight | Shiki + rehype-pretty-code                                         |
-| Themes           | next-themes + entrepta ThemeSwitcher, dark/light + 6 color presets |
-| OG image         | @vercel/og                                                         |
-| Analytics        | Vercel Analytics                                                   |
-| SEO              | next-sitemap                                                       |
-| Icons            | Phosphor Icons, simple-icons                                       |
-| Database         | Postgres (Supabase) via Drizzle ORM — wristkit, /log, /roadmap     |
-| API layer        | Hono, mounted at /api/v1                                           |
-| Admin auth       | WorkOS AuthKit + an email allowlist                                |
-| Forms            | react-hook-form + zod                                              |
-| Deploy           | Vercel                                                             |
-| Fonts            | Newsreader, JetBrains Mono, Inter, self hosted via next/font       |
+| Layer            | Tech                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| Framework        | Next.js 16 (App Router)                                                             |
+| Language         | TypeScript (strict)                                                                 |
+| Styling          | Tailwind CSS v4 + entrepta tokens                                                   |
+| Design system    | entrepta 3.0, copied in by its CLI, no SDK, dark first                              |
+| Languages        | next-intl: English at `/`, Portuguese at `/pt`                                      |
+| Content          | MDX via Velite, with a `pt/` twin of every post and project                         |
+| Animation        | Motion v12, and CSS sprite sheets for the cat                                       |
+| Email            | Resend SDK + React Email                                                            |
+| Syntax highlight | Shiki + rehype-pretty-code                                                          |
+| OG image         | @vercel/og                                                                          |
+| Analytics        | Vercel Analytics                                                                    |
+| SEO              | next-sitemap, `hreflang` and canonical from `lib/metadata.ts`                       |
+| Icons            | Phosphor Icons, simple-icons                                                        |
+| Database         | Postgres (Supabase) via Drizzle ORM: the log, the wall, wristkit, the chat's limits |
+| API layer        | Hono, mounted at /api/v1                                                            |
+| Admin auth       | WorkOS AuthKit + an email allowlist                                                 |
+| Forms            | zod, always; react-hook-form in the admin                                           |
+| AI               | OpenRouter behind `/api/v1/ai/chat`, with limits in Postgres                        |
+| Files            | Vercel Blob, for the photos on the wall                                             |
+| State            | Zustand, for the playlist's timer                                                   |
+| Deploy           | Vercel                                                                              |
+| Fonts            | Newsreader, JetBrains Mono, Inter, self hosted via next/font                        |
 
 ---
 
@@ -48,12 +53,13 @@ places are entrepta's rather than the site's:
   hooks `use-theme`, `use-mode`, `use-command-palette`, `use-url-filter`, `use-redact`
 
 A change to any of them belongs in entrepta, then comes back with `add --overwrite`. A local edit
-is lost on the next update. What only this site knows stays out of those files: its CSS lives in
-`app/globals.css`, its helpers in `lib/format.ts`, and `components/chrome/` binds entrepta's
-Sidebar, PageOutline and TabNav to the site's routes.
+is lost on the next update. What only this site knows stays out of those files: its CSS lives beside
+each piece in `components/site/` (and the little that is shared in `app/globals.css`), its helpers
+in `lib/format.ts`, and `components/site/frame/` binds entrepta's Sidebar and MobileNav to the
+site's routes.
 
-**Never run `entrepta init --overwrite` here.** It rewrites `app/globals.css` whole, which is where
-the site's own ~1,100 lines of CSS live, and it brings a Google Fonts `@import` that fights
+**Never run `entrepta init --overwrite` here.** It rewrites `app/globals.css` whole, which holds
+the site's own CSS, and it brings a Google Fonts `@import` that fights
 `next/font`. The migration guide's first step assumes a project whose `globals.css` is entrepta's alone; this
 one keeps its own CSS there.
 
@@ -124,13 +130,47 @@ Only the brand changes between themes: `--fg-brand`, `--fg-brand-hover`, the two
 | ivy                | green `#35a365`  |
 | bosco              | blue `#2563eb`   |
 
+**v3 uses one theme.** The six are still in `app/entrepta.css`, but the new site has no theme
+switcher and drops a `data-theme` saved by the old one (`site-frame.tsx`). Light and dark stay,
+on the button in the header. Keep deriving accents from `--fg-brand` anyway: the tokens are
+entrepta's, and a hardcoded hex is still wrong in light mode.
+
+**What the site overrides without editing entrepta.** A piece entrepta draws that the new UI does
+not want (the `◆` on a label, the `//` before a field's error, the filled dialog) is hidden or
+restyled from the site's CSS, and each override says so in a comment. They are the list of what
+goes upstream when entrepta is redone; do not add one without the comment.
+
 ---
 
 ## Visual identity
 
 ### Philosophy
 
-Editor metaphor. The site looks like a code editor: titlebar with tabs (like VSCode), sidebar with icon nav, status bar at the bottom. Each page reads as an "open file." This is not a designer's portfolio, it's a dev's portfolio that happens to have good design.
+A playground more than a résumé. The site has **three sides**, switched from a pill in the header:
+
+- **Front**: the pages. Home, Anna as a person, Anna as a professional, notes, projects, the wall
+  of love, contact, and the log.
+- **Back** (`/back`): a terminal over the same content. A file system, `ls`, `cd`, `cat`, `open`.
+- **IA** (`/ai`): a chat that answers about Anna and the site, with a model behind layers of limits.
+
+Abimaela, Anna's real cat, lives in the corner as a set of sprite sheets and reacts to what the
+visitor does. Everything about her is in [docs/abimaela.md](docs/abimaela.md).
+
+The new UI has rules, and each one was asked for:
+
+- **No `◆` and no `//`.** The old site's two glyphs are gone. A note about how something works is a
+  dashed `Hint`, not a comment line.
+- **Cards are dashed and unfilled, with an icon in the label**: `Tile` (`components/site/tile.tsx`),
+  which is entrepta's Card with that surface. Do not reach for the bare Card on a page.
+- **Only entrepta tokens.** No new colour, font or surface. "Freedom to make components" never
+  meant changing those.
+- **Soft hovers.** No glow following the cursor: `[data-spotlight]` is switched off for the whole
+  site.
+- **Real things look like things**: a polaroid, a sticker, a strip of tape, a folder, a browser
+  window, a dock, a postcard. They are small shared pieces in `components/site/`, listed below.
+- **Nothing invented is presented as real.** A number, a quote or a fact on a page is Anna's.
+- **The town is not named.** Anna is from Pernambuco; the name of her town does not appear
+  anywhere on the site, in either language.
 
 ### Typography
 
@@ -178,33 +218,26 @@ Rules, each one paid for:
 - **No adjacent pair closer than ~25%.** That is why there is no 20 between 18 and 24, and no
   48 between 40 and 64. If two steps are 9% apart, they are one step with two names, and the
   question the scale exists to kill ("13 or 14?") comes straight back.
-- **Two exceptions, both deliberate.** A decorative glyph (`◆`, `♥`, `■`, the mini piano's key
-  labels) keeps a numeric inline size, because it is matched optically to the text beside it
+- **Two exceptions, both deliberate.** A decorative glyph (a `♥`, a star) keeps a numeric inline size, because it is matched optically to the text beside it
   rather than filling a role — they are all 18px and under, which is what the test asserts. And
   a page title may be fluid, `fontSize: clamp(...)`, since a title that scales with the
   viewport is a technique rather than a missing step.
 
-### Chrome
+### The frame
 
-```
-┌─────────────────────────────────────────────────────────┐
-│ ● ● ●  [ home.tsx ◆ × ]  [ about.md × ]  [ + ]  · · ·  │  titlebar/tabs, 40px
-├──┬──────────────────────────────────────────────────────┤
-│  │                                                       │
-│  │  content area                                         │  main
-│  │                                                       │
-│ ↑ │                                                       │
-│sidebar│                                                     │
-│(56px)│                                                     │
-├──┴──────────────────────────────────────────────────────┤
-│ ◆ annamaria.app  main ✓  ⌘K palette  UTF-8  TypeScript  │  status bar, 28px
-└─────────────────────────────────────────────────────────┘
-```
+`components/site/frame/site-frame.tsx` is the layout of every page: entrepta's `Sidebar`
+(labeled, collapsible) on the left, the page in the middle, an island floating over its top, and
+the cat in the corner. Below 768px the sidebar gives way to entrepta's `MobileNav` at the bottom.
 
-- Titlebar: entrepta's `TabNav` with `variant="window"` — traffic lights, file tabs, meta on the right, a brand underline that travels to the active tab. `components/chrome/titlebar.tsx` knows the pages and the palette; the dots still say hi through a delegated click
-- Sidebar: entrepta's `Sidebar` — logo `a` in serif italic + nav icons + a `◆` that travels to the active item. `components/chrome/sidebar.tsx` holds the pages and the route matching
-- Status bar: entrepta `StatusBar`, brand color, page context on the right
-- Recurring glyphs: `◆` as the brand mark, `//` for comments, `$` for section prompts
+- **The island** (`island.tsx`): the Front / Back / IA switcher, and four actions: report a bug,
+  mute, the other language (a flag), light or dark (the new mode comes down like a curtain).
+- **The sides stay mounted.** The terminal and the chat load on the first visit to their address
+  and are then only hidden, so a session and a conversation survive a trip to another side.
+- **Every page of the Front ends in the footer**, which is a game: one sign per page, and the cat
+  walks to the sign you point at (`components/site/cat-track.tsx`).
+- **The screens nobody plans to see** (loading, 404, error, a removed page) are
+  `components/site/frame/screen-state.tsx`: the cat doing something about it.
+- **A click draws a small burst** where it landed (`click-burst.tsx`), and plays a click.
 
 ---
 
@@ -212,240 +245,139 @@ Rules, each one paid for:
 
 ```
 app/
-  page.tsx                 home (bento grid)
-  about/page.tsx
-  blog/                     list + [slug]
-  projects/                 list + [slug]
-  piano/
-  contact/page.tsx
-  log/                      public feed of everything I finish
-  roadmap/                  the board: to do, in progress, shipped
-  admin/                    log + roadmap CRUD, behind AuthKit + the allowlist
-  components/entrepta/     entrepta 3.0 components, written by its CLI — don't edit here
+  [locale]/(site)/          every public page, once per language
+    page.tsx                 home
+    person/ professional/    the two "about" pages
+    notes/ projects/         lists and [slug], from MDX
+    wall-of-love/ contact/ log/
+    back/ ai/                the terminal and the chat
+    invite/[token]/          the form behind a wall of love invite
+    roadmap/ piano/ components/   removed in v3: each answers only to say so
+  admin/                    log and wall CRUD, its own root layout, English only
+  components/entrepta/      entrepta 3.0 components, written by its CLI — don't edit here
   api/
-    contact/route.ts        email via Resend
+    contact/route.ts        the postcard, via Resend
     og/route.tsx             dynamic OG images
-    now-playing/route.ts    Spotify Now Playing
+    now-playing/route.ts    the playlist
     auth/callback/route.ts  WorkOS AuthKit callback
-    v1/[[...route]]/        the Hono app — wristkit ingest + admin CRUD
+    v1/[[...route]]/        the Hono app
     wristkit-sync/route.ts  legacy path, forwards into Hono (delete once the Shortcut moves)
-  layout.tsx                root layout, editor chrome + fonts + theme setup
+  root-shell.tsx            <html>, fonts, the toaster, the click sound: shared by both layouts
   entrepta.css               entrepta's tokens, scale and themes, synced from @entrepta/registry
-  globals.css                the site's own CSS, imports entrepta.css
+  globals.css                the little CSS the whole site shares
 
-proxy.ts                    AuthKit proxy (Next 16's name for middleware), /admin only
+proxy.ts                    Next 16's name for middleware: the AuthKit session for /admin and
+                            the API, and the language of a page (lib/i18n/locales.ts)
 
 content/
-  blog/*.mdx
-  projects/*.mdx
+  blog/*.mdx     blog/pt/*.mdx        the notes, and their Portuguese
+  projects/*.mdx projects/pt/*.mdx
+
+messages/
+  en.json pt.json           every sentence of the UI, in both languages
 
 components/
-  chrome/                   titlebar, sidebar, page outline (site bindings over entrepta), palette, feed shell
-  home/                     bento grid cards (stack, mini piano, GitHub, log)
-  log/                      feed, catalog card, star rating
-  roadmap/                  board, item card, progress card, status mark
-  admin/                    entry + item forms, tables, rating input, quick add, delete dialogs
-  spotify/                  Now Playing widget
-  wristkit/                 Apple Watch activity card
-  blog/                     feed, post card, MDX renderer, reading progress
-  projects/                 feed + project card
-  about/                    GitHub calendar, stack graph, timeline, interest card
-  contact/                  contact form, channels card
-  piano/                    keymap card
-  brand/                    logo mark
-  ui/                       chrome error, sound feedback, generated cover, meta grid, icons
+  site/                     the site: one folder per page, plus the shared pieces
+    frame/                  the frame, the island, the screen states
+    abimaela/               the cat: sheets, events, the component
+    home/ person/ professional/ notes/ post/ projects/ project/ wall/ contact/ log/
+    terminal/ ai/ bug/ footer/
+    tile, hint, page-header, window, folder, dock, plate, tape, polaroid, sticker, …
+  admin/                    forms, tables, delete dialogs
+  wall/                     the invite form and its closed states
+  wristkit/                 the Apple Watch activity card (wristkit's markup, marked `SITE:`)
+  about/ blog/ log/ ui/     four leftovers still in use: the contributions calendar, the MDX
+                            renderer, the star rating, the sound and the tooltip
 
-emails/
-  contact-email.tsx         React Email template
+emails/                     React Email: contact, bug report, wall submission
 
 lib/
   api/                      Hono app, routes, middleware (rate limit, api key, admin)
+  ai/                       the chat: prompt, guard, limits, usage
   auth/require-admin.ts     the email allowlist — AuthKit says who, this says whether
-  db/client.ts              shared Postgres client, one pool for wristkit and /log
-  log/                      schema, validation, queries, mutations, stars, date
-  roadmap/                  schema, validation, queries, counts, mutations
-  slug.ts                    slugify() + uniqueSlug(), shared by log and roadmap
-  stack.ts                   the stack list + the simple-icons path per entry
-  velite.ts                 content query helpers
+  db/client.ts              one Postgres client and pool for everything
+  i18n/                     locales and routing, the page helpers, tests of the two languages
+  log/ wall/ wristkit/      schema, validation, queries, mutations
+  velite.ts                 content query helpers, and `inLocale`
   site-config.ts             name, email, socials, single source of identity
-  experience.ts              career start date, years of experience
-  spotify.ts                 token + playlist fetch
-  wristkit/                  DB client (Drizzle), schema, validation
-  utils.ts                   entrepta's cn(); motion.ts, icon.tsx and overlay.ts are entrepta's too
+  sound-effects.ts           the three sounds: prompt, moment, volume
+  utils.ts                   entrepta's cn(); motion.ts, icon.tsx, overlay.ts and nav.ts are entrepta's too
   format.ts                  formatDate(), slugify() for headings, isUuid(), reading time
-  metadata.ts                createMetadata() helper
-  contact-schema.ts          zod schema for the contact form
 
-store/
-  nowPlayingStore.ts         Zustand, Spotify widget timer state
-
-hooks/                      entrepta's: use-theme, use-mode, use-command-palette, use-url-filter
-  use-media-query.ts
-  use-optimistic-removal.ts
+docs/
+  abimaela.md               the cat
+  sound-rights.md           what the ElevenLabs terms say about the sounds
+  sql/                      the migrations, in order
+  *-plan.md                 decisions of the old site, kept as history
 ```
 
 ---
 
 ## Pages
 
-### Home (`/`)
+Each page is a folder in `components/site/` with a component, its CSS beside it, and its words in
+`messages/`. The route file in `app/[locale]/(site)/` does three things: `pageLocale(params)`,
+metadata, and the data the page needs.
 
-entrepta's `BentoGrid`, one per section. Hero card, Spotify Now Playing, wristkit Apple Watch activity card, GitHub contributions, featured project, career stats. Section headers use `$ whoami`, `$ ls projects/`, style commands.
+| Address           | What it is                                                                                                                             |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`               | Home: a door to each page                                                                                                              |
+| `/person`         | Anna as a person: photos, a playlist, today's activity rings, the weather in Pernambuco, stickers, a shelf of the log, things she uses |
+| `/professional`   | Anna as a professional: the career, the stack, the apps, the contributions                                                             |
+| `/notes`          | The posts, and `/notes/[slug]`                                                                                                         |
+| `/projects`       | The projects as folders in a browser window, and `/projects/[slug]`                                                                    |
+| `/wall-of-love`   | Letters from people she worked with, as messages in a channel, with reactions                                                          |
+| `/contact`        | A postcard that sends an email, and the ways to reach her                                                                              |
+| `/log`            | Everything she finishes: films, series, books, albums, podcasts, games                                                                 |
+| `/back`           | The terminal                                                                                                                           |
+| `/ai`             | The chat                                                                                                                               |
+| `/invite/[token]` | The form a wall of love invite opens: one letter per link, three days                                                                  |
+| `/admin`          | The log and the wall, behind AuthKit and the allowlist                                                                                 |
 
-A tile is a full row below 768px, a half from there (the `HALF_FROM_MD` class in `app/(home)/page.tsx`, since `BentoGrid` only speaks 640 and 1024) and its `colSpan.lg` from 1024px. The tile brings the entrance, so a card inside one carries none of its own; `reveal={false}` is for the two that sequence themselves — the profile card, which also holds the LCP element, and the tree. A `Suspense` boundary goes _inside_ the tile, never around it: `BentoGrid` only recognises a `BentoItem` that is its direct child.
+Things that are true of all of them, each one learned:
 
-`ls ./work` is the featured project and the featured post stacked on the left, and `git shortlog` on its own on the right: commits in the last thirty days per project, the last commit under each, and the projects that went quiet. It replaced `oss '26`, a goal counter that stopped changing once the goal was met; the goal is its footer comment now. One GitHub request feeds it, cached for an hour — see `lib/github/shortlog.ts` and [/components/shortlog](content/components/shortlog.mdx).
+- **Every layout and page under `[locale]` calls `pageLocale(params)` first.** next-intl fixes a
+  request's language on the first translation it is asked for; a layout that skipped the call made
+  the home render in English under a Portuguese frame, now and then.
+- **A sentence a visitor reads is in `messages/en.json` and `messages/pt.json`**, never in a
+  component. Tests fail when the two files do not have the same keys, when a sentence of four
+  words or more is identical in both, or when either has an em dash.
+- **A link to another page of the site is a `ScreenLink`**, by the page's id, so it stays in the
+  language of the page. From code it is `useNavigate()`.
+- **A sentence in Anna's voice follows `.agents/write/SKILL.md`**: fix what is wrong, keep Anna.
+  Direct, casual, no corporate words, no em dashes.
 
-### `/about`
+### The log
 
-Two columns: photo + long bio. Career timeline (vertical brand line, circular dots). Stack icon grid. Interests.
+One feed for everything she finishes. A card opens a dialog with the whole entry. The title and
+the note are English in the database, with `title_pt` and `note_pt` beside them, both optional;
+`inLocale` (`lib/log/locale.ts`) swaps them in on `/pt`. Posters go through
+`/api/v1/poster/<base64url>`, a local path, so `next/image` optimises them with no poster host in
+`remotePatterns`, and the route only fetches a URL already stored in `log_entries.poster_url`.
 
-### `/blog`
+There is no `/log/[slug]` and there should not be: an entry is a title, a creator, a year and two
+sentences, and a page each would be a hundred thin pages.
 
-The shelf. One post per row, entrepta's Card like everything else, and the text taking the full
-width. It briefly had a generated cover on the left and lost it: a poster earns its place when it
-is the thing you scan for, and a post is scanned by its title — a rectangle beside every row was
-decoration competing with the sentence doing the work. `/projects` keeps covers, because a project
-_is_ a thing you recognise by sight.
+### The wall of love
 
-Posts are grouped by year, and the outline in the left rail lists those years with a count. Grouping
-is what gives the outline somewhere to point, and unlike `/log` it costs nothing — years descend and
-posts descend inside them, which is the order the feed always had with headings added.
+An invite is a link good for three days and one letter; only its hash is stored. A letter waits
+for approval in the admin, then shows on the wall, oldest first like a channel. Reactions are a
+count per emoji on the letter's row, with nobody's identity kept.
 
-The tag filter mirrors into `?tag=` through `useUrlFilter`, **not** `useSearchParams`: on a static
-route the latter makes prerender emit the Suspense fallback, so every post was missing from the HTML
-a crawler reads, on the one page whose whole job is listing posts. The outline and the cards share
-that filter, which is why `BlogFeed` owns both; the page header is server-rendered and passed in as
-children.
+### The chat
 
-Post page: Newsreader title, brand progress bar, sticky TOC, Shiki dark theme, callouts with a brand
-left border.
+`POST /api/v1/ai/chat`. A question is screened before it reaches the model (`lib/ai/guard.ts`),
+the prompt fences what the visitor wrote, the answer is not streamed so it can be screened too,
+and the limits (per visitor, per day, a budget) live in Postgres. Without the OpenRouter key the
+chat answers from a script. The cap that holds even if the code is wrong is the credit limit on
+the key itself.
 
-### `/projects`
+### The admin
 
-The uniform feed: one card per project, cover on top, text below, two per row, newest first.
-Everything `/blog` does — the outline in the left rail listing years with a count, `useUrlFilter`
-for the tag pills, the header server-rendered and passed into the client feed as children — is the
-same here on purpose. Two sibling index pages solving the same problem differently is the
-divergence the Standardization check is about.
-
-Where they differ is the cover, and only there. Projects get **real images**, kept in
-`public/projects/` and named after the project: `cover: "/projects/name.png"` in the frontmatter.
-The card renders them with `fill`, so no intrinsic dimensions are needed, and a `public/` path is
-local — `next/image` still optimises it with no `remotePatterns` entry. The field is optional and
-stays optional: a project without one falls back to the generated cover, so the grid is never
-missing a tile and adding art later is a one-line frontmatter change.
-
-It was `s.image()` on a co-located file, which also returned a blur placeholder. What that gave up
-is the placeholder; what it must not give up is **proof the file exists**, so `velite.config.ts`
-checks the path with `existsSync` instead. That check is not theoretical. `wristkit.mdx` shipped
-`cover: "./wirstkit.png"` — two letters swapped — and because `output.clean` empties `.velite`
-before writing and a failed validation then writes nothing, **every project vanished from
-`/projects`** and the page said "nothing published yet". One typo in one file, and the symptom
-pointed nowhere near it.
-
-Case study page: left sidebar with metadata (stack, links, period).
-
-### `/piano`
-
-A two-octave Web Audio piano, and the one page where the instrument is deliberately **not** a card.
-The wooden cabinet is skeuomorphic on purpose; wrapping it would be a frame inside a frame.
-
-Everything around it is the shared surface, though. The key mapping was one hand-written box
-painted `--bg-surface` — the token for what sits _above_ a card — and is four Cards now, one
-per octave group. The six song buttons hand-rolled the same surface six times and are
-`cardVariants({ size: "sm" })` with `grid`, which `cn()` swaps in for the card's flex-column since
-those rows are three columns. They are the one card on the site with **no spotlight**: they are controls whose
-playing state already lights the whole surface brand, and a glow following the cursor across six of
-them would compete with the one that means something.
-
-### `/contact`
-
-The form leads. It used to come last — hero, then four channel cards, then the only thing on the
-page that does anything, two scrolls down. Now it is the wide card beside a narrow column holding
-the four channels as **rows in one card**, and the hero shrank from 96px to ~62px to make room
-above the fold.
-
-The form owns its card in both states, rather than the page wrapping it — the success state replaces
-the form entirely, and a page-owned card would have nested a card inside a card the moment someone
-hit send. entrepta `Input` + `Button`, loading state, inline field errors, a network failure told
-apart from a rejection, honeypot on the backend.
-
-Both states are entrepta's Card, like every other card on the site. The site's own `.bento-card`
-became entrepta v2's Card, so there is one card vocabulary again.
-
-### `/log`
-
-One feed for everything I finish: films, series, books, albums, podcasts, games. Catalog cards with poster, type badge, serif title, `creator · year` and a drawn star rating. Favourites carry a `♥`; entries with a note get an inline expand; entries with an external link make the whole card clickable.
-
-Grouped by type, with the outline in the left rail listing those types and their counts — the same
-arrangement `/blog` and `/projects` use. Grouping costs the ordering nothing here: `TYPE_ORDER` in
-`lib/log/queries.ts` is `["music"]`, and grouping in **arrival order** rather than by `LOG_TYPES`
-keeps it exactly — albums lead because the query already put them first, and favourites still lead
-inside each section.
-
-Filter pills mirror into `?type=` through `useUrlFilter`, read with `useSyncExternalStore` rather
-than `useSearchParams` so every card lands in the server HTML.
-
-The card is entrepta's Card at `size="sm"`. It used to draw its own `rounded-[14px] border p-3.5`
-and was the one card on the site that didn't hover like the rest; `sm` exists because 24px of
-padding on a 320px tile in a poster grid is most of the tile, and a density step is cheaper than
-a second card.
-
-Posters go through `next/image` pointed at **`/api/v1/poster/<base64url>`** — a local path, so
-they are optimised without a single poster host appearing in `remotePatterns`. That property is
-the whole reason they used to be a plain `<img>`, and it is kept; what changed is that the plain
-`<img>` was costing 2.7 MB of oversized bytes on `/log` (one poster was 1791×2704 at 1.79 MB,
-drawn 92px wide — 275× more than it needed) and eleven third-party cookies, nine of them Adobe
-Analytics and Kampyle from `image.api.playstation.com`. Hotlinking hands every visitor to the
-poster host's analytics; that was the half that mattered, and it is what put the page's
-best-practices score at 77.
-
-The route only ever fetches a URL already stored in `log_entries.poster_url`, so it is not an
-open proxy — writing the entry is what authorises the image, and there is nothing to maintain.
-The URL rides in the path rather than a query string because `next/image` rejects a local `src`
-with a query unless `images.localPatterns` matches it, and a `LocalPattern`'s `search` is a
-literal with no wildcard. A URL that doesn't load falls back to the type label.
-
-Every entry has a slug, but there is no `/log/[slug]` page and there shouldn't be. An entry is a title, a creator, a year and maybe two sentences — a page per entry would be a hundred thin pages diluting a small site, competing for queries Letterboxd and Goodreads already own. The slug is there to be a stable anchor and to keep the option open, not as a route waiting to be built.
-
-### `/roadmap`
-
-Three columns, to do, in progress and shipped, of what this site is going to become, over a
-progress card whose stepper — entrepta's `Stepper`, with each stage's count as the line under
-its label — walks the same three stages. Every item is entrepta's Card with
-the status mark, a serif title, the blurb and a `Badge`; shipped ones are struck through.
-Hovering a card runs a light around its border, and the in-progress ones rest dimly lit.
-
-Filter pills mirror into `?status=` and are read with `useSyncExternalStore`, like `/log`,
-so every card lands in the server HTML. They are also what keeps the cards' `layoutId`
-animation alive: the mark is **read-only** on the public site, so filtering is the only
-thing a visitor can do that makes a card travel.
-
-It sits in the primary nav now — an eighth tab in the titlebar and an eighth icon in the
-sidebar, like every other page. It used to live under a hairline in the sidebar and open as a
-dynamic tab, on the grounds that a permanent eighth tab would crowd the row; the row is a
-scroller with fade edges and handles that on its own, and a page reachable from the sidebar
-and the palette but never from the tabs was the odd one out.
-
-That sidebar link used to open a dialog containing a copy of the board; the page says the same
-thing with a URL people can send each other, so the dialog was a second implementation to keep
-in step and it went. The public `GET /api/v1/roadmap` went with it, because the dialog was its
-only consumer.
-
-### `/admin`
-
-Guarded by WorkOS AuthKit **and** an `ADMIN_EMAILS` allowlist checked at the route level, not just in `proxy.ts`. Anyone else gets a 404, never a 403. `/admin/log` lists everything including drafts; `/admin/roadmap` lists everything including
-`raw`. Create, edit and delete go through Hono at `/api/v1/admin/log` and
-`/api/v1/admin/roadmap`.
-
-Both lists are entrepta's `Table`, and the type and status fields are its `Select`. The rows are
-`MotionTableRow` (`components/admin/motion-table-row.tsx`), the Table's row as a Motion component,
-because a row here fades in and fades out on delete.
-
-Full docs, including the phase-by-phase decisions and their reasoning:
-[docs/log-plan.md](docs/log-plan.md) and
-[docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
+Guarded by WorkOS AuthKit **and** an `ADMIN_EMAILS` allowlist checked at the route level, not just
+in `proxy.ts`. Anyone else gets a 404, never a 403. It has its own root layout, outside the
+language segment, in English: a tool with one reader. Lists are entrepta's `Table`; create, edit
+and delete go through Hono at `/api/v1/admin/log` and `/api/v1/admin/wall`.
 
 ---
 
@@ -482,6 +414,12 @@ published: true
 ```
 
 Only the most recent `featured: true` project shows on the home page.
+
+---
+
+A translation is the same file name under `pt/` (`content/blog/pt/<slug>.mdx`), with the same
+date. `inLocale` in `lib/velite.ts` takes only the title, the description and the body from it.
+A test fails when a post or a project has no `pt/` twin.
 
 ---
 
@@ -526,12 +464,26 @@ NEXT_PUBLIC_WORKOS_REDIRECT_URI=https://annamaria.app/api/auth/callback
 # this is what decides who is actually let through.
 ADMIN_EMAILS=
 
-# GitHub GraphQL, for the contributions grid on / and /about, optional.
+# GitHub GraphQL, for the contributions grid on /professional, optional.
 # Classic PAT, `read:user` scope — see lib/github/contributions.ts.
 GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+
+# Vercel Blob, for the photos on the wall of love, optional
+BLOB_READ_WRITE_TOKEN=
+
+# OpenRouter, for the chat at /ai, optional. Without both the chat answers from its script.
+# Put a credit limit on the key itself: it is the cap that holds even if the code is wrong.
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=anthropic/claude-haiku-5.5
+
+# ElevenLabs, only for `npm run generate:sounds`, never at runtime
+ELEVENLABS_API_KEY=
 ```
 
-Everything except Resend and the base URL is optional. Without a database the wristkit card shows an error state and `/log` renders empty; without WorkOS `/admin` is unreachable; without `GITHUB_TOKEN` the contributions card shows an empty state. The rest of the site still builds and runs either way.
+Everything except Resend and the base URL is optional. Without a database the activity card shows an error state, and the log, the wall and the shelf say the database did not answer; without WorkOS `/admin` is unreachable; without `GITHUB_TOKEN` the contributions card shows an empty state. The rest of the site still builds and runs either way.
+
+**Never print a secret, and never paste one into a chat.** Check that a variable is there, as a
+yes or a no.
 
 ---
 
@@ -542,13 +494,13 @@ Everything except Resend and the base URL is optional. Without a database the wr
   "dev": "infisical run -- run-p dev:velite dev:next",
   "dev:local": "run-p dev:velite dev:next",
   "dev:clean": "rm -rf .next && npm run dev",
-  "build": "velite build && next build",
+  "build": "velite build --strict && next build",
   "postbuild": "next-sitemap",
   "lint": "eslint . && prettier --check .",
   "format": "prettier --write .",
   "email:dev": "email dev --dir emails",
   "seed:log": "tsx scripts/seed-log.ts",
-  "seed:roadmap": "tsx scripts/seed-roadmap.ts"
+  "generate:sounds": "tsx scripts/generate-elevenlabs-sounds.ts"
 }
 ```
 
@@ -579,12 +531,17 @@ idle the whole time, and it reproduces with a bare `npx next dev` and nothing co
 - Brand accents always derive from `--fg-brand` via `color-mix()`, never a hardcoded hex, so every theme stays reactive.
 - Mono is the default UI font. Reach for Inter only in long prose blocks.
 - entrepta components in `app/components/entrepta/` are entrepta's. Change them upstream and bring them back with `add --overwrite`; don't wrap or override them from outside. See Design system above.
-- No native `title` for a tooltip. Wrap the control in `Tip` (`components/ui/tip.tsx`), which is entrepta's `Tooltip` assembled once; the provider is in `app/layout.tsx`. An icon-only control still needs its own `aria-label`. The one tooltip that is not the component is the contributions calendar's: a single box following a delegated pointer over 371 cells, wearing the same overlay surface.
+- No native `title` for a tooltip. Wrap the control in `Tip` (`components/ui/tip.tsx`), which is entrepta's `Tooltip` assembled once; the provider is in `app/root-shell.tsx`. An icon-only control still needs its own `aria-label`. The one tooltip that is not the component is the contributions calendar's: a single box following a delegated pointer over 371 cells, wearing the same overlay surface.
+- **Every form is validated by a zod schema, and by nothing else.** The form is `noValidate` and no field carries `required`, `pattern` or `minLength`: the browser's own bubble answers first when it is left on, in its own language and style, before the schema is asked anything. `lib/forms.test.ts` fails on a form that breaks this.
+- **Every button clicks.** The click sound is one listener on the document (`components/ui/sound-feedback.ts`) that hears buttons and anything with a control's role. A link that behaves like a button joins with `data-sound="click"`; a part of the page that should stay quiet says `data-sound="off"`. The palette is three sounds (click, success, error) and a fourth is a decision, not a commit. See [docs/sound-rights.md](docs/sound-rights.md) before adding a file.
+- **The cat is told, not asked.** A page says something happened with `pet.notify("<event>")`; what she does about it is in `components/site/abimaela/events.ts`, and a test ties that table to `docs/abimaela.md`.
+- **Never drive a browser to check the UI**, headless included. `curl`, `tsc`, lint and the tests are the tools; what was not seen on a screen is said plainly in the hand-off, as a list of what to look at.
+- **A new screen starts as a discovery**: clickable options in a throwaway, dev-only route. Anna picks, it gets built, the discovery is deleted.
 - Chrome mobile won't resize below about 550px in DevTools. For real narrow viewports (375px), use the device toolbar, not window resize.
 - New API routes go in the Hono app under `lib/api/routes/`, mounted at `/api/v1`. The older handlers (`/api/contact`, `/api/og`, `/api/now-playing`) stay where they are — they work, and moving them buys nothing.
 - Anything under `/admin` calls `requireAdmin()` (pages) or `requireAdminApi` (routes). The `proxy.ts` matcher is not the gate; a matcher can be edited wrong.
 - **Before committing, run the tests.** `npm run test:all` walks every layer — unit, integration, then e2e — and does the database and build setup each one needs (`-- --no-e2e` to skip the browser layer when the change doesn't touch it). At minimum run `npm run test` (the unit project) alongside `npm run lint` and `npx tsc --noEmit`. A green commit is the baseline; don't commit a red one without saying so.
-- **Pages that read Postgres are `force-dynamic`, not ISR.** That covers `/`, `/log`, `/roadmap` and everything under `/admin`. The log and the wristkit rings are supposed to read as live — an activity ring frozen at this morning's numbers, or an entry I published ten minutes ago still missing from the feed, is a worse experience than the handful of milliseconds two indexed queries cost against a pooled connection. Caching them was buying convenience, not speed, and it bought it at the price of a `revalidatePath` call I'd have to remember every time a new page started reading the same table. Content that comes from MDX stays static — this is about the database, not about the site.
+- **Pages that read Postgres are `force-dynamic`, not ISR.** That covers `/log`, `/person`, `/wall-of-love`, an invite and everything under `/admin`. The log and the wristkit rings are supposed to read as live — an activity ring frozen at this morning's numbers, or an entry I published ten minutes ago still missing from the feed, is a worse experience than the handful of milliseconds two indexed queries cost against a pooled connection. Caching them was buying convenience, not speed, and it bought it at the price of a `revalidatePath` call I'd have to remember every time a new page started reading the same table. Content that comes from MDX stays static — this is about the database, not about the site.
 - Because of the above, mutations do **not** call `revalidatePath`. If you ever put log or wristkit data on a cached page, that decision changes and the trade-off above is the one to re-argue.
 
 ### Writing new UI: five things that broke silently once
@@ -616,11 +573,11 @@ looking at the screen. They are the questions to ask _while_ writing, not after.
   Change the component — upstream, in entrepta, which is how `StatusBar` got
   `position="static"`. If a second consumer ever wants the other behaviour, that is a variant,
   not an override.
-- **A glyph is not a type role.** `◆`, `♥`, `■`, the mini piano's key labels: they are matched
-  optically to the text beside them and keep a numeric inline size, all 18px and under. Use
-  `<Diamond />` for the brand mark rather than an inline span — that one reached eleven copies,
-  and the tenth had lost its `aria-hidden`, so a screen reader announced "black diamond suit"
-  before a file name.
+- **A glyph is not a type role.** A decorative mark matched optically to the text beside it (a
+  `♥`, a star) keeps a numeric inline size, 18px and under, and is `aria-hidden` with a screen
+  reader's words beside it. The old site's `◆` reached eleven hand-written copies and the tenth
+  had lost its `aria-hidden`, so a screen reader announced "black diamond suit" before a file
+  name. The new UI does not draw it at all.
 
 And two mechanical ones: **Tailwind v4 scans Markdown**, so a class written as an example in a
 doc compiles — a wildcard inside the brackets emits invalid CSS and warns on every build. And
@@ -629,70 +586,39 @@ doc compiles — a wildcard inside the brackets emits invalid CSS and warns on e
 
 ---
 
-## The roadmap
+## The pieces, and motion
 
-Raw ideas for the site used to live in a `ROADMAP.md` at the repo root. They live in
-Postgres now, written and edited at `/admin/roadmap`, and shown at `/roadmap`.
-
-The file is gone but its rules are not:
-
-- **An item is two or three sentences.** What the thing is, and at most one line on why I
-  want it.
-- **When I ask you to add one, write it down — don't evaluate it.** No feasibility, no
-  architecture, no list of what makes it hard, no accessibility caveats. I know something
-  might not work; finding that out is what the plan doc is for, later, if the idea
-  survives. Adding an item is me not wanting to lose a thought, not asking for an opinion
-  on it. The same sentence is the helper text under the blurb field, so the rule lives
-  where the writing happens.
-- **New items land as `raw`,** which never renders on the site. That status _is_ the old
-  file: somewhere to put a thought without deciding anything about it. Promote it to `todo`
-  when it becomes real.
-- **An idea that grows into real work becomes `docs/<name>-plan.md`,** the way the tree and
-  this roadmap did, and the item gets a `plan` pointing at it. That is where analysis
-  belongs, and it is what keeps the board from turning into a pile of half-designs nobody
-  rereads.
-
-If capture ever starts costing more than typing a line into an open editor did, that is the
-signal the move was wrong — the fix is an import script, not going back to the file. The
-reasoning is in [docs/roadmap-component-plan.md](docs/roadmap-component-plan.md).
-
-`ROADMAP.md` is gone. The seed carried every item it held into the table, and a file
-regenerated from the database was a second copy of the same list to keep in step, which is
-the problem the move was supposed to solve. `scripts/seed-roadmap.ts` still has the
-original text if it is ever needed.
-
----
-
-## Cards and motion
-
-Every card on the site is built from the same pieces, all of them entrepta's (`app/components/entrepta/`). Reaching for raw markup instead is how the home page ended up with eight cards that each invented their own header, and how the contributions card spent months re-implementing the card surface in inline styles with a React state hook driving its hover.
+Every page is built from the same small pieces. Reaching for raw markup instead is how the old
+home ended up with eight cards that each invented their own header.
 
 ### The pieces
 
-| Piece                                                                          | What it is                                                                                                               |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| `Card` / `cardVariants()`                                                      | The card surface: padding, radius, border, hover. `cardVariants()` puts it on a `motion.div`, an `article` or a `button` |
-| `size="sm"` / `"xl"`                                                           | The same card, denser or roomier. A size, not a new card                                                                 |
-| `CardHeader` + `CardLabel` + `CardMeta`, `CardFooter` + `CardComment`, `Badge` | The chrome inside a card                                                                                                 |
-| `ArrowLink` / `ArrowAffordance`                                                | A link with a travelling arrow and a rule that wipes in                                                                  |
-| `SpotlightCard`                                                                | A Card with the glow trailing the cursor, hook included. The default for a card that is just a card                      |
-| `useSpotlight` + `Spotlight`                                                   | The same glow by hand, for a card `SpotlightCard` cannot be: see below                                                   |
-| `BentoGrid` + `BentoItem`                                                      | The home page's grids. A tile stretches what is inside it and brings its entrance                                        |
-| `useReveal` + `Reveal`                                                         | The entrance every card shares                                                                                           |
-| `RollingNumber`                                                                | An odometer for any number worth watching land                                                                           |
-| `TypeIn`                                                                       | Text that assembles itself a piece at a time                                                                             |
+| Piece                                                         | What it is                                                                            |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `Tile` / `tileClass()` / `TILE_SURFACE`                       | The card of the new pages: entrepta's Card, dashed and unfilled, an icon in its label |
+| `PageHeader`, `PageLabel`, `Lede`                             | The top of a page: the label with its icon, and the serif line under it               |
+| `Hint`                                                        | A dashed pill that says how something works                                           |
+| `BrowserWindow`, `Folder`                                     | A project: a window with an address, a folder that opens on hover                     |
+| `Dock`                                                        | A row of icons that grow toward the pointer: the apps, the ways to reach her          |
+| `Plate`, `Tape`, `STICKER`, polaroid                          | A brand mark's backing, a strip of tape, a sticker (die-cut or on white), a photo     |
+| `CatTrack`                                                    | A row of signs with the cat walking between them: the footer, the invite's steps      |
+| `ScreenLoading` / `NotFound` / `Error` / `Removed` / `Notice` | The screens nobody plans to see                                                       |
+| `st-dialog` (`components/site/dialog.css`)                    | A dialog as one of the site's cards, over entrepta's `Dialog`                         |
+| `Reveal`, `RollingNumber`                                     | entrepta's entrance, and its odometer                                                 |
+| `Tip`                                                         | The tooltip                                                                           |
 
-Card shape is fixed: `◆ name` on the left of the head, muted meta on the right, no border and no fill on the head itself. The foot is a `//` comment on the left and an accent on the right. If a card needs something the pieces don't do, change the piece.
+A class the site writes starts with `st-`. A piece's CSS sits beside it and is imported by it.
 
-**`SpotlightCard` first, the hook when it cannot be one.** `SpotlightCard` is always a `div`, and it puts its children in a wrapper above the glow. So the hook stays for a card that has to be an `article` or an `li`, that carries a `layoutId`, that sequences its own entrance through variant labels on its root, or that has a child positioned against the card's own edge. Inside `SpotlightCard` an `absolute inset-0` link covers the content box and leaves the padding dead, and a bar meant for the card's bottom edge lands under the footer text instead, which is what happened to the playlist's progress bar. That is why `project-card`, `post-card`, `log-card`, `featured-project-card`, `roadmap-card`, `tree-card`, `profile-card` and the playlist's `sleeve-card` still use `cardVariants()` with `useSpotlight`.
+**The second copy is a warning, the third is a bug.** The dialog's surface lived in the bug
+report's stylesheet until the log needed it too; it moved to `dialog.css` in the change that
+added the second user, which is when it is cheap.
 
-The wristkit card (`components/wristkit/today-activity-card/`) is wristkit v2's markup and stylesheet on the site's surface: `cardVariants()` with the hook, the rings sweeping in through variant labels on the panel, and a hover that thickens them in `styles.css`. Every change to wristkit's stylesheet is marked `SITE:` there, so the next version can be pasted over and the marks put back.
-
-Outside a `BentoGrid`, a `SpotlightCard` gets its entrance from a `Reveal` around it. When that `Reveal` is a grid item it is what the row stretches, so it takes `flex flex-col` and the card `flex-1`, or a row of cards stops lining up.
-
-`--bg-card` is for cards. `--bg-surface` is for things that sit _above_ a card — dropdowns, dialogs, code blocks, tooltips — which genuinely need to be lighter than what they cover.
+The wristkit card (`components/wristkit/today-activity-card/`) is wristkit v2's markup and stylesheet on the site's surface. Every change to wristkit's stylesheet is marked `SITE:` there, so the next version can be pasted over and the marks put back.
 
 ### Motion rules, each one paid for
+
+The cat is the exception to "through Motion": her sheets are CSS `steps()`, so the global
+`prefers-reduced-motion` reset stops them with no code of their own.
 
 - **Entrances use `whileInView` with `once`, never `animate`** — including above the fold, where the observer is satisfied on the first frame anyway. One trigger everywhere means there is no "is this above the fold" judgement left to get wrong, and getting it wrong is silent: the animation runs perfectly, to an empty room.
 - **Never put `whileInView` on an element that starts at zero size.** `scaleX: 0` is no width, no width is no area, and an observer asked for a fraction of no area never fires. Put the trigger on an ancestor with an honest box and reach the children through variants.
@@ -719,16 +645,18 @@ The checks below are the ones this codebase has actually been bitten by. Read th
 - **Security** — auth on every admin surface (layout AND route, never just the proxy matcher), input validation on the server, URL fields restricted to `https://` before they become an `href`, no secrets or stack traces in responses, middleware ordered so unauthenticated requests never reach a body parse.
 - **Backend (Hono)** — new routes live under `lib/api/routes/` behind the right middleware, and errors return JSON through `onError` rather than a leaked stack. Where a route or page sits on the caching decisions in Conventions, check it agrees with them; if it has a reason not to, the reason belongs in the diff.
 - **Loading and error states** — a page that hits the database needs a `loading.tsx`; where the data IS the page it needs an `error.tsx`, because an empty state when the DB is down is a lie. Forms need a submitting state and need to tell a network failure apart from a rejection.
-- **Reuse before invention** — this is the one worth reading the diff twice for. A new card that hand-rolls a header, a hover, or a surface is re-implementing something entrepta already ships; see Cards and motion. The tell is inline styles that add up to the Card, or a `useState` doing what `:hover` does.
+- **Reuse before invention** — this is the one worth reading the diff twice for. A new card that hand-rolls a header, a hover, or a surface is re-implementing something entrepta already ships; see The pieces, and motion. The tell is inline styles that add up to the Card, or a `useState` doing what `:hover` does.
 - **Standardization** — reuse asks "does this already exist?". This asks the harder question: **does this page look like it belongs to the same site as the home page?** Two failures, and the second is the one that gets missed.
 
-  _Divergence_ — a page that solves a solved problem its own way. Every page is the editor metaphor: outline panel, `$ command` or `## label` section heads, entrepta's Card for collections, prose for narrative, mono as the default and Inter only in long text. A section that invents its own header rhythm, its own footer rule, or its own surface is a page drifting, even when every line of it is fine on its own.
+  _Divergence_ — a page that solves a solved problem its own way. Every page is the new UI: a `PageHeader`, `Tile` for a card, `Hint` for how something works, the shared pieces for anything that looks like a thing, mono as the default and Inter only in long text, and no `◆` or `//` anywhere. A section that invents its own header rhythm, its own footer rule, or its own surface is a page drifting, even when every line of it is fine on its own.
 
   _Duplication_ — the same component living in more than one place. `about-outline` / `contact-outline` / `piano-outline` were three files whose diff was a comment, a function name, a string and a footer; they only got folded together when a change had to be applied to all three at once. The rule now: **the second copy is a warning, the third is a bug.** When a diff adds copy number two, say so in the review even if extracting is out of scope — that note is what makes the extraction obvious later instead of expensive.
 
   Two questions that catch most of it: if this pattern had to change, how many files would you edit? And could a reader tell which page a screenshot came from, for the right reasons rather than because one of them is styled differently?
 
-- **Motion** — every rule in Cards and motion came out of a bug that shipped. The expensive ones to miss: an entrance on `animate` instead of `whileInView`, a trigger on an element with no area, and anything animated through JS that never asks `useReducedMotion`.
+- **Two languages** — a sentence added to a component instead of to both message files; a page or layout under `[locale]` that does not call `pageLocale`; a link written as an `href` instead of a `ScreenLink`, which leaves `/pt`; a post or a project with no `pt/` twin.
+- **Forms** — zod is the only validation: `noValidate`, no native constraint on a field, a wrong field marked and focused, the words for it in the page's language.
+- **Motion** — every rule in The pieces, and motion came out of a bug that shipped. The expensive ones to miss: an entrance on `animate` instead of `whileInView`, a trigger on an element with no area, and anything animated through JS that never asks `useReducedMotion`.
 - **Accessibility** — real semantics over roles on divs, `aria-pressed`/`aria-expanded` on toggles, screen-reader text for glyph-only info (stars, ♥), hover-only affordances mirrored on `focus-visible`, no two links sharing a name and pointing elsewhere, and contrast wherever text sits _on top of_ `--fg-brand` — that combination changes per theme and orange (marmalade) is where white text fails first.
 - **Theme reactivity** — grep the diff for hardcoded brand hexes; every accent derives from `--fg-brand`. Fixed colours are only acceptable as overlays on images, where no token can guarantee legibility.
 - **SEO** — metadata on new pages, and the content itself in the server HTML. Two ways it silently isn't: `useSearchParams` on a static route makes prerender emit the Suspense fallback (`useSyncExternalStore` reads the URL without that), and any animation that gates mount on a timer or grows a sliced string ships an empty element.

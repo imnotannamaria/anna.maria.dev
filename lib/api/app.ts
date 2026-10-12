@@ -1,6 +1,5 @@
 import { Hono } from "hono"
 import { adminLog } from "./routes/admin-log"
-import { adminRoadmap } from "./routes/admin-roadmap"
 import { adminWall } from "./routes/admin-wall"
 import { ai } from "./routes/ai"
 import { bug } from "./routes/bug"
@@ -24,7 +23,6 @@ app.route("/site", site)
 app.route("/ai", ai)
 app.route("/bug", bug)
 app.route("/admin/log", adminLog)
-app.route("/admin/roadmap", adminRoadmap)
 app.route("/admin/wall", adminWall)
 app.route("/invite", wallInvite)
 app.route("/wall", wall)

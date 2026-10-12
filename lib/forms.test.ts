@@ -15,14 +15,11 @@ const ROOTS = [
   "app/admin",
   "app/[locale]",
 ]
-// not used by any page any more, and removed with the old site in phase 11
-const OLD = ["components/admin/roadmap-quick-add.tsx"]
-
 const files = (dir: string): string[] =>
   readdirSync(join(process.cwd(), dir), { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name)
     if (entry.isDirectory()) return files(path)
-    return path.endsWith(".tsx") && !OLD.includes(path) ? [path] : []
+    return path.endsWith(".tsx") ? [path] : []
   })
 
 /** Every JSX opening tag, its name and the text up to the `>` that closes it (braces skipped). */

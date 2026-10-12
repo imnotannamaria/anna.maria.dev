@@ -17,7 +17,7 @@ assertDisposableDatabase(url, "TRUNCATE")
 const sql = postgres(url, { prepare: false })
 
 beforeEach(async () => {
-  await sql`truncate log_entries, roadmap_items, wristkit_samples, wall_testimonials, ai_usage, ai_visitors restart identity cascade`
+  await sql`truncate log_entries, wristkit_samples, wall_testimonials, ai_usage, ai_visitors restart identity cascade`
 })
 
 afterAll(async () => {

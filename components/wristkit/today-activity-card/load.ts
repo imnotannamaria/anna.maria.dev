@@ -1,6 +1,6 @@
 import { dbUrl } from "@/lib/db/client"
 import { getTodayActivity } from "@/lib/wristkit/queries"
-import type { CardState } from "@/lib/showcase/state"
+import type { CardState } from "@/lib/card-state"
 
 export type Goals = {
   kcal: number

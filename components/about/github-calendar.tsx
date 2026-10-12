@@ -8,7 +8,7 @@ import { EASE_OUT } from "@/lib/motion"
 import { OVERLAY_SURFACE } from "@/lib/overlay"
 import { cn } from "@/lib/utils"
 import type { ContributionWeek, ContributionYear } from "@/lib/github/contributions"
-import type { CardState } from "@/lib/showcase/state"
+import type { CardState } from "@/lib/card-state"
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]

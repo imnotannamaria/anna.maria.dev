@@ -5,7 +5,7 @@ import { ArrowLink } from "@/app/components/entrepta/arrow-link"
 import { CardFooter } from "@/app/components/entrepta/card"
 import { GithubCalendar } from "@/components/about/github-calendar"
 import { getContributions, type ContributionYear } from "@/lib/github/contributions"
-import type { CardState } from "@/lib/showcase/state"
+import type { CardState } from "@/lib/card-state"
 import { siteConfig } from "@/lib/site-config"
 import { Tile } from "@/components/site/tile"
 

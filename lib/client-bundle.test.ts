@@ -5,9 +5,9 @@ import { describe, expect, it } from "vitest"
 /**
  * zod stays on the server, apart from the forms that validate as you type.
  *
- * `lib/log/validation.ts` and `lib/roadmap/validation.ts` import zod at module scope. A client
+ * `lib/log/validation.ts` and `lib/wall/validation.ts` import zod at module scope. A client
  * component that imported a label from either one — `TYPE_LABEL`, `STATUS_LABEL` — pulled all of
- * zod into the browser, about 60 KB gzipped, on the home page, /log and /roadmap. The labels live
+ * zod into the browser, about 60 KB gzipped, on every page that shows the log. The labels live
  * in `constants.ts` now; this test is what keeps a value import from creeping back. Type-only
  * imports are fine, since they are erased before bundling.
  */
@@ -16,10 +16,8 @@ const ROOTS = ["app", "components", "hooks"]
 
 /** The forms whose whole point is validating on the client, and nothing else. */
 const ALLOWED = new Set([
-  "components/contact/contact-form.tsx",
   "components/site/contact/postcard.tsx",
   "components/admin/log-entry-form.tsx",
-  "components/admin/roadmap-item-form.tsx",
   "components/admin/wall-invite-form.tsx",
   "components/wall/invite-form.tsx",
   // the chat is a form too: its question is held to the server's own schema. It loads with
@@ -62,7 +60,7 @@ describe("client bundles", () => {
   })
 
   it("keeps the shared constants free of zod", () => {
-    for (const file of ["lib/log/constants.ts", "lib/roadmap/constants.ts"]) {
+    for (const file of ["lib/log/constants.ts", "lib/wall/constants.ts"]) {
       expect(readFileSync(file, "utf8")).not.toMatch(/from "zod"/)
     }
   })

@@ -61,8 +61,8 @@ describe("the sound palette", () => {
  */
 describe("what can be clicked", () => {
   const ROOTS = ["components", "app"]
-  // entrepta is not this site's to change; `components/chrome` is the old site, gone in phase 11
-  const SKIP = [join("app", "components", "entrepta"), join("components", "chrome")]
+  // entrepta is not this site's to change
+  const SKIP = [join("app", "components", "entrepta")]
 
   const files = (dir: string): string[] =>
     readdirSync(join(process.cwd(), dir), { withFileTypes: true }).flatMap((entry) => {
