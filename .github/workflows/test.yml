@@ -18,6 +18,9 @@ jobs:
       # lib/velite-output.test.ts, so both tsc and the unit suite need it built first.
       - run: npx velite build
       - run: npm run lint
+      # next-env.d.ts is gitignored and is what declares an imported image as a module. Without
+      # it every `import photo from "./photo.jpg"` is an unknown module to tsc.
+      - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npm test
 
