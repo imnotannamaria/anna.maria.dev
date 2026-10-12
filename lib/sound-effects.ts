@@ -4,10 +4,16 @@
  * These prompts are consumed only by `scripts/generate-elevenlabs-sounds.ts`.
  * The browser receives the resulting MP3s from `/public`, never an ElevenLabs key,
  * SDK, or runtime API request.
+ *
+ * `moment` says when the site plays it, for the table in the README and for whoever reads this
+ * in a year. There are three, on purpose: more were tried (a key press, a meow, a blip on the
+ * cat's lines) and taken out.
  */
 export const SOUND_EFFECTS = {
   click: {
     file: "click.mp3",
+    moment: "any button, tab, menu item, switch or checkbox is pressed",
+    volume: 0.14,
     durationSeconds: 0.5,
     promptInfluence: 0.65,
     prompt:
@@ -15,6 +21,8 @@ export const SOUND_EFFECTS = {
   },
   success: {
     file: "success.mp3",
+    moment: "a form was sent, or an admin action worked",
+    volume: 0.14,
     durationSeconds: 0.7,
     promptInfluence: 0.7,
     prompt:
@@ -22,12 +30,24 @@ export const SOUND_EFFECTS = {
   },
   error: {
     file: "error.mp3",
+    moment: "a form or an admin action failed",
+    volume: 0.1,
     durationSeconds: 0.6,
     promptInfluence: 0.7,
     prompt:
       "A soft, low, muted UI warning tone for a code editor interface, brief and helpful, not alarming, no voice, no music, no percussion",
   },
-} as const
+} as const satisfies Record<
+  string,
+  {
+    file: string
+    moment: string
+    volume: number
+    durationSeconds: number
+    promptInfluence: number
+    prompt: string
+  }
+>
 
 export type SoundEffectName = keyof typeof SOUND_EFFECTS
 

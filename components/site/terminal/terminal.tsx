@@ -137,6 +137,8 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
           ref={output}
           role="log"
           aria-label={t("output")}
+          // a click on the empty part only puts the cursor back in the field: not a control
+          data-sound="off"
           className="st-term-output flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto overscroll-y-contain p-5"
           onClick={(event) => {
             if (!(event.target as Element).closest("button, a")) field.current?.focus()

@@ -1,0 +1,23 @@
+{
+  "click.mp3": {
+    "prompt": "A single soft mechanical keyboard key press for a calm code editor interface, muted and tactile, very short, no voice, no music, no reverb",
+    "model": "eleven_text_to_sound_v2",
+    "generatedAt": "2026-09-10",
+    "plan": "free",
+    "note": "generated before this manifest existed; the date is the commit that added the file"
+  },
+  "success.mp3": {
+    "prompt": "A cheerful bright UI success sound: three tiny ascending sparkling synth notes with a clean shimmering finish, joyful and polished for a code editor interface, very short, no voice, no ambient music, no percussion",
+    "model": "eleven_text_to_sound_v2",
+    "generatedAt": "2026-09-10",
+    "plan": "free",
+    "note": "generated before this manifest existed; the date is the commit that added the file"
+  },
+  "error.mp3": {
+    "prompt": "A soft, low, muted UI warning tone for a code editor interface, brief and helpful, not alarming, no voice, no music, no percussion",
+    "model": "eleven_text_to_sound_v2",
+    "generatedAt": "2026-09-10",
+    "plan": "free",
+    "note": "generated before this manifest existed; the date is the commit that added the file"
+  }
+}

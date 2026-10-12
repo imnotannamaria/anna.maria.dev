@@ -4,6 +4,9 @@ import { join } from "node:path"
 import { SOUND_EFFECTS } from "../lib/sound-effects"
 
 const OUTPUT_DIR = join("public", "sounds")
+// Where each file came from: the prompt, the model and the day. Written by this script.
+const MANIFEST = join(OUTPUT_DIR, "manifest.json")
+const MODEL = "eleven_text_to_sound_v2"
 const FORCE = process.argv.includes("--force")
 const requestedEffects = process.argv.slice(2).filter((argument) => argument !== "--force")
 
@@ -45,6 +48,27 @@ async function exists(path: string) {
   }
 }
 
+/** Keeps `manifest.json`: one entry per sound, rewritten when the sound is generated again. */
+async function record(name: keyof typeof SOUND_EFFECTS) {
+  const effect = SOUND_EFFECTS[name]
+  let manifest: Record<string, unknown> = {}
+  try {
+    manifest = JSON.parse(await readFile(MANIFEST, "utf8")) as Record<string, unknown>
+  } catch {
+    // the first sound makes the file
+  }
+  manifest[effect.file] = {
+    prompt: effect.prompt,
+    model: MODEL,
+    promptInfluence: effect.promptInfluence,
+    durationSeconds: effect.durationSeconds,
+    generatedAt: new Date().toISOString().slice(0, 10),
+    // the plan of the ElevenLabs account at the time, which only a person can know
+    plan: process.env.ELEVENLABS_PLAN ?? "unknown",
+  }
+  await writeFile(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`)
+}
+
 async function generate(name: keyof typeof SOUND_EFFECTS, apiKey: string) {
   const effect = SOUND_EFFECTS[name]
   const target = join(OUTPUT_DIR, effect.file)
@@ -63,7 +87,7 @@ async function generate(name: keyof typeof SOUND_EFFECTS, apiKey: string) {
         text: effect.prompt,
         duration_seconds: effect.durationSeconds,
         prompt_influence: effect.promptInfluence,
-        model_id: "eleven_text_to_sound_v2",
+        model_id: MODEL,
       }),
     },
   )
@@ -74,6 +98,7 @@ async function generate(name: keyof typeof SOUND_EFFECTS, apiKey: string) {
 
   const audio = Buffer.from(await response.arrayBuffer())
   await writeFile(target, audio)
+  await record(name)
   const cost = response.headers.get("character-cost")
   console.log(
     `generated ${effect.file} (${Math.ceil(audio.byteLength / 1024)} KB${cost ? `; ${cost} credits` : ""})`,

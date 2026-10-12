@@ -169,7 +169,18 @@ The activity card reads from the same database, fed by an iOS Shortcut. [wristki
 
 ### Sound effects
 
-A short click plays on buttons and nav controls, and success and error cues play on form submissions and admin actions. The files in `public/sounds/` are generated once with the [ElevenLabs Sound Effects API](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert) and committed, so visitors never talk to ElevenLabs. To regenerate them, set `ELEVENLABS_API_KEY` and run `npm run generate:sounds`; the prompts live in `lib/sound-effects.ts`.
+Sound is a supplement, never the only confirmation. The speaker button in the header silences all of it, and the choice is remembered. Nothing plays before the visitor has interacted with the page, which is also what browsers require.
+
+| Sound              | When                                                                                                                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `click`            | Any button, tab, menu item, switch or checkbox. A link joins in with `data-sound="click"` (the sidebar and the phone's bar do); `data-sound="off"` opts a part of the page out |
+| `success`, `error` | A form was sent or failed, and admin actions                                                                                                                                   |
+
+The files in `public/sounds/` are generated once with the [ElevenLabs Sound Effects API](https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert) and committed, so visitors never talk to ElevenLabs. The prompt, the moment and the volume of each live in `lib/sound-effects.ts`, and `public/sounds/manifest.json` records where each file came from (prompt, model, date, plan).
+
+**The three files are not under this repository's MIT license**, and a fork should make its own: they were generated on a free plan, which means non-commercial use and a credit to ElevenLabs (elevenlabs.io). See [public/sounds/NOTICE.md](public/sounds/NOTICE.md) and [docs/sound-rights.md](docs/sound-rights.md). To replace them with yours, set `ELEVENLABS_API_KEY` and `ELEVENLABS_PLAN` (`free` or `paid`, it goes into the manifest) and run `npm run generate:sounds -- --force`; without `--force` a sound that exists is skipped, and a name regenerates just that one (`npm run generate:sounds -- click --force`).
+
+A test fails if a file in `public/sounds/` is not in the palette, has no entry in the manifest or does not say its plan, and another if something that takes a click is neither a button, a link nor marked silent on purpose.
 
 ## Testing
 
@@ -219,4 +230,4 @@ docs/                      design plans and the SQL migrations
 
 ## License
 
-MIT. Built by [Anna Maria](https://annamaria.app).
+MIT for the code. The three sound files in `public/sounds/` are not covered by it: they are ElevenLabs output with terms of their own, in [public/sounds/NOTICE.md](public/sounds/NOTICE.md). Built by [Anna Maria](https://annamaria.app).

@@ -21,7 +21,7 @@ export function InviteClosed({ kind, lang }: { kind: "expired" | "used"; lang: W
         body={expired ? copy.expiredBody : copy.usedBody}
         action={
           expired ? (
-            <a href={`mailto:${siteConfig.email}`} className={buttonVariants()}>
+            <a href={`mailto:${siteConfig.email}`} data-sound="click" className={buttonVariants()}>
               {copy.expiredAction}
             </a>
           ) : undefined

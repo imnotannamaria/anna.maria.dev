@@ -2,7 +2,7 @@
 
 import { pageEvent } from "@/components/site/abimaela/events"
 import Image from "next/image"
-import Link from "next/link"
+import { SoundLink } from "@/components/site/frame/sound-link"
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { useEffect, useRef, useState, type ReactNode } from "react"
@@ -163,7 +163,7 @@ export function SiteFrame({
         active={part === "front" ? (listed ?? undefined) : undefined}
         label={t("site")}
         labels={{ collapse: t("collapse"), expand: t("expand") }}
-        linkComponent={Link}
+        linkComponent={SoundLink}
         logo={({ collapsed }) => <BrandMark compact={collapsed} />}
       />
 
@@ -201,7 +201,7 @@ export function SiteFrame({
         active={part === "front" ? (listed ?? undefined) : undefined}
         label={t("site")}
         labels={{ more: t("more") }}
-        linkComponent={Link}
+        linkComponent={SoundLink}
       />
     </div>
   )
