@@ -96,3 +96,21 @@
 .st-lg-slip:hover h3 {
   color: var(--fg-brand-text);
 }
+
+/* The entry, open. The cover leads on a wide dialog and stacks on a narrow one. */
+.st-lg-entry-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  /* the close button sits in the corner */
+  padding-right: 28px;
+}
+.st-lg-entry-head > .st-lg-cover {
+  flex: none;
+  width: 112px;
+}
+@media (max-width: 479px) {
+  .st-lg-entry-head > .st-lg-cover {
+    width: 84px;
+  }
+}

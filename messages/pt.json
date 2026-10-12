@@ -233,7 +233,16 @@
     "down": "O log mora no Postgres, e o Postgres não respondeu agora.",
     "empty": "Nada registrado ainda.",
     "favourite": "favorito",
-    "openLink": "{title}: abrir o link",
+    "open": "{title}: abrir",
+    "openLink": "abrir em {site}",
+    "type": {
+      "film": "filme",
+      "series": "série",
+      "book": "livro",
+      "music": "álbum",
+      "podcast": "podcast",
+      "game": "jogo"
+    },
     "types": {
       "film": "filmes",
       "series": "séries",
@@ -248,9 +257,7 @@
     "label": "anna como pessoa",
     "avatarAlt": "Anna Maria",
     "wristkit": "Ver o wristkit",
-    "bio1": "Primeiro, que legal que você está aqui pra me conhecer como pessoa. Me chamo <anna>Anna</anna>, sou de <pe>Pernambuco</pe>, de uma cidade bem perto da <beach>praia</beach>.",
-    "bio2": "Adoro <gym>musculação</gym>, <horror>filmes e séries de terror</horror> (especificamente tudo do Mike Flanagan), e aprendi inglês em boa parte por causa do <drag>RuPaul's Drag Race</drag>.",
-    "bio3": "Amo <music>música</music>, qualquer tipo, mas principalmente pop, e toco <instruments>vários instrumentos</instruments> (mediocremente). E eu obedeço à <abi>Abimaela</abi>, a gatinha ali no canto.",
+    "bio": "Bom, eu não sou muito de falar sobre mim, então montei esse playground. Só de olhar a página dá pra saber muita coisa sobre mim :)",
     "roll": "Rolo da câmera. {alt}. Foto {n} de {total}; clica pra ver a próxima.",
     "photos": {
       "selfie": "Uma selfie, com uma camiseta da Olivia Rodrigo",
@@ -333,7 +340,7 @@
       "guitarName": "Violão"
     },
     "activity": {
-      "title": "Hoje / Atividade",
+      "title": "Atividade / Hoje",
       "aria": "Atividade de hoje",
       "rings": "Anéis de atividade",
       "synced": "sincronizado",

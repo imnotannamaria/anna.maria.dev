@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 import { UserIcon } from "@phosphor-icons/react/dist/ssr"
-import { PageLabel } from "@/components/site/page-header"
+import { Lede, PageLabel } from "@/components/site/page-header"
 import { TILE_SURFACE } from "@/components/site/tile"
 import { cn } from "@/lib/utils"
 import { Suspense } from "react"
@@ -11,7 +11,6 @@ import { Reveal } from "@/app/components/entrepta/reveal"
 import { TodayActivityCard } from "@/components/wristkit/today-activity-card"
 import { loadTodayActivity } from "@/components/wristkit/today-activity-card/load"
 import type { LogEntry } from "@/lib/log/validation"
-import { Bio } from "./bio"
 import { Stickers } from "./stickers"
 import { Things } from "./things"
 import { Shelf } from "./shelf"
@@ -55,7 +54,8 @@ export function Person({ log }: { log: LogEntry[] | null }) {
         />
         <div className="flex flex-col justify-center gap-4">
           <PageLabel icon={<UserIcon aria-hidden size={13} weight="bold" />} label={t("label")} />
-          <Bio />
+          {/* One sentence, on purpose: the page under it is the bio. */}
+          <Lede>{t("bio")}</Lede>
         </div>
         <CameraRoll />
       </header>

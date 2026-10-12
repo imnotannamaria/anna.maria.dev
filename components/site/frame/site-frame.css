@@ -158,7 +158,9 @@ body:has(.st) [data-theme-switcher] {
 .st [data-sidebar-mark],
 .st [data-mobile-nav-mark],
 .st-ia li[data-message] > div > span > span[aria-hidden="true"],
-.st-screen [role="separator"] > span[aria-hidden="true"] {
+.st-screen [role="separator"] > span[aria-hidden="true"],
+/* and the `//` entrepta's Field puts in front of an error: the new UI has no comment glyph */
+.st [role="alert"] > span[aria-hidden="true"].opacity-70 {
   display: none;
 }
 .st-screen [role="separator"] {

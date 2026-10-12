@@ -13,6 +13,28 @@ function input(overrides: Partial<LogEntryInput> = {}): LogEntryInput {
 }
 
 describe("createEntry", () => {
+  it("keeps the Portuguese of the title and of the note, and null when there is none", async () => {
+    const translated = await createEntry(
+      input({
+        title: "The Haunting of Hill House",
+        titlePt: " A Maldição da Residência Hill ",
+        note: "The one I rewatch.",
+        notePt: "A que eu sempre revejo.",
+      }),
+    )
+    expect(await getEntryById(translated.id)).toMatchObject({
+      title: "The Haunting of Hill House",
+      titlePt: "A Maldição da Residência Hill",
+      notePt: "A que eu sempre revejo.",
+    })
+
+    const plain = await createEntry(input({ title: "In Rainbows", titlePt: "", notePt: "" }))
+    expect(await getEntryById(plain.id)).toMatchObject({ titlePt: null, notePt: null })
+
+    await updateEntry(plain.id, input({ title: "In Rainbows", notePt: "o disco" }))
+    expect((await getEntryById(plain.id))?.notePt).toBe("o disco")
+  })
+
   it("stores blank optional fields as null, not empty strings", async () => {
     const created = await createEntry(
       input({ creator: "", note: "", posterUrl: "", externalUrl: "" }),

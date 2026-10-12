@@ -15,6 +15,8 @@ import { Plate } from "@/components/site/plate"
 export type Channels = { email: string; github: string; linkedin: string; x: string }
 
 type Phase = "writing" | "sending" | "sent" | "error"
+/** The three things a visitor writes. */
+type Field = "name" | "email" | "message"
 
 const WAIT = 1100
 
@@ -93,27 +95,37 @@ export function Postcard({ channels }: { channels: Channels }) {
   const [phase, setPhase] = useState<Phase>("writing")
   // what to say under the card: a field to fix, or why it came back
   const [problem, setProblem] = useState<string | null>(null)
+  // which field the problem is in, so it is marked and gets the cursor
+  const [wrong, setWrong] = useState<Field | null>(null)
 
   // the schema and the server say which field is wrong; the words for it are in the page's language
-  const worded = (field: string | undefined) =>
-    field === "name" || field === "email" || field === "message" ? t(`errors.${field}`) : null
+  const isField = (field: string | undefined): field is Field =>
+    field === "name" || field === "email" || field === "message"
+  const worded = (field: string | undefined) => (isField(field) ? t(`errors.${field}`) : null)
+  /** Says what is wrong with a field, marks it and puts the cursor in it. */
+  const refuse = (form: HTMLFormElement, field: string | undefined, fallback: string) => {
+    setProblem(worded(field) ?? fallback)
+    setWrong(isField(field) ? field : null)
+    if (isField(field)) form.querySelector<HTMLElement>(`[name="${field}"]`)?.focus()
+    setPhase("writing")
+  }
 
   const onSend = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (phase === "sending") return
-    const form = new FormData(event.currentTarget)
+    const card = event.currentTarget
+    const form = new FormData(card)
     const parsed = contactSchema.safeParse({
       name: form.get("name"),
       email: form.get("email"),
       message: form.get("message"),
     })
-    if (!parsed.success) {
-      setProblem(worded(String(parsed.error.issues[0]?.path[0])) ?? t("check"))
-      setPhase("writing")
-      return
-    }
+    // The schema is the only validation, on purpose: the form is `noValidate`, so the browser's
+    // own bubble ("Please fill out this field"), in its own language and style, never shows.
+    if (!parsed.success) return refuse(card, String(parsed.error.issues[0]?.path[0]), t("check"))
 
     setProblem(null)
+    setWrong(null)
     setPhase("sending")
     // the stamp gets its moment even when the answer is instant
     const stamp = new Promise((done) => setTimeout(done, WAIT))
@@ -134,8 +146,7 @@ export function Postcard({ channels }: { channels: Channels }) {
       }
       if (res.status === 400) {
         const first = Object.entries(body.fieldErrors ?? {}).find(([, list]) => list?.length)
-        setProblem(worded(first?.[0]) ?? t("notRight"))
-        return setPhase("writing")
+        return refuse(card, first?.[0], t("notRight"))
       }
       setProblem(t("failed"))
       setPhase("error")
@@ -207,6 +218,7 @@ export function Postcard({ channels }: { channels: Channels }) {
             <motion.form
               key="card"
               onSubmit={onSend}
+              noValidate
               className="st-ct-postal"
               data-phase={phase}
               initial={{ opacity: 0, y: reduce ? 0 : 20 }}
@@ -244,11 +256,13 @@ export function Postcard({ channels }: { channels: Channels }) {
                   id="postal-message"
                   name="message"
                   placeholder={t("messagePlaceholder")}
-                  required
+                  aria-required
+                  aria-invalid={wrong === "message" || undefined}
                   className="st-ct-message font-serif"
                   onInput={() => {
                     if (phase === "error") setPhase("writing")
                     setProblem(null)
+                    setWrong(null)
                   }}
                 />
               </div>
@@ -323,7 +337,9 @@ export function Postcard({ channels }: { channels: Channels }) {
                     name="name"
                     aria-label={t("yourName")}
                     placeholder={t("namePlaceholder")}
-                    required
+                    aria-required
+                    aria-invalid={wrong === "name" || undefined}
+                    onInput={() => setWrong(null)}
                     className="text-mono-md font-mono"
                   />
                   <input
@@ -331,7 +347,9 @@ export function Postcard({ channels }: { channels: Channels }) {
                     type="email"
                     aria-label={t("yourEmail")}
                     placeholder={t("emailPlaceholder")}
-                    required
+                    aria-required
+                    aria-invalid={wrong === "email" || undefined}
+                    onInput={() => setWrong(null)}
                     className="text-mono-md font-mono"
                   />
                 </div>

@@ -28,6 +28,7 @@ import { Cat, CatAngry, pet } from "@/components/site/abimaela/abimaela"
 import { useSitePath } from "@/components/site/i18n"
 import { ScreenLink } from "@/components/site/screen-link"
 import { BUG_ATTACHMENT_MAX_BYTES, bugSchema } from "@/lib/bug-schema"
+import "@/components/site/dialog.css"
 import "./bug-report.css"
 
 type Phase = "writing" | "sending" | "sent"
@@ -126,7 +127,7 @@ export function BugReport({
 
   return (
     <Dialog open={open} onOpenChange={change}>
-      <DialogContent className="st-bug max-w-3xl">
+      <DialogContent className="st-dialog st-bug max-w-3xl">
         <CardHeader>
           <CardLabel icon={<BugBeetleIcon />}>{t("label")}</CardLabel>
         </CardHeader>

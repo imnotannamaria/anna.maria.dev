@@ -13,7 +13,7 @@ import bosco from "@/components/site/person/stickers/bosco.png"
 import cherry from "@/components/site/person/stickers/cherry.png"
 import dany from "@/components/site/person/stickers/dany.png"
 import galadriel from "@/components/site/person/stickers/galadriel.png"
-import { Flag } from "./flag"
+import pernambuco from "@/components/site/person/stickers/pernambuco.png"
 import "./stickers.css"
 
 const cutout = (src: StaticImageData, width: number) => (
@@ -35,7 +35,17 @@ type Sticker = {
 const STICKERS: Sticker[] = [
   {
     id: "pe",
-    art: <Flag className="w-[104px]" />,
+    // the real flag, a rectangle: it sits on the sticker's white backing, which is its border
+    art: (
+      <Image
+        src={pernambuco}
+        alt=""
+        width={104}
+        sizes="104px"
+        draggable={false}
+        className="rounded-[8px]"
+      />
+    ),
     x: "4%",
     y: "4%",
     tilt: -6,

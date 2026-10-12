@@ -1,0 +1,23 @@
+/* A dialog as one of the site's cards: dashed, with no fill beyond the canvas it needs to be read
+   over a page. entrepta's dialog is a filled, sheened overlay; this is the override that goes
+   upstream as a variant. Two classes, so it wins over entrepta's whatever the stylesheet order. */
+
+.st-dialog.st-dialog {
+  gap: 20px;
+  max-height: calc(100dvh - 32px);
+  padding: 24px;
+  overflow-y: auto;
+  border: 1px dashed var(--border-strong);
+  background: var(--bg-canvas);
+  box-shadow: none;
+}
+.st-dialog::before,
+.st-dialog::after {
+  display: none;
+}
+/* A dialog is drawn outside `.st`, so what the frame hides has to be hidden here too: entrepta's
+   ◆ on a field label, and the `//` in front of a field's error. */
+.st-dialog [role="alert"] > span[aria-hidden="true"].opacity-70,
+.st-dialog span[aria-hidden="true"].leading-none[style*="font-size"] {
+  display: none;
+}

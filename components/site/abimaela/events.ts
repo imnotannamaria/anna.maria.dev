@@ -23,7 +23,7 @@ export const EVENTS = {
   // her
   click: { when: "a click on her", urgency: "direct", gesture: "jump" },
   clickAgain: { when: "a second click within 2.5 seconds", urgency: "direct", gesture: "angry" },
-  meow: { when: "her name hovered in the bio, or `meow` in the terminal", urgency: "direct" },
+  meow: { when: "`meow`, `abimaela` or `pspsps` in the terminal", urgency: "direct" },
 
   // the three sides, and the frame
   front: { when: "switching to Front", urgency: "ambient" },

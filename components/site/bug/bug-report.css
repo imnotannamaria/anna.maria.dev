@@ -1,24 +1,5 @@
-/* The bug report. The dialog as one of the site's cards: dashed, with no fill beyond the canvas
-   it needs to be read over a page. entrepta's dialog is a filled, sheened overlay; this is the
-   override that goes upstream as a variant. */
+/* The bug report's own layout. The dialog's surface is the site's (dialog.css). */
 
-.st-bug.st-bug {
-  gap: 20px;
-  max-height: calc(100dvh - 32px);
-  padding: 24px;
-  overflow-y: auto;
-  border: 1px dashed var(--border-strong);
-  background: var(--bg-canvas);
-  box-shadow: none;
-}
-.st-bug::before,
-.st-bug::after {
-  display: none;
-}
-/* entrepta's ◆ on a field label, where it draws one */
-.st-bug span[aria-hidden="true"].leading-none[style*="font-size"] {
-  display: none;
-}
 .st-bug-split {
   display: grid;
   gap: 24px;

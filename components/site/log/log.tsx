@@ -4,7 +4,8 @@ import { TYPE_PLURAL, type LogType } from "@/lib/log/constants"
 import type { LogEntry } from "@/lib/log/validation"
 import { ScreenLink } from "@/components/site/screen-link"
 import { PageHeader } from "@/components/site/page-header"
-import { Slips, ByType } from "./catalog"
+import { ByType } from "./catalog"
+import { Slips } from "./slips"
 import "./log.css"
 
 export function Log({ entries }: { entries: LogEntry[] | null }) {

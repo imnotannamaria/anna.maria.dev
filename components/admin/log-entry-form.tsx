@@ -22,11 +22,13 @@ function toDefaults(entry?: LogEntry): LogEntryInput {
   return {
     type: entry?.type ?? "film",
     title: entry?.title ?? "",
+    titlePt: entry?.titlePt ?? "",
     creator: entry?.creator ?? "",
     year: entry?.year ?? null,
     rating: entry?.rating ?? null,
     favorite: entry?.favorite ?? false,
     note: entry?.note ?? "",
+    notePt: entry?.notePt ?? "",
     posterUrl: entry?.posterUrl ?? "",
     externalUrl: entry?.externalUrl ?? "",
     loggedAt: entry?.loggedAt ?? new Date().toISOString().slice(0, 10),
@@ -85,7 +87,12 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
   }
 
   return (
-    <motion.form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6" {...reveal}>
+    <motion.form
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+      className="flex flex-col gap-6"
+      {...reveal}
+    >
       <div className="grid gap-5 sm:grid-cols-2">
         <Field id="type" label="type" required error={errors.type?.message}>
           <Controller
@@ -121,6 +128,23 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
           aria-invalid={Boolean(errors.title)}
           aria-describedby={errors.title ? "title-error" : undefined}
           {...register("title")}
+        />
+      </Field>
+
+      {/* The Portuguese of the title, right under it: the two are read as a pair. */}
+      <Field
+        id="titlePt"
+        label="title in portuguese"
+        error={errors.titlePt?.message}
+        hint="optional. empty shows the title above on /pt too, which is right for a name"
+      >
+        <Input
+          id="titlePt"
+          lang="pt-BR"
+          state={errors.titlePt ? "error" : "default"}
+          aria-invalid={Boolean(errors.titlePt)}
+          aria-describedby={errors.titlePt ? "titlePt-error" : undefined}
+          {...register("titlePt")}
         />
       </Field>
 
@@ -196,7 +220,7 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
 
       <Field
         id="note"
-        label="note"
+        label="note in english"
         error={errors.note?.message}
         hint="optional — entries with a note get an expand on the public page"
       >
@@ -206,6 +230,22 @@ export function LogEntryForm({ entry }: { entry?: LogEntry }) {
           state={errors.note ? "error" : "default"}
           aria-invalid={Boolean(errors.note)}
           {...register("note")}
+        />
+      </Field>
+
+      <Field
+        id="notePt"
+        label="note in portuguese"
+        error={errors.notePt?.message}
+        hint="optional. empty shows the english note on /pt"
+      >
+        <Textarea
+          id="notePt"
+          lang="pt-BR"
+          rows={4}
+          state={errors.notePt ? "error" : "default"}
+          aria-invalid={Boolean(errors.notePt)}
+          {...register("notePt")}
         />
       </Field>
 

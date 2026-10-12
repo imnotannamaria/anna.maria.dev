@@ -1,4 +1,5 @@
 import { Log } from "@/components/site/log/log"
+import { entriesIn } from "@/lib/log/locale"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { pageLocale, pageMetadata, type LocaleParams } from "@/lib/i18n/page"
 
@@ -8,8 +9,8 @@ export const dynamic = "force-dynamic"
 export const generateMetadata = ({ params }: LocaleParams) => pageMetadata(params, "log", "/log")
 
 export default async function Page({ params }: LocaleParams) {
-  await pageLocale(params)
+  const locale = await pageLocale(params)
   // a database that is down costs a line of text on the page, not the page
   const entries = await getPublishedEntries().catch(() => null)
-  return <Log entries={entries} />
+  return <Log entries={entriesIn(entries, locale)} />
 }

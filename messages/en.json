@@ -233,7 +233,16 @@
     "down": "The log lives in Postgres, and Postgres did not answer just now.",
     "empty": "Nothing logged yet.",
     "favourite": "favourite",
-    "openLink": "{title}: open the link",
+    "open": "{title}: open",
+    "openLink": "open on {site}",
+    "type": {
+      "film": "film",
+      "series": "series",
+      "book": "book",
+      "music": "album",
+      "podcast": "podcast",
+      "game": "game"
+    },
     "types": {
       "film": "films",
       "series": "series",
@@ -248,9 +257,7 @@
     "label": "anna as a person",
     "avatarAlt": "Anna Maria",
     "wristkit": "View wristkit",
-    "bio1": "First, it's nice that you're here to get to know me as a person. I'm <anna>Anna</anna>, from <pe>Pernambuco</pe>, from a town really close to the <beach>beach</beach>.",
-    "bio2": "I love <gym>lifting</gym>, <horror>horror movies and series</horror> (specifically everything by Mike Flanagan), and I learned a good part of my English because of <drag>RuPaul's Drag Race</drag>.",
-    "bio3": "I love <music>music</music>, any kind, but mostly pop, and I play <instruments>several instruments</instruments> (mediocrely). And I obey <abi>Abimaela</abi>, the little cat over there in the corner.",
+    "bio": "Well, I'm not much for talking about myself, so I built this playground. Just looking at the page tells you a lot about me :)",
     "roll": "Camera roll. {alt}. Photo {n} of {total}; click for the next one.",
     "photos": {
       "selfie": "A selfie, in an Olivia Rodrigo t-shirt",

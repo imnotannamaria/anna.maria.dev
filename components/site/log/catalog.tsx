@@ -1,14 +1,12 @@
 import { useTranslations } from "next-intl"
 import Image from "next/image"
-import { tileClass } from "@/components/site/tile"
 import type { ReactNode } from "react"
-import { Reveal } from "@/app/components/entrepta/reveal"
 import { RollingNumber } from "@/app/components/entrepta/rolling-number"
 import { StarRating } from "@/components/log/star-rating"
 import { posterSrc } from "@/lib/log/poster-src"
 import type { LogEntry } from "@/lib/log/validation"
 
-function LogCover({ entry, sizes }: { entry: LogEntry; sizes: string }) {
+export function LogCover({ entry, sizes }: { entry: LogEntry; sizes: string }) {
   return (
     <span className="st-lg-cover" data-type={entry.type}>
       {entry.posterUrl ? (
@@ -20,7 +18,7 @@ function LogCover({ entry, sizes }: { entry: LogEntry; sizes: string }) {
   )
 }
 
-function Note({ entry, size = 13 }: { entry: LogEntry; size?: number }) {
+export function Note({ entry, size = 13 }: { entry: LogEntry; size?: number }) {
   const t = useTranslations("log")
   return (
     <span className="flex shrink-0 items-center gap-2">
@@ -35,50 +33,7 @@ function Note({ entry, size = 13 }: { entry: LogEntry; size?: number }) {
   )
 }
 
-function Hidden({ entry }: { entry: LogEntry }) {
-  const t = useTranslations("log")
-  if (!entry.externalUrl) return null
-  return (
-    <a
-      href={entry.externalUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="focus-ring absolute inset-0 z-[1] rounded-[var(--radius-md)]"
-      aria-label={t("openLink", { title: entry.title })}
-    />
-  )
-}
-
-const who = (entry: LogEntry) => [entry.creator, entry.year].filter(Boolean).join(" · ")
-
-export function Slips({ items }: { items: LogEntry[] }) {
-  return (
-    <ul className="st-lg-grid" data-drawing="slips">
-      {items.map((entry, index) => (
-        <li key={entry.id}>
-          <Reveal index={index} step={0.04} className="flex flex-1">
-            <article className={tileClass({ size: "sm" }, "st-lg-slip")}>
-              <Hidden entry={entry} />
-              <LogCover entry={entry} sizes="96px" />
-              <div className="flex min-w-0 flex-col gap-1.5">
-                <h3 className="text-heading-md font-serif text-[var(--fg-primary)]">
-                  {entry.title}
-                </h3>
-                <p className="text-mono-xs font-mono text-[var(--fg-muted)]">{who(entry)}</p>
-                <Note entry={entry} />
-                {entry.note ? (
-                  <p className="text-body-md mt-1 line-clamp-4 font-serif text-[var(--fg-secondary)] italic">
-                    &ldquo;{entry.note}&rdquo;
-                  </p>
-                ) : null}
-              </div>
-            </article>
-          </Reveal>
-        </li>
-      ))}
-    </ul>
-  )
-}
+export const who = (entry: LogEntry) => [entry.creator, entry.year].filter(Boolean).join(" · ")
 
 export function ByType({
   groups,

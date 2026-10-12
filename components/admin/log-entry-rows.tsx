@@ -130,6 +130,13 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
                   {entry.creator}
                 </span>
               )}
+              {/* A note with no Portuguese is the one thing /pt shows in the wrong language: a
+                  title is often a name and fine as it is, a sentence is not. */}
+              {entry.note && !entry.notePt && (
+                <span className="text-mono-xs block font-mono" style={{ color: "var(--fg-muted)" }}>
+                  note not translated
+                </span>
+              )}
             </TableCell>
 
             <TableCell>

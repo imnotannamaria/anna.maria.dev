@@ -164,6 +164,7 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
         {/* The input lives at the foot, the way Warp and fish do it: a row of chips saying where
             you are, the command under it, and everything that ran stacking up above. */}
         <form
+          noValidate
           className="st-term-input"
           onSubmit={(event) => {
             event.preventDefault()

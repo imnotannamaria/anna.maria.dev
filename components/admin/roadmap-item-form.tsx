@@ -86,7 +86,12 @@ export function RoadmapItemForm({ item }: { item?: RoadmapItem }) {
   }
 
   return (
-    <motion.form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6" {...reveal}>
+    <motion.form
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+      className="flex flex-col gap-6"
+      {...reveal}
+    >
       <Field id="title" label="title" required error={errors.title?.message}>
         <Input
           id="title"
