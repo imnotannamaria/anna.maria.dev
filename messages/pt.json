@@ -158,6 +158,7 @@
     "another": "escrever outro",
     "check": "confere o cartão e tenta de novo",
     "notRight": "tem alguma coisa errada no cartão",
+    "tooMany": "voltou: foram muitos cartões de uma vez. tenta de novo em alguns minutos.",
     "failed": "voltou: falhou do meu lado. sua mensagem continua aqui.",
     "offline": "voltou: sem conexão. sua mensagem continua aqui.",
     "errors": {

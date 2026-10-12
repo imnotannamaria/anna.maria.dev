@@ -115,12 +115,12 @@ export function BugReport({
         return setPhase("sent")
       }
       const body = (await res.json().catch(() => ({}))) as { fields?: Errors }
-      if (res.status === 400 && body.fields) setErrors(body.fields)
-      else if (res.status === 429)
-        setProblem("That is a lot of reports at once. Try again in a few minutes.")
-      else setProblem("It did not go: my side failed. What you wrote is still here.")
+      // the server says which fields it refused; the words for them are the page's, in its language
+      if (res.status === 400 && body.fields) setErrors(worded(Object.keys(body.fields)))
+      else if (res.status === 429) setProblem(t("tooMany"))
+      else setProblem(t("failed"))
     } catch {
-      setProblem("It did not go: no connection. What you wrote is still here.")
+      setProblem(t("offline"))
     }
     setPhase("writing")
   }

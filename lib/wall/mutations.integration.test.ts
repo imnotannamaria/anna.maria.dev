@@ -24,6 +24,16 @@ async function invite() {
   return createInvite({ name: "Marina", company: "CESAR", note: "oi", formLang: "pt-BR" })
 }
 
+/** Sets when a letter was decided, as that long ago. */
+async function decidedAt(id: string, ago: string) {
+  const sql = postgres(process.env.DATABASE_URL as string, { prepare: false })
+  try {
+    await sql`update wall_testimonials set decided_at = now() - ${ago}::interval where id = ${id}`
+  } finally {
+    await sql.end()
+  }
+}
+
 /** Moves an invite's expiry into the past, the way the days passing would. */
 async function expire(id: string) {
   const sql = postgres(process.env.DATABASE_URL as string, { prepare: false })
@@ -61,6 +71,10 @@ describe("an invite, from link to wall", () => {
     // approved in the opposite order they were written: the order that counts is the decision's
     await decide(second.id, "approved")
     await decide(first.id, "approved")
+    // Two decisions in a row can land on the same millisecond, and then the tie goes to whichever
+    // was written first. The times are set apart here so the test is about the order, not luck.
+    await decidedAt(second.id, "2 hours")
+    await decidedAt(first.id, "1 hour")
     expect((await getApprovedTestimonials()).map((t) => t.name)).toEqual([
       "Second Person",
       "First Person",

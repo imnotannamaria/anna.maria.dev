@@ -10,7 +10,7 @@ import { CardFooter, CardHeader, CardLabel } from "@/app/components/entrepta/car
 import { SegmentedControl } from "@/app/components/entrepta/segmented-control"
 import { TechBadge } from "@/components/about/tech-badge"
 import { EASE_OUT, revealViewport } from "@/lib/motion"
-import { MONTHS, axis, period, type Entry } from "./career"
+import { axis, period, type Entry } from "./career"
 
 type Mode = "timeline" | "list"
 

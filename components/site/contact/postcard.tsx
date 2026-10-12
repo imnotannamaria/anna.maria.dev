@@ -148,7 +148,8 @@ export function Postcard({ channels }: { channels: Channels }) {
         const first = Object.entries(body.fieldErrors ?? {}).find(([, list]) => list?.length)
         return refuse(card, first?.[0], t("notRight"))
       }
-      setProblem(t("failed"))
+      // too many in a row is not a failure of mine or of the card: it says so, and to wait
+      setProblem(t(res.status === 429 ? "tooMany" : "failed"))
       setPhase("error")
       pet.notify("mailFailed")
     } catch {

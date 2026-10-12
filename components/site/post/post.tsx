@@ -7,7 +7,6 @@ import { MDXContent } from "@/components/blog/mdx-content"
 import { getPostReadingStats, getPostToc, getPublishedPosts } from "@/lib/velite"
 import { Tape } from "@/components/site/tape"
 import { ScreenLink } from "@/components/site/screen-link"
-import { readDate } from "@/components/site/notes/note"
 import { PageHeader } from "@/components/site/page-header"
 import "./post.css"
 

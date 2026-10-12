@@ -3,8 +3,19 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { ContactEmail } from "@/emails/contact-email"
 import { contactSchema } from "@/lib/contact-schema"
+import { clientIp, take } from "@/lib/api/middleware/rate-limit"
 
 export async function POST(req: Request) {
+  // Each message is an email in my inbox and one off the Resend quota. The honeypot stops a
+  // bot that fills every field; this stops a script that knows which ones to fill.
+  const taken = take(`contact:${clientIp(req)}`, 5, 10 * 60 * 1000)
+  if (!taken.ok) {
+    return NextResponse.json(
+      { error: "Too many messages. Try again in a few minutes." },
+      { status: 429, headers: { "retry-after": String(taken.retryAfterSec) } },
+    )
+  }
+
   const resend = new Resend(process.env.RESEND_API_KEY)
 
   let payload: unknown
@@ -39,7 +50,8 @@ export async function POST(req: Request) {
     from: "onboarding@resend.dev",
     to: ["anna.maria.dev.br@gmail.com"],
     replyTo: email,
-    subject: `New message from ${name}`,
+    // one line: a name is free text, and a subject is a header
+    subject: `New message from ${name.replace(/[\r\n]+/g, " ")}`,
     react: ContactEmail({ name, email, message }),
   })
 

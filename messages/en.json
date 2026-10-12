@@ -158,6 +158,7 @@
     "another": "write another one",
     "check": "check the card and try again",
     "notRight": "something on the card is not right",
+    "tooMany": "it came back: that is a lot of cards at once. try again in a few minutes.",
     "failed": "it came back: my side failed. your message is still here.",
     "offline": "it came back: no connection. your message is still here.",
     "errors": {

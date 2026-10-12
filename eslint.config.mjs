@@ -7,7 +7,19 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   prettier,
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".velite/**"]),
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    ".velite/**",
+    // the agents' own tooling, not the site: skills and hooks with code of their own
+    ".agents/**",
+    ".claude/**",
+    ".codex/**",
+    ".github/**",
+    ".impeccable/**",
+  ]),
   {
     // entrepta's files are copied in as they are and linted upstream, with Biome. An empty
     // props interface that only extends another is how its components leave room for a prop

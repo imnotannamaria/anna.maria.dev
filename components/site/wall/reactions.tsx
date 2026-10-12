@@ -76,10 +76,9 @@ export function Reactions({
     setCounts((now) => ({ ...now, [reaction]: Math.max(0, count) }))
 
   /**
-   * The click moves the count at once; the reply only confirms it. The first version replaced
-   * every count with the server's, so a click on a second reaction before the first reply came
-   * back had its number put back to zero until its own reply arrived, which read as a button
-   * that takes a second to count.
+   * The click moves the count at once; the reply only confirms it, and only for the reaction
+   * that was clicked. Taking every count from a reply would undo a click on another reaction
+   * that is still on its way.
    */
   const toggle = (reaction: WallReaction) => {
     const on = !picks.current.includes(reaction)

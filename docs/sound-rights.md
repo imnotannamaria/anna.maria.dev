@@ -52,7 +52,7 @@ Switzerland and the UK; it was not read, since the account is in Brazil.
 - Nothing about a **public repository**, **open source**, or **forks**.
 - Nothing specific to **sound effects**: no rule on distributing them as files, or as a library.
 - No definition of **"commercial"** that settles whether a personal portfolio counts. A portfolio
-  sells nothing, and it is also how its author gets hired.
+  sells nothing; it is also a professional page.
 
 ## What this means for this repository
 
@@ -73,8 +73,7 @@ plan**, as the account owner confirmed on 12 October 2026. `public/sounds/manife
 
 ## The question that is left
 
-Whether this site is a **commercial** use. The terms do not define the word. A portfolio sells
-nothing; it is also how its author is found for work. If it counts as commercial, a free plan does
+Whether this site is a **commercial** use. The terms do not define the word. A portfolio sells nothing; it is also a professional page. If it counts as commercial, a free plan does
 not cover it, and there are three ways out, cheapest first:
 
 - **Regenerate the three on a paid plan.** One month of the smallest paid plan, the same command,

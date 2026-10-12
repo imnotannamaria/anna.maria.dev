@@ -20,9 +20,8 @@ import "@/components/site/dialog.css"
  * The entries as slips, and the one that is open. A slip shows four lines of the note; the
  * dialog shows all of it, a bigger cover and the way out to wherever the entry lives.
  *
- * The whole slip opens it, through a button stretched over the card. It used to be a link to the
- * entry's external address, which sent the visitor away on a click that looked like "more".
- * That link is in the dialog now, as what it is.
+ * The whole slip opens it, through a button stretched over the card. The link to wherever the
+ * entry lives is inside the dialog, so a click on a card never leaves the site.
  */
 export function Slips({ items }: { items: LogEntry[] }) {
   const t = useTranslations("log")

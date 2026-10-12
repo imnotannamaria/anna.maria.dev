@@ -11,7 +11,29 @@ type Bucket = { count: number; resetAt: number }
  */
 const buckets = new Map<string, Bucket>()
 
-function clientIp(req: Request): string {
+/**
+ * One request against a bucket. For a handler that is not part of the Hono app (/api/contact):
+ * the middleware below is this, with the answer written for it.
+ */
+export function take(
+  bucketKey: string,
+  max: number,
+  windowMs: number,
+): { ok: true } | { ok: false; retryAfterSec: number } {
+  const now = Date.now()
+  const existing = buckets.get(bucketKey)
+  if (!existing || existing.resetAt <= now) {
+    buckets.set(bucketKey, { count: 1, resetAt: now + windowMs })
+    return { ok: true }
+  }
+  if (existing.count >= max) {
+    return { ok: false, retryAfterSec: Math.ceil((existing.resetAt - now) / 1000) }
+  }
+  existing.count += 1
+  return { ok: true }
+}
+
+export function clientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for")
   if (fwd) return fwd.split(",")[0]?.trim() || "unknown"
   return req.headers.get("x-real-ip") ?? "unknown"
@@ -34,21 +56,10 @@ export function rateLimit({
   key?: (c: Context) => string
 } = {}) {
   return createMiddleware(async (c, next) => {
-    const bucketKey = key ? key(c) : clientIp(c.req.raw)
-    const now = Date.now()
-    const existing = buckets.get(bucketKey)
-
-    if (!existing || existing.resetAt <= now) {
-      buckets.set(bucketKey, { count: 1, resetAt: now + windowMs })
-      return next()
+    const taken = take(key ? key(c) : clientIp(c.req.raw), max, windowMs)
+    if (!taken.ok) {
+      return c.json({ error: "rate_limited" }, 429, { "retry-after": String(taken.retryAfterSec) })
     }
-
-    if (existing.count >= max) {
-      const retryAfterSec = Math.ceil((existing.resetAt - now) / 1000)
-      return c.json({ error: "rate_limited" }, 429, { "retry-after": String(retryAfterSec) })
-    }
-
-    existing.count += 1
     await next()
   })
 }

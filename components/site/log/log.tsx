@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl"
 import { BooksIcon } from "@phosphor-icons/react/dist/ssr"
-import { TYPE_PLURAL, type LogType } from "@/lib/log/constants"
+import type { LogType } from "@/lib/log/constants"
 import type { LogEntry } from "@/lib/log/validation"
 import { ScreenLink } from "@/components/site/screen-link"
 import { PageHeader } from "@/components/site/page-header"
