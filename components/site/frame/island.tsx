@@ -1,5 +1,6 @@
 "use client"
 
+import { pet } from "@/components/site/abimaela/abimaela"
 import {
   BugBeetleIcon,
   MoonIcon,
@@ -132,7 +133,10 @@ export function Island({
               size="icon-sm"
               aria-label={t("muteLabel")}
               aria-pressed={silenced}
-              onClick={() => setMuted(!silenced)}
+              onClick={() => {
+                setMuted(!silenced)
+                pet.notify(silenced ? "unmute" : "mute")
+              }}
             >
               {silenced ? (
                 <SpeakerSlashIcon aria-hidden size={16} />
@@ -157,7 +161,10 @@ export function Island({
               variant="ghost"
               size="icon-sm"
               aria-label={modeLabel}
-              onClick={() => dropCurtain(toggleMode)}
+              onClick={() => {
+                dropCurtain(toggleMode)
+                pet.notify(mode === "dark" ? "light" : "dark")
+              }}
             >
               {mode === "dark" ? (
                 <SunIcon aria-hidden size={16} />

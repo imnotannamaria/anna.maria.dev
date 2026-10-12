@@ -1,7 +1,8 @@
 "use client"
 
+import { pet } from "@/components/site/abimaela/abimaela"
 import { useTranslations } from "next-intl"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { WALL_REACTIONS, type ReactionCounts, type WallReaction } from "@/lib/wall/constants"
 import "@/components/site/person/favorites.css"
 
@@ -50,35 +51,66 @@ export function Reactions({
   const [counts, setCounts] = useState(initial)
   const [mine, setMine] = useState<WallReaction[]>([])
   const [flights, setFlights] = useState<Record<string, number>>({})
+  // what this browser has picked, for the code below that runs between two renders
+  const picks = useRef<WallReaction[]>([])
+  // the newest click of each reaction, and the request of the one before it: a reply only counts
+  // if no later click has happened since, and two requests of one reaction go out in order
+  const latest = useRef<Partial<Record<WallReaction, number>>>({})
+  const queue = useRef<Partial<Record<WallReaction, Promise<void>>>>({})
 
   // after mount, so the server's HTML and the first paint agree
   useEffect(() => {
-    if (!readOnly) setMine(readPicks()[id] ?? [])
+    if (readOnly) return
+    const stored = readPicks()[id] ?? []
+    picks.current = stored
+    setMine(stored)
   }, [id, readOnly])
 
-  const toggle = async (reaction: WallReaction) => {
-    const on = !mine.includes(reaction)
-    const before = { counts, mine }
-    const picks = on ? [...mine, reaction] : mine.filter((pick) => pick !== reaction)
-    setMine(picks)
-    setCounts({ ...counts, [reaction]: Math.max(0, counts[reaction] + (on ? 1 : -1)) })
-    if (on) setFlights((now) => ({ ...now, [reaction]: (now[reaction] ?? 0) + 1 }))
-    writePicks(id, picks)
+  const choose = (next: WallReaction[]) => {
+    picks.current = next
+    setMine(next)
+    writePicks(id, next)
+  }
+  // the count of one reaction, and only that one: another click's number is not this reply's to set
+  const setCount = (reaction: WallReaction, count: number) =>
+    setCounts((now) => ({ ...now, [reaction]: Math.max(0, count) }))
 
-    try {
-      const res = await fetch(`/api/v1/wall/${id}/react`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reaction, on }),
-      })
-      if (!res.ok) throw new Error(String(res.status))
-      const body = (await res.json()) as { reactions?: ReactionCounts }
-      if (body.reactions) setCounts(body.reactions)
-    } catch {
-      setMine(before.mine)
-      setCounts(before.counts)
-      writePicks(id, before.mine)
+  /**
+   * The click moves the count at once; the reply only confirms it. The first version replaced
+   * every count with the server's, so a click on a second reaction before the first reply came
+   * back had its number put back to zero until its own reply arrived, which read as a button
+   * that takes a second to count.
+   */
+  const toggle = (reaction: WallReaction) => {
+    const on = !picks.current.includes(reaction)
+    choose(on ? [...picks.current, reaction] : picks.current.filter((pick) => pick !== reaction))
+    setCounts((now) => ({ ...now, [reaction]: Math.max(0, now[reaction] + (on ? 1 : -1)) }))
+    if (on) pet.notify("react")
+    if (on) setFlights((now) => ({ ...now, [reaction]: (now[reaction] ?? 0) + 1 }))
+
+    const ticket = (latest.current[reaction] = (latest.current[reaction] ?? 0) + 1)
+    const send = async () => {
+      try {
+        const res = await fetch(`/api/v1/wall/${id}/react`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reaction, on }),
+        })
+        if (!res.ok) throw new Error(String(res.status))
+        const body = (await res.json()) as { reactions?: ReactionCounts }
+        if (body.reactions && latest.current[reaction] === ticket) {
+          setCount(reaction, body.reactions[reaction])
+        }
+      } catch {
+        // a later click of this reaction decides what is right now; only the last one undoes
+        if (latest.current[reaction] !== ticket) return
+        choose(
+          on ? picks.current.filter((pick) => pick !== reaction) : [...picks.current, reaction],
+        )
+        setCounts((now) => ({ ...now, [reaction]: Math.max(0, now[reaction] + (on ? -1 : 1)) }))
+      }
     }
+    queue.current[reaction] = (queue.current[reaction] ?? Promise.resolve()).then(send)
   }
 
   return (
@@ -94,7 +126,7 @@ export function Reactions({
               aria-label={t("reactionCount", { reaction: t(`reactions.${reaction}`), count })}
               aria-pressed={on}
               disabled={readOnly}
-              onClick={() => void toggle(reaction)}
+              onClick={() => toggle(reaction)}
             >
               <span aria-hidden className="st-reaction-emoji">
                 {emoji}

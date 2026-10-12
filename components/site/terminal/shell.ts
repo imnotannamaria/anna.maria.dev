@@ -71,7 +71,8 @@ export type Result = {
 
   open?: string
 
-  event?: "meow" | "secret" | "snake"
+  /** Something Abimaela should hear about. */
+  event?: "meow" | "secret" | "snake" | "sudo" | "unknown" | "open"
 }
 
 export const COMMANDS = [
@@ -230,6 +231,7 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
         cwd,
         output: [text(say(words.opening, { name: destinationName(href, words) }))],
         open: href,
+        event: "open",
       }
     }
 
@@ -242,10 +244,10 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
       return { cwd, output: [text(words.snake)], event: "snake" }
 
     case "sudo":
-      return ok(error(words.sudo))
+      return { cwd, output: [error(words.sudo)], event: "sudo" }
 
     default:
-      return ok(error(say(words.unknown, { command: cmd })))
+      return { cwd, output: [error(say(words.unknown, { command: cmd }))], event: "unknown" }
   }
 }
 

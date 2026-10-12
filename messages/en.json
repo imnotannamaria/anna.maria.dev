@@ -129,8 +129,7 @@
     "reactions": {
       "heart": "heart hands",
       "clap": "clapping hands",
-      "party": "party popper",
-      "up": "thumbs up"
+      "party": "party popper"
     }
   },
   "contact": {
@@ -654,6 +653,88 @@
       },
       "snake": {
         "0": "no snake yet. I would have caught it."
+      },
+      "light": {
+        "0": "too bright. I will allow it."
+      },
+      "dark": {
+        "0": "better. I can see in this."
+      },
+      "mute": {
+        "0": "finally, quiet."
+      },
+      "unmute": {
+        "0": "and the clicking is back."
+      },
+      "home": {
+        "0": "this is where it starts.",
+        "1": "you are back at the door."
+      },
+      "person": {
+        "0": "this one is about her. I am in it."
+      },
+      "professional": {
+        "0": "the serious page. she works a lot."
+      },
+      "notes": {
+        "0": "she writes things down. I sit on them."
+      },
+      "post": {
+        "0": "a long one. I will wait."
+      },
+      "projects": {
+        "0": "she builds things. I supervise."
+      },
+      "project": {
+        "0": "I watched her build this one."
+      },
+      "wall": {
+        "0": "people being nice about her. suspicious."
+      },
+      "contact": {
+        "0": "write to her. she answers."
+      },
+      "log": {
+        "0": "everything she finished. I slept through most."
+      },
+      "pin": {
+        "0": "pinned. it stays."
+      },
+      "copy": {
+        "0": "copied. use it well."
+      },
+      "sticker": {
+        "0": "that is not where it goes."
+      },
+      "react": {
+        "0": "I saw that. nice."
+      },
+      "sent": {
+        "0": "off it goes."
+      },
+      "mailFailed": {
+        "0": "it came back. not my fault."
+      },
+      "bug": {
+        "0": "a bug. I will find it."
+      },
+      "sudo": {
+        "0": "you are not root here. I am."
+      },
+      "unknown": {
+        "0": "that is not a command. try help."
+      },
+      "open": {
+        "0": "going. keep up."
+      },
+      "noAnswer": {
+        "0": "I do not have that one."
+      },
+      "offTopic": {
+        "0": "no. ask about Anna."
+      },
+      "limit": {
+        "0": "that is enough questions for today."
       }
     },
     "asleep": "Abimaela, the cat, asleep. Click to wake her.",

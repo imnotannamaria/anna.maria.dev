@@ -1,5 +1,6 @@
 "use client"
 
+import { pageEvent } from "@/components/site/abimaela/events"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -131,7 +132,7 @@ export function SiteFrame({
     }
     if (part !== "front") return
     front.current?.scrollTo({ top: 0 })
-    pet.notify("page")
+    pet.notify(pageEvent(screen))
   }, [pathname, part])
 
   const panes: Record<Part, ReactNode> = {
@@ -188,7 +189,7 @@ export function SiteFrame({
 
         <Island part={part} onSwap={swap} sides={!focused} />
 
-        <Abimaela />
+        <Abimaela away={part === "front" && atFooter} />
       </div>
 
       {/* Below 768px the sidebar is gone (CSS) and this takes over, in reach of the thumb. Both

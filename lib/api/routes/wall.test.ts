@@ -8,7 +8,7 @@ import { wall } from "./wall"
 
 const reacted = vi.mocked(react)
 const ID = "3f0c1f0e-7a55-4c1d-9b55-0d7b1a3d2e11"
-const counts = { heart: 2, clap: 0, party: 0, up: 1 }
+const counts = { heart: 2, clap: 0, party: 0 }
 
 let ip = 0
 const post = (id: string, body: unknown) =>
@@ -43,12 +43,12 @@ describe("POST /wall/:id/react", () => {
 
   it("404s a letter that is not on the wall", async () => {
     reacted.mockResolvedValue(null)
-    expect((await post(ID, { reaction: "up", on: true })).status).toBe(404)
+    expect((await post(ID, { reaction: "clap", on: true })).status).toBe(404)
   })
 
   it("says so when the database does not answer, and leaks nothing", async () => {
     reacted.mockRejectedValue(new Error("secret connection string"))
-    const res = await post(ID, { reaction: "up", on: true })
+    const res = await post(ID, { reaction: "clap", on: true })
     expect(res.status).toBe(503)
     expect(await res.text()).not.toContain("secret")
   })

@@ -33,8 +33,8 @@ export const MESSAGE_MAX = 3000
 /** Past this the card clamps the text. Roughly six lines at the card's width. */
 export const CLAMP_AT = 320
 
-/** An invite link is good for a day from the moment it is created or renewed. */
-export const INVITE_TTL_MS = 24 * 60 * 60 * 1000
+/** An invite link is good for three days from the moment it is created or renewed. */
+export const INVITE_TTL_MS = 3 * 24 * 60 * 60 * 1000
 
 /**
  * The photo, as the server accepts it. The form shrinks it to 512px before sending, so a
@@ -62,7 +62,6 @@ export const WALL_REACTIONS = [
   { id: "heart", emoji: "\u{1FAF6}", name: "heart hands" },
   { id: "clap", emoji: "\u{1F44F}", name: "clapping hands" },
   { id: "party", emoji: "\u{1F389}", name: "party popper" },
-  { id: "up", emoji: "\u{1F44D}", name: "thumbs up" },
 ] as const
 export type WallReaction = (typeof WALL_REACTIONS)[number]["id"]
 export const WALL_REACTION_IDS = WALL_REACTIONS.map((reaction) => reaction.id) as [
@@ -71,12 +70,12 @@ export const WALL_REACTION_IDS = WALL_REACTIONS.map((reaction) => reaction.id) a
 ]
 export type ReactionCounts = Record<WallReaction, number>
 
-/** The counts as stored, read safely: only the four known reactions, never below zero. */
+/** The counts as stored, read safely: only the known reactions, never below zero. */
 export function reactionCounts(stored: unknown): ReactionCounts {
   const raw = stored && typeof stored === "object" ? (stored as Record<string, unknown>) : {}
   const count = (id: WallReaction) => {
     const value = Number(raw[id])
     return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0
   }
-  return { heart: count("heart"), clap: count("clap"), party: count("party"), up: count("up") }
+  return { heart: count("heart"), clap: count("clap"), party: count("party") }
 }

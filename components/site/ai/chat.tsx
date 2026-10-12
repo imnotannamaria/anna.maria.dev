@@ -12,6 +12,7 @@ import type { SiteData } from "@/components/site/frame/site-data"
 import { Tile } from "@/components/site/tile"
 import { ICON, INNER_ICON } from "@/components/site/icons"
 import type { Group } from "@/components/site/professional/stack-data"
+import { pet } from "@/components/site/abimaela/abimaela"
 import { useNavigate } from "@/components/site/navigation"
 import { PAGES, type PageId } from "@/components/site/pages"
 import { screenQuestion } from "@/lib/ai/guard"
@@ -143,14 +144,21 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
     // The same screen the server runs: a request for work, or an attempt on the rules, is turned
     // away here whether or not a model is answering, and is not kept as context.
     const screened = screenQuestion(question)
-    if (screened !== "ok") return type(id, "", undefined, screened === "task" ? "scope" : "blocked")
+    if (screened !== "ok") {
+      pet.notify("offTopic")
+      return type(id, "", undefined, screened === "task" ? "scope" : "blocked")
+    }
 
     const scripted = answer(question, data, stack, words)
     const earlier = asked.current
     asked.current = [...earlier, question]
 
     if (!fits) return type(id, "", undefined, "long")
-    if (!live) return type(id, scripted.text, scripted.card)
+    if (!live) {
+      // the script had nothing for it: no card means it fell through to "not in my notes"
+      if (!scripted.card) pet.notify("noAnswer")
+      return type(id, scripted.text, scripted.card)
+    }
 
     const controller = new AbortController()
     stop.current = () => {
@@ -165,7 +173,11 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
       const card = reply.topic ? answerOf(reply.topic, data, stack, words).card : undefined
       return type(id, reply.text, card)
     }
-    if (endsTheDay(reply.reason)) setLive(false)
+    if (endsTheDay(reply.reason)) {
+      setLive(false)
+      pet.notify("limit")
+    }
+    if (isAboutTheQuestion(reply.reason)) pet.notify("offTopic")
     if (isAboutTheQuestion(reply.reason)) return type(id, "", undefined, reply.reason as NoticeKind)
     const notice = NOTICE_KINDS.includes(reply.reason) ? (reply.reason as NoticeKind) : null
     // "slow" is about the pace, not the day: the notice says it all and the question can be asked again

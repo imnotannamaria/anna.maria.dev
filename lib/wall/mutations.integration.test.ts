@@ -24,7 +24,7 @@ async function invite() {
   return createInvite({ name: "Marina", company: "CESAR", note: "oi", formLang: "pt-BR" })
 }
 
-/** Moves an invite's expiry into the past, the way a day passing would. */
+/** Moves an invite's expiry into the past, the way the days passing would. */
 async function expire(id: string) {
   const sql = postgres(process.env.DATABASE_URL as string, { prepare: false })
   try {
@@ -51,6 +51,20 @@ describe("an invite, from link to wall", () => {
 
     await decide(id, "rejected")
     expect(await getApprovedTestimonials()).toEqual([])
+  })
+
+  it("lists the wall oldest first, like a channel", async () => {
+    const first = await invite()
+    const second = await invite()
+    await submitTestimonial(first.token, { ...written, name: "First Person" }, null)
+    await submitTestimonial(second.token, { ...written, name: "Second Person" }, null)
+    // approved in the opposite order they were written: the order that counts is the decision's
+    await decide(second.id, "approved")
+    await decide(first.id, "approved")
+    expect((await getApprovedTestimonials()).map((t) => t.name)).toEqual([
+      "Second Person",
+      "First Person",
+    ])
   })
 
   it("takes one testimonial per link, not two", async () => {
@@ -106,7 +120,7 @@ describe("an invite, from link to wall", () => {
 })
 
 describe("reactions", () => {
-  const zero = { heart: 0, clap: 0, party: 0, up: 0 }
+  const zero = { heart: 0, clap: 0, party: 0 }
 
   it("counts on a letter that is on the wall, and shows on the wall", async () => {
     const { id, token } = await invite()
@@ -115,8 +129,8 @@ describe("reactions", () => {
     expect((await getApprovedTestimonials())[0].reactions).toEqual(zero)
 
     expect(await react(id, "heart", true)).toEqual({ ...zero, heart: 1 })
-    expect(await react(id, "up", true)).toEqual({ ...zero, heart: 1, up: 1 })
-    expect((await getApprovedTestimonials())[0].reactions).toEqual({ ...zero, heart: 1, up: 1 })
+    expect(await react(id, "clap", true)).toEqual({ ...zero, heart: 1, clap: 1 })
+    expect((await getApprovedTestimonials())[0].reactions).toEqual({ ...zero, heart: 1, clap: 1 })
   })
 
   it("takes a reaction back, and never goes below zero", async () => {

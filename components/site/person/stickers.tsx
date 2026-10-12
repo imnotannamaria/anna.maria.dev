@@ -1,5 +1,6 @@
 "use client"
 
+import { pet } from "@/components/site/abimaela/abimaela"
 import { useTranslations } from "next-intl"
 import { StickerIcon } from "@phosphor-icons/react"
 import { motion, useMotionValue } from "motion/react"
@@ -112,7 +113,10 @@ function Sticker({
         dragElastic={0}
         data-in-hand={inHand || undefined}
         onDragStart={() => setInHand(true)}
-        onDragEnd={() => setInHand(false)}
+        onDragEnd={() => {
+          setInHand(false)
+          pet.notify("sticker")
+        }}
         onPointerDown={onGrab}
         onFocus={onGrab}
         onKeyDown={(event) => {

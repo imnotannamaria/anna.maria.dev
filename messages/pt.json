@@ -129,8 +129,7 @@
     "reactions": {
       "heart": "coração com as mãos",
       "clap": "palmas",
-      "party": "festa",
-      "up": "joinha"
+      "party": "festa"
     }
   },
   "contact": {
@@ -654,6 +653,88 @@
       },
       "snake": {
         "0": "ainda não tem cobrinha. eu teria pegado."
+      },
+      "light": {
+        "0": "claro demais. vou deixar passar."
+      },
+      "dark": {
+        "0": "melhor. nisso aqui eu enxergo."
+      },
+      "mute": {
+        "0": "finalmente, silêncio."
+      },
+      "unmute": {
+        "0": "e os cliquezinhos voltaram."
+      },
+      "home": {
+        "0": "é aqui que começa.",
+        "1": "você voltou pra porta."
+      },
+      "person": {
+        "0": "essa é sobre ela. eu apareço."
+      },
+      "professional": {
+        "0": "a página séria. ela trabalha muito."
+      },
+      "notes": {
+        "0": "ela anota as coisas. eu sento em cima."
+      },
+      "post": {
+        "0": "esse é comprido. eu espero."
+      },
+      "projects": {
+        "0": "ela constrói as coisas. eu supervisiono."
+      },
+      "project": {
+        "0": "esse eu vi ela construir."
+      },
+      "wall": {
+        "0": "gente sendo legal com ela. suspeito."
+      },
+      "contact": {
+        "0": "escreve pra ela. ela responde."
+      },
+      "log": {
+        "0": "tudo que ela terminou. eu dormi na maior parte."
+      },
+      "pin": {
+        "0": "fixado. fica aí."
+      },
+      "copy": {
+        "0": "copiado. usa direito."
+      },
+      "sticker": {
+        "0": "não é aí que vai."
+      },
+      "react": {
+        "0": "eu vi. gostei."
+      },
+      "sent": {
+        "0": "lá vai."
+      },
+      "mailFailed": {
+        "0": "voltou. não foi culpa minha."
+      },
+      "bug": {
+        "0": "um bug. eu acho ele."
+      },
+      "sudo": {
+        "0": "você não é root aqui. eu sou."
+      },
+      "unknown": {
+        "0": "isso não é um comando. tenta help."
+      },
+      "open": {
+        "0": "indo. acompanha."
+      },
+      "noAnswer": {
+        "0": "essa eu não tenho."
+      },
+      "offTopic": {
+        "0": "não. pergunta sobre a Anna."
+      },
+      "limit": {
+        "0": "chega de pergunta por hoje."
       }
     },
     "asleep": "Abimaela, a gata, dormindo. Clica pra acordar.",

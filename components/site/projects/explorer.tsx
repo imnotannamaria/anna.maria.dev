@@ -1,5 +1,6 @@
 "use client"
 
+import { pet } from "@/components/site/abimaela/abimaela"
 import { useTranslations } from "next-intl"
 import {
   ArrowDownIcon,
@@ -35,6 +36,7 @@ export function Explorer({ projects }: { projects: Project[] }) {
   const pinnedProject = projects.find((project) => project.slug === pinned)
 
   const toggle = (slug: string) => {
+    if (pinned !== slug) pet.notify("pin")
     setPinned((before) => (before === slug ? null : slug))
     setPeeked(slug)
   }

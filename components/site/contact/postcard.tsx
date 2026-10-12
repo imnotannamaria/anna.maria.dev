@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl"
 import { useState, type FormEvent } from "react"
 import { siGithub, siGmail, siX } from "simple-icons"
 import { Button } from "@/app/components/entrepta/button"
-import { Cat } from "@/components/site/abimaela/abimaela"
+import { Cat, pet } from "@/components/site/abimaela/abimaela"
 import { Dock, type DockItem } from "@/components/site/dock"
 import { Plate } from "@/components/site/plate"
 
@@ -128,7 +128,10 @@ export function Postcard({ channels }: { channels: Channels }) {
         fieldErrors?: Record<string, string[] | undefined>
       }
       await stamp
-      if (res.ok) return setPhase("sent")
+      if (res.ok) {
+        pet.notify("sent")
+        return setPhase("sent")
+      }
       if (res.status === 400) {
         const first = Object.entries(body.fieldErrors ?? {}).find(([, list]) => list?.length)
         setProblem(worded(first?.[0]) ?? t("notRight"))
@@ -136,10 +139,12 @@ export function Postcard({ channels }: { channels: Channels }) {
       }
       setProblem(t("failed"))
       setPhase("error")
+      pet.notify("mailFailed")
     } catch {
       await stamp
       setProblem(t("offline"))
       setPhase("error")
+      pet.notify("mailFailed")
     }
   }
   const stamped = phase !== "writing"

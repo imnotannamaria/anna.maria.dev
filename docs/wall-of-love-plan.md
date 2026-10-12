@@ -35,7 +35,7 @@ discovery route is gone; this is what is left of it.
 ## The link
 
 32 random bytes, base64url. Only the sha256 is stored, so a leaked table hands out no working
-link, and the link is shown once. Good for 24 hours from creation or renewal and for one
+link, and the link is shown once. Good for 3 days from creation or renewal and for one
 submission. Renewing replaces the hash, so the old link stops working at once.
 
 The submit is one conditional `UPDATE … WHERE token_hash = ? AND status = 'invited' AND

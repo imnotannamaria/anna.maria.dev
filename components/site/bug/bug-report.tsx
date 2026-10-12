@@ -24,7 +24,7 @@ import {
 import { Field } from "@/app/components/entrepta/field"
 import { Input } from "@/app/components/entrepta/input"
 import { Textarea } from "@/app/components/entrepta/textarea"
-import { Cat, CatAngry } from "@/components/site/abimaela/abimaela"
+import { Cat, CatAngry, pet } from "@/components/site/abimaela/abimaela"
 import { useSitePath } from "@/components/site/i18n"
 import { ScreenLink } from "@/components/site/screen-link"
 import { BUG_ATTACHMENT_MAX_BYTES, bugSchema } from "@/lib/bug-schema"
@@ -109,7 +109,10 @@ export function BugReport({
     else form.delete("attachment")
     try {
       const res = await fetch("/api/v1/bug", { method: "POST", body: form })
-      if (res.ok) return setPhase("sent")
+      if (res.ok) {
+        pet.notify("bug")
+        return setPhase("sent")
+      }
       const body = (await res.json().catch(() => ({}))) as { fields?: Errors }
       if (res.status === 400 && body.fields) setErrors(body.fields)
       else if (res.status === 429)

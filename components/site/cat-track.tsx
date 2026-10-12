@@ -21,11 +21,12 @@ export type Stop = {
  * or the focus is on. The walk is a CSS transition on her position. Its length grows with the
  * distance (so many ms per sign, between a floor and a ceiling), and the timing is close to
  * linear on purpose: an ease-out tail kept her legs moving while she was already standing still.
- * When she arrives she plays the stopping frame for a moment, then sits.
+ * When she arrives she plays the stopping sheet, the last step turning into a sit, then idles.
  */
 const PER_SIGN = 560
 const MIN = 560
 const MAX = 2400
+// as long as the stopping sheet takes to play (abimaela.css)
 const STOP = 220
 
 export function CatTrack({
@@ -127,9 +128,9 @@ export function CatTrack({
             {trip ? (
               <CatWalking height={70} />
             ) : stopping ? (
-              <CatStopping height={78} />
+              <CatStopping height={70} />
             ) : (
-              <Cat height={64} />
+              <Cat height={72} />
             )}
           </span>
         </div>

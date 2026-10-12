@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm"
+import { asc, desc, eq } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
 import { isUuid } from "@/lib/format"
 import { reactionCounts, type WallLang, type WallStatus } from "./constants"
@@ -51,7 +51,7 @@ function monthOf(d: Date): string {
   }).format(d)
 }
 
-/** The wall: approved only, the newest decision first. */
+/** The wall: approved only, the oldest decision first, the way a channel reads: the newest is last. */
 export async function getApprovedTestimonials(): Promise<Testimonial[]> {
   const conn = db()
   if (!conn) return []
@@ -60,7 +60,7 @@ export async function getApprovedTestimonials(): Promise<Testimonial[]> {
     .select()
     .from(wallTestimonials)
     .where(eq(wallTestimonials.status, "approved"))
-    .orderBy(desc(wallTestimonials.decidedAt))
+    .orderBy(asc(wallTestimonials.decidedAt), asc(wallTestimonials.createdAt))
 
   return rows.flatMap((row) =>
     // The CHECK constraint guarantees both, and the type cannot know that.

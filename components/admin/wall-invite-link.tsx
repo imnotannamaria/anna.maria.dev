@@ -19,7 +19,7 @@ export function WallInviteLink({ url, expires }: { url: string; expires: string 
       </CardHeader>
       <SecretField value={url} name="invite link" />
       <Hint icon={<ClockCountdownIcon aria-hidden size={13} />}>
-        <span>shown once · good for 24 hours · one letter</span>
+        <span>shown once · good for 3 days · one letter</span>
       </Hint>
     </div>
   )

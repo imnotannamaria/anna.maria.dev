@@ -1,5 +1,6 @@
 "use client"
 
+import { pet } from "@/components/site/abimaela/abimaela"
 import { CheckIcon, CopyIcon } from "@phosphor-icons/react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
 import { useTranslations } from "next-intl"
@@ -38,6 +39,7 @@ export function Dock({ items, label }: { items: DockItem[]; label: string }) {
     try {
       await navigator.clipboard.writeText(text)
       setCopied(index)
+      pet.notify("copy")
       setActive(index)
       clearTimeout(hideTimer.current)
       hideTimer.current = setTimeout(() => setCopied(null), 1800)
