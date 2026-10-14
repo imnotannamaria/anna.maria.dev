@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, type CSSProperties } from "react"
 import "./click-burst.css"
 
 const LINES = 8
@@ -38,4 +38,23 @@ export function ClickBurst() {
   }, [])
 
   return <div ref={layer} aria-hidden className="st-burst-layer" />
+}
+
+/**
+ * The same burst as a piece of the page, for a moment that is not a click: the end of a round of
+ * the footer's memory game. `scale` makes it bigger, `delay` starts it later, so several can go
+ * off in a wave. It plays once on mount; give it a new key to play it again.
+ */
+export function Burst({ scale = 1, delay = 0 }: { scale?: number; delay?: number }) {
+  return (
+    <span
+      aria-hidden
+      className="st-burst"
+      style={{ "--burst-scale": scale, "--burst-delay": `${delay}ms` } as CSSProperties}
+    >
+      {Array.from({ length: LINES }, (_, index) => (
+        <i key={index} style={{ "--turn": `${(360 / LINES) * index}deg` } as CSSProperties} />
+      ))}
+    </span>
+  )
 }

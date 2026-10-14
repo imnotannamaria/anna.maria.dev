@@ -1,14 +1,15 @@
 import { type PostgresJsDatabase, drizzle } from "drizzle-orm/postgres-js"
 import postgres, { type Sql } from "postgres"
 import * as logSchema from "@/lib/log/schema"
+import * as memorySchema from "@/lib/memory/schema"
 import * as wristkitSchema from "@/lib/wristkit/schema"
 import * as wallSchema from "@/lib/wall/schema"
 
 /**
- * Every feature that talks to Postgres goes through here. wristkit, /log and the wall share
- * one Supabase database, so they should also share one connection pool.
+ * Every feature that talks to Postgres goes through here. wristkit, /log, the wall and the
+ * footer's memory game share one Supabase database, so they should also share one connection pool.
  */
-const schema = { ...wristkitSchema, ...logSchema, ...wallSchema }
+const schema = { ...wristkitSchema, ...logSchema, ...wallSchema, ...memorySchema }
 
 export type AppDb = {
   db: PostgresJsDatabase<typeof schema>

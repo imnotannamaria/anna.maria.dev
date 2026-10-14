@@ -34,31 +34,6 @@
     pointer-events: none;
   }
 }
-/* When the footer is on screen she is in the game down there, and leaves the corner: she gets up,
-   walks off the right edge, and walks back in when the footer is gone. The component runs the
-   trip (`data-presence`); this is where she is drawn at each leg of it. */
-.st-abi:not([data-presence="here"]),
-.st-abi:not([data-presence="here"]) * {
-  pointer-events: none;
-}
-.st-abi:not([data-presence="here"]) .st-abi-speech {
-  opacity: 0;
-}
-.st-abi {
-  --st-abi-off: 240px;
-}
-.st-abi[data-presence="walkingOut"] .st-abi-body {
-  translate: var(--st-abi-off) 0;
-  transition: translate 800ms linear;
-}
-.st-abi[data-presence="gone"] .st-abi-body {
-  visibility: hidden;
-  translate: var(--st-abi-off) 0;
-}
-.st-abi[data-presence="walkingIn"] .st-abi-body {
-  translate: 0 0;
-  transition: translate 800ms linear;
-}
 .st-abi-body {
   display: block;
   border-radius: var(--radius-lg);
@@ -191,10 +166,7 @@
 /* The sheets below all stand on the idle cat's ground, centred over her, at her scale: the
    idle frame is 235 tall, and each one is sized from that. */
 .st-abi-confused,
-.st-abi-happy,
-.st-abi-out,
-.st-abi-gait,
-.st-abi-settle {
+.st-abi-happy {
   position: absolute;
   bottom: 0;
   left: 50%;
@@ -202,18 +174,6 @@
   margin-left: calc(var(--w) / -2);
   background-image: var(--st-abi-sheet);
   background-repeat: no-repeat;
-}
-/* Twelve frames of 249 by 234: she gets up and turns to the side, ready to walk. Once. */
-.st-abi-out {
-  --w: calc(var(--st-abi-h) * 249 / 235);
-  height: calc(var(--st-abi-h) * 234 / 235);
-  background-size: calc(var(--w) * 12) 100%;
-  animation: st-abi-out 600ms steps(12, jump-none) forwards;
-}
-@keyframes st-abi-out {
-  to {
-    background-position-x: calc(var(--w) * -11);
-  }
 }
 /* Twenty frames of 262 by 234: her head tilts and a question mark shows up. Once. */
 .st-abi-confused {
@@ -237,30 +197,6 @@
 @keyframes st-abi-happy {
   to {
     background-position-x: calc(var(--w) * -19);
-  }
-}
-/* The walking sheet, 24 frames of 252 by 228, at the corner's size. */
-.st-abi-gait {
-  --w: calc(var(--st-abi-h) * 252 / 235);
-  height: calc(var(--st-abi-h) * 228 / 235);
-  background-size: calc(var(--w) * 24) 100%;
-  animation: st-abi-gait 2.6s steps(24) infinite;
-}
-@keyframes st-abi-gait {
-  to {
-    background-position-x: calc(var(--w) * -24);
-  }
-}
-/* The stopping sheet, two frames of 260 by 229, at the corner's size: she sits back down. */
-.st-abi-settle {
-  --w: calc(var(--st-abi-h) * 260 / 235);
-  height: calc(var(--st-abi-h) * 229 / 235);
-  background-size: calc(var(--w) * 2) 100%;
-  animation: st-abi-settle 220ms steps(2, jump-none) forwards;
-}
-@keyframes st-abi-settle {
-  to {
-    background-position-x: calc(var(--w) * -1);
   }
 }
 /* Falling asleep, then asleep: one sheet with two rows, at the idle sheet's scale, in cells of

@@ -21,7 +21,8 @@ export const SOUND_EFFECTS = {
   },
   success: {
     file: "success.mp3",
-    moment: "a form was sent, or an admin action worked",
+    moment:
+      "a form was sent, an admin action worked, or a round of the footer's memory game was won",
     volume: 0.14,
     durationSeconds: 0.7,
     promptInfluence: 0.7,

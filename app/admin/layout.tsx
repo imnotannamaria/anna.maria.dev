@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 const SECTIONS = [
   { href: "/admin/log", label: "log" },
   { href: "/admin/wall", label: "wall of love" },
+  { href: "/admin/memory", label: "memory" },
 ]
 
 /**

@@ -36,9 +36,9 @@ It comes in English and Portuguese, and it is also an open source template for f
 | `/log`          | One feed for everything I finish: films, series, books, albums, podcasts, games, with ratings          |
 | `/back`         | A terminal: `ls`, `cd`, `cat`, `open`, over the site's own content                                     |
 | `/ai`           | A chat that answers about me and the site, with a model behind layers of limits                        |
-| `/admin`        | CRUD for the log and the wall, behind WorkOS AuthKit and an email allowlist                            |
+| `/admin`        | CRUD for the log and the wall, and the memory board, behind WorkOS AuthKit and an email allowlist      |
 
-Every page exists at `/pt/...` too. Light and dark, dynamic OG images, a sitemap, `hreflang` and canonical URLs come with it. Spotify, the Apple Watch card, the log, the wall and the chat are all optional: without their keys the site still builds, and each one says so in its place.
+Every page of the front ends in the same footer: a memory game whose pairs are the pages, with a board of the ten fastest rounds, and the license line as a diff. Every page exists at `/pt/...` too. Light and dark, dynamic OG images, a sitemap, `hreflang` and canonical URLs come with it. Spotify, the Apple Watch card, the log, the wall and the chat are all optional: without their keys the site still builds, and each one says so in its place.
 
 [Abimaela](docs/abimaela.md), the cat, is a set of sprite sheets and a table of what she reacts to.
 
@@ -159,9 +159,9 @@ The Portuguese of a post or a project is a file with the same name under `pt/` (
 
 Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), then set `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` and the ID of a public playlist in `SPOTIFY_PLAYLIST_ID`. It uses the Client Credentials flow, server to server, so the secret never reaches the browser.
 
-### The log and the wall of love
+### The log, the wall of love and the memory board
 
-Both read the same Postgres database.
+All three read the same Postgres database.
 
 1. Set `DATABASE_URL` (on Supabase, the transaction pooler string on port 6543) and run the files in [docs/sql/](docs/sql/) against it, in order. `008-drop-roadmap.sql` removes a table of the old site and deletes what is in it: skip it on a new database.
 2. Seed sample entries for the log if you like: `npm run seed:log`.
@@ -170,7 +170,7 @@ Both read the same Postgres database.
 
 The last step matters. AuthKit decides who is signed in, not who is allowed in; without the allowlist, anyone who signs up in your WorkOS organisation reaches the admin. `lib/auth/require-admin.ts` is the real guard.
 
-A log entry is written in English, with an optional Portuguese title and note beside it. A letter on the wall comes in through an invite: a link you create in the admin, good for three days and one letter, which you approve before it shows. Photos go to Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set.
+A log entry is written in English, with an optional Portuguese title and note beside it. A letter on the wall comes in through an invite: a link you create in the admin, good for three days and one letter, which you approve before it shows. Photos go to Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set. A name on the memory board works the same way: the server times the round, a time in the ten best gets a form, and the name waits for you in `/admin/memory`, with an email when Resend is set. Without the database the game still plays, with no board.
 
 ### The chat
 
@@ -220,7 +220,7 @@ Import the repo at [vercel.com/new](https://vercel.com/new), add the environment
 ```
 app/
   [locale]/(site)/         every public page, once per language
-  admin/                   log and wall CRUD, behind AuthKit + the allowlist
+  admin/                   log, wall and memory board, behind AuthKit + the allowlist
   components/entrepta/     entrepta components, written by its CLI
   api/                     contact, OG images, the playlist, auth callback, the Hono app at v1/
   entrepta.css             entrepta's tokens and themes

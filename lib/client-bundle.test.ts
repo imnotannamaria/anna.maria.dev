@@ -25,6 +25,8 @@ const ALLOWED = new Set([
   "components/site/ai/chat.tsx",
   // loaded on the first click of the bug button, not with the frame (see island.tsx)
   "components/site/bug/bug-report.tsx",
+  // the name for the memory board, loaded only after a round that makes it (memory-game.tsx)
+  "components/site/footer/claim-form.tsx",
 ])
 
 function sourceFiles(dir: string): string[] {

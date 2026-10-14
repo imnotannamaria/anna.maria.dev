@@ -106,12 +106,62 @@
     "projectsFallback": "projetos"
   },
   "footer": {
+    "end": "fim da página",
     "label": "lugares que você pode ir a partir daqui",
-    "note": "é só apontar que ela te ajuda",
-    "next": "próxima:",
-    "here": "você está aqui.",
-    "hereLabel": "{page}: você está aqui",
-    "goTo": "Ir para {page}"
+    "note": "par achado é página achada",
+    "places": "Pra onde ir",
+    "game": {
+      "label": "Jogo da memória",
+      "hint": "Vira duas cartas. Par achado é página achada, e a Abimaela ajuda.",
+      "found": "Achou {page}. A carta virou um link.",
+      "foundCat": "Achou a Abimaela. Ela vai te dar uma espiada.",
+      "peeking": "A Abimaela te mostrou tudo. Decora rápido!",
+      "done": "Achou os {pairs} pares em {time}, com {moves} jogadas. Cada carta agora te leva pra página dela.",
+      "official": "Tempo oficial: {time}.",
+      "officialIn": "Tempo oficial: {time}, e você entrou no placar!",
+      "officialRank": "Tempo oficial: {time}, ficaria em {rank}º.",
+      "shuffle": "Embaralhar",
+      "goTo": "Ir para {page}",
+      "card": "Carta {n}, virada",
+      "cat": "Abimaela",
+      "time": "tempo",
+      "moves": "jogadas",
+      "streak": "pares seguidos"
+    },
+    "board": {
+      "title": "placar",
+      "loading": "lendo o placar...",
+      "down": "O placar mora no Postgres, e ele não respondeu. O jogo funciona do mesmo jeito.",
+      "empty": "Ninguém no placar ainda. O primeiro nome pode ser o seu.",
+      "waiting": "aguardando"
+    },
+    "claim": {
+      "first": "Recorde do placar!",
+      "place": "{rank}º lugar!",
+      "ask": "{time}. Quer seu nome lá?",
+      "label": "Seu nome no placar",
+      "placeholder": "seu nome",
+      "send": "mandar",
+      "help": "Só o nome, até {max} caracteres. Ele aparece depois que a Anna aprovar.",
+      "sent": "Mandado! Seu nome aparece no placar quando a Anna aprovar. Neste navegador ele já está lá, marcado.",
+      "errors": {
+        "empty": "Escreve um nome.",
+        "long": "Até {max} caracteres.",
+        "chars": "Só letras, números, espaço e . ' _ -",
+        "link": "Sem link, só o nome.",
+        "expired": "Essa partida não pode mais ganhar nome: passou meia hora, ou o placar mudou.",
+        "tooMany": "Muitas tentativas daqui. Espera uns minutos.",
+        "down": "O placar não respondeu. Tenta de novo daqui a pouco.",
+        "offline": "Sem conexão. Nada foi mandado, tenta de novo."
+      }
+    },
+    "signoff": {
+      "all": "todos os direitos",
+      "out": "reservados",
+      "in": "forkados",
+      "fork": "faz o seu fork",
+      "changes": "uma linha mudou na licença"
+    }
   },
   "wall": {
     "label": "mural de carinho",

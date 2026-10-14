@@ -1,13 +1,11 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useReducedMotion } from "motion/react"
 import { useEffect, useRef, useState, type CSSProperties } from "react"
 import { OVERLAY_SURFACE } from "@/lib/overlay"
 import { cn } from "@/lib/utils"
 import confused from "./abimaela-confused.png"
 import happy from "./abimaela-happy.png"
-import leaving from "./abimaela-leaving.png"
 import waking from "./abimaela-waking.png"
 import walking from "./abimaela-walking.png"
 import angry from "./abimaela-angry.png"
@@ -49,11 +47,6 @@ const AGAIN_MS = 2500
 // a little past the jump sheet's own 900ms (abimaela.css), so its last frame is seen
 const JUMP_MS = 940
 const ANGRY_MS = 1500
-// leaving the corner and coming back: she gets up, walks, and on the way back sits down again
-const OUT_MS = 600
-const WALK_MS = 800
-const SETTLE_MS = 220
-
 // as long as the confused and the happy sheets take to play (abimaela.css)
 const CONFUSED_MS = 1700
 const HAPPY_MS = 1900
@@ -65,11 +58,6 @@ const GESTURE_MS = {
   happy: HAPPY_MS,
 } as const
 
-/**
- * Where she is. `here` is the corner. The rest is the trip out of it and back: getting up,
- * walking off the edge of the screen, gone, walking back in, sitting down.
- */
-type Presence = "here" | "leaving" | "walkingOut" | "gone" | "walkingIn" | "settling"
 // as long as the waking sheet takes to play (abimaela.css)
 const WAKE_MS = 1800
 
@@ -135,6 +123,22 @@ export function CatAngry({ height = 96 }: { height?: number }) {
   )
 }
 
+/** She is happy: eyes closed, tail going, hearts over her head. The sheet plays once. */
+export function CatHappy({ height = 96 }: { height?: number }) {
+  return (
+    <span
+      aria-hidden
+      className="relative block"
+      style={{ "--st-abi-h": `${height}px`, width: (height * 224) / 235, height } as CSSProperties}
+    >
+      <span
+        className="st-abi-happy"
+        style={{ "--st-abi-sheet": `url(${happy.src})` } as CSSProperties}
+      />
+    </span>
+  )
+}
+
 /** She falls asleep: the sheet's first row plays once, and its second loops after it. */
 export function CatSleeping({ height = 96 }: { height?: number }) {
   return (
@@ -151,19 +155,9 @@ export function CatSleeping({ height = 96 }: { height?: number }) {
   )
 }
 
-/**
- * `away` is the frame saying she should not be in the corner (the footer is on screen, and she
- * is in the game down there). She walks out, and walks back in when it stops being true.
- */
-export function Abimaela({ away = false }: { away?: boolean }) {
+/** The cat in the corner. She stays there: the footer's game is its own thing now. */
+export function Abimaela() {
   const t = useTranslations("cat")
-  const reduce = useReducedMotion() ?? false
-  const [presence, setPresence] = useState<Presence>("here")
-  // the same, for the code that runs outside of a render
-  const where = useRef<Presence>("here")
-  const trip = useRef<ReturnType<typeof setTimeout>>(undefined)
-  // what the speech code wants to hear when she is back in the corner
-  const arrived = useRef<() => void>(undefined)
   const [speech, setSpeech] = useState<string | null>(null)
   const [looking, setLooking] = useState<"left" | "right">("left")
   const [sleeping, setSleeping] = useState(false)
@@ -203,8 +197,7 @@ export function Abimaela({ away = false }: { away?: boolean }) {
     // when she last spoke, and when someone last typed in a field
     const last = { spokeAt: 0, typedAt: 0 }
 
-    // A line she could not say when it happened: she was out of the corner, or a page opened
-    // right after she spoke. It is kept for a few seconds and said when she can. Only the latest
+    // A line she could not say when it happened: a page opened right after she spoke. It is kept for a few seconds and said when she can. Only the latest
     // one is kept, so three pages opened in a row get one line, for the page the visitor is on.
     let waiting: { event: PetEvent; at: number } | null = null
     let retry: ReturnType<typeof setTimeout> | undefined
@@ -213,15 +206,9 @@ export function Abimaela({ away = false }: { away?: boolean }) {
       waiting = null
       if (held && Date.now() - held.at <= WAITING_MS) say(held.event)
     }
-    arrived.current = later
 
     const say = (event: PetEvent) => {
       const now = Date.now()
-      // she is not in the corner to say it
-      if (where.current !== "here") {
-        waiting = { event, at: now }
-        return
-      }
       const wait = waitToSpeak(event, now, last)
       if (wait > 0) {
         // anything else nobody asked her for is dropped: late, it would be about nothing
@@ -300,56 +287,11 @@ export function Abimaela({ away = false }: { away?: boolean }) {
     }
   }, [])
 
-  // The trip out of the corner and back, one timer per leg. A change of mind in the middle (the
-  // footer scrolled past and back) drops the timer and starts the other way from where she is.
-  useEffect(() => {
-    const go = (to: Presence) => {
-      where.current = to
-      setPresence(to)
-      if (to === "here") arrived.current?.()
-    }
-    const walk = ([[to, ms], ...rest]: [Presence, number][]) => {
-      go(to)
-      if (rest.length) trip.current = setTimeout(() => walk(rest), ms)
-    }
-    trip.current = setTimeout(() => {
-      if (away) {
-        if (where.current === "gone") return
-        // whatever she was doing, she stops it to go
-        clearTimeout(back.current)
-        setAction("idle")
-        setSpeech(null)
-        asleep.current = false
-        setSleeping(false)
-        if (reduce) return go("gone")
-        // the sheets face right, and so does the way out
-        setLooking("right")
-        walk([
-          ["leaving", OUT_MS],
-          ["walkingOut", WALK_MS],
-          ["gone", 0],
-        ])
-        return
-      }
-      if (where.current === "here") return
-      if (reduce) return go("here")
-      // she comes back the way she left, so she walks facing left
-      setLooking("left")
-      walk([
-        ["walkingIn", WALK_MS],
-        ["settling", SETTLE_MS],
-        ["here", 0],
-      ])
-    }, 0)
-    return () => clearTimeout(trip.current)
-  }, [away, reduce])
-
-  const here = presence === "here"
   // sitting in the corner with nothing else going on
-  const resting = here && action === "idle" && !sleeping
+  const resting = action === "idle" && !sleeping
 
   return (
-    <div className="st-abi" data-presence={presence}>
+    <div className="st-abi">
       <p
         role="status"
         className={cn(
@@ -384,35 +326,14 @@ export function Abimaela({ away = false }: { away?: boolean }) {
             data-hidden={resting ? undefined : ""}
             style={{ "--st-abi-sheet": `url(${sheet.src})` } as CSSProperties}
           />
-          {presence === "leaving" ? (
-            <span
-              aria-hidden
-              className="st-abi-out"
-              style={{ "--st-abi-sheet": `url(${leaving.src})` } as CSSProperties}
-            />
-          ) : null}
-          {presence === "walkingOut" || presence === "walkingIn" ? (
-            <span
-              aria-hidden
-              className="st-abi-gait"
-              style={{ "--st-abi-sheet": `url(${walking.src})` } as CSSProperties}
-            />
-          ) : null}
-          {presence === "settling" ? (
-            <span
-              aria-hidden
-              className="st-abi-settle"
-              style={{ "--st-abi-sheet": `url(${stopping.src})` } as CSSProperties}
-            />
-          ) : null}
-          {here && sleeping && action === "idle" ? (
+          {sleeping && action === "idle" ? (
             <span
               aria-hidden
               className="st-abi-sleep"
               style={{ "--st-abi-sheet": `url(${sleepingSheet.src})` } as CSSProperties}
             />
           ) : null}
-          {here && action === "confused" ? (
+          {action === "confused" ? (
             <span
               key={tap}
               aria-hidden
@@ -420,7 +341,7 @@ export function Abimaela({ away = false }: { away?: boolean }) {
               style={{ "--st-abi-sheet": `url(${confused.src})` } as CSSProperties}
             />
           ) : null}
-          {here && action === "happy" ? (
+          {action === "happy" ? (
             <span
               key={tap}
               aria-hidden
@@ -428,7 +349,7 @@ export function Abimaela({ away = false }: { away?: boolean }) {
               style={{ "--st-abi-sheet": `url(${happy.src})` } as CSSProperties}
             />
           ) : null}
-          {here && action === "jump" ? (
+          {action === "jump" ? (
             <span
               key={tap}
               aria-hidden
@@ -436,7 +357,7 @@ export function Abimaela({ away = false }: { away?: boolean }) {
               style={{ "--st-abi-sheet": `url(${jumping.src})` } as CSSProperties}
             />
           ) : null}
-          {here && action === "wake" ? (
+          {action === "wake" ? (
             <span
               key={tap}
               aria-hidden
@@ -444,7 +365,7 @@ export function Abimaela({ away = false }: { away?: boolean }) {
               style={{ "--st-abi-sheet": `url(${waking.src})` } as CSSProperties}
             />
           ) : null}
-          {here && action === "angry" ? (
+          {action === "angry" ? (
             <span
               key={tap}
               aria-hidden

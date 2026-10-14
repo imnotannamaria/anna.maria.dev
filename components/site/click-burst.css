@@ -12,27 +12,29 @@
   width: 0;
   height: 0;
 }
-/* each line leaves along its own angle */
+/* each line leaves along its own angle. `--burst-scale` and `--burst-delay` are for a burst that
+   is a piece of the page (`Burst`), not a click */
 .st-burst > i {
   position: absolute;
   top: 0;
   left: 0;
   width: 2px;
-  height: 9px;
-  margin: -4px 0 0 -1px;
+  height: calc(9px * var(--burst-scale, 1));
+  margin: calc(-4px * var(--burst-scale, 1)) 0 0 -1px;
   border-radius: 1px;
   background: var(--fg-brand);
   rotate: var(--turn);
   animation: st-burst 420ms var(--ease-out) both;
+  animation-delay: var(--burst-delay, 0ms);
 }
 @keyframes st-burst {
   from {
     opacity: 1;
-    transform: translateY(-6px) scaleY(1);
+    transform: translateY(calc(-6px * var(--burst-scale, 1))) scaleY(1);
   }
   to {
     opacity: 0;
-    transform: translateY(-24px) scaleY(0.3);
+    transform: translateY(calc(-24px * var(--burst-scale, 1))) scaleY(0.3);
   }
 }
 @media print {

@@ -106,12 +106,62 @@
     "projectsFallback": "projects"
   },
   "footer": {
+    "end": "end of the page",
     "label": "places you can go from here",
-    "note": "just point and she'll help you",
-    "next": "next:",
-    "here": "you are here.",
-    "hereLabel": "{page}: you are here",
-    "goTo": "Go to {page}"
+    "note": "a pair found is a page found",
+    "places": "Where to go",
+    "game": {
+      "label": "Memory game",
+      "hint": "Turn two cards. A pair found is a page found, and Abimaela helps.",
+      "found": "Found {page}. The card is a link now.",
+      "foundCat": "Found Abimaela. She'll give you a peek.",
+      "peeking": "Abimaela showed you everything. Memorize it, quick!",
+      "done": "All {pairs} pairs in {time}, with {moves} moves. Every card takes you to its page now.",
+      "official": "Official time: {time}.",
+      "officialIn": "Official time: {time}, and you made the board!",
+      "officialRank": "Official time: {time}, that would be #{rank}.",
+      "shuffle": "Shuffle",
+      "goTo": "Go to {page}",
+      "card": "Card {n}, face down",
+      "cat": "Abimaela",
+      "time": "time",
+      "moves": "moves",
+      "streak": "pairs in a row"
+    },
+    "board": {
+      "title": "board",
+      "loading": "reading the board...",
+      "down": "The board lives in Postgres, and Postgres didn't answer. The game works the same.",
+      "empty": "Nobody on the board yet. The first name could be yours.",
+      "waiting": "waiting"
+    },
+    "claim": {
+      "first": "Board record!",
+      "place": "#{rank}!",
+      "ask": "{time}. Want your name up there?",
+      "label": "Your name on the board",
+      "placeholder": "your name",
+      "send": "send",
+      "help": "Just the name, up to {max} characters. It shows once Anna approves it.",
+      "sent": "Sent! Your name shows on the board once Anna approves it. On this browser it's already there, marked.",
+      "errors": {
+        "empty": "Write a name.",
+        "long": "Up to {max} characters.",
+        "chars": "Only letters, numbers, spaces and . ' _ -",
+        "link": "No links, just the name.",
+        "expired": "This round can't take a name anymore: half an hour went by, or the board changed.",
+        "tooMany": "Too many tries from here. Give it a few minutes.",
+        "down": "The board didn't answer. Try again in a bit.",
+        "offline": "No connection. Nothing was sent, try again."
+      }
+    },
+    "signoff": {
+      "all": "all rights",
+      "out": "reserved",
+      "in": "forked",
+      "fork": "fork your own",
+      "changes": "one line changed in the license"
+    }
   },
   "wall": {
     "label": "wall of love",

@@ -51,15 +51,12 @@ She does not talk over people.
   on screen goes away at once, and so does the gesture that came with it, to make room. Clicking
   through home, about and contact in a row shows the line for the page the visitor ended up on,
   not a pile of them. Only a line she cannot say yet is kept (see above), and only the latest.
-- What happens while she is out of the corner (a postcard sent with the footer on screen) is kept
-  too, and she reacts when she is back, if that happens within 6 seconds.
 - A line stays on screen for 3.6 seconds.
 - After 45 seconds with no click and no key, she dozes off and falls asleep. Anything wakes her, and
   she wakes up with a yawn and a stretch before going back to sitting.
 - She looks toward the last place the pointer was pressed.
-- When the footer comes on screen (she is in the game down there), she **walks out**: gets up,
-  walks off the right edge, and walks back in and sits down when the footer is gone. While she is
-  out she does not speak: the line is kept for her return.
+- She stays in the corner. She used to walk out when the footer came on screen, to be "in the
+  game down there"; the footer is a memory game now, and the trip out and back is gone with it.
 - She also does not show up on an invite or in the admin, and on a phone she hides while the
   keyboard is open.
 - With `prefers-reduced-motion`, no sheet animates: the site's global reset stops every CSS
@@ -117,37 +114,35 @@ question mark) or `happy` (eyes closed and hearts).
 
 One PNG per animation, with the frames side by side in a single row, played with CSS `steps()`.
 
-| Sheet               | File                    | Frames  | Frame size | How it plays                                                        |
-| ------------------- | ----------------------- | ------- | ---------- | ------------------------------------------------------------------- |
-| Idle                | `abimaela-idle.png`     | 24      | 224 × 235  | 4s loop                                                             |
-| Walking             | `abimaela-walking.png`  | 24      | 252 × 228  | 2.6s loop                                                           |
-| Stopping            | `abimaela-stopping.png` | 2       | 260 × 229  | 220ms, once, when a walk ends                                       |
-| Jumping             | `abimaela-jumping.png`  | 20      | 270 × 290  | 900ms, once                                                         |
-| Angry               | `abimaela-angry.png`    | 20      | 254 × 229  | 1400ms, once, holding the last frame                                |
-| Dozing and sleeping | `abimaela-sleeping.png` | 20 + 24 | 245 × 235  | two rows: the top one plays once, in 2s; the bottom one loops in 5s |
-| Waking              | `abimaela-waking.png`   | 20      | 257 × 230  | 1.8s, once, when something wakes her                                |
-| Leaving             | `abimaela-leaving.png`  | 12      | 249 × 234  | 600ms, once, before she walks out                                   |
-| Confused            | `abimaela-confused.png` | 20      | 262 × 234  | 1.6s, once                                                          |
-| Happy               | `abimaela-happy.png`    | 20      | 255 × 235  | 1.8s, once                                                          |
+| Sheet               | File                    | Frames                                                  | Frame size | How it plays                                                        |
+| ------------------- | ----------------------- | ------------------------------------------------------- | ---------- | ------------------------------------------------------------------- |
+| Idle                | `abimaela-idle.png`     | 24                                                      | 224 × 235  | 4s loop                                                             |
+| Walking             | `abimaela-walking.png`  | 24                                                      | 252 × 228  | 2.6s loop                                                           |
+| Stopping            | The invite's walk.      | The last 220ms of a walk: she plants her feet and sits. |
+| Jumping             | `abimaela-jumping.png`  | 20                                                      | 270 × 290  | 900ms, once                                                         |
+| Angry               | `abimaela-angry.png`    | 20                                                      | 254 × 229  | 1400ms, once, holding the last frame                                |
+| Dozing and sleeping | `abimaela-sleeping.png` | 20 + 24                                                 | 245 × 235  | two rows: the top one plays once, in 2s; the bottom one loops in 5s |
+| Waking              | `abimaela-waking.png`   | 20                                                      | 257 × 230  | 1.8s, once, when something wakes her                                |
+| Confused            | `abimaela-confused.png` | 20                                                      | 262 × 234  | 1.6s, once                                                          |
+| Happy               | `abimaela-happy.png`    | 20                                                      | 255 × 235  | 1.8s, once                                                          |
 
 ### Where and when each one shows
 
 The corner cat is `Abimaela` in `abimaela.tsx`, in the frame of every page. The same sheets are
 also drawn elsewhere as small components (`Cat`, `CatWalking`, `CatStopping`, `CatAngry`,
-`CatSleeping`), at a size that fits the place.
+`CatHappy`, `CatSleeping`), at a size that fits the place.
 
-| Sheet               | Where                                                                                                                                                                                                                             | When                                                                                                                                                                                                    |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Idle                | The corner cat. The footer's door game and the invite's walk (`cat-track.tsx`). The stamp on the home and contact postcards. The invite's "sent" screen and the bug report's "sent" screen. The chat's "slow" and "long" notices. | The corner cat: whenever nothing else is playing. Elsewhere: the cat standing still, before a walk starts or after it ends, or the cat of a finished form.                                              |
-| Walking             | The loading screen of a page that reads the database (`ScreenLoading`). The footer's door game and the invite's walk. The corner cat, on the way out and back.                                                                    | While a page loads. In the footer, when the pointer or the focus lands on a sign: she walks to it. In the invite, when the step changes: she walks to the step. When the footer comes on or off screen. |
-| Stopping            | The footer's door game and the invite's walk. The corner cat, when she sits back down.                                                                                                                                            | The last 220ms of a walk: she plants her feet and sits.                                                                                                                                                 |
-| Leaving             | The corner cat.                                                                                                                                                                                                                   | The footer comes on screen: she gets up and turns right, then walks out.                                                                                                                                |
-| Jumping             | The corner cat.                                                                                                                                                                                                                   | A click on her (`click`), and with the lines for `light`, `unmute` and `bug`.                                                                                                                           |
-| Angry               | The corner cat. The 404 and the error screens. The invite's "closed" screen when the link expired, and its failure notice. The chat's `scope` and `blocked` notices. The bug report's header.                                     | A second click within 2.5 seconds (`clickAgain`), with the lines for `sudo` and `offTopic`. On the 404 and error screens, as long as they are shown.                                                    |
-| Confused            | The corner cat.                                                                                                                                                                                                                   | With the lines for `mailFailed`, `unknown` and `noAnswer`.                                                                                                                                              |
-| Happy               | The corner cat.                                                                                                                                                                                                                   | With the lines for `react` and `sent`.                                                                                                                                                                  |
-| Dozing and sleeping | The corner cat. A removed page (the roadmap). The empty wall. The invite's "closed" screen when the link was already used. The chat's `budget` and `visitor` notices.                                                             | The corner cat: after 45 seconds with no click and no key, she dozes (2s) and then sleeps in a loop until anything wakes her. Elsewhere: as long as the screen is shown.                                |
-| Waking              | The corner cat.                                                                                                                                                                                                                   | The first thing that happens after she fell asleep (a line, a click, a key, a press): she yawns and stretches for 1.8s, unless the line brings a gesture of its own.                                    |
+| Sheet               | Where                                                                                                                                                                                                                                            | When                                                                                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Idle                | The corner cat. The invite's walk (`cat-track.tsx`). The cat card of the footer's memory game. The stamp on the home and contact postcards. The invite's "sent" screen and the bug report's "sent" screen. The chat's "slow" and "long" notices. | The corner cat: whenever nothing else is playing. Elsewhere: the cat standing still, before a walk starts or after it ends, the cat of a finished form, or her card face up. |
+| Walking             | The loading screen of a page that reads the database (`ScreenLoading`). The invite's walk.                                                                                                                                                       | While a page loads. In the invite, when the step changes: she walks to the step.                                                                                             |
+| Stopping            | The invite's walk.                                                                                                                                                                                                                               | The last 220ms of a walk: she plants her feet and sits.                                                                                                                      |
+| Jumping             | The corner cat.                                                                                                                                                                                                                                  | A click on her (`click`), and with the lines for `light`, `unmute` and `bug`.                                                                                                |
+| Angry               | The corner cat. The 404 and the error screens. The invite's "closed" screen when the link expired, and its failure notice. The chat's `scope` and `blocked` notices. The bug report's header.                                                    | A second click within 2.5 seconds (`clickAgain`), with the lines for `sudo` and `offTopic`. On the 404 and error screens, as long as they are shown.                         |
+| Confused            | The corner cat.                                                                                                                                                                                                                                  | With the lines for `mailFailed`, `unknown` and `noAnswer`.                                                                                                                   |
+| Happy               | The corner cat. Her card in the footer's memory game.                                                                                                                                                                                            | With the lines for `react` and `sent`. In the game, when her pair is found: she shows every card for a moment.                                                               |
+| Dozing and sleeping | The corner cat. A removed page (the roadmap). The empty wall. The invite's "closed" screen when the link was already used. The chat's `budget` and `visitor` notices.                                                                            | The corner cat: after 45 seconds with no click and no key, she dozes (2s) and then sleeps in a loop until anything wakes her. Elsewhere: as long as the screen is shown.     |
+| Waking              | The corner cat.                                                                                                                                                                                                                                  | The first thing that happens after she fell asleep (a line, a click, a key, a press): she yawns and stretches for 1.8s, unless the line brings a gesture of its own.         |
 
 ### The format of a new sheet
 
@@ -163,7 +158,7 @@ also drawn elsewhere as small components (`Cat`, `CatWalking`, `CatStopping`, `C
   would have to be fewer frames or smaller ones.
 - **The redone sheets share one scale:** the cat is the same size in pixels in all of them, so they
   are drawn at heights proportional to the frame height (235 for idle, 228 for walking, 229 for
-  stopping, 290 for jumping, 229 for angry, 235 for dozing and sleeping, 230 for waking, 234 for leaving and confused, 235 for happy).
+  stopping, 290 for jumping, 229 for angry, 235 for dozing and sleeping, 230 for waking, 234 for confused, 235 for happy).
 - **In the jumping sheet, the height of the jump is set when the sheet is cut.** The generator
   draws every pose resting on the same line, the airborne ones included; the script that builds the
   sheet is what lifts each frame off the ground.

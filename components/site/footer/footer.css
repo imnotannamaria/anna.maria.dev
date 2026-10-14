@@ -10,15 +10,38 @@
   }
 }
 
-.st-ft-nav {
+/* where the page stops: a dashed rule with paw prints walking across it to the words */
+.st-ft-end {
   display: flex;
-  justify-content: flex-end;
-  padding-top: 16px;
-  border-top: 1px dashed var(--border-subtle);
+  align-items: center;
+  gap: 12px;
+  margin: 72px 0 32px;
+  color: var(--fg-muted);
 }
-
-/* Under a card's head, her speech needs headroom: a page's name and its line can run to three
-   lines, and at the track's own height they reached the title above. */
-.st-footer .st-track-ground {
-  height: 172px;
+.st-ft-rule {
+  flex: 1;
+  border-top: 1px dashed var(--border-strong);
+}
+.st-ft-paws {
+  display: flex;
+  gap: 10px;
+  color: var(--fg-brand);
+}
+/* a walk, not a row: every other print a little higher, and each one turned the way she goes */
+.st-ft-paw {
+  display: block;
+  rotate: 90deg;
+}
+.st-ft-paw:nth-child(even) {
+  translate: 0 -6px;
+}
+.st-ft-end-label {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+@container (max-width: 480px) {
+  .st-ft-paws {
+    display: none;
+  }
 }

@@ -1,8 +1,10 @@
 import { Hono } from "hono"
 import { adminLog } from "./routes/admin-log"
+import { adminMemory } from "./routes/admin-memory"
 import { adminWall } from "./routes/admin-wall"
 import { ai } from "./routes/ai"
 import { bug } from "./routes/bug"
+import { memory } from "./routes/memory"
 import { poster } from "./routes/poster"
 import { site } from "./routes/site"
 import { wall } from "./routes/wall"
@@ -24,8 +26,10 @@ app.route("/ai", ai)
 app.route("/bug", bug)
 app.route("/admin/log", adminLog)
 app.route("/admin/wall", adminWall)
+app.route("/admin/memory", adminMemory)
 app.route("/invite", wallInvite)
 app.route("/wall", wall)
+app.route("/memory", memory)
 
 app.onError((err, c) => {
   console.error("[api]", err)

@@ -5,7 +5,7 @@ import Image from "next/image"
 import { SoundLink } from "@/components/site/frame/sound-link"
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useRef, type ReactNode } from "react"
 import { MobileNav } from "@/app/components/entrepta/mobile-nav"
 import { Sidebar, type SidebarGroup } from "@/app/components/entrepta/sidebar"
 import { Abimaela, pet } from "@/components/site/abimaela/abimaela"
@@ -14,7 +14,6 @@ import { Footer } from "@/components/site/footer/footer"
 import { useSitePath } from "@/components/site/i18n"
 import { localePath } from "@/lib/i18n/locales"
 import { ICON } from "@/components/site/icons"
-import { useNavigate } from "@/components/site/navigation"
 import { PAGES, hrefOf, listedPageOf, screenOf } from "@/components/site/pages"
 import { Island, PARTS, type Part } from "./island"
 import "./site-frame.css"
@@ -90,7 +89,6 @@ export function SiteFrame({
     href: localePath(locale, hrefOf(page.id)),
     icon: ICON[page.id],
   }))
-  const navigate = useNavigate()
   const part = partOf(pathname)
   const screen = screenOf(pathname)
   // the page of the sidebar this screen belongs to: lit in the nav, and where the footer starts
@@ -112,9 +110,6 @@ export function SiteFrame({
   useEffect(() => {
     document.documentElement.removeAttribute("data-theme")
   }, [])
-
-  // with the footer on screen the corner cat steps out: she is in the game down there
-  const [atFooter, setAtFooter] = useState(false)
 
   const swap = (to: Part) => {
     if (to === part) return
@@ -142,7 +137,7 @@ export function SiteFrame({
         {children}
         {/* Every page of the Front ends in the footer. On an inner page the cat starts at the
             page it is reached from. The admin has none: it is not a page for a visitor. */}
-        {listed ? <Footer page={listed} onGo={navigate} onVisible={setAtFooter} /> : null}
+        {listed ? <Footer page={listed} /> : null}
       </div>
     ),
     back,
@@ -172,7 +167,6 @@ export function SiteFrame({
         id="main-content"
         tabIndex={-1}
         className="st-main outline-none"
-        data-at-footer={(part === "front" && atFooter) || undefined}
         data-focused={focused || undefined}
       >
         {PARTS.map(({ value }) => (
@@ -189,7 +183,7 @@ export function SiteFrame({
 
         <Island part={part} onSwap={swap} sides={!focused} />
 
-        <Abimaela away={part === "front" && atFooter} />
+        <Abimaela />
       </div>
 
       {/* Below 768px the sidebar is gone (CSS) and this takes over, in reach of the thumb. Both

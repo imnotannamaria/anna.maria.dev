@@ -14,30 +14,30 @@ For setup, fork instructions, and how to add content, see [README.md](README.md)
 
 ## Stack
 
-| Layer            | Tech                                                                                |
-| ---------------- | ----------------------------------------------------------------------------------- |
-| Framework        | Next.js 16 (App Router)                                                             |
-| Language         | TypeScript (strict)                                                                 |
-| Styling          | Tailwind CSS v4 + entrepta tokens                                                   |
-| Design system    | entrepta 3.0, copied in by its CLI, no SDK, dark first                              |
-| Languages        | next-intl: English at `/`, Portuguese at `/pt`                                      |
-| Content          | MDX via Velite, with a `pt/` twin of every post and project                         |
-| Animation        | Motion v12, and CSS sprite sheets for the cat                                       |
-| Email            | Resend SDK + React Email                                                            |
-| Syntax highlight | Shiki + rehype-pretty-code                                                          |
-| OG image         | @vercel/og                                                                          |
-| Analytics        | Vercel Analytics                                                                    |
-| SEO              | next-sitemap, `hreflang` and canonical from `lib/metadata.ts`                       |
-| Icons            | Phosphor Icons, simple-icons                                                        |
-| Database         | Postgres (Supabase) via Drizzle ORM: the log, the wall, wristkit, the chat's limits |
-| API layer        | Hono, mounted at /api/v1                                                            |
-| Admin auth       | WorkOS AuthKit + an email allowlist                                                 |
-| Forms            | zod, always; react-hook-form in the admin                                           |
-| AI               | OpenRouter behind `/api/v1/ai/chat`, with limits in Postgres                        |
-| Files            | Vercel Blob, for the photos on the wall                                             |
-| State            | Zustand, for the playlist's timer                                                   |
-| Deploy           | Vercel                                                                              |
-| Fonts            | Newsreader, JetBrains Mono, Inter, self hosted via next/font                        |
+| Layer            | Tech                                                                                                  |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
+| Framework        | Next.js 16 (App Router)                                                                               |
+| Language         | TypeScript (strict)                                                                                   |
+| Styling          | Tailwind CSS v4 + entrepta tokens                                                                     |
+| Design system    | entrepta 3.0, copied in by its CLI, no SDK, dark first                                                |
+| Languages        | next-intl: English at `/`, Portuguese at `/pt`                                                        |
+| Content          | MDX via Velite, with a `pt/` twin of every post and project                                           |
+| Animation        | Motion v12, and CSS sprite sheets for the cat                                                         |
+| Email            | Resend SDK + React Email                                                                              |
+| Syntax highlight | Shiki + rehype-pretty-code                                                                            |
+| OG image         | @vercel/og                                                                                            |
+| Analytics        | Vercel Analytics                                                                                      |
+| SEO              | next-sitemap, `hreflang` and canonical from `lib/metadata.ts`                                         |
+| Icons            | Phosphor Icons, simple-icons                                                                          |
+| Database         | Postgres (Supabase) via Drizzle ORM: the log, the wall, the memory board, wristkit, the chat's limits |
+| API layer        | Hono, mounted at /api/v1                                                                              |
+| Admin auth       | WorkOS AuthKit + an email allowlist                                                                   |
+| Forms            | zod, always; react-hook-form in the admin                                                             |
+| AI               | OpenRouter behind `/api/v1/ai/chat`, with limits in Postgres                                          |
+| Files            | Vercel Blob, for the photos on the wall                                                               |
+| State            | Zustand, for the playlist's timer                                                                     |
+| Deploy           | Vercel                                                                                                |
+| Fonts            | Newsreader, JetBrains Mono, Inter, self hosted via next/font                                          |
 
 ---
 
@@ -233,8 +233,11 @@ the cat in the corner. Below 768px the sidebar gives way to entrepta's `MobileNa
   mute, the other language (a flag), light or dark (the new mode comes down like a curtain).
 - **The sides stay mounted.** The terminal and the chat load on the first visit to their address
   and are then only hidden, so a session and a conversation survive a trip to another side.
-- **Every page of the Front ends in the footer**, which is a game: one sign per page, and the cat
-  walks to the sign you point at (`components/site/cat-track.tsx`).
+- **Every page of the Front ends in the footer**, which is a game: a memory game whose pairs are
+  the pages, a found pair turning into a link, with a plain row of the pages under it for anyone
+  who would rather not play. The fastest rounds go on a board (`lib/memory`), timed by the server
+  and shown once Anna approves the name in `/admin/memory`. Under it all, the signature: the
+  license line as a diff, "all rights ~~reserved~~ forked", with the link to fork the site.
 - **The screens nobody plans to see** (loading, 404, error, a removed page) are
   `components/site/frame/screen-state.tsx`: the cat doing something about it.
 - **A click draws a small burst** where it landed (`click-burst.tsx`), and plays a click.
@@ -253,7 +256,7 @@ app/
     back/ ai/                the terminal and the chat
     invite/[token]/          the form behind a wall of love invite
     roadmap/ piano/ components/   removed in v3: each answers only to say so
-  admin/                    log and wall CRUD, its own root layout, English only
+  admin/                    log, wall and memory board CRUD, its own root layout, English only
   components/entrepta/      entrepta 3.0 components, written by its CLI — don't edit here
   api/
     contact/route.ts        the postcard, via Resend
@@ -601,7 +604,7 @@ home ended up with eight cards that each invented their own header.
 | `BrowserWindow`, `Folder`                                     | A project: a window with an address, a folder that opens on hover                     |
 | `Dock`                                                        | A row of icons that grow toward the pointer: the apps, the ways to reach her          |
 | `Plate`, `Tape`, `STICKER`, polaroid                          | A brand mark's backing, a strip of tape, a sticker (die-cut or on white), a photo     |
-| `CatTrack`                                                    | A row of signs with the cat walking between them: the footer, the invite's steps      |
+| `CatTrack`                                                    | A row of signs with the cat walking between them: the invite's steps                  |
 | `ScreenLoading` / `NotFound` / `Error` / `Removed` / `Notice` | The screens nobody plans to see                                                       |
 | `st-dialog` (`components/site/dialog.css`)                    | A dialog as one of the site's cards, over entrepta's `Dialog`                         |
 | `Reveal`, `RollingNumber`                                     | entrepta's entrance, and its odometer                                                 |
