@@ -6,12 +6,14 @@ import {
   FireIcon,
   PawPrintIcon,
   ShuffleIcon,
+  TrophyIcon,
 } from "@phosphor-icons/react"
 import { useTranslations } from "next-intl"
 import dynamic from "next/dynamic"
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react"
 import { Cat, CatHappy } from "@/components/site/abimaela/abimaela"
 import { Burst } from "@/components/site/click-burst"
+import { Hint } from "@/components/site/hint"
 import type { PageId } from "@/components/site/pages"
 import { ScreenLink } from "@/components/site/screen-link"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
@@ -193,6 +195,23 @@ export function MemoryGame({ page }: { page: PageId }) {
 
   return (
     <div ref={root} className="st-ft-game">
+      {/* what this is, before anyone has to guess: a game, and a board for the fastest */}
+      <ul className="st-ft-hints">
+        <Hint as="li" icon={<CardsIcon aria-hidden size={13} />}>
+          <span>
+            {t.rich("introGame", {
+              b: (words) => <strong className="font-medium">{words}</strong>,
+            })}
+          </span>
+        </Hint>
+        <Hint as="li" icon={<TrophyIcon aria-hidden size={13} />}>
+          <span>
+            {t.rich("introBoard", {
+              b: (words) => <strong className="font-medium">{words}</strong>,
+            })}
+          </span>
+        </Hint>
+      </ul>
       <div className="st-ft-layout">
         <div className="st-ft-game">
           <div className="relative">

@@ -10,38 +10,42 @@
   }
 }
 
-/* where the page stops: a dashed rule with paw prints walking across it to the words */
+/* where the page stops: a dashed rule, and a strip of tape across it with the words on it */
 .st-ft-end {
   display: flex;
   align-items: center;
   gap: 12px;
   margin: 72px 0 32px;
-  color: var(--fg-muted);
+  padding-block: 8px;
 }
 .st-ft-rule {
   flex: 1;
   border-top: 1px dashed var(--border-strong);
 }
-.st-ft-paws {
-  display: flex;
-  gap: 10px;
-  color: var(--fg-brand);
-}
-/* a walk, not a row: every other print a little higher, and each one turned the way she goes */
-.st-ft-paw {
-  display: block;
-  rotate: 90deg;
-}
-.st-ft-paw:nth-child(even) {
-  translate: 0 -6px;
-}
-.st-ft-end-label {
+/* the site's tape (tape.css), long enough to write on */
+.st-ft-tape {
+  padding: 6px 22px;
+  background: color-mix(in srgb, var(--fg-brand) 26%, transparent);
+  color: var(--fg-primary);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
-}
-@container (max-width: 480px) {
-  .st-ft-paws {
-    display: none;
-  }
+  rotate: -2deg;
+  /* torn ends, like tape pulled off the roll */
+  clip-path: polygon(
+    0 8%,
+    3% 0,
+    97% 6%,
+    100% 0,
+    98% 30%,
+    100% 55%,
+    97% 78%,
+    100% 100%,
+    3% 94%,
+    0 100%,
+    2% 70%,
+    0 45%,
+    2% 22%
+  );
 }

@@ -108,11 +108,13 @@
   "footer": {
     "end": "fim da página",
     "label": "lugares que você pode ir a partir daqui",
-    "note": "par achado é página achada",
+    "note": "um jogo, com placar",
     "places": "Pra onde ir",
     "game": {
       "label": "Jogo da memória",
-      "hint": "Vira duas cartas. Par achado é página achada, e a Abimaela ajuda.",
+      "introGame": "<b>Jogo da memória</b>: vira duas cartas, e par achado é página achada.",
+      "introBoard": "Os <b>10 tempos mais rápidos</b> vão pro placar, com o nome de quem jogou.",
+      "hint": "Clica numa carta pra começar. O tempo começa a contar aí.",
       "found": "Achou {page}. A carta virou um link.",
       "foundCat": "Achou a Abimaela. Ela vai te dar uma espiada.",
       "peeking": "A Abimaela te mostrou tudo. Decora rápido!",
@@ -133,7 +135,8 @@
       "loading": "lendo o placar...",
       "down": "O placar mora no Postgres, e ele não respondeu. O jogo funciona do mesmo jeito.",
       "empty": "Ninguém no placar ainda. O primeiro nome pode ser o seu.",
-      "waiting": "aguardando"
+      "waiting": "aguardando",
+      "top": "top {count}"
     },
     "claim": {
       "first": "Recorde do placar!",

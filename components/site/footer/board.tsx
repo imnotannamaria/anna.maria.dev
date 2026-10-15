@@ -108,6 +108,7 @@ export function Board({ rows, mine }: { rows: BoardRow[] | null | undefined; min
       >
         <TrophyIcon aria-hidden size={14} className="text-[var(--fg-brand)]" />
         {t("title")}
+        <span className="text-[var(--fg-muted)]">· {t("top", { count: BOARD_SIZE })}</span>
       </h3>
       {rows === undefined ? (
         <BoardLoading label={t("loading")} />

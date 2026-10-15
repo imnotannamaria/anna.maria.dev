@@ -108,11 +108,13 @@
   "footer": {
     "end": "end of the page",
     "label": "places you can go from here",
-    "note": "a pair found is a page found",
+    "note": "a game, with a board",
     "places": "Where to go",
     "game": {
       "label": "Memory game",
-      "hint": "Turn two cards. A pair found is a page found, and Abimaela helps.",
+      "introGame": "<b>Memory game</b>: turn two cards, and a pair found is a page found.",
+      "introBoard": "The <b>10 fastest rounds</b> go on the board, with the name of who played.",
+      "hint": "Click a card to start. The clock starts with it.",
       "found": "Found {page}. The card is a link now.",
       "foundCat": "Found Abimaela. She'll give you a peek.",
       "peeking": "Abimaela showed you everything. Memorize it, quick!",
@@ -133,7 +135,8 @@
       "loading": "reading the board...",
       "down": "The board lives in Postgres, and Postgres didn't answer. The game works the same.",
       "empty": "Nobody on the board yet. The first name could be yours.",
-      "waiting": "waiting"
+      "waiting": "waiting",
+      "top": "top {count}"
     },
     "claim": {
       "first": "Board record!",
