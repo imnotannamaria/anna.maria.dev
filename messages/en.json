@@ -426,7 +426,7 @@
     "view": "View",
     "timeline": "timeline",
     "list": "list",
-    "legend": "solid is work, hatched is academic. click a bar to read it",
+    "legend": "solid is work, striped is academic. click a bar to read it",
     "yearsIn": "{years} years in",
     "present": "present",
     "stack": "Stack",
@@ -575,7 +575,7 @@
       "scope": {
         "label": "off topic",
         "title": "Nice try.",
-        "body": "I have one subject and it is Anna. No code, no homework, no recipes, no translations. Ask me about her and I am all yours."
+        "body": "I have one subject and it is Anna. No code, no homework, no recipes, no translations. Ask me about her."
       },
       "blocked": {
         "label": "not happening",

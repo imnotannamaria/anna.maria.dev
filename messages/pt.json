@@ -426,7 +426,7 @@
     "view": "Visualização",
     "timeline": "linha do tempo",
     "list": "lista",
-    "legend": "cheio é trabalho, hachurado é estudo. clica numa barra pra ler",
+    "legend": "cheio é trabalho, listrado é estudo. clica numa barra pra ler",
     "yearsIn": "{years} anos de estrada",
     "present": "hoje",
     "stack": "Stack",
@@ -575,7 +575,7 @@
       "scope": {
         "label": "fora do assunto",
         "title": "Boa tentativa.",
-        "body": "Eu tenho um assunto só, e é a Anna. Nada de código, lição de casa, receita ou tradução. Pergunta sobre ela que eu sou toda sua."
+        "body": "Eu tenho um assunto só, e é a Anna. Nada de código, lição de casa, receita ou tradução. Pergunta sobre ela."
       },
       "blocked": {
         "label": "não vai rolar",

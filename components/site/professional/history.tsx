@@ -16,7 +16,7 @@ type Mode = "timeline" | "list"
 
 /**
  * Work and study on one axis of years: a bar per period, a line for now, and a line that follows
- * the pointer and names the month under it. Solid is work, hatched is study. Clicking a bar opens
+ * the pointer and names the month under it. Solid is work, striped is study. Clicking a bar opens
  * what happened then; the switch turns the bars into a full-width list.
  *
  * Motion: the entrance belongs to the chart area, which has a real size, and the bars answer
