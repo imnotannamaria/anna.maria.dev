@@ -1,5 +1,6 @@
 "use client"
 
+import { RequiredMark } from "@/components/site/required-mark"
 import { contactSchema } from "@/lib/contact-schema"
 import { LinkedinLogoIcon, PaperPlaneTiltIcon } from "@phosphor-icons/react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
@@ -252,6 +253,7 @@ export function Postcard({ channels }: { channels: Channels }) {
                   className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase"
                 >
                   {t("greetings")}
+                  <RequiredMark />
                 </label>
                 <textarea
                   id="postal-message"
@@ -333,6 +335,7 @@ export function Postcard({ channels }: { channels: Channels }) {
                 <div className="st-ct-sender">
                   <span className="text-mono-xs font-mono tracking-widest text-[var(--fg-muted)] uppercase">
                     {t("from")}
+                    <RequiredMark />
                   </span>
                   <input
                     name="name"

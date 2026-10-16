@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { useRef, useState, type FormEvent } from "react"
 import { Button } from "@/app/components/entrepta/button"
 import { Input } from "@/app/components/entrepta/input"
+import { RequiredMark } from "@/components/site/required-mark"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
 import { NAME_MAX, formatMs } from "@/lib/memory/constants"
 import { boardName } from "@/lib/memory/validation"
@@ -125,7 +126,12 @@ export default function ClaimForm({
         role={problem ? "alert" : undefined}
         style={{ color: problem ? "var(--status-error-fg)" : "var(--fg-muted)" }}
       >
-        {problem ?? t("help", { max: NAME_MAX })}
+        {problem ?? (
+          <>
+            <RequiredMark />
+            {t("help", { max: NAME_MAX })}
+          </>
+        )}
       </p>
     </form>
   )

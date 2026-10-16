@@ -51,3 +51,16 @@
   border-radius: 0 0 var(--radius-md) var(--radius-md);
   margin-top: 0;
 }
+
+/* A required field's star is red, entrepta's error red. entrepta's Field draws it in the brand
+   colour (a hidden span with the brand class and no inline style: the label's icon has one), and
+   the site wants it red: it is what a required field is marked with everywhere. It belongs in
+   the Field as an option, so it goes upstream with the other overrides. `.st-required` is the
+   same star for the fields the site draws itself (the postcard, the board's name). */
+label > span[aria-hidden="true"].text-\[var\(--fg-brand\)\]:not([style]),
+.st-required {
+  color: var(--status-error-fg);
+}
+.st-required {
+  margin-inline-start: 0.25em;
+}
