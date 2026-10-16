@@ -7,81 +7,89 @@ featured: true
 published: true
 ---
 
-Ora ora ora, se você está lendo isso, eu já terminei a refatoração, e espero que você esteja pensando "uau." agora.
+Se você está lendo isso, essa é a TERCEIRA versão de UI desse portfólio. Eu tenho me divertido bastante gastando meus tokens nesse site, e venho fazendo melhorias nele há um tempo. Nessa nota você vai acompanhar o processo de construir cada versão (com fotos pra comparação).
 
-## Como eu cheguei aqui
+## V1
 
-Eu terminei meu portfólio. Quando olhei pra ele, notei uma coisa. Ele parecia genérico. O tipo de site que parece ter sido "feito com IA em 30 minutos".
+### Como era
 
-Ele tinha coisas divertidas, como o piano, mas a UI não era eu. Eu queria algo mais único. Algo que tivesse saído de mim de verdade.
+![Home da V1](/blog/ui-refactor/before-1.png)
 
-Então comecei a refatorar. Dividi o trabalho em 3 partes.
+_V1: home_
 
-## 1. Um design system
+![Página de projetos da V1](/blog/ui-refactor/before-2.png)
 
-A primeira parte é uma coisa que estava na minha cabeça fazia muito tempo: o entrepta.
+_V1: página de projetos_
 
-O entrepta é um design system dark first. Você copia os componentes pro seu projeto e o código é seu. Sem SDK, sem caixa preta. Ele vem com 14 componentes, 6 temas prontos e uma CLI pra configurar tudo com um comando.
+![Página de contato da V1](/blog/ui-refactor/before-3.png)
 
-Se quiser dar uma olhada: https://entrepta.vercel.app
+_V1: página de contato_
 
-## 2. Wrist kit
+![Página do piano da V1](/blog/ui-refactor/before-4.png)
 
-Procurando inspiração pro meu portfólio novo, encontrei um site pessoal que me fez parar e pensar "uau". É essa reação que eu quero que as pessoas tenham quando chegam no meu.
+_V1: página do piano_
+
+### Por que eu quis mudar
+
+Eu achava muito simples. Depois que fui vendo referências de portfólio, faltava muito de mim no meu. E essa primeira versão realmente foi construída em meia hora com IA (rs).
+
+## V2
+
+### Como era
+
+Aqui eu comecei a colocar mais de mim no projeto.
+
+O entrepta é um design system dark first. Você copia os componentes pro seu projeto e o código é seu. Sem SDK, sem caixa preta, e uma CLI pra configurar tudo com um comando. Se quiser dar uma olhada: https://entrepta.vercel.app
+
+O wristkit começou enquanto eu procurava inspiração pro meu portfólio novo. Encontrei um site pessoal que me fez parar e pensar "uau". É essa reação que eu quero que as pessoas tenham quando chegam no meu.
 
 Duas coisas em especial chamaram minha atenção.
 
 1. O bento grid. Eu nunca tinha visto esse layout. É uma grade de cards de tamanhos diferentes que se encaixam como caixinhas. Acabei usando algo parecido na minha própria home.
 2. O anel do Apple Fitness. Aquele anelzinho do Apple Watch com os dados da sua atividade.
 
-Procurei uma solução pronta que entregasse esse anel da Apple preenchido com os dados do Apple Watch, e não achei. Então eu construí. Foi assim que o wristkit nasceu.
+Procurei uma solução pronta que entregasse esse anel da Apple preenchido com os dados do Apple Watch, e não achei. Então eu construí. Foi assim que o wristkit nasceu. Eu uso os Atalhos da Apple pra mandar meus dados pra um endpoint, e todo dia o endpoint atualiza um componente de anel que mora no meu site. Se quiser usar no seu site: https://wristkit-web.vercel.app/
 
-A ideia é simples. Eu uso os Atalhos da Apple pra mandar meus dados pra um endpoint. Todo dia o endpoint atualiza um componente de anel que mora no meu site.
+Pra UI, usei o Claude pra transformar minhas ideias em algo visual antes de escrever uma linha de código. O plano: um bento grid na home, um chrome com metáfora de editor (titlebar, sidebar, status bar) em volta de toda página, e o mesmo conteúdo em todo lugar, só de roupa nova. Blog, projetos, sobre, contato e piano receberam o mesmo tratamento.
 
-Tanto o design system quanto o wristkit já estão no ar. Dá pra ver o wristkit funcionando na minha home, embaixo de `$ cat ./off-the-clock`, ao lado do widget do Spotify e do mini piano.
+![Home da V2](/blog/ui-refactor/v2-home.png)
 
-Se quiser usar no seu site: https://wristkit-web.vercel.app/
+_V2: home_
 
-## 3. Prototipação e UI
+![Home da V2, trabalhos em destaque](/blog/ui-refactor/v2-home-work.png)
 
-Nessa parte eu usei o Claude pra transformar minhas ideias em algo visual antes de escrever uma linha de código. O plano: um bento grid na home, um chrome com metáfora de editor (titlebar, sidebar, status bar) em volta de toda página, e o mesmo conteúdo em todo lugar, só de roupa nova. Blog, projetos, sobre, contato e piano receberam o mesmo tratamento.
+_V2: home, trabalhos em destaque_
 
-## Antes e depois
+![Página de projetos da V2](/blog/ui-refactor/v2-projects.png)
 
-Aqui está a comparação de verdade. Esses quatro prints são do site antigo, logo antes da refatoração. O "depois" é o que você está vendo agora, já que você já está no novo.
+_V2: página de projetos_
 
-![Home antiga](/blog/ui-refactor/before-1.png)
+![Página de contato da V2](/blog/ui-refactor/v2-contact.png)
 
-_Antes: home_
+_V2: página de contato_
 
-![Página de projetos antiga](/blog/ui-refactor/before-2.png)
+### Por que eu quis mudar
 
-_Antes: página de projetos_
+Eu sentia que tinha coisa demais, páginas demais, e a home era muito bagunçada. Olhando o analytics, as pessoas não olhavam as outras páginas, porque a home tinha tanta coisa.
 
-![Página de contato antiga](/blog/ui-refactor/before-3.png)
+Aqui eu aprendi mais sobre animações, e construí o entrepta em cima dessa versão, mas depois enjoei. Quis algo mais clean, com menos coisas.
 
-_Antes: página de contato_
+## V3
 
-![Página do piano antiga](/blog/ui-refactor/before-4.png)
+### Como é
 
-_Antes: página do piano_
+Essa é a versão atual. Separei melhor as páginas, usei mais bento grid, principalmente na página /person, que é a minha favorita, falei com um artista pra criar artes minhas, e trabalhei a marca.
 
-## Notas do Lighthouse
+Aqui eu levei muito mais tempo pra construir. Fui fazendo um discovery de cada componente, do footer, de cada página, trabalhando cada componente individualmente: eu falava o que queria, pedia pro Claude gerar 3 versões de UI e ia moldando.
 
-Também rodei o PageSpeed Insights antes e depois, só pra ter certeza de que a UI nova não derrubou a performance.
+O tom do entrepta mudou bastante aqui. Eu parei de pensar nele como um design system pessoal, e passei a pensar nele como o design system que eu quero usar em todos os meus projetos, independente do tema. Enquanto você está lendo isso, estou trabalhando na v4 do entrepta, que possivelmente vai tirar um pouco dessa vibe de "posar de editor", e ficar mais simples e mais customizável. Devo escrever um artigo sobre isso também.
 
-![Relatório do Lighthouse antes da refatoração](/blog/ui-refactor/lighthouse/before.png)
+Essa versão também traz essa visualização de quem eu sou como profissional: o site dividido entre front, back (um terminal) e IA.
 
-_Antes: 100 de performance, 85 de acessibilidade, 100 de boas práticas, 100 de SEO_
+Aprendi mais sobre AI engineering na prática, e pesquisei sobre segurança e prompt limiting.
 
-![Relatório do Lighthouse depois da refatoração](/blog/ui-refactor/lighthouse/after.png)
+Sempre amei joguinhos em portfólios, por isso adicionei um jogo da memória com placar de recorde no footer.
 
-_Depois: 100 de performance, 100 de acessibilidade, 100 de boas práticas, 100 de SEO_
+E a Abimaela, minha gata, uma mascote tipo tamagotchi que eu quero evoluir no futuro (dá pra ver mais no doc [docs/abimaela.md](https://github.com/imnotannamaria/anna.maria.dev/blob/main/docs/abimaela.md) no GitHub). Ela tem várias animações que eu fiz usando sprites, e reage a cliques e a mudanças de página.
 
-A acessibilidade foi de 85 pra 100. Todo o resto já estava em 100 e continuou lá.
-
-## O que vem agora
-
-A página de log ainda está no meu roadmap. Algo tipo um Letterboxd, mas pra tudo: filmes, séries, álbuns, lugares que eu fui.
-
-Além disso, quero colocar mais coisas pessoais no site. Não só o meu lado dev, mas quem eu sou de verdade fora do código também.
+E claro, tudo isso com boas notas no Lighthouse. Cuidei dos detalhes, principalmente de performance e acessibilidade.

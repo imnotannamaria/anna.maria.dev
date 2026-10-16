@@ -1,28 +1,45 @@
 ---
 title: "annamaria.app"
-description: "Meu site pessoal, com projetos, um blog e uma página de contato."
+description: "Meu portfólio, e o playground por trás dele: páginas, um terminal, um chat e uma gata."
 date: "2026-05-04"
-tags: ["nextjs", "react", "typescript", "tailwindcss", "mdx", "resend"]
+tags: ["nextjs", "react", "typescript", "tailwindcss", "mdx", "resend", "postgres", "hono"]
 published: true
 ---
 
 ## Visão geral
 
-Esse é o meu site pessoal. Eu uso ele pra publicar projetos e posts do blog.
+Esse é o site que você está vendo. É o meu portfólio, e a terceira versão dele. Eu penso nele mais como um playground do que como um currículo.
 
-Ele também tem uma página de contato com envio de email, e páginas estáticas como About e Uses.
+Ele tem três lados, e você troca entre eles no header. O Front são as páginas. O Back é um terminal em cima do mesmo conteúdo, onde você anda com `ls`, `cd` e `cat`. A IA é um chat que responde sobre mim e sobre o site.
 
-## Seções principais
+Tudo existe em inglês e em português, em `/pt`.
 
-- Home com uma apresentação curta e links rápidos
-- Projetos com estudos de caso em MDX
-- Blog com posts em MDX
-- Contato com um formulário que envia email
+## O que tem nele
+
+- Uma home que é uma porta pra cada página
+- `/person`, com fotos, uma playlist, os anéis do meu Apple Watch, o tempo em Pernambuco, stickers e uma estante do que eu terminei
+- `/professional`, com a minha carreira, a minha stack, os apps em que eu trabalho e as minhas contribuições no GitHub
+- Notas e projetos, em MDX, cada um com o par em português
+- Um mural de carinho, com cartas de pessoas com quem eu trabalhei, por convite
+- Uma página de contato que é um postal, e manda um email
+- Um jogo da memória no footer, em que os pares são as páginas, e um placar das rodadas mais rápidas
+- A Abimaela, minha gata, no canto, reagindo ao que você faz
+
+## Decisões
+
+- **O entrepta é copiado pra dentro, não instalado.** O site não depende dele em runtime. Uma mudança no entrepta só chega aqui quando eu trago ela de propósito.
+- **O chat tem um modelo por trás, e o modelo é a última barreira, não a única.** A pergunta passa por uma checagem antes de chegar nele, e a resposta também, por isso ela não é transmitida aos poucos. Os limites moram no Postgres. Sem a chave, o chat responde com um roteiro. O teto que vale mesmo se o meu código estiver errado é o limite de crédito da própria chave.
+- **As páginas que leem o Postgres não têm cache, de propósito.** Uma entrada que eu publiquei faz dez minutos tem que estar lá, e um anel não pode ficar congelado nos números de hoje de manhã. Custa duas queries com índice.
+- **O `/admin` fica atrás do WorkOS AuthKit e de uma lista de emails.** Quem não está nela recebe 404, nunca 403, porque um 403 confirma que a página existe.
+- **No placar do jogo da memória, quem guarda o tempo é o servidor, não o navegador.** Um nome só aparece depois que eu aprovo.
 
 ## Stack
 
-- Next.js (App Router)
-- TypeScript
-- Tailwind CSS
-- MDX com Velite
-- Resend pra enviar email
+- Next.js (App Router), TypeScript e Tailwind
+- entrepta, o meu design system
+- MDX com Velite, em dois idiomas com next-intl
+- Postgres no Supabase, com Drizzle
+- Hono pra API
+- WorkOS AuthKit pro admin
+- Resend pra email
+- OpenRouter pro chat
