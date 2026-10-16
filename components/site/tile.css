@@ -1,0 +1,20 @@
+/* The card of the new pages: dashed and unfilled (D-031). Plain CSS over entrepta's Card, so it
+   is unlayered on purpose and wins over the Card's own classes, hover included. It belongs
+   upstream, as a `variant` of the Card, once this migrates. */
+
+.st .st-card {
+  border-style: dashed;
+  border-color: var(--border-strong);
+  background: none;
+  box-shadow: none;
+}
+.st .st-card:hover,
+.st .st-card:focus-within {
+  border-color: var(--border-brand-strong);
+}
+.st-bare {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}

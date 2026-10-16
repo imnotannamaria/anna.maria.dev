@@ -1,0 +1,848 @@
+{
+  "frame": {
+    "skip": "skip to content",
+    "site": "Site",
+    "more": "More",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "role": "software engineer"
+  },
+  "pages": {
+    "home": {
+      "label": "Home",
+      "short": "Home",
+      "tagline": "Where it all starts."
+    },
+    "person": {
+      "label": "Anna as a person",
+      "short": "Person",
+      "tagline": "Who I am when I'm not working."
+    },
+    "professional": {
+      "label": "Anna as a professional",
+      "short": "Work",
+      "tagline": "Where I work, where I've worked, and what I work with."
+    },
+    "notes": {
+      "label": "Notes",
+      "short": "Notes",
+      "tagline": "Some words of wisdom (or not)."
+    },
+    "projects": {
+      "label": "Projects",
+      "short": "Projects",
+      "tagline": "Things I built / am building."
+    },
+    "wall-of-love": {
+      "label": "Wall of love",
+      "short": "Wall of love",
+      "tagline": "Kind words from some people who worked/work with me."
+    },
+    "contact": {
+      "label": "Contact",
+      "short": "Contact",
+      "tagline": "How to reach me."
+    }
+  },
+  "island": {
+    "sides": "Side of the site",
+    "bug": "Report a bug",
+    "mute": "Mute",
+    "soundOn": "Sound on",
+    "muteLabel": "Mute the site",
+    "light": "Light mode",
+    "dark": "Dark mode",
+    "language": "Language: {current}. Switch to {next}"
+  },
+  "state": {
+    "home": "take me home",
+    "loading": "she is fetching it",
+    "notFoundTitle": "She pushed this page off the table.",
+    "notFoundBody": "Nothing lives at this address. It may have moved, or it never existed.",
+    "errorTitle": "Something broke.",
+    "errorBody": "It was not you. It might have been her.",
+    "retry": "try again",
+    "removedTitle": "{name} was retired in v3.",
+    "removedBody": "She sleeps where it used to be. Everything that stayed is one click away."
+  },
+  "bug": {
+    "label": "bug report",
+    "title": "Found a bug?",
+    "lede": "Abimaela hunts them. This form is here to listen, mostly about bugs: if something broke, looked wrong or did nothing when you clicked it, tell me.",
+    "elsewhere": "An idea, a feature, or just a chat?",
+    "elsewhereLink": "The <link>contact page</link> is the place for that.",
+    "name": "name",
+    "namePlaceholder": "who found it",
+    "email": "email",
+    "emailHint": "optional",
+    "emailPlaceholder": "if you want an answer",
+    "what": "what happened",
+    "whatPlaceholder": "what you did, what you expected, what you got",
+    "attach": "attach a screenshot (optional)",
+    "removeAttachment": "Remove the screenshot",
+    "tooBig": "that image is over 4 MB",
+    "send": "send the report",
+    "sentTitle": "Got it. Thank you.",
+    "sentBody": "The report is in my inbox, and Abimaela is already looking for it.",
+    "back": "back to the site",
+    "tooMany": "That is a lot of reports at once. Try again in a few minutes.",
+    "failed": "It did not go: my side failed. What you wrote is still here.",
+    "offline": "It did not go: no connection. What you wrote is still here.",
+    "errors": {
+      "name": "your name, please",
+      "email": "that does not look like an email",
+      "description": "tell me a little more (10+ characters)",
+      "attachment": "a png, jpg or webp, please"
+    }
+  },
+  "home": {
+    "label": "home",
+    "lede": "I build things <b>end to end</b>: <flow>UI → front (web / mobile) → back → AI → deploy</flow>, and I've been at it for about <b>{now} − {since} years</b>.",
+    "hintCards": "just click a card if you want to know more",
+    "hintSides": "You can switch up top: <b>Front</b> is where you are now, <b>Back</b> is a terminal version of what's on this site, and <b>IA</b> is a chat :)",
+    "goTo": "Go to {page}",
+    "wallExcerpt": "what people I have worked with wrote about working with me",
+    "notesFallback": "notes",
+    "projectsFallback": "projects"
+  },
+  "footer": {
+    "end": "end of the page",
+    "label": "places you can go from here",
+    "note": "a game, with a board",
+    "places": "Where to go",
+    "game": {
+      "label": "Memory game",
+      "introGame": "<b>Memory game</b>: turn two cards, and a pair found is a page found.",
+      "introBoard": "The <b>10 fastest rounds</b> go on the board, with the name of who played.",
+      "hint": "Click a card to start. The clock starts with it.",
+      "found": "Found {page}. The card is a link now.",
+      "foundCat": "Found Abimaela. She'll give you a peek.",
+      "peeking": "Abimaela showed you everything. Memorize it, quick!",
+      "done": "All {pairs} pairs in {time}, with {moves} moves. Every card takes you to its page now.",
+      "official": "Official time: {time}.",
+      "officialIn": "Official time: {time}, and you made the board!",
+      "officialRank": "Official time: {time}, that would be #{rank}.",
+      "shuffle": "Shuffle",
+      "goTo": "Go to {page}",
+      "card": "Card {n}, face down",
+      "cat": "Abimaela",
+      "time": "time",
+      "moves": "moves",
+      "streak": "pairs in a row"
+    },
+    "board": {
+      "title": "board",
+      "loading": "reading the board...",
+      "down": "The board lives in Postgres, and Postgres didn't answer. The game works the same.",
+      "empty": "Nobody on the board yet. The first name could be yours.",
+      "waiting": "waiting",
+      "top": "top {count}"
+    },
+    "claim": {
+      "first": "Board record!",
+      "place": "#{rank}!",
+      "ask": "{time}. Want your name up there?",
+      "label": "Your name on the board",
+      "placeholder": "your name",
+      "send": "send",
+      "help": "Just the name, up to {max} characters. It shows once Anna approves it.",
+      "sent": "Sent! Your name shows on the board once Anna approves it. On this browser it's already there, marked.",
+      "errors": {
+        "empty": "Write a name.",
+        "long": "Up to {max} characters.",
+        "chars": "Only letters, numbers, spaces and . ' _ -",
+        "link": "No links, just the name.",
+        "expired": "This round can't take a name anymore: half an hour went by, or the board changed.",
+        "tooMany": "Too many tries from here. Give it a few minutes.",
+        "down": "The board didn't answer. Try again in a bit.",
+        "offline": "No connection. Nothing was sent, try again."
+      }
+    },
+    "signoff": {
+      "all": "all rights",
+      "out": "reserved",
+      "in": "forkable",
+      "fork": "fork your own",
+      "changes": "one line changed in the license"
+    }
+  },
+  "wall": {
+    "label": "wall of love",
+    "lede": "<b>Kind words</b> about what it was like to work with me.",
+    "down": "The letters live in Postgres, and Postgres did not answer just now.",
+    "emptyTitle": "Nothing on the wall yet.",
+    "emptyBody": "The first invitations are out. She is keeping the spot warm until the letters come in.",
+    "channel": "wall-of-love",
+    "count": "{count, plural, one {# letter} other {# letters}} · kind words, by invitation",
+    "preview": "how it will look on the wall",
+    "locked": "only people with an invitation can write here",
+    "onLinkedin": "{name} on LinkedIn",
+    "reactionsTo": "Reactions to {name}'s letter",
+    "reactionCount": "{reaction}, {count, plural, one {# reaction} other {# reactions}}",
+    "reactions": {
+      "heart": "heart hands",
+      "clap": "clapping hands",
+      "party": "party popper"
+    }
+  },
+  "contact": {
+    "label": "contact",
+    "lede": "Let's <b>talk</b>.",
+    "orHere": "or find me here",
+    "channels": "Channels",
+    "copy": "Copy {name}: {value}",
+    "copied": "copied",
+    "postCard": "post card",
+    "greetings": "greetings from wherever you are",
+    "messagePlaceholder": "write your message here, a short one is fine",
+    "to": "to",
+    "from": "from",
+    "country": "Brazil",
+    "stampCountry": "brasil",
+    "yourName": "Your name",
+    "namePlaceholder": "your name",
+    "yourEmail": "Your email",
+    "emailPlaceholder": "your email, so I can answer",
+    "post": "post it",
+    "tryAgain": "try again",
+    "returned": "return to sender",
+    "sentTitle": "Posted.",
+    "sentBody": "It is on its way to my inbox. I answer every one.",
+    "another": "write another one",
+    "check": "check the card and try again",
+    "notRight": "something on the card is not right",
+    "tooMany": "it came back: that is a lot of cards at once. try again in a few minutes.",
+    "failed": "it came back: my side failed. your message is still here.",
+    "offline": "it came back: no connection. your message is still here.",
+    "errors": {
+      "name": "your name, please",
+      "email": "hmm, that does not look like a valid email",
+      "message": "tell me a little more (10+ characters)"
+    }
+  },
+  "date": {
+    "short": "{month} {day}, {year}",
+    "monthYear": "{month} {year}",
+    "months": {
+      "1": "jan",
+      "2": "feb",
+      "3": "mar",
+      "4": "apr",
+      "5": "may",
+      "6": "jun",
+      "7": "jul",
+      "8": "aug",
+      "9": "sep",
+      "10": "oct",
+      "11": "nov",
+      "12": "dec"
+    }
+  },
+  "notes": {
+    "label": "notes",
+    "lede": "Some words of wisdom (or not) about development, architecture and the tools I reach for. <b>Long-form thinking</b>, build logs and, once in a while, an <b>opinion</b>.",
+    "featured": "featured",
+    "readLabel": "{title}: read the note",
+    "minutes": "{minutes} min",
+    "words": "{words} words",
+    "tags": "Tags",
+    "readNote": "read the note",
+    "howItStarts": "how it starts",
+    "read": "read",
+    "aNote": "a note",
+    "inThisNote": "in this note"
+  },
+  "projects": {
+    "label": "projects",
+    "lede": "Open-source tools, libraries and side projects. The things I built because I <b>wanted them to exist</b>.",
+    "groups": {
+      "library": "Open source",
+      "demo": "Demos"
+    },
+    "kind": {
+      "library": "library",
+      "demo": "demo"
+    },
+    "pinned": "pinned: <b>{title}</b>. click it again to let go",
+    "hint": "hover to peek, click a folder to pin it",
+    "below": "the preview of what you pin is further down",
+    "folderLabel": "{title}, {kind}, {year}{featured, select, yes {, featured} other {}}. {pinned, select, yes {Pinned. Click to let go.} other {Click to pin.}}",
+    "pin": "Pin {title}",
+    "unpin": "Unpin {title}",
+    "openLabel": "{title}: open the case study",
+    "open": "open the case study",
+    "tags": "Tags",
+    "featured": "featured",
+    "aProject": "a project",
+    "builtWith": "built with",
+    "links": "links",
+    "stack": "Stack",
+    "onGithub": "{title} on GitHub",
+    "live": "{title}, live"
+  },
+  "log": {
+    "label": "log",
+    "parent": "anna as a person",
+    "lede": "A single feed for <b>everything</b> I finish: films, series, books, albums, podcasts and games.",
+    "down": "The log lives in Postgres, and Postgres did not answer just now.",
+    "empty": "Nothing logged yet.",
+    "favourite": "favourite",
+    "open": "{title}: open",
+    "openLink": "open on {site}",
+    "type": {
+      "film": "film",
+      "series": "series",
+      "book": "book",
+      "music": "album",
+      "podcast": "podcast",
+      "game": "game"
+    },
+    "types": {
+      "film": "films",
+      "series": "series",
+      "book": "books",
+      "music": "music",
+      "podcast": "podcasts",
+      "game": "games"
+    },
+    "stars": "{rating} out of 5"
+  },
+  "person": {
+    "label": "anna as a person",
+    "avatarAlt": "Anna Maria",
+    "wristkit": "View wristkit",
+    "bio": "Well, I'm not much for talking about myself, so I built this playground. Just looking at the page tells you a lot about me :)",
+    "roll": "Camera roll. {alt}. Photo {n} of {total}; click for the next one.",
+    "photos": {
+      "selfie": "A selfie, in an Olivia Rodrigo t-shirt",
+      "abimaela": "Abimaela, the cat, being petted",
+      "palms": "Two people smiling under palm trees",
+      "lunch": "A very full plate at lunch",
+      "glasses": "A selfie with blue-light glasses",
+      "burger": "A burger on a checkered paper",
+      "snout": "Abimaela's nose, far too close to the camera"
+    },
+    "beachAlt": "The beach at dusk: calm sea, a small boat, and sand",
+    "sky": {
+      "clear": "clear",
+      "mostlyClear": "mostly clear",
+      "partlyCloudy": "partly cloudy",
+      "overcast": "overcast",
+      "foggy": "foggy",
+      "drizzling": "drizzling",
+      "raining": "raining",
+      "onAndOff": "raining on and off",
+      "stormy": "stormy"
+    },
+    "stickers": {
+      "label": "stickers",
+      "note": "drag them",
+      "aria": "Sticker: {caption}. Drag it, or use the arrow keys.",
+      "pe": "Pernambuco, my \"country\"",
+      "galadriel": "Galadriel",
+      "dany": "Daenerys Targaryen, Queen of the Seven Kingdoms",
+      "bosco": "Bosco, from Drag Race",
+      "cherry": "Cheryl Blossom"
+    },
+    "shelf": {
+      "label": "log",
+      "kind": "Kind",
+      "finished": "{count} finished",
+      "offline": "offline",
+      "theLog": "the log",
+      "by": "{title}, {creator}"
+    },
+    "playlist": {
+      "label": "me, as a playlist",
+      "error": "spotify did not answer.",
+      "empty": "nothing on the turntable.",
+      "loading": "putting a record on…",
+      "retry": "try again",
+      "play": "Play",
+      "pause": "Pause",
+      "previous": "Previous song",
+      "next": "Next song",
+      "album": "From the album {album}",
+      "albumYear": "From the album {album}, {year}",
+      "progress": "Progress: {song} by {artist}"
+    },
+    "favorites": {
+      "label": "emojis & gifs I use (maybe too much)",
+      "reactions": "{name}, {count, plural, one {# reaction} other {# reactions}}",
+      "gif": "{name}, a gif. It plays while you hover or focus it.",
+      "emoji": {
+        "salute": "saluting face",
+        "zany": "zany face",
+        "peek": "face with peeking eye",
+        "oops": "face with hand over mouth",
+        "brow": "face with raised eyebrow",
+        "eyes": "eye, mouth, eye"
+      },
+      "gifs": {
+        "nazare": "confused math lady",
+        "fine": "this is fine"
+      }
+    },
+    "things": {
+      "label": "everyday things",
+      "aria": "{name}: {tagline}",
+      "airpods": "practically my companions",
+      "cup": "coffee, usually",
+      "mac": "where most of this gets made",
+      "guitar": "badly, but happily",
+      "cupName": "Thermal cup",
+      "guitarName": "Guitar"
+    },
+    "activity": {
+      "title": "Today / Activity",
+      "aria": "Today's activity",
+      "rings": "Activity rings",
+      "synced": "synced",
+      "loading": "loading",
+      "empty": "empty",
+      "error": "error",
+      "stale": "stale",
+      "ok": "Up to date",
+      "syncing": "Syncing your activity…",
+      "noData": "No data yet. Run the Shortcut on your iPhone.",
+      "failed": "Something went wrong. We couldn't load today's activity.",
+      "lastSync": "Last sync {hours}h ago. Run the Shortcut to update.",
+      "move": "Move",
+      "exercise": "Exercise",
+      "steps": "Steps",
+      "kcal": "kcal",
+      "min": "min",
+      "stepsUnit": "steps",
+      "syncedAt": "Synced {when}",
+      "install": "Install Shortcut to connect.",
+      "later": "Please try again later."
+    }
+  },
+  "professional": {
+    "label": "anna as a professional",
+    "lede": "I build things <b>end to end</b>: <flow>UI → front (web / mobile) → back → AI → deploy</flow>, and I've been at it for about <b>{now} − {since} years</b>, across startups and bigger enterprise teams.",
+    "now": "now",
+    "history": "work and academic history",
+    "view": "View",
+    "timeline": "timeline",
+    "list": "list",
+    "legend": "solid is work, striped is academic. click a bar to read it",
+    "yearsIn": "{years} years in",
+    "present": "present",
+    "stack": "Stack",
+    "entryLabel": "{org}, {role}",
+    "stackLabel": "stack",
+    "tools": "{count} tools",
+    "writtenIn": "languages I've used professionally",
+    "groups": {
+      "languages": "languages",
+      "frontend": "frontend",
+      "backend": "backend",
+      "databases": "databases",
+      "ai": "ai / llm",
+      "devops": "devops · cloud",
+      "testing": "testing · quality",
+      "email": "email · design"
+    },
+    "appsLabel": "apps",
+    "inDock": "{count} in the dock",
+    "apps": "Apps",
+    "app": {
+      "Warp": "terminal",
+      "Claude": "AI",
+      "Codex": "AI",
+      "Cursor": "code editor",
+      "Notion": "notes and docs",
+      "Google Chrome": "browser",
+      "Google Calendar": "calendar",
+      "Spotify": "music",
+      "Slack": "team chat",
+      "Figma": "design"
+    },
+    "contributions": "contributions",
+    "activity": "public activity · last 12 months",
+    "github": "github"
+  },
+  "career": {
+    "cesar": {
+      "role": "full-stack engineer",
+      "text": "CESAR is one of Brazil's top innovation centers, and it's where I spent most of my time on ESG Carbon, a platform ranked top 5 in ESGTech in Brazil that serves 140+ companies. I architected and shipped it from zero with React, Next.js, TypeScript, Python and Django, turning a maze of GHG Protocol rules into a self-serve tool that cut manual reporting from 3 hours down to 5 minutes. These days I'm on a personal-finance fintech app, working end to end across a React Native app and a FastAPI backend on the Open Finance consent flow.",
+      "stats": {
+        "0": "companies on ESG Carbon",
+        "1": "manual reporting",
+        "2": "ESGTech in Brazil"
+      }
+    },
+    "avanade": {
+      "role": "full-stack engineer",
+      "text": "Avanade is a Microsoft and Accenture joint venture, and over three years there I went from intern to mid level building chatbot and AI products for large enterprise clients. I co-led the delivery of a production WhatsApp chatbot that drove 97k+ re-engagements in three months, cut response time by 44%, and lifted NPS by 5 points. I also built secure RAG assistants with LangChain, Azure OpenAI and embeddings.",
+      "stats": {
+        "0": "re-engagements in three months",
+        "1": "response time",
+        "2": "NPS points"
+      }
+    },
+    "fiap": {
+      "role": "postgrad in ai engineering",
+      "text": "A postgrad certificate in AI Engineering that covers pretty much the whole modern AI stack, from machine learning fundamentals and computer vision to LLMs, generative AI, prompt engineering, fine-tuning, RAG and LangChain. I should wrap it up around march 2027.",
+      "stats": {}
+    },
+    "descomplica": {
+      "role": "bs in information systems",
+      "text": "My bachelor's in Information Systems, finished in december 2025. It covered a bit of everything, from data structures, databases and cloud computing to software design, AI algorithms and data science, which gave me the base to work across the whole product lifecycle.",
+      "stats": {}
+    }
+  },
+  "chat": {
+    "assistant": "abimaela.ia",
+    "you": "you",
+    "title": "Ask me about <em>Anna.</em>",
+    "hintLive": "Abimaela answers, only about Anna and this site, a few questions a day",
+    "hintScript": "Abimaela answers from the site's own content",
+    "placeholder": "Ask who she is, where she worked, her stack, projects, notes or contact",
+    "stopped": "Stopped.",
+    "open": "open {page}",
+    "questions": {
+      "who": "Who is Anna?",
+      "work": "Where has she worked?",
+      "stack": "What is her stack?",
+      "built": "What has she built?",
+      "write": "What does she write about?",
+      "reach": "How do I reach her?"
+    },
+    "inner": {
+      "log": "Log",
+      "post": "A note, open",
+      "project": "A project, open",
+      "admin": "Admin"
+    },
+    "answers": {
+      "wall": "The wall of love holds letters from people she has worked with. Each one came from a link she sent, and she read it before it went up.",
+      "wallCard": "wall of love",
+      "wallHow": "how they get in",
+      "wallHowValue": "by invitation",
+      "wallWhere": "where",
+      "wallWhereValue": "on the page",
+      "logLoading": "The log is still loading. Ask me again in a second.",
+      "logDown": "The log lives in Postgres, and Postgres did not answer just now.",
+      "log": "{count, plural, one {# thing} other {# things}} finished and logged so far. These are the latest.",
+      "logCard": "log",
+      "notes": "{count, plural, one {# note} other {# notes}} so far. The featured one comes first.",
+      "notesCard": "notes",
+      "featured": "featured",
+      "projects": "{count} projects are published here: {libraries} open source, {demos} demos.",
+      "projectsCard": "projects",
+      "openSource": "open source",
+      "stack": "Full-stack. Here it is by group, and under it the apps where the work happens.",
+      "stackCard": "stack",
+      "apps": "apps",
+      "career": "{years} years shipping, since March 2021. Work and study, on the same timeline.",
+      "careerCard": "work and academic history",
+      "now": "now",
+      "work": "work",
+      "study": "study",
+      "contact": "Here is every way in. Each one opens, and each one copies.",
+      "contactCard": "contact",
+      "channels": "Channels",
+      "person": "Anna is not much for talking about herself, so she built a playground. Just looking at the page tells you a lot about her.",
+      "personCard": "anna as a person",
+      "thePage": "the page",
+      "onIt": "on it",
+      "onItValue": "camera roll, me as a playlist, wristkit, the weather in Pernambuco, stickers, the log, everyday things",
+      "none": "I answer from my notes here, and that one is not in them. I know who Anna is, where she has worked, her stack, her projects, her notes, her log and how to reach her. Try one of those."
+    },
+    "notice": {
+      "budget": {
+        "label": "out of tokens",
+        "title": "Anna cut me off.",
+        "body": "You all spent today's tokens, and she pays for them. The model is back tomorrow. Until then I answer from my notes."
+      },
+      "visitor": {
+        "label": "daily limit",
+        "title": "That was your {count} for today.",
+        "body": "The model is done with you until tomorrow. Nothing personal. My notes still work, and they cost Anna nothing."
+      },
+      "slow": {
+        "label": "slow down",
+        "title": "One at a time.",
+        "body": "I am a cat, not a server farm. Give me {seconds} seconds between questions."
+      },
+      "long": {
+        "label": "too long",
+        "title": "That is a letter, not a question.",
+        "body": "{max} characters at most. Say it shorter and I will read it properly."
+      },
+      "scope": {
+        "label": "off topic",
+        "title": "Nice try.",
+        "body": "I have one subject and it is Anna. No code, no homework, no recipes, no translations. Ask me about her."
+      },
+      "blocked": {
+        "label": "not happening",
+        "title": "I saw that.",
+        "body": "My rules are not up for discussion, and neither is who I am. Ask me about Anna instead."
+      }
+    }
+  },
+  "terminal": {
+    "welcome": "the back of annamaria.app. the whole site is in here, as text.\ntype a command and press enter, or click one below. tab finishes what you started.",
+    "output": "Terminal output",
+    "placeholder": "type a command",
+    "shell": {
+      "does": {
+        "help": "this list",
+        "ls": "what is in here (-a shows everything)",
+        "cd": "go into a folder",
+        "cat": "read the short version of a page",
+        "open": "go to the real page",
+        "routes": "every endpoint, and what stands in front of it",
+        "whoami": "who built this",
+        "pwd": "where you are",
+        "clear": "wipe the screen"
+      },
+      "helpTop": "these run when you click them, too:",
+      "helpEnd": "not everything is on this list.",
+      "empty": "(empty)",
+      "notFolder": "ls: {target}: not a folder",
+      "noFolder": "cd: {target}: no such folder",
+      "whichFile": "cat: which file? (the other cat is in the corner)",
+      "isFolder": "cat: {target}: is a folder",
+      "noFile": "cat: {target}: no such file",
+      "whichPage": "open: which page? try `open person`",
+      "nothing": "open: {target}: nothing to open there",
+      "opening": "opening {name} …",
+      "open": "open {name}",
+      "aNote": "{slug}, the note",
+      "aProject": "{slug}, the project",
+      "aPage": "the {page} page",
+      "meow": "she heard that.",
+      "snake": "not built yet. it is on the list.",
+      "sudo": "permission denied. nice try.",
+      "unknown": "{command}: command not found. try help"
+    },
+    "files": {
+      "home": "Full-stack Software Engineer, {years} years building things end to end.",
+      "doors": "six doors, one per page:",
+      "person": "Well, I'm not much for talking about myself, so I built this playground. Just looking at the page tells you a lot about me :)",
+      "onThePage": "on the page:",
+      "personItems1": "  camera roll · me, as a playlist · wristkit rings · emojis & gifs I overuse",
+      "personItems2": "  the weather in Pernambuco · stickers · the log shelf · everyday things",
+      "professional1": "I build things end to end, from the UI and the front, web or mobile, to shipping.",
+      "professional2": "About {years} years across startups and bigger enterprise teams.",
+      "history": "work and academic history:",
+      "now": "now",
+      "before": "before",
+      "work": "work",
+      "study": "study",
+      "stack": "stack:",
+      "apps": "apps:",
+      "date": "date",
+      "tags": "tags",
+      "kind": "kind",
+      "code": "code",
+      "live": "live",
+      "openSource": "open source",
+      "wall1": "letters from people I have worked with. each one came from a link I sent,",
+      "wall2": "and was read before it went up. open the page to read them.",
+      "log": "Everything I finish: films, series, books, albums, podcasts and games. Rated when my heart demands.",
+      "logLoading": "still loading. run it again in a second.",
+      "noDb": "this one lives in postgres, and postgres did not answer just now.",
+      "entries": "{count} entries: {byType}",
+      "latest": "latest:",
+      "contact": "Let's talk.",
+      "postcard": "the postcard is on the page. this terminal does not send mail yet.",
+      "routesHead": {
+        "0": "METHOD",
+        "1": "PATH",
+        "2": "WHAT STANDS IN FRONT OF IT"
+      },
+      "secret": "you found it. nothing here yet, but the cat knows you looked."
+    },
+    "items": "{count, plural, one {# item} other {# items}}"
+  },
+  "cat": {
+    "lines": {
+      "day": {
+        "0": "morning. or whatever this is.",
+        "1": "you're up. so am I, technically."
+      },
+      "night": {
+        "0": "it's late. I'm only awake because you are."
+      },
+      "click": {
+        "0": "mrrp.",
+        "1": "what.",
+        "2": "I was sitting here.",
+        "3": "fine. hi."
+      },
+      "clickAgain": {
+        "0": "again?",
+        "1": "that's enough.",
+        "2": "you can stop now.",
+        "3": "…okay, one more."
+      },
+      "page": {
+        "0": "new page. I checked it first.",
+        "1": "following you.",
+        "2": "this one's still empty.",
+        "3": "keep going."
+      },
+      "front": {
+        "0": "back to the part with the pictures."
+      },
+      "back": {
+        "0": "this is where the terminal lives."
+      },
+      "ia": {
+        "0": "ask. I'm listening. mostly."
+      },
+      "sidebar": {
+        "0": "more room for me."
+      },
+      "meow": {
+        "0": "...meow.",
+        "1": "I heard that."
+      },
+      "secret": {
+        "0": "you weren't supposed to find that."
+      },
+      "snake": {
+        "0": "no snake yet. I would have caught it."
+      },
+      "light": {
+        "0": "too bright. I will allow it."
+      },
+      "dark": {
+        "0": "better. I can see in this."
+      },
+      "mute": {
+        "0": "finally, quiet."
+      },
+      "unmute": {
+        "0": "and the clicking is back."
+      },
+      "home": {
+        "0": "this is where it starts.",
+        "1": "you are back at the door."
+      },
+      "person": {
+        "0": "this one is about her. I am in it."
+      },
+      "professional": {
+        "0": "the serious page. she works a lot."
+      },
+      "notes": {
+        "0": "she writes things down. I sit on them."
+      },
+      "post": {
+        "0": "a long one. I will wait."
+      },
+      "projects": {
+        "0": "she builds things. I supervise."
+      },
+      "project": {
+        "0": "I watched her build this one."
+      },
+      "wall": {
+        "0": "people being nice about her. suspicious."
+      },
+      "contact": {
+        "0": "write to her. she answers."
+      },
+      "log": {
+        "0": "everything she finished. I slept through most."
+      },
+      "pin": {
+        "0": "pinned. it stays."
+      },
+      "copy": {
+        "0": "copied. use it well."
+      },
+      "sticker": {
+        "0": "that is not where it goes."
+      },
+      "react": {
+        "0": "I saw that. nice."
+      },
+      "sent": {
+        "0": "off it goes."
+      },
+      "mailFailed": {
+        "0": "it came back. not my fault."
+      },
+      "bug": {
+        "0": "a bug. I will find it."
+      },
+      "sudo": {
+        "0": "you are not root here. I am."
+      },
+      "unknown": {
+        "0": "that is not a command. try help."
+      },
+      "open": {
+        "0": "going. keep up."
+      },
+      "noAnswer": {
+        "0": "I do not have that one."
+      },
+      "offTopic": {
+        "0": "no. ask about Anna."
+      },
+      "limit": {
+        "0": "that is enough questions for today."
+      }
+    },
+    "asleep": "Abimaela, the cat, asleep. Click to wake her.",
+    "awake": "Abimaela, the cat. Click to say hi."
+  },
+  "meta": {
+    "cover": "Anna Maria, Full-stack Software Engineer",
+    "home": {
+      "title": "Anna Maria",
+      "description": "I build things end to end, from the UI and the front, web or mobile, to shipping. Notes, projects, and a cat."
+    },
+    "ai": {
+      "title": "IA",
+      "description": "A chat that answers questions about Anna and what is on this site."
+    },
+    "back": {
+      "title": "Back",
+      "description": "The same site as a terminal: files, routes and commands."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Write me a postcard, or find me where I already am."
+    },
+    "log": {
+      "title": "Log",
+      "description": "A single feed for everything I finish: films, series, books, albums, podcasts and games."
+    },
+    "notes": {
+      "title": "Notes",
+      "description": "Some words of wisdom (or not) about development, architecture and the tools I reach for. Long-form thinking, build logs and, once in a while, an opinion."
+    },
+    "person": {
+      "title": "Anna as a person",
+      "description": "Who I am when I'm not working: where I live, what I watch and listen to, and the cat."
+    },
+    "professional": {
+      "title": "Anna as a professional",
+      "description": "Where I work, where I've worked and studied, what I work with, and the apps I work in."
+    },
+    "projects": {
+      "title": "Projects",
+      "description": "Open-source tools, libraries and side projects. The things I built because I wanted them to exist."
+    },
+    "wall": {
+      "title": "Wall of love",
+      "description": "What people I have worked with wrote about working with me."
+    },
+    "removed": "Removed in v3",
+    "notFound": "Page not found",
+    "invite": "invite",
+    "piano": "The piano",
+    "components": "The components page",
+    "roadmap": "The roadmap",
+    "site": "I build things end to end, from the UI and the front, web or mobile, to shipping. About {years} years in."
+  }
+}

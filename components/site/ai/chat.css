@@ -1,0 +1,128 @@
+.st-ia {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
+  height: 100%;
+
+  /* the top is the island's */
+  padding: 64px 16px 16px;
+}
+.st-ia-column {
+  width: min(100%, 760px);
+  margin-inline: auto;
+}
+@media (min-width: 640px) {
+  .st-ia {
+    padding-right: 150px;
+    padding-left: max(16px, min(150px, calc(100% - 910px)));
+  }
+}
+/* A phone: the cat sits in the corner, so the prompt keeps clear of her; while a touch keyboard
+   is up she steps aside (abimaela.css) and the room closes. */
+@media (max-width: 767px) {
+  .st-ia {
+    padding-bottom: 72px;
+  }
+}
+@media (max-width: 767px) and (pointer: coarse) {
+  .st-ia:has(:is(textarea, input):focus) {
+    padding-bottom: 16px;
+  }
+}
+.st-ia-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.st-ia-list {
+  margin: 0;
+}
+.st-ia-list > div {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 12px;
+  padding-block: 7px;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+.st-ia-list > div:last-child {
+  border-bottom: 0;
+}
+.st-ia-list dt {
+  color: var(--fg-muted);
+}
+.st-ia-list dd {
+  min-width: 0;
+  margin: 0;
+}
+.st-ia-projects {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.st-ia-projects > li + li {
+  border-top: 1px dashed var(--border-subtle);
+}
+.st-ia-project {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 10px 6px;
+  border-radius: var(--radius-md);
+  transition: background-color 150ms var(--ease-out);
+}
+.st-ia-project:hover {
+  background: var(--bg-hover-soft);
+}
+.st-ia-cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 1.9;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+}
+.st-ia-cover img {
+  object-fit: cover;
+  object-position: top center;
+}
+
+/* Abimaela's face beside her name. entrepta's ChatThread draws a ◆ there and takes no avatar,
+   so the hidden mark is shown again as a picture (to go upstream: an `avatar` on the thread). */
+.st .st-ia li[data-message] > div > span > span[aria-hidden="true"].leading-none {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: url("/brand/mark.png") center / cover no-repeat;
+  /* the glyph stays in the DOM and out of sight */
+  font-size: 0 !important;
+  color: transparent;
+}
+
+.st-ia-notice {
+  height: auto;
+}
+.st-ia-notice-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.st-ia-notice-cat {
+  display: grid;
+  flex: none;
+  place-items: end center;
+  width: 84px;
+}
+@media (max-width: 479px) {
+  .st-ia-notice-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

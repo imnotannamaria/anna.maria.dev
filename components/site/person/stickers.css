@@ -1,0 +1,22 @@
+.st-grab {
+  display: block;
+  border-radius: 12px;
+}
+.st-grab > .st-sticker {
+  rotate: var(--tilt, 0deg);
+  transition:
+    scale 240ms var(--ease-out),
+    box-shadow 240ms var(--ease-out);
+}
+.st-grab:hover > .st-sticker,
+.st-grab:focus-visible > .st-sticker {
+  box-shadow: 0 6px 14px rgb(0 0 0 / 0.28);
+  scale: 1.03;
+}
+.st-grab.st-grab > .st-sticker[data-diecut] {
+  box-shadow: none;
+}
+.st-grab[data-in-hand] > .st-sticker {
+  box-shadow: 0 12px 22px rgb(0 0 0 / 0.32);
+  scale: 1.06;
+}

@@ -1,0 +1,68 @@
+/* A browser window: the frame, the bar with three dots and an address, and its pin button. */
+
+.st-window {
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  box-shadow: 0 14px 30px rgb(0 0 0 / 0.18);
+}
+.st-window .st-cover {
+  border-radius: 0;
+}
+.st-window-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 34px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-surface-elevated);
+}
+.st-window-dots {
+  display: flex;
+  gap: 6px;
+}
+.st-window-dots > i {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--status-error);
+}
+.st-window-dots > i:nth-child(2) {
+  background: var(--status-warning);
+}
+.st-window-dots > i:nth-child(3) {
+  background: var(--status-success);
+}
+.st-window-pin {
+  display: grid;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition:
+    color 150ms var(--ease-out),
+    background-color 150ms var(--ease-out);
+}
+.st-window-pin:hover {
+  background: var(--bg-hover-soft);
+  color: var(--fg-primary);
+}
+.st-window-pin[aria-pressed="true"] {
+  color: var(--fg-brand-text);
+}
+.st-window-address {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--bg-hover-soft);
+  color: var(--fg-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

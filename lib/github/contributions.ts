@@ -1,6 +1,6 @@
 import "server-only"
 
-import type { CardState } from "@/lib/showcase/state"
+import type { CardState } from "@/lib/card-state"
 
 export type ContributionLevel = 0 | 1 | 2 | 3 | 4
 export type ContributionDay = { date: string; count: number; level: ContributionLevel }

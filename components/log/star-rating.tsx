@@ -1,4 +1,4 @@
-import { starLabel } from "@/lib/log/stars"
+import { useTranslations } from "next-intl"
 
 /**
  * Draws the rating with real glyphs instead of the "½" character.
@@ -11,6 +11,7 @@ import { starLabel } from "@/lib/log/stars"
  * matching the design, which never shows empty stars.
  */
 export function StarRating({ rating, size = 18 }: { rating: number | null; size?: number }) {
+  const t = useTranslations("log")
   if (rating == null) return null
 
   const count = Math.ceil(rating)
@@ -19,7 +20,7 @@ export function StarRating({ rating, size = 18 }: { rating: number | null; size?
   return (
     <span
       role="img"
-      aria-label={starLabel(rating)}
+      aria-label={t("stars", { rating })}
       className="inline-flex items-center"
       style={{ gap: size * 0.06 }}
     >

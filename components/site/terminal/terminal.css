@@ -1,0 +1,153 @@
+.st-term {
+  --t-folder: var(--fg-brand-text);
+  --t-path: var(--status-success-fg);
+  --t-command: var(--status-warning-fg);
+  border: 0;
+  border-radius: 0;
+  background: var(--bg-canvas);
+  box-shadow: none;
+  color: var(--fg-primary);
+}
+/* the top is the island's */
+.st-term {
+  padding-top: 56px;
+}
+/* Warp's way round: what ran stacks up from the foot, and the input stays under it. The first
+   line takes the free room above it, so a short session sits just over the input instead of
+   hanging from the top. `margin-top: auto` rather than `justify-content: end`, which would
+   make the overflow unreachable by scroll. */
+.st-term-output > :first-child {
+  margin-top: auto;
+}
+/* each command opens a block */
+.st-term-block {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-subtle);
+}
+.st-term-output > .st-term-block:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+/* The foot: chips that say where you are, and the command under them. No box around it, as in
+   Warp: a line above, and the page's own background. */
+.st-term-input {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 16px 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+.st-term-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.st-term-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 3px 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--fg-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.st-term-chip > svg {
+  flex: none;
+}
+.st-term-chip[data-kind="folder"] {
+  color: var(--t-folder);
+}
+.st-term-chip[data-kind="branch"] {
+  color: var(--t-path);
+}
+.st-term-input input {
+  /* a command reads a size up from the chips above it */
+  font-size: var(--text-mono-md);
+}
+/* The field, and the grey rest of the word laid over it. Both are the same size and family, the
+   rest starts after a copy of what was typed (invisible), so it begins where the cursor is. */
+.st-term-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.st-term-ghost {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  font-size: var(--text-mono-md);
+  white-space: pre;
+  pointer-events: none;
+}
+.st-term-ghost-typed {
+  visibility: hidden;
+}
+/* a button, so a tap on a phone takes it; the layer around it lets every other touch through */
+.st-term-ghost-rest {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-muted);
+  font: inherit;
+  white-space: pre;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.st-term-ghost-rest:hover {
+  color: var(--fg-secondary);
+}
+/* the key the rest answers to: for a keyboard, so a phone does not draw it */
+.st-term-ghost-key {
+  padding: 0 5px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  font-family: inherit;
+}
+@media (pointer: coarse) {
+  .st-term-ghost-key {
+    display: none;
+  }
+}
+/* the corner is the cat's */
+.st-term-shortcuts,
+.st-term-input {
+  margin-right: 84px;
+}
+.st-term-shortcuts {
+  padding-right: 0;
+}
+@media (min-width: 768px) {
+  .st-term-shortcuts,
+  .st-term-input {
+    margin-right: 140px;
+  }
+}
+/* A phone, typing: she steps aside (abimaela.css), so the foot gives its room back. */
+@media (max-width: 767px) and (pointer: coarse) {
+  .st-term:has(input:focus) :is(.st-term-shortcuts, .st-term-input) {
+    margin-right: 16px;
+  }
+}
+
+/* The terminal fills its side exactly and scrolls in one place, the log. The page area around
+   it scrolls for the Front's pages; here that would be a second scrollbar beside the first. */
+.st-page[data-part="back"] {
+  overflow: hidden;
+}
+.st-term {
+  min-height: 0;
+  max-height: 100%;
+}

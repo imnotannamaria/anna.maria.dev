@@ -5,19 +5,27 @@ on:
   push:
     branches: [main]
 
+# Nothing here writes to the repository, so the token cannot either, whatever the repository's own
+# default is.
+permissions:
+  contents: read
+
 jobs:
   static:
     name: lint, typecheck, unit tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with: { node-version: 22, cache: npm }
       - run: npm ci
       # .velite is gitignored — lib/velite.ts imports it, and so does
       # lib/velite-output.test.ts, so both tsc and the unit suite need it built first.
       - run: npx velite build
       - run: npm run lint
+      # next-env.d.ts is gitignored and is what declares an imported image as a module. Without
+      # it every `import photo from "./photo.jpg"` is an unknown module to tsc.
+      - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npm test
 
@@ -34,12 +42,9 @@ jobs:
           --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 20
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
-      # Seals throwaway sessions for the e2e admin-gate/CRUD specs — unrelated to the real
-      # production WORKOS_COOKIE_PASSWORD. AuthKit requires 32+ chars or it throws.
-      TEST_WORKOS_COOKIE_PASSWORD: ${{ secrets.TEST_WORKOS_COOKIE_PASSWORD }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with: { node-version: 22, cache: npm }
       - run: npm ci
 
@@ -47,6 +52,12 @@ jobs:
       # server with "cookie password ... at least 32 characters" — a failure that points
       # nowhere near the cause. Fail here instead, where the fix is obvious.
       - name: check required secrets
+        # Seals throwaway sessions for the e2e admin-gate/CRUD specs — unrelated to the real
+        # production WORKOS_COOKIE_PASSWORD. AuthKit requires 32+ chars or it throws. It is set
+        # on the two steps that use it and not on the job, so `npm ci` and its install scripts
+        # never see it.
+        env:
+          TEST_WORKOS_COOKIE_PASSWORD: ${{ secrets.TEST_WORKOS_COOKIE_PASSWORD }}
         run: |
           if [ -z "$TEST_WORKOS_COOKIE_PASSWORD" ]; then
             echo "::error::Set the TEST_WORKOS_COOKIE_PASSWORD repo secret (32+ chars: openssl rand -base64 32)"
@@ -72,10 +83,12 @@ jobs:
       # playwright/global-setup.ts stands up — see docs/tests-plan.md, "What the first
       # draft of this plan got wrong", for why that's necessary instead of a simpler stub.
       - run: npm run test:e2e
+        env:
+          TEST_WORKOS_COOKIE_PASSWORD: ${{ secrets.TEST_WORKOS_COOKIE_PASSWORD }}
 
       - name: upload playwright report on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: playwright-report
           path: playwright-report/

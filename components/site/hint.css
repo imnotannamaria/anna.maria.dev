@@ -1,0 +1,37 @@
+/* A dashed pill that says how something works. */
+
+.st-hint {
+  display: flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 12px 6px 10px;
+  border: 1px dashed var(--border-brand-strong);
+  border-radius: var(--radius-full);
+  color: var(--fg-secondary);
+}
+.st-hint > svg {
+  flex: none;
+  color: var(--fg-brand);
+}
+.st-hint strong {
+  color: var(--fg-primary);
+}
+
+/* inside a link the pill is the button: it answers the pointer and the keyboard */
+.st-hint {
+  transition:
+    border-color 160ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    color 160ms var(--ease-out),
+    translate 160ms var(--ease-out);
+}
+a:hover > .st-hint,
+a:focus-visible > .st-hint {
+  border-style: solid;
+  border-color: var(--fg-brand);
+  background: var(--bg-surface-brand);
+  color: var(--fg-primary);
+  translate: 0 -1px;
+}

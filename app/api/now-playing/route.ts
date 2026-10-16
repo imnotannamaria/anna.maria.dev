@@ -14,7 +14,8 @@ export async function GET() {
     const tracks = await getPlaylistTracks(playlistId)
     return NextResponse.json(tracks)
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unknown error"
-    return NextResponse.json({ error: message }, { status: 500 })
+    // what went wrong is for the log: the message names env vars and upstream statuses
+    console.error("[now-playing]", err)
+    return NextResponse.json({ error: "Could not load the playlist." }, { status: 500 })
   }
 }

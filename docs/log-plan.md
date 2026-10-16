@@ -83,7 +83,7 @@ WORKOS_COOKIE_PASSWORD=          # 32+ chars: openssl rand -base64 32
 NEXT_PUBLIC_WORKOS_REDIRECT_URI=https://annamaria.app/api/auth/callback
 
 # Comma-separated emails allowed into /admin
-ADMIN_EMAILS=a2002aninha22@gmail.com
+ADMIN_EMAILS=you@example.com
 ```
 
 On Supabase, take the connection string on port 6543 (the transaction pooler), not 5432.

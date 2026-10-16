@@ -8,7 +8,10 @@ const MAX_BODY_BYTES = 256 * 1024
  */
 export function jsonBody({ maxBytes = MAX_BODY_BYTES } = {}) {
   return createMiddleware(async (c, next) => {
-    if (!c.req.header("content-type")?.includes("application/json")) {
+    // the media type itself, not a header that merely mentions it: `text/plain;x=application/json`
+    // is a type a cross-site form can send without a preflight
+    const type = c.req.header("content-type")?.split(";")[0]?.trim().toLowerCase()
+    if (type !== "application/json") {
       return c.json({ error: "expected application/json" }, 415)
     }
 

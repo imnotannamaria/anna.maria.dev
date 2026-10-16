@@ -1,0 +1,240 @@
+/* The frame of the new site: the sidebar column, the switcher, the page area, and the base
+   classes every screen uses (`st-screen`, `st-room`). Unlayered on purpose, so it wins over
+   entrepta's layered classes: the hidden ◆ and the raised dialogs are overrides that belong
+   upstream in entrepta once this migrates. */
+
+.st {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  /* a phone: the page, and the bar under it */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  background: var(--bg-canvas);
+  color: var(--fg-primary);
+}
+body:has(.st) [data-theme-switcher] {
+  display: none;
+}
+.st > aside {
+  display: none;
+  transition: width 240ms var(--ease-out);
+}
+/* from 768px: the sidebar beside the page, and no bar */
+@media (min-width: 768px) {
+  .st {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+  .st > aside {
+    display: flex;
+  }
+  .st > .st-bar {
+    display: none;
+  }
+}
+.st-main {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+}
+/* The header: one pill floating over the page, with the sides and the actions in it. */
+.st-island {
+  position: absolute;
+  top: 12px;
+  /* Centred with auto margins, not `left: 50%`: an absolute box pinned at the middle may only
+     grow into the half to its right, and on a phone that squeezed the sides down to nothing. */
+  right: 0;
+  left: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  margin-inline: auto;
+  padding: 4px 6px 4px 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  background: var(--bg-overlay);
+  box-shadow: var(--shadow-overlay);
+}
+/* nothing in the pill gives up its width: the sides keep their names, the icons their size */
+.st-island > nav,
+.st-island [role="radiogroup"],
+.st-island [role="radiogroup"] > label,
+.st-island-actions,
+.st-island-actions > * {
+  flex: none;
+}
+/* entrepta's segments truncate, so their smallest width is zero; here it is the word */
+.st-island [role="radiogroup"] > label {
+  min-width: max-content;
+}
+.st-island > i {
+  flex: none;
+  width: 1px;
+  height: 18px;
+  background: var(--border-strong);
+}
+.st-island [role="radiogroup"],
+.st-island [role="radiogroup"] > span,
+.st-island [role="radiogroup"] > label {
+  border-radius: var(--radius-full);
+}
+.st-island-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.st-island-actions > :is(a, button) {
+  border-radius: var(--radius-full);
+}
+/* the narrowest phones: the same pill, closer together */
+@media (max-width: 359px) {
+  .st-island {
+    gap: 2px;
+  }
+  .st-island > i {
+    display: none;
+  }
+  .st-island-actions {
+    gap: 0;
+  }
+}
+/* on a page with no sides the pill is the actions alone, in the corner */
+.st-main[data-focused] > .st-island {
+  right: 16px;
+  left: auto;
+  margin-inline: 0;
+  padding-left: 6px;
+}
+/* every side leaves the top of its first screen to the island */
+.st-page {
+  --st-island-room: 60px;
+}
+.st-page[data-part="front"] > div {
+  padding-top: var(--st-island-room);
+}
+.st-page {
+  grid-row: 1;
+  grid-column: 1;
+  min-height: 0;
+  overflow-y: auto;
+  /* the page scrolls down, never sideways: a tilted sheet or a sticker at the edge must not
+     open a horizontal scroll. The sources are fixed where they are; this is the net under them. */
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+[data-page] {
+  --st-width: 1120px;
+}
+[data-page="person"],
+[data-page="professional"] {
+  --st-width: 1320px;
+}
+.st-screen {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: var(--st-width);
+  margin-inline: auto;
+}
+.st-room {
+  padding: 24px 16px 40px;
+}
+@media (min-width: 768px) {
+  .st-room {
+    padding-inline: 32px;
+  }
+}
+.st [data-spotlight] {
+  display: none;
+}
+/* entrepta's Diamond wherever a piece draws it with no way to turn it off (a field label, the
+   stepper, a dialog label): it is the one hidden span that is `leading-none` with an inline
+   font size. */
+.st span[aria-hidden="true"].leading-none[style*="font-size"],
+.st [data-sidebar-mark],
+.st [data-mobile-nav-mark],
+.st-ia li[data-message] > div > span > span[aria-hidden="true"],
+.st-screen [role="separator"] > span[aria-hidden="true"],
+/* and the `//` entrepta's Field puts in front of an error: the new UI has no comment glyph */
+.st [role="alert"] > span[aria-hidden="true"].opacity-70 {
+  display: none;
+}
+.st-screen [role="separator"] {
+  gap: 0;
+}
+
+/* A page that is loading, missing or broken has no "where to next": the footer waits, and the
+   state screen gets the whole page area to sit in the middle of. */
+.st-page:has([data-screen-state]) .st-footer {
+  display: none;
+}
+.st-page:has([data-screen-state]) > div {
+  height: 100%;
+}
+
+/* A page that asks for the visitor's whole attention (an invite): no corner cat. */
+.st-main[data-focused] > .st-abi {
+  display: none;
+}
+
+/* Light to dark. entrepta wraps a mode change in a view transition and crossfades it; for the
+   length of a switch started from the header, `data-st-switch` on <html> makes the new mode
+   come down from the top instead. */
+html[data-st-switch]::view-transition-old(root),
+html[data-st-switch]::view-transition-new(root) {
+  mix-blend-mode: normal;
+  animation: none;
+}
+html[data-st-switch]::view-transition-new(root) {
+  z-index: 2;
+  animation: st-curtain 620ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+@keyframes st-curtain {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* A tooltip, and anything else that opens from a trigger, follows the page's mode. entrepta draws
+   them on its always-dark surface (`data-surface="dark"` redeclares every token that differs
+   between modes), which in light mode left a black bubble on a white page. A redeclared
+   property can be handed back with `inherit`: it takes the value of the parent, which is the
+   page's own. To go upstream as an option on the tooltip. */
+[data-surface="dark"][data-side] {
+  --bg-canvas: inherit;
+  --bg-surface: inherit;
+  --bg-surface-elevated: inherit;
+  --bg-card: inherit;
+  --bg-card-hover: inherit;
+  --bg-overlay: inherit;
+  --bg-field: inherit;
+  --fg-primary: inherit;
+  --fg-secondary: inherit;
+  --fg-muted: inherit;
+  --border-subtle: inherit;
+  --border-strong: inherit;
+  --bg-hover-soft: inherit;
+  --bg-hover-strong: inherit;
+  --bg-chrome: inherit;
+  --bg-spotlight: inherit;
+  --shadow-card-hover: inherit;
+  --sheen-tint: inherit;
+  --edge-light: inherit;
+  --shadow-card: inherit;
+  --shadow-overlay: inherit;
+  --status-success-fg: inherit;
+  --status-warning-fg: inherit;
+  --status-error-fg: inherit;
+  --status-info-fg: inherit;
+  color-scheme: inherit;
+}

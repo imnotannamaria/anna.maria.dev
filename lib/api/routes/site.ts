@@ -1,0 +1,38 @@
+import { Hono } from "hono"
+import { localeFrom } from "@/lib/i18n/locales"
+import { TYPE_LABEL } from "@/lib/log/constants"
+import { inLocale } from "@/lib/log/locale"
+import { getPublishedEntries } from "@/lib/log/queries"
+import { byClient, rateLimit } from "../middleware/rate-limit"
+
+export const site = new Hono()
+
+/**
+ * The log as the terminal and the chat read it: type, title, creator and date of every published
+ * entry. The same entries /log shows, so there is nothing here a visitor cannot already see.
+ * `?lang=pt` gives the titles as /pt/log shows them.
+ *
+ * It exists because those two sides live in the layout, which stays static: reading Postgres
+ * there would make every page of the site dynamic. They ask for it when they are first opened.
+ */
+site.get(
+  "/log",
+  // its own bucket: the default key is the bare IP, which the other routes count on too
+  rateLimit({
+    max: 30,
+    windowMs: 60_000,
+    key: byClient("site-log"),
+  }),
+  async (c) => {
+    const locale = localeFrom(c.req.query("lang"), null)
+    const entries = (await getPublishedEntries()).map((entry) => inLocale(entry, locale))
+    return c.json({
+      entries: entries.map((entry) => ({
+        type: TYPE_LABEL[entry.type],
+        title: entry.title,
+        creator: entry.creator,
+        loggedAt: entry.loggedAt,
+      })),
+    })
+  },
+)

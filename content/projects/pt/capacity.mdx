@@ -1,0 +1,90 @@
+---
+title: "capacity"
+description: "Um pequeno quadro de despacho: equipes e caminhões como colunas, serviços agendados dentro de janelas de horário, arrastáveis entre equipes e entre dias."
+date: "2026-08-20"
+tags:
+  [
+    "nextjs",
+    "typescript",
+    "apollo-client",
+    "graphql",
+    "dnd-kit",
+    "flask",
+    "graphene",
+    "postgresql",
+    "turborepo",
+    "reference-implementation",
+  ]
+kind: "demo"
+published: true
+---
+
+## Visão geral
+
+Um pequeno quadro de despacho: equipes e caminhões como colunas, serviços agendados dentro de
+janelas de horário, arrastáveis entre equipes e entre dias, com mouse, toque ou teclado. As
+setas movem um serviço que foi pego, `Tab`/`Shift+Tab` troca de dia no meio do arrasto, e
+nenhum dos dois é um remendo colado depois que o caminho do mouse ficou pronto.
+
+É um projeto pessoal, não um produto. Eu construí pra praticar GraphQL, Apollo Client e
+drag and drop entre grupos que não estão todos na tela ao mesmo tempo, num fluxo real em vez de
+três tutoriais separados. O domínio é o despacho de uma empresa de mudanças, escolhido porque
+já vem com restrições de verdade (equipes finitas, caminhões finitos, janelas de horário que
+colidem), então os problemas interessantes aparecem sozinhos em vez de serem forçados em cima
+de uma lista de tarefas genérica.
+
+## O que ele prova
+
+O dnd-kit cuida da mecânica do arrasto. A parte que importa de verdade começa quando solta:
+
+- Uma mutation otimista com uma resposta real e visível à rejeição. O bloco volta pra onde
+  estava e um toast diz por quê. Uma mutation que só trata o caso em que dá certo é a demo de
+  caminho feliz que esse projeto existe pra não ser.
+- Arrasto entre dias com troca automática de aba no hover, e o equivalente no teclado, que não
+  é um plano B dele.
+- Todo resolver de lista passa por um DataLoader, com um teste de contagem de queries que
+  falha de propósito se algum for removido.
+- Concorrência sem WebSocket, subscription ou polling. Duas pessoas editando o mesmo quadro se
+  resolvem em "o servidor decide, o cliente desfaz".
+
+## Reproduzindo o conflito
+
+Abra duas abas no mesmo quadro. Arraste um serviço pra um horário vazio na primeira aba e
+confirme a mudança. Sem recarregar a segunda aba, arraste outro serviço pra exatamente o mesmo
+horário. A prévia local de colisão não mostra nada errado, porque ela não tem como saber que a
+primeira aba já ocupou o lugar. Ao soltar, o servidor rejeita a mudança: o bloco volta e um
+toast diz o que já está ali. O `apps/web/e2e/concurrency-conflict.spec.ts` roda o mesmo cenário
+com dois contextos de navegador do Playwright.
+
+## Stack
+
+- Next.js, Apollo Client e dnd-kit no frontend
+- Flask, Graphene e SQLAlchemy em Postgres na API
+- Turborepo e npm workspaces juntando os dois
+
+## Rodando local
+
+Tem uma demo no ar no link acima. Pra rodar local:
+
+```bash
+docker compose up -d postgres
+npm install
+cd apps/api && uv run python seed.py && cd ../..
+npm run dev
+```
+
+Abre em `localhost:3000`. Não precisa de `.env` na configuração padrão: o Postgres está mapeado
+em `localhost:5434`, e os dois apps já caem nisso.
+
+## Testes
+
+A pirâmide inteira: Vitest pra lógica pura (geometria, snapping, colisão local, o limite da
+troca automática, nada disso precisa de DOM), Testing Library pra foco e ARIA, o
+`MockedProvider` do Apollo pra loading, erro e rollback, Playwright pro arrasto de verdade e
+pro conflito com dois contextos, e pytest na API pros resolvers e pra contagem de queries.
+
+## Links
+
+https://capacity-crew.vercel.app/
+
+https://github.com/imnotannamaria/capacity

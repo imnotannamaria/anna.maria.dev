@@ -1,8 +1,13 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import { LockKeyIcon } from "@phosphor-icons/react/dist/ssr"
 import { signOut } from "@workos-inc/authkit-nextjs"
-import { requireAdmin } from "@/lib/auth/require-admin"
 import { Button } from "@/app/components/entrepta/button"
+import { RootShell } from "@/app/root-shell"
+import { SiteShell } from "@/components/site/frame/site-shell"
+import { PageLabel } from "@/components/site/page-header"
+import { requireAdmin } from "@/lib/auth/require-admin"
+import "./admin.css"
 
 export const metadata: Metadata = {
   title: "admin",
@@ -11,62 +16,57 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
+const SECTIONS = [
+  { href: "/admin/log", label: "log" },
+  { href: "/admin/wall", label: "wall of love" },
+  { href: "/admin/memory", label: "memory" },
+]
+
 /**
  * The guard for every admin page. It runs here rather than only in proxy.ts, because a
  * matcher can be edited wrong and this cannot.
+ *
+ * The admin sits in the site's frame like any other page, with the page label on top and its
+ * sections and the signed-in account under it. It is a root layout of its own, outside the
+ * language segment the public pages live under: it is a tool with one reader, in English, and
+ * staying out keeps the session proxy and the language proxy from touching the same request.
  */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await requireAdmin()
 
   return (
-    <div className="mx-auto w-full max-w-[1020px] px-5 py-10 sm:px-8">
-      <div
-        className="mb-8 flex flex-wrap items-center justify-between gap-3 border-b pb-4"
-        style={{ borderColor: "var(--border-subtle)" }}
-      >
-        <nav aria-label="Breadcrumb" className="text-mono-sm font-mono">
-          <Link href="/admin/log" style={{ color: "var(--fg-muted)" }}>
-            ~
-          </Link>
-          <span aria-hidden style={{ opacity: 0.5, margin: "0 6px", color: "var(--fg-muted)" }}>
-            /
-          </span>
-          <Link href="/admin/log" style={{ color: "var(--fg-primary)" }}>
-            admin
-          </Link>
-        </nav>
+    <RootShell locale="en">
+      <SiteShell>
+        <div className="st-room st-screen st-admin">
+          <header className="st-admin-top">
+            <PageLabel icon={<LockKeyIcon aria-hidden size={13} weight="bold" />} label="admin" />
+            <nav aria-label="Admin sections" className="st-admin-nav text-mono-sm font-mono">
+              {SECTIONS.map((section) => (
+                <Link key={section.href} href={section.href} className="focus-ring">
+                  {section.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="text-mono-sm min-w-0 truncate font-mono text-[var(--fg-muted)]">
+                {user?.email}
+              </span>
+              <form
+                action={async () => {
+                  "use server"
+                  await signOut()
+                }}
+              >
+                <Button type="submit" variant="ghost" size="sm">
+                  sign out
+                </Button>
+              </form>
+            </div>
+          </header>
 
-        {/* Two things live here now, so the layout has to say so. */}
-        <nav aria-label="Admin sections" className="text-mono-sm flex items-center gap-3 font-mono">
-          <Link href="/admin/log" style={{ color: "var(--fg-secondary)" }}>
-            log
-          </Link>
-          <span aria-hidden style={{ opacity: 0.4, color: "var(--fg-muted)" }}>
-            ·
-          </span>
-          <Link href="/admin/roadmap" style={{ color: "var(--fg-secondary)" }}>
-            roadmap
-          </Link>
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <span className="text-mono-sm font-mono" style={{ color: "var(--fg-muted)" }}>
-            {user?.email}
-          </span>
-          <form
-            action={async () => {
-              "use server"
-              await signOut()
-            }}
-          >
-            <Button type="submit" variant="ghost" size="sm">
-              sign out
-            </Button>
-          </form>
+          {children}
         </div>
-      </div>
-
-      {children}
-    </div>
+      </SiteShell>
+    </RootShell>
   )
 }

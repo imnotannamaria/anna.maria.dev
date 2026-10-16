@@ -1,0 +1,848 @@
+{
+  "frame": {
+    "skip": "pular para o conteúdo",
+    "site": "Site",
+    "more": "Mais",
+    "collapse": "Recolher",
+    "expand": "Expandir",
+    "role": "engenheira de software"
+  },
+  "pages": {
+    "home": {
+      "label": "Início",
+      "short": "Início",
+      "tagline": "Onde tudo começa."
+    },
+    "person": {
+      "label": "Anna como pessoa",
+      "short": "Pessoa",
+      "tagline": "Quem eu sou quando não tô trabalhando."
+    },
+    "professional": {
+      "label": "Anna como profissional",
+      "short": "Trabalho",
+      "tagline": "Onde eu trabalho, onde trabalhei e com o que eu trabalho."
+    },
+    "notes": {
+      "label": "Notas",
+      "short": "Notas",
+      "tagline": "Algumas palavras de sabedoria (ou não)."
+    },
+    "projects": {
+      "label": "Projetos",
+      "short": "Projetos",
+      "tagline": "Coisas que eu construí / estou construindo."
+    },
+    "wall-of-love": {
+      "label": "Mural de carinho",
+      "short": "Mural",
+      "tagline": "Palavras gentis de algumas pessoas que trabalharam/trabalham comigo."
+    },
+    "contact": {
+      "label": "Contato",
+      "short": "Contato",
+      "tagline": "Como falar comigo."
+    }
+  },
+  "island": {
+    "sides": "Lado do site",
+    "bug": "Reportar um bug",
+    "mute": "Silenciar",
+    "soundOn": "Ligar o som",
+    "muteLabel": "Silenciar o site",
+    "light": "Modo claro",
+    "dark": "Modo escuro",
+    "language": "Idioma: {current}. Trocar para {next}"
+  },
+  "state": {
+    "home": "me leva pro início",
+    "loading": "ela foi buscar",
+    "notFoundTitle": "Ela derrubou essa página da mesa.",
+    "notFoundBody": "Não tem nada nesse endereço. Pode ter mudado de lugar, ou nunca existiu.",
+    "errorTitle": "Alguma coisa quebrou.",
+    "errorBody": "Não foi você. Pode ter sido ela.",
+    "retry": "tentar de novo",
+    "removedTitle": "{name} se aposentou na v3.",
+    "removedBody": "Ela dorme onde isso ficava. Tudo que ficou está a um clique."
+  },
+  "bug": {
+    "label": "reportar bug",
+    "title": "Achou um bug?",
+    "lede": "A Abimaela caça eles. Esse formulário existe pra ouvir, principalmente sobre bugs: se alguma coisa quebrou, ficou estranha ou não fez nada quando você clicou, me conta.",
+    "elsewhere": "Uma ideia, uma feature, ou só um papo?",
+    "elsewhereLink": "A <link>página de contato</link> é o lugar pra isso.",
+    "name": "nome",
+    "namePlaceholder": "quem achou",
+    "email": "email",
+    "emailHint": "opcional",
+    "emailPlaceholder": "se quiser uma resposta",
+    "what": "o que aconteceu",
+    "whatPlaceholder": "o que você fez, o que esperava, o que aconteceu",
+    "attach": "anexar um print (opcional)",
+    "removeAttachment": "Remover o print",
+    "tooBig": "essa imagem passa de 4 MB",
+    "send": "enviar",
+    "sentTitle": "Recebi. Obrigada.",
+    "sentBody": "O relato está na minha caixa de entrada, e a Abimaela já foi atrás dele.",
+    "back": "voltar pro site",
+    "tooMany": "É muito relato de uma vez. Tenta de novo em alguns minutos.",
+    "failed": "Não foi: falhou do meu lado. O que você escreveu continua aqui.",
+    "offline": "Não foi: sem conexão. O que você escreveu continua aqui.",
+    "errors": {
+      "name": "seu nome, por favor",
+      "email": "isso não parece um email",
+      "description": "me conta um pouco mais (10+ caracteres)",
+      "attachment": "um png, jpg ou webp, por favor"
+    }
+  },
+  "home": {
+    "label": "início",
+    "lede": "Eu construo as coisas <b>de ponta a ponta</b>: <flow>UI → front (web / mobile) → back → IA → deploy</flow>, e faço isso há uns <b>{now} − {since} anos</b>.",
+    "hintCards": "é só clicar em um card se quiser saber mais",
+    "hintSides": "Você pode trocar lá em cima: <b>Front</b> é onde você tá agora, <b>Back</b> é uma versão terminal das infos desse site e <b>IA</b> é um chat :)",
+    "goTo": "Ir para {page}",
+    "wallExcerpt": "o que quem trabalhou comigo escreveu sobre trabalhar comigo",
+    "notesFallback": "notas",
+    "projectsFallback": "projetos"
+  },
+  "footer": {
+    "end": "fim da página",
+    "label": "lugares que você pode ir a partir daqui",
+    "note": "um jogo, com placar",
+    "places": "Pra onde ir",
+    "game": {
+      "label": "Jogo da memória",
+      "introGame": "<b>Jogo da memória</b>: vira duas cartas, e par achado é página achada.",
+      "introBoard": "Os <b>10 tempos mais rápidos</b> vão pro placar, com o nome de quem jogou.",
+      "hint": "Clica numa carta pra começar. O tempo começa a contar aí.",
+      "found": "Achou {page}. A carta virou um link.",
+      "foundCat": "Achou a Abimaela. Ela vai te dar uma espiada.",
+      "peeking": "A Abimaela te mostrou tudo. Decora rápido!",
+      "done": "Achou os {pairs} pares em {time}, com {moves} jogadas. Cada carta agora te leva pra página dela.",
+      "official": "Tempo oficial: {time}.",
+      "officialIn": "Tempo oficial: {time}, e você entrou no placar!",
+      "officialRank": "Tempo oficial: {time}, ficaria em {rank}º.",
+      "shuffle": "Embaralhar",
+      "goTo": "Ir para {page}",
+      "card": "Carta {n}, virada",
+      "cat": "Abimaela",
+      "time": "tempo",
+      "moves": "jogadas",
+      "streak": "pares seguidos"
+    },
+    "board": {
+      "title": "placar",
+      "loading": "lendo o placar...",
+      "down": "O placar mora no Postgres, e ele não respondeu. O jogo funciona do mesmo jeito.",
+      "empty": "Ninguém no placar ainda. O primeiro nome pode ser o seu.",
+      "waiting": "aguardando",
+      "top": "top {count}"
+    },
+    "claim": {
+      "first": "Recorde do placar!",
+      "place": "{rank}º lugar!",
+      "ask": "{time}. Quer seu nome lá?",
+      "label": "Seu nome no placar",
+      "placeholder": "seu nome",
+      "send": "mandar",
+      "help": "Só o nome, até {max} caracteres. Ele aparece depois que a Anna aprovar.",
+      "sent": "Mandado! Seu nome aparece no placar quando a Anna aprovar. Neste navegador ele já está lá, marcado.",
+      "errors": {
+        "empty": "Escreve um nome.",
+        "long": "Até {max} caracteres.",
+        "chars": "Só letras, números, espaço e . ' _ -",
+        "link": "Sem link, só o nome.",
+        "expired": "Essa partida não pode mais ganhar nome: passou meia hora, ou o placar mudou.",
+        "tooMany": "Muitas tentativas daqui. Espera uns minutos.",
+        "down": "O placar não respondeu. Tenta de novo daqui a pouco.",
+        "offline": "Sem conexão. Nada foi mandado, tenta de novo."
+      }
+    },
+    "signoff": {
+      "all": "todos os direitos",
+      "out": "reservados",
+      "in": "forkáveis",
+      "fork": "faz o seu fork",
+      "changes": "uma linha mudou na licença"
+    }
+  },
+  "wall": {
+    "label": "mural de carinho",
+    "lede": "<b>Palavras gentis</b> sobre como foi trabalhar comigo.",
+    "down": "As cartas moram no Postgres, e o Postgres não respondeu agora.",
+    "emptyTitle": "Ainda não tem nada no mural.",
+    "emptyBody": "Os primeiros convites já saíram. Ela está guardando o lugar até as cartas chegarem.",
+    "channel": "mural-de-carinho",
+    "count": "{count, plural, one {# carta} other {# cartas}} · palavras gentis, por convite",
+    "preview": "como vai ficar no mural",
+    "locked": "só quem tem convite pode escrever aqui",
+    "onLinkedin": "{name} no LinkedIn",
+    "reactionsTo": "Reações à carta de {name}",
+    "reactionCount": "{reaction}, {count, plural, one {# reação} other {# reações}}",
+    "reactions": {
+      "heart": "coração com as mãos",
+      "clap": "palmas",
+      "party": "festa"
+    }
+  },
+  "contact": {
+    "label": "contato",
+    "lede": "Vamos <b>conversar</b>.",
+    "orHere": "ou me acha por aqui",
+    "channels": "Canais",
+    "copy": "Copiar {name}: {value}",
+    "copied": "copiado",
+    "postCard": "cartão postal",
+    "greetings": "saudações de onde você estiver",
+    "messagePlaceholder": "escreve aqui sua mensagem, pode ser curtinha",
+    "to": "para",
+    "from": "de",
+    "country": "Brasil",
+    "stampCountry": "brasil",
+    "yourName": "Seu nome",
+    "namePlaceholder": "seu nome",
+    "yourEmail": "Seu email",
+    "emailPlaceholder": "seu email, pra eu responder",
+    "post": "postar",
+    "tryAgain": "tentar de novo",
+    "returned": "devolvido ao remetente",
+    "sentTitle": "Postado.",
+    "sentBody": "Está a caminho da minha caixa de entrada. Eu respondo todos.",
+    "another": "escrever outro",
+    "check": "confere o cartão e tenta de novo",
+    "notRight": "tem alguma coisa errada no cartão",
+    "tooMany": "voltou: foram muitos cartões de uma vez. tenta de novo em alguns minutos.",
+    "failed": "voltou: falhou do meu lado. sua mensagem continua aqui.",
+    "offline": "voltou: sem conexão. sua mensagem continua aqui.",
+    "errors": {
+      "name": "seu nome, por favor",
+      "email": "hmm, isso não parece um email válido",
+      "message": "me conta um pouco mais (10+ caracteres)"
+    }
+  },
+  "date": {
+    "short": "{day} de {month} de {year}",
+    "monthYear": "{month} de {year}",
+    "months": {
+      "1": "jan",
+      "2": "fev",
+      "3": "mar",
+      "4": "abr",
+      "5": "mai",
+      "6": "jun",
+      "7": "jul",
+      "8": "ago",
+      "9": "set",
+      "10": "out",
+      "11": "nov",
+      "12": "dez"
+    }
+  },
+  "notes": {
+    "label": "notas",
+    "lede": "Algumas palavras de sabedoria (ou não) sobre desenvolvimento, arquitetura e as ferramentas que eu uso. <b>Texto longo</b>, diários de construção e, de vez em quando, uma <b>opinião</b>.",
+    "featured": "destaque",
+    "readLabel": "{title}: ler a nota",
+    "minutes": "{minutes} min",
+    "words": "{words} palavras",
+    "tags": "Tags",
+    "readNote": "ler a nota",
+    "howItStarts": "como começa",
+    "read": "ler",
+    "aNote": "uma nota",
+    "inThisNote": "nessa nota"
+  },
+  "projects": {
+    "label": "projetos",
+    "lede": "Ferramentas open source, bibliotecas e projetos paralelos. As coisas que eu construí porque <b>queria que existissem</b>.",
+    "groups": {
+      "library": "Open source",
+      "demo": "Demos"
+    },
+    "kind": {
+      "library": "biblioteca",
+      "demo": "demo"
+    },
+    "pinned": "fixado: <b>{title}</b>. clica de novo pra soltar",
+    "hint": "passa o mouse pra espiar, clica numa pasta pra fixar",
+    "below": "a prévia do que você fixa está mais abaixo",
+    "folderLabel": "{title}, {kind}, {year}{featured, select, yes {, destaque} other {}}. {pinned, select, yes {Fixado. Clica pra soltar.} other {Clica pra fixar.}}",
+    "pin": "Fixar {title}",
+    "unpin": "Soltar {title}",
+    "openLabel": "{title}: abrir o estudo de caso",
+    "open": "abrir o estudo de caso",
+    "tags": "Tags",
+    "featured": "destaque",
+    "aProject": "um projeto",
+    "builtWith": "feito com",
+    "links": "links",
+    "stack": "Stack",
+    "onGithub": "{title} no GitHub",
+    "live": "{title}, no ar"
+  },
+  "log": {
+    "label": "log",
+    "parent": "anna como pessoa",
+    "lede": "Um feed só pra <b>tudo</b> que eu termino: filmes, séries, livros, álbuns, podcasts e jogos.",
+    "down": "O log mora no Postgres, e o Postgres não respondeu agora.",
+    "empty": "Nada registrado ainda.",
+    "favourite": "favorito",
+    "open": "{title}: abrir",
+    "openLink": "abrir em {site}",
+    "type": {
+      "film": "filme",
+      "series": "série",
+      "book": "livro",
+      "music": "álbum",
+      "podcast": "podcast",
+      "game": "jogo"
+    },
+    "types": {
+      "film": "filmes",
+      "series": "séries",
+      "book": "livros",
+      "music": "música",
+      "podcast": "podcasts",
+      "game": "jogos"
+    },
+    "stars": "{rating} de 5"
+  },
+  "person": {
+    "label": "anna como pessoa",
+    "avatarAlt": "Anna Maria",
+    "wristkit": "Ver o wristkit",
+    "bio": "Bom, eu não sou muito de falar sobre mim, então montei esse playground. Só de olhar a página dá pra saber muita coisa sobre mim :)",
+    "roll": "Rolo da câmera. {alt}. Foto {n} de {total}; clica pra ver a próxima.",
+    "photos": {
+      "selfie": "Uma selfie, com uma camiseta da Olivia Rodrigo",
+      "abimaela": "Abimaela, a gata, ganhando carinho",
+      "palms": "Duas pessoas sorrindo debaixo de coqueiros",
+      "lunch": "Um prato bem cheio no almoço",
+      "glasses": "Uma selfie com óculos de luz azul",
+      "burger": "Um hambúrguer num papel quadriculado",
+      "snout": "O focinho da Abimaela, perto demais da câmera"
+    },
+    "beachAlt": "A praia no fim da tarde: mar calmo, um barquinho e areia",
+    "sky": {
+      "clear": "céu limpo",
+      "mostlyClear": "quase limpo",
+      "partlyCloudy": "parcialmente nublado",
+      "overcast": "nublado",
+      "foggy": "neblina",
+      "drizzling": "garoando",
+      "raining": "chovendo",
+      "onAndOff": "chove e para",
+      "stormy": "tempestade"
+    },
+    "stickers": {
+      "label": "adesivos",
+      "note": "arrasta",
+      "aria": "Sticker: {caption}. Arrasta, ou usa as setas do teclado.",
+      "pe": "Pernambuco, meu país",
+      "galadriel": "Galadriel",
+      "dany": "Daenerys Targaryen, Rainha dos Sete Reinos",
+      "bosco": "Bosco, de Drag Race",
+      "cherry": "Cheryl Blossom"
+    },
+    "shelf": {
+      "label": "log",
+      "kind": "Tipo",
+      "finished": "{count, plural, one {# terminado} other {# terminados}}",
+      "offline": "fora do ar",
+      "theLog": "o log",
+      "by": "{title}, {creator}"
+    },
+    "playlist": {
+      "label": "eu, em forma de playlist",
+      "error": "o spotify não respondeu.",
+      "empty": "nada na vitrola.",
+      "loading": "botando um disco…",
+      "retry": "tentar de novo",
+      "play": "Tocar",
+      "pause": "Pausar",
+      "previous": "Música anterior",
+      "next": "Próxima música",
+      "album": "Do álbum {album}",
+      "albumYear": "Do álbum {album}, {year}",
+      "progress": "Progresso: {song}, de {artist}"
+    },
+    "favorites": {
+      "label": "emojis e gifs que eu uso (até demais)",
+      "reactions": "{name}, {count, plural, one {# reação} other {# reações}}",
+      "gif": "{name}, um gif. Toca enquanto o mouse ou o foco estiver nele.",
+      "emoji": {
+        "salute": "rosto batendo continência",
+        "zany": "rosto maluco",
+        "peek": "rosto espiando",
+        "oops": "rosto com a mão na boca",
+        "brow": "rosto com a sobrancelha levantada",
+        "eyes": "olho, boca, olho"
+      },
+      "gifs": {
+        "nazare": "Nazaré confusa",
+        "fine": "está tudo bem"
+      }
+    },
+    "things": {
+      "label": "coisas que eu uso todo dia",
+      "aria": "{name}: {tagline}",
+      "airpods": "praticamente meus companheiros",
+      "cup": "café, geralmente",
+      "mac": "onde a maior parte disso é feita",
+      "guitar": "mal, mas feliz",
+      "cupName": "Copo térmico",
+      "guitarName": "Violão"
+    },
+    "activity": {
+      "title": "Atividade / Hoje",
+      "aria": "Atividade de hoje",
+      "rings": "Anéis de atividade",
+      "synced": "sincronizado",
+      "loading": "carregando",
+      "empty": "vazio",
+      "error": "erro",
+      "stale": "desatualizado",
+      "ok": "Atualizado",
+      "syncing": "Sincronizando sua atividade…",
+      "noData": "Ainda sem dados. Roda o Atalho no seu iPhone.",
+      "failed": "Algo deu errado. Não consegui carregar a atividade de hoje.",
+      "lastSync": "Última sincronização há {hours}h. Roda o Atalho pra atualizar.",
+      "move": "Mover",
+      "exercise": "Exercício",
+      "steps": "Passos",
+      "kcal": "kcal",
+      "min": "min",
+      "stepsUnit": "passos",
+      "syncedAt": "Sincronizado {when}",
+      "install": "Instale o Atalho pra conectar.",
+      "later": "Tenta de novo mais tarde."
+    }
+  },
+  "professional": {
+    "label": "anna como profissional",
+    "lede": "Eu construo as coisas <b>de ponta a ponta</b>: <flow>UI → front (web / mobile) → back → IA → deploy</flow>, e faço isso há uns <b>{now} − {since} anos</b>, em startups e em times grandes de empresa.",
+    "now": "agora",
+    "history": "histórico de trabalho e estudo",
+    "view": "Visualização",
+    "timeline": "linha do tempo",
+    "list": "lista",
+    "legend": "cheio é trabalho, listrado é estudo. clica numa barra pra ler",
+    "yearsIn": "{years} anos de estrada",
+    "present": "hoje",
+    "stack": "Stack",
+    "entryLabel": "{org}, {role}",
+    "stackLabel": "stack",
+    "tools": "{count} ferramentas",
+    "writtenIn": "linguagens que eu já usei profissionalmente",
+    "groups": {
+      "languages": "linguagens",
+      "frontend": "frontend",
+      "backend": "backend",
+      "databases": "bancos de dados",
+      "ai": "ia / llm",
+      "devops": "devops · nuvem",
+      "testing": "testes · qualidade",
+      "email": "email · design"
+    },
+    "appsLabel": "apps",
+    "inDock": "{count} no dock",
+    "apps": "Apps",
+    "app": {
+      "Warp": "terminal",
+      "Claude": "IA",
+      "Codex": "IA",
+      "Cursor": "editor de código",
+      "Notion": "notas e docs",
+      "Google Chrome": "navegador",
+      "Google Calendar": "agenda",
+      "Spotify": "música",
+      "Slack": "chat do time",
+      "Figma": "design"
+    },
+    "contributions": "contribuições",
+    "activity": "atividade pública · últimos 12 meses",
+    "github": "github"
+  },
+  "career": {
+    "cesar": {
+      "role": "engenheira full-stack",
+      "text": "O CESAR é um dos principais centros de inovação do Brasil, e foi lá que passei a maior parte do tempo no ESG Carbon, uma plataforma no top 5 de ESGTech do Brasil que atende mais de 140 empresas. Eu arquitetei e coloquei no ar do zero, com React, Next.js, TypeScript, Python e Django, transformando um labirinto de regras do GHG Protocol numa ferramenta de autoatendimento que derrubou o relatório manual de 3 horas pra 5 minutos. Hoje estou num app de finanças pessoais, trabalhando de ponta a ponta entre um app em React Native e um backend em FastAPI, no fluxo de consentimento do Open Finance.",
+      "stats": {
+        "0": "empresas no ESG Carbon",
+        "1": "relatório manual",
+        "2": "ESGTech no Brasil"
+      }
+    },
+    "avanade": {
+      "role": "engenheira full-stack",
+      "text": "A Avanade é uma joint venture da Microsoft com a Accenture, e em três anos lá fui de estagiária a pleno construindo chatbots e produtos de IA pra grandes clientes corporativos. Co-liderei a entrega de um chatbot de WhatsApp em produção que gerou mais de 97 mil reengajamentos em três meses, cortou o tempo de resposta em 44% e subiu o NPS em 5 pontos. Também construí assistentes de RAG seguros com LangChain, Azure OpenAI e embeddings.",
+      "stats": {
+        "0": "reengajamentos em três meses",
+        "1": "tempo de resposta",
+        "2": "pontos de NPS"
+      }
+    },
+    "fiap": {
+      "role": "pós em engenharia de ia",
+      "text": "Uma pós-graduação em Engenharia de IA que cobre praticamente toda a stack moderna de IA, de fundamentos de machine learning e visão computacional a LLMs, IA generativa, engenharia de prompt, fine-tuning, RAG e LangChain. Devo terminar por volta de março de 2027.",
+      "stats": {}
+    },
+    "descomplica": {
+      "role": "bacharelado em sistemas de informação",
+      "text": "Meu bacharelado em Sistemas de Informação, concluído em dezembro de 2025. Cobriu um pouco de tudo, de estruturas de dados, bancos de dados e computação em nuvem a design de software, algoritmos de IA e ciência de dados, o que me deu a base pra trabalhar em todo o ciclo de vida de um produto.",
+      "stats": {}
+    }
+  },
+  "chat": {
+    "assistant": "abimaela.ia",
+    "you": "você",
+    "title": "Me pergunta sobre a <em>Anna.</em>",
+    "hintLive": "Quem responde é a Abimaela, só sobre a Anna e esse site, algumas perguntas por dia",
+    "hintScript": "A Abimaela responde com o conteúdo do próprio site",
+    "placeholder": "Pergunta quem ela é, onde trabalhou, a stack, os projetos, as notas ou o contato",
+    "stopped": "Parei.",
+    "open": "abrir {page}",
+    "questions": {
+      "who": "Quem é a Anna?",
+      "work": "Onde ela já trabalhou?",
+      "stack": "Qual é a stack dela?",
+      "built": "O que ela já construiu?",
+      "write": "Sobre o que ela escreve?",
+      "reach": "Como eu falo com ela?"
+    },
+    "inner": {
+      "log": "Log",
+      "post": "Uma nota, aberta",
+      "project": "Um projeto, aberto",
+      "admin": "Admin"
+    },
+    "answers": {
+      "wall": "O mural de carinho guarda cartas de pessoas com quem ela trabalhou. Cada uma veio de um link que ela mandou, e ela leu antes de subir.",
+      "wallCard": "mural de carinho",
+      "wallHow": "como entram",
+      "wallHowValue": "por convite",
+      "wallWhere": "onde",
+      "wallWhereValue": "na página",
+      "logLoading": "O log ainda está carregando. Pergunta de novo daqui a pouco.",
+      "logDown": "O log mora no Postgres, e o Postgres não respondeu agora.",
+      "log": "{count, plural, one {# coisa terminada e registrada} other {# coisas terminadas e registradas}} até agora. Essas são as mais recentes.",
+      "logCard": "log",
+      "notes": "{count, plural, one {# nota} other {# notas}} até agora. A em destaque vem primeiro.",
+      "notesCard": "notas",
+      "featured": "destaque",
+      "projects": "{count} projetos publicados aqui: {libraries} open source, {demos} demos.",
+      "projectsCard": "projetos",
+      "openSource": "open source",
+      "stack": "Full-stack. Aqui está por grupo, e embaixo os apps onde o trabalho acontece.",
+      "stackCard": "stack",
+      "apps": "apps",
+      "career": "{years} anos entregando, desde março de 2021. Trabalho e estudo, na mesma linha do tempo.",
+      "careerCard": "histórico de trabalho e estudo",
+      "now": "hoje",
+      "work": "trabalho",
+      "study": "estudo",
+      "contact": "Aqui estão todos os caminhos. Cada um abre, e cada um copia.",
+      "contactCard": "contato",
+      "channels": "Canais",
+      "person": "A Anna não é muito de falar sobre ela, então montou um playground. Só de olhar a página dá pra saber muita coisa sobre ela.",
+      "personCard": "anna como pessoa",
+      "thePage": "a página",
+      "onIt": "o que tem",
+      "onItValue": "rolo da câmera, eu em playlist, wristkit, o tempo em Pernambuco, stickers, o log, coisas do dia a dia",
+      "none": "Aqui eu respondo com as minhas anotações, e essa não está nelas. Eu sei quem é a Anna, onde ela trabalhou, a stack, os projetos, as notas, o log e como falar com ela. Tenta uma dessas."
+    },
+    "notice": {
+      "budget": {
+        "label": "sem tokens",
+        "title": "A Anna me barrou.",
+        "body": "Vocês gastaram os tokens de hoje, e quem paga é ela. O modelo volta amanhã. Até lá eu respondo com as minhas anotações."
+      },
+      "visitor": {
+        "label": "limite do dia",
+        "title": "Essas foram as suas {count} de hoje.",
+        "body": "O modelo só te atende de novo amanhã. Nada pessoal. Minhas anotações continuam funcionando, e não custam nada pra Anna."
+      },
+      "slow": {
+        "label": "calma",
+        "title": "Uma de cada vez.",
+        "body": "Eu sou uma gata, não um data center. Me dá {seconds} segundos entre uma pergunta e outra."
+      },
+      "long": {
+        "label": "longa demais",
+        "title": "Isso é uma carta, não uma pergunta.",
+        "body": "No máximo {max} caracteres. Fala mais curto que eu leio direito."
+      },
+      "scope": {
+        "label": "fora do assunto",
+        "title": "Boa tentativa.",
+        "body": "Eu tenho um assunto só, e é a Anna. Nada de código, lição de casa, receita ou tradução. Pergunta sobre ela."
+      },
+      "blocked": {
+        "label": "não vai rolar",
+        "title": "Eu vi isso.",
+        "body": "Minhas regras não estão em discussão, e quem eu sou também não. Me pergunta sobre a Anna."
+      }
+    }
+  },
+  "terminal": {
+    "welcome": "o verso do annamaria.app. o site inteiro está aqui, em texto.\ndigita um comando e aperta enter, ou clica em um aqui embaixo. o tab completa o que você começou.",
+    "output": "Saída do terminal",
+    "placeholder": "digita um comando",
+    "shell": {
+      "does": {
+        "help": "essa lista",
+        "ls": "o que tem aqui (-a mostra tudo)",
+        "cd": "entrar numa pasta",
+        "cat": "ler a versão curta de uma página",
+        "open": "ir pra página de verdade",
+        "routes": "todos os endpoints, e o que fica na frente de cada um",
+        "whoami": "quem fez isso",
+        "pwd": "onde você está",
+        "clear": "limpar a tela"
+      },
+      "helpTop": "esses também rodam com um clique:",
+      "helpEnd": "nem tudo está nessa lista.",
+      "empty": "(vazio)",
+      "notFolder": "ls: {target}: não é uma pasta",
+      "noFolder": "cd: {target}: essa pasta não existe",
+      "whichFile": "cat: qual arquivo? (a outra gata está ali no canto)",
+      "isFolder": "cat: {target}: é uma pasta",
+      "noFile": "cat: {target}: esse arquivo não existe",
+      "whichPage": "open: qual página? tenta `open person`",
+      "nothing": "open: {target}: não tem nada pra abrir ali",
+      "opening": "abrindo {name} …",
+      "open": "abrir {name}",
+      "aNote": "{slug}, a nota",
+      "aProject": "{slug}, o projeto",
+      "aPage": "a página {page}",
+      "meow": "ela ouviu.",
+      "snake": "ainda não existe. está na lista.",
+      "sudo": "permissão negada. boa tentativa.",
+      "unknown": "{command}: comando não encontrado. tenta help"
+    },
+    "files": {
+      "home": "Engenheira de Software full-stack, {years} anos construindo as coisas de ponta a ponta.",
+      "doors": "seis portas, uma por página:",
+      "person": "Bom, eu não sou muito de falar sobre mim, então montei esse playground. Só de olhar a página dá pra saber muita coisa sobre mim :)",
+      "onThePage": "na página:",
+      "personItems1": "  rolo da câmera · eu, em playlist · anéis do wristkit · emojis e gifs que eu uso demais",
+      "personItems2": "  o tempo em Pernambuco · stickers · a estante do log · coisas do dia a dia",
+      "professional1": "Eu construo as coisas de ponta a ponta, da UI e do front, web ou mobile, até colocar no ar.",
+      "professional2": "Uns {years} anos, em startups e em times grandes de empresa.",
+      "history": "histórico de trabalho e estudo:",
+      "now": "hoje",
+      "before": "antes",
+      "work": "trabalho",
+      "study": "estudo",
+      "stack": "stack:",
+      "apps": "apps:",
+      "date": "data",
+      "tags": "tags",
+      "kind": "tipo",
+      "code": "código",
+      "live": "no ar",
+      "openSource": "open source",
+      "wall1": "cartas de pessoas com quem trabalhei. cada uma veio de um link que eu mandei,",
+      "wall2": "e foi lida antes de subir. abre a página pra ler.",
+      "log": "Tudo que eu termino: filmes, séries, livros, álbuns, podcasts e jogos. Com nota quando o coração pede.",
+      "logLoading": "ainda carregando. roda de novo daqui a pouco.",
+      "noDb": "esse mora no postgres, e o postgres não respondeu agora.",
+      "entries": "{count} registros: {byType}",
+      "latest": "mais recentes:",
+      "contact": "Vamos conversar.",
+      "postcard": "o postal está na página. esse terminal ainda não manda email.",
+      "routesHead": {
+        "0": "MÉTODO",
+        "1": "CAMINHO",
+        "2": "O QUE FICA NA FRENTE"
+      },
+      "secret": "você achou. ainda não tem nada aqui, mas a gata sabe que você olhou."
+    },
+    "items": "{count, plural, one {# item} other {# itens}}"
+  },
+  "cat": {
+    "lines": {
+      "day": {
+        "0": "bom dia. ou seja lá o que for isso.",
+        "1": "você acordou. eu também, tecnicamente."
+      },
+      "night": {
+        "0": "tá tarde. só estou acordada porque você está."
+      },
+      "click": {
+        "0": "mrrp.",
+        "1": "que foi.",
+        "2": "eu estava sentada aqui.",
+        "3": "tá. oi."
+      },
+      "clickAgain": {
+        "0": "de novo?",
+        "1": "já deu.",
+        "2": "pode parar agora.",
+        "3": "…tá, mais uma."
+      },
+      "page": {
+        "0": "página nova. eu conferi antes.",
+        "1": "indo atrás de você.",
+        "2": "essa ainda está vazia.",
+        "3": "continua."
+      },
+      "front": {
+        "0": "de volta pra parte com as figuras."
+      },
+      "back": {
+        "0": "é aqui que mora o terminal."
+      },
+      "ia": {
+        "0": "pergunta. estou ouvindo. mais ou menos."
+      },
+      "sidebar": {
+        "0": "mais espaço pra mim."
+      },
+      "meow": {
+        "0": "...miau.",
+        "1": "eu ouvi."
+      },
+      "secret": {
+        "0": "não era pra você achar isso."
+      },
+      "snake": {
+        "0": "ainda não tem cobrinha. eu teria pegado."
+      },
+      "light": {
+        "0": "claro demais. vou deixar passar."
+      },
+      "dark": {
+        "0": "melhor. nisso aqui eu enxergo."
+      },
+      "mute": {
+        "0": "finalmente, silêncio."
+      },
+      "unmute": {
+        "0": "e os cliquezinhos voltaram."
+      },
+      "home": {
+        "0": "é aqui que começa.",
+        "1": "você voltou pra porta."
+      },
+      "person": {
+        "0": "essa é sobre ela. eu apareço."
+      },
+      "professional": {
+        "0": "a página séria. ela trabalha muito."
+      },
+      "notes": {
+        "0": "ela anota as coisas. eu sento em cima."
+      },
+      "post": {
+        "0": "esse é comprido. eu espero."
+      },
+      "projects": {
+        "0": "ela constrói as coisas. eu supervisiono."
+      },
+      "project": {
+        "0": "esse eu vi ela construir."
+      },
+      "wall": {
+        "0": "gente sendo legal com ela. suspeito."
+      },
+      "contact": {
+        "0": "escreve pra ela. ela responde."
+      },
+      "log": {
+        "0": "tudo que ela terminou. eu dormi na maior parte."
+      },
+      "pin": {
+        "0": "fixado. fica aí."
+      },
+      "copy": {
+        "0": "copiado. usa direito."
+      },
+      "sticker": {
+        "0": "não é aí que vai."
+      },
+      "react": {
+        "0": "eu vi. gostei."
+      },
+      "sent": {
+        "0": "lá vai."
+      },
+      "mailFailed": {
+        "0": "voltou. não foi culpa minha."
+      },
+      "bug": {
+        "0": "um bug. eu acho ele."
+      },
+      "sudo": {
+        "0": "você não é root aqui. eu sou."
+      },
+      "unknown": {
+        "0": "isso não é um comando. tenta help."
+      },
+      "open": {
+        "0": "indo. acompanha."
+      },
+      "noAnswer": {
+        "0": "essa eu não tenho."
+      },
+      "offTopic": {
+        "0": "não. pergunta sobre a Anna."
+      },
+      "limit": {
+        "0": "chega de pergunta por hoje."
+      }
+    },
+    "asleep": "Abimaela, a gata, dormindo. Clica pra acordar.",
+    "awake": "Abimaela, a gata. Clica pra dar oi."
+  },
+  "meta": {
+    "cover": "Anna Maria, Engenheira de Software Full-stack",
+    "home": {
+      "title": "Anna Maria",
+      "description": "Eu construo as coisas de ponta a ponta, da UI e do front, web ou mobile, até colocar no ar. Notas, projetos e uma gata."
+    },
+    "ai": {
+      "title": "IA",
+      "description": "Um chat que responde perguntas sobre a Anna e sobre o que tem nesse site."
+    },
+    "back": {
+      "title": "Back",
+      "description": "O mesmo site em forma de terminal: arquivos, rotas e comandos."
+    },
+    "contact": {
+      "title": "Contato",
+      "description": "Me escreve um postal, ou me acha onde eu já estou."
+    },
+    "log": {
+      "title": "Log",
+      "description": "Um feed só pra tudo que eu termino: filmes, séries, livros, álbuns, podcasts e jogos."
+    },
+    "notes": {
+      "title": "Notas",
+      "description": "Algumas palavras de sabedoria (ou não) sobre desenvolvimento, arquitetura e as ferramentas que eu uso. Texto longo, diários de construção e, de vez em quando, uma opinião."
+    },
+    "person": {
+      "title": "Anna como pessoa",
+      "description": "Quem eu sou quando não tô trabalhando: onde moro, o que assisto e escuto, e a gata."
+    },
+    "professional": {
+      "title": "Anna como profissional",
+      "description": "Onde eu trabalho, onde trabalhei e estudei, com o que eu trabalho, e os apps em que eu trabalho."
+    },
+    "projects": {
+      "title": "Projetos",
+      "description": "Ferramentas open source, bibliotecas e projetos paralelos. As coisas que eu construí porque queria que existissem."
+    },
+    "wall": {
+      "title": "Mural de carinho",
+      "description": "O que quem trabalhou comigo escreveu sobre trabalhar comigo."
+    },
+    "removed": "Removida na v3",
+    "notFound": "Página não encontrada",
+    "invite": "convite",
+    "piano": "O piano",
+    "components": "A página de componentes",
+    "roadmap": "O roadmap",
+    "site": "Eu construo as coisas de ponta a ponta, da UI e do front, web ou mobile, até colocar no ar. Uns {years} anos nisso."
+  }
+}

@@ -1,0 +1,51 @@
+.st-footer {
+  container-type: inline-size;
+  max-width: var(--st-width);
+  margin-inline: auto;
+  padding: 0 16px 176px;
+}
+@media (min-width: 768px) {
+  .st-footer {
+    padding-inline: 32px;
+  }
+}
+
+/* where the page stops: a dashed rule, and a strip of tape across it with the words on it */
+.st-ft-end {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 72px 0 32px;
+  padding-block: 8px;
+}
+.st-ft-rule {
+  flex: 1;
+  border-top: 1px dashed var(--border-strong);
+}
+/* the site's tape (tape.css), long enough to write on */
+.st-ft-tape {
+  padding: 6px 22px;
+  background: color-mix(in srgb, var(--fg-brand) 26%, transparent);
+  color: var(--fg-primary);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  rotate: -2deg;
+  /* torn ends, like tape pulled off the roll */
+  clip-path: polygon(
+    0 8%,
+    3% 0,
+    97% 6%,
+    100% 0,
+    98% 30%,
+    100% 55%,
+    97% 78%,
+    100% 100%,
+    3% 94%,
+    0 100%,
+    2% 70%,
+    0 45%,
+    2% 22%
+  );
+}

@@ -36,6 +36,9 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+# any other env file (`.env.production`, `.env.test`): only the example is committed
+.env.*
+!.env.example
 
 # vercel
 .vercel
@@ -57,3 +60,15 @@ CODE-REVIEW-*.md
 /public/robots.txt
 /public/sitemap.xml
 /public/sitemap-0.xml
+
+# Local agent tooling and skills
+.agents/
+.codex/
+.impeccable/
+.github/agents/
+.github/hooks/
+.github/skills/
+PRODUCT.md
+
+# Raw originals for the new UI (photos carry location metadata). Never committed.
+/assets/

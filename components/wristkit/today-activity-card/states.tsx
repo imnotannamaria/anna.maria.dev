@@ -1,5 +1,6 @@
 "use client"
 
+import { useLocale, useTranslations } from "next-intl"
 /**
  * wristkit v2's card, on this site's surface.
  *
@@ -30,15 +31,15 @@ import type { TodayData } from "./load"
 import "./styles.css"
 
 const METRICS = [
-  { id: "move", label: "Move", value: "kcal", goal: "kcalGoal", unit: "kcal" },
+  { id: "move", label: "move", value: "kcal", goal: "kcalGoal", unit: "kcal" },
   {
     id: "exercise",
-    label: "Exercise",
+    label: "exercise",
     value: "exerciseMinutes",
     goal: "exerciseGoal",
     unit: "min",
   },
-  { id: "steps", label: "Steps", value: "steps", goal: "stepsGoal", unit: "steps" },
+  { id: "steps", label: "steps", value: "steps", goal: "stepsGoal", unit: "stepsUnit" },
 ] as const
 
 type DisplayKind = "loading" | "empty" | "error" | "stale" | "ok"
@@ -58,14 +59,15 @@ type DisplayKind = "loading" | "empty" | "error" | "stale" | "ok"
 export function ActivityRings({ data, kind = "ok" }: { data?: TodayData; kind?: DisplayKind }) {
   // Asked here, not inherited: the reduced-motion block in the stylesheet only reaches CSS.
   const reduce = useReducedMotion() ?? false
+  const t = useTranslations("person.activity")
   // The loading state does not take part in the entrance. It is what the server streams while
   // the query runs, so it is on screen *before* hydration, and anything starting at
   // `opacity: 0` there would stay invisible for exactly as long as the state exists.
   const enters = kind !== "loading"
 
   return (
-    <svg className="wk-rings" viewBox="0 0 200 200" role="img" aria-label="Activity rings">
-      <title>Activity rings</title>
+    <svg className="wk-rings" viewBox="0 0 200 200" role="img" aria-label={t("rings")}>
+      <title>{t("rings")}</title>
       {METRICS.map((metric, index) => {
         const radius = 84 - index * 23
         const circumference = 2 * Math.PI * radius
@@ -150,14 +152,16 @@ function ActivityPanel({
 }) {
   const reduce = useReducedMotion() ?? false
   const { onMouseMove, spotlight } = useSpotlight(380)
+  const t = useTranslations("person.activity")
+  const locale = useLocale() === "pt" ? "pt-BR" : "en-US"
 
   const status = kind === "ok" ? "synced" : kind
   const notes: Record<DisplayKind, React.ReactNode> = {
-    ok: "Up to date",
-    loading: "Syncing your activity…",
-    empty: "No data yet. Run the Shortcut on your iPhone.",
-    error: "Something went wrong. We couldn't load today's activity.",
-    stale: `Last sync ${data?.hoursSinceSync ?? 0}h ago. Run the Shortcut to update.`,
+    ok: t("ok"),
+    loading: t("syncing"),
+    empty: t("noData"),
+    error: t("failed"),
+    stale: t("lastSync", { hours: data?.hoursSinceSync ?? 0 }),
   }
   return (
     <motion.section
@@ -165,7 +169,7 @@ function ActivityPanel({
       // top of that would push the three parts apart.
       className={cn(cardVariants(), "wk-activity gap-0", className)}
       data-state={kind}
-      aria-label="Today's activity"
+      aria-label={t("aria")}
       aria-busy={kind === "loading"}
       onMouseMove={onMouseMove}
       // The surface itself does not animate here: on the home page the tile brings it in.
@@ -180,11 +184,11 @@ function ActivityPanel({
         {/* An h3, where wristkit ships a span: every other card on the home page names itself
             with a heading, and this one dropped out of the outline when v2 came in. */}
         <h3 className="wk-activity-label m-0 font-normal">
-          <span aria-hidden>↗</span> Today / Activity
+          <span aria-hidden>↗</span> {t("title")}
         </h3>
         <span className="wk-activity-status">
           <span aria-hidden className="wk-status-dot" />
-          {status}
+          {t(status)}
         </span>
       </header>
       <div className="wk-activity-body">
@@ -214,15 +218,15 @@ function ActivityPanel({
             >
               <dt>
                 <span className="wk-metric-dot" aria-hidden />
-                {metric.label}
+                {t(metric.label)}
               </dt>
               <dd>
                 <span className="wk-metric-value">
-                  {data ? Math.round(data[metric.value]).toLocaleString("en-US") : "—"}
+                  {data ? Math.round(data[metric.value]).toLocaleString(locale) : "—"}
                 </span>
                 <span className="wk-metric-goal">
-                  {data ? `/ ${data[metric.goal].toLocaleString("en-US")} ` : ""}
-                  {metric.unit}
+                  {data ? `/ ${data[metric.goal].toLocaleString(locale)} ` : ""}
+                  {t(metric.unit)}
                 </span>
               </dd>
             </motion.div>
@@ -232,10 +236,10 @@ function ActivityPanel({
       <footer className="wk-activity-footer">
         <span aria-live="polite">{notes[kind]}</span>
         {kind === "ok" && data ? (
-          <time dateTime={data.lastSyncIso}>Synced {data.lastSyncLabel}</time>
+          <time dateTime={data.lastSyncIso}>{t("syncedAt", { when: data.lastSyncLabel })}</time>
         ) : null}
-        {kind === "empty" ? <span>Install Shortcut to connect.</span> : null}
-        {kind === "error" ? <span>Please try again later.</span> : null}
+        {kind === "empty" ? <span>{t("install")}</span> : null}
+        {kind === "error" ? <span>{t("later")}</span> : null}
       </footer>
     </motion.section>
   )

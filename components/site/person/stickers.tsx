@@ -1,0 +1,198 @@
+"use client"
+
+import { pet } from "@/components/site/abimaela/abimaela"
+import { useTranslations } from "next-intl"
+import { StickerIcon } from "@phosphor-icons/react"
+import { motion, useMotionValue } from "motion/react"
+import Image, { type StaticImageData } from "next/image"
+import { useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react"
+import { Tip } from "@/components/ui/tip"
+import { STICKER } from "@/components/site/sticker"
+import { Tile } from "@/components/site/tile"
+import bosco from "@/components/site/person/stickers/bosco.png"
+import cherry from "@/components/site/person/stickers/cherry.png"
+import dany from "@/components/site/person/stickers/dany.png"
+import galadriel from "@/components/site/person/stickers/galadriel.png"
+import pernambuco from "@/components/site/person/stickers/pernambuco.png"
+import "./stickers.css"
+
+const cutout = (src: StaticImageData, width: number) => (
+  <Image src={src} alt="" width={width} sizes={`${width}px`} draggable={false} />
+)
+
+type Sticker = {
+  /** Also the key of its caption in the messages. */
+  id: "pe" | "galadriel" | "dany" | "bosco" | "cherry"
+
+  art: ReactNode
+
+  diecut?: boolean
+  x: string
+  y: string
+  tilt: number
+}
+
+const STICKERS: Sticker[] = [
+  {
+    id: "pe",
+    // the real flag, a rectangle: it sits on the sticker's white backing, which is its border
+    art: (
+      <Image
+        src={pernambuco}
+        alt=""
+        width={104}
+        sizes="104px"
+        draggable={false}
+        className="rounded-[8px]"
+      />
+    ),
+    x: "4%",
+    y: "4%",
+    tilt: -6,
+  },
+  {
+    id: "galadriel",
+    art: cutout(galadriel, 118),
+    diecut: true,
+    x: "56%",
+    y: "2%",
+    tilt: 5,
+  },
+  {
+    id: "dany",
+    art: cutout(dany, 118),
+    diecut: true,
+    x: "30%",
+    y: "30%",
+    tilt: -3,
+  },
+  {
+    id: "bosco",
+    art: cutout(bosco, 118),
+    diecut: true,
+    x: "2%",
+    y: "56%",
+    tilt: 4,
+  },
+  {
+    id: "cherry",
+    art: cutout(cherry, 118),
+    diecut: true,
+    x: "60%",
+    y: "54%",
+    tilt: -5,
+  },
+]
+
+const STEP = 16
+
+function Sticker({
+  caption,
+  diecut,
+  children,
+  bounds,
+  front,
+  onGrab,
+  x: left,
+  y: top,
+  tilt,
+}: {
+  caption: string
+  diecut?: boolean
+  children: ReactNode
+  bounds: RefObject<HTMLDivElement | null>
+  front: number
+  onGrab: () => void
+  x: string
+  y: string
+  tilt: number
+}) {
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const [inHand, setInHand] = useState(false)
+  const button = useRef<HTMLButtonElement>(null)
+  const t = useTranslations("person.stickers")
+  // a sticker left focused after a drag or a click would keep the arrow keys: the page would
+  // not scroll with them, the sticker would move instead. A pointer lets go; Tab still arrives.
+  const letGo = () => button.current?.blur()
+
+  return (
+    <Tip label={caption}>
+      <motion.button
+        ref={button}
+        type="button"
+        aria-label={t("aria", { caption })}
+        drag
+        dragConstraints={bounds}
+        dragMomentum={false}
+        dragElastic={0}
+        data-in-hand={inHand || undefined}
+        onDragStart={() => setInHand(true)}
+        onDragEnd={() => {
+          setInHand(false)
+          letGo()
+          pet.notify("sticker")
+        }}
+        onPointerUp={letGo}
+        onPointerDown={onGrab}
+        onFocus={onGrab}
+        onKeyDown={(event) => {
+          const steps: Record<string, [number, number]> = {
+            ArrowLeft: [-STEP, 0],
+            ArrowRight: [STEP, 0],
+            ArrowUp: [0, -STEP],
+            ArrowDown: [0, STEP],
+          }
+          const step = steps[event.key]
+          if (!step) return
+          event.preventDefault()
+          x.set(x.get() + step[0])
+          y.set(y.get() + step[1])
+        }}
+        className="st-grab focus-ring absolute cursor-grab touch-none select-none active:cursor-grabbing"
+        style={{ x, y, left, top, zIndex: front }}
+      >
+        <span
+          className={STICKER}
+          data-diecut={diecut || undefined}
+          style={{ "--tilt": `${tilt}deg` } as CSSProperties}
+        >
+          {children}
+        </span>
+      </motion.button>
+    </Tip>
+  )
+}
+
+export function Stickers() {
+  const stage = useRef<HTMLDivElement>(null)
+  const [order, setOrder] = useState<Record<string, number>>({})
+  const topmost = useRef(1)
+  const t = useTranslations("person.stickers")
+
+  return (
+    <Tile label={t("label")} icon={<StickerIcon />} note={t("note")}>
+      <div ref={stage} className="relative min-h-[320px] flex-1">
+        {STICKERS.map((item) => (
+          <Sticker
+            key={item.id}
+            caption={t(item.id)}
+            diecut={item.diecut}
+            bounds={stage}
+            front={order[item.id] ?? 1}
+            x={item.x}
+            y={item.y}
+            tilt={item.tilt}
+            onGrab={() => {
+              topmost.current += 1
+              const z = topmost.current
+              setOrder((before) => ({ ...before, [item.id]: z }))
+            }}
+          >
+            {item.art}
+          </Sticker>
+        ))}
+      </div>
+    </Tile>
+  )
+}

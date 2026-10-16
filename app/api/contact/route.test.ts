@@ -21,6 +21,39 @@ afterEach(() => {
 })
 
 describe("POST /api/contact", () => {
+  it("stops an address that keeps sending: each message is an email and a unit of quota", async () => {
+    send.mockResolvedValue({ error: null })
+    const from = (ip: string) =>
+      new Request("http://localhost/api/contact", {
+        method: "POST",
+        headers: { "x-forwarded-for": ip },
+        body: JSON.stringify({
+          name: "Someone",
+          email: "someone@example.com",
+          message: "A message long enough to be one.",
+        }),
+      })
+    for (let i = 0; i < 5; i++) expect((await POST(from("203.0.113.9"))).status).toBe(200)
+    const sixth = await POST(from("203.0.113.9"))
+    expect(sixth.status).toBe(429)
+    expect(sixth.headers.get("retry-after")).toMatch(/^\d+$/)
+    expect(send).toHaveBeenCalledTimes(5)
+    // somebody else is not held back by it
+    expect((await POST(from("203.0.113.10"))).status).toBe(200)
+  })
+
+  it("refuses a body that is not a postcard, however its length is declared", async () => {
+    const res = await POST(
+      new Request("http://localhost/api/contact", {
+        method: "POST",
+        headers: { "x-forwarded-for": "203.0.113.50" },
+        body: JSON.stringify({ name: "x", email: "x@x.com", message: "m".repeat(25_000) }),
+      }),
+    )
+    expect(res.status).toBe(413)
+    expect(send).not.toHaveBeenCalled()
+  })
+
   it("honeypot: a filled 'website' field returns success without ever calling Resend", async () => {
     const res = await POST(
       req({ website: "https://spam.example", name: "x", email: "x@x.com", message: "x" }),

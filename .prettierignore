@@ -5,3 +5,13 @@ public/static
 
 # Bundled design export — minified on purpose, and deleted once /log ships.
 docs/log-design.html
+
+# Local agent tooling, not part of the project
+.agents
+.codex
+.impeccable
+.github/agents
+.github/hooks
+.github/skills
+PRODUCT.md
+assets

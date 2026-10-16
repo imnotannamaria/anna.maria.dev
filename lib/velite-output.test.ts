@@ -24,8 +24,13 @@ import { blog, projects } from "@/.velite"
  * relied on by the Next build itself.
  */
 
+/** Every document of a collection: the English files, and their translations under `pt/`. */
 function mdxFileCount(dir: "blog" | "projects"): number {
-  return readdirSync(join(process.cwd(), "content", dir)).filter((f) => f.endsWith(".mdx")).length
+  const count = (...parts: string[]) => {
+    const path = join(process.cwd(), "content", dir, ...parts)
+    return existsSync(path) ? readdirSync(path).filter((f) => f.endsWith(".mdx")).length : 0
+  }
+  return count() + count("pt")
 }
 
 describe("velite output matches content/ on disk", () => {

@@ -1,0 +1,10 @@
+/* A photo with a white border, thicker at the bottom. */
+
+.st-polaroid {
+  overflow: hidden;
+  border: 5px solid #fbfaf7;
+  border-bottom-width: 18px;
+  border-radius: 4px;
+  background: #d9d6cf;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+}
