@@ -36,6 +36,9 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+# any other env file (`.env.production`, `.env.test`): only the example is committed
+.env.*
+!.env.example
 
 # vercel
 .vercel

@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 // exercised — it exists only to make the module importable.
 vi.mock("@workos-inc/authkit-nextjs", () => ({ withAuth: vi.fn() }))
 
-const { isAdminEmail } = await import("./require-admin")
+const { isAdmin, isAdminEmail } = await import("./require-admin")
 
 const ORIGINAL_ADMIN_EMAILS = process.env.ADMIN_EMAILS
 
@@ -46,5 +46,26 @@ describe("isAdminEmail", () => {
     process.env.ADMIN_EMAILS = "anna@example.com"
     expect(isAdminEmail(null)).toBe(false)
     expect(isAdminEmail(undefined)).toBe(false)
+  })
+})
+
+describe("isAdmin", () => {
+  it("lets in an allowlisted email that WorkOS has verified, or does not say either way", () => {
+    process.env.ADMIN_EMAILS = "admin@example.com"
+    expect(isAdmin({ email: "admin@example.com", emailVerified: true })).toBe(true)
+    // an older user object has no such field: not a reason to lock the owner out
+    expect(isAdmin({ email: "admin@example.com" })).toBe(true)
+  })
+
+  it("refuses an allowlisted address that WorkOS marks as not verified", () => {
+    process.env.ADMIN_EMAILS = "admin@example.com"
+    expect(isAdmin({ email: "admin@example.com", emailVerified: false })).toBe(false)
+  })
+
+  it("refuses everyone else, and no one at all", () => {
+    process.env.ADMIN_EMAILS = "admin@example.com"
+    expect(isAdmin({ email: "stranger@example.com", emailVerified: true })).toBe(false)
+    expect(isAdmin(null)).toBe(false)
+    expect(isAdmin(undefined)).toBe(false)
   })
 })

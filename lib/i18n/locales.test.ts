@@ -42,6 +42,9 @@ describe("stripLocale", () => {
     ["/", "/"],
     ["/person", "/person"],
     ["/pto", "/pto"],
+    // an empty segment must not turn the address into `//host`, which is another site
+    ["/pt//example.test", "/example.test"],
+    ["/en///example.test/a", "/example.test/a"],
   ])("%s is %s", (inner, outer) => {
     expect(stripLocale(inner)).toBe(outer)
   })

@@ -1,6 +1,6 @@
 import postgres from "postgres"
 import { describe, expect, it } from "vitest"
-import { BOARD_SIZE } from "./constants"
+import { BOARD_SIZE, MAX_PENDING } from "./constants"
 import {
   claimRound,
   decideScore,
@@ -38,6 +38,14 @@ async function onBoard(name: string, seconds: number) {
   await claimRound(id, name)
   await decideScore(id, "approved")
   return id
+}
+
+/** A claimed name, not decided: it waits in the queue. */
+async function pending(name: string) {
+  const id = (await startRound()) as string
+  await startedAgo(id, "30 seconds")
+  await finishRound(id, 12)
+  return { id, claimed: await claimRound(id, name) }
 }
 
 describe("the memory board", () => {
@@ -106,6 +114,39 @@ describe("the memory board", () => {
     const fast = (await startRound()) as string
     await startedAgo(fast, "10 seconds")
     expect(await finishRound(fast, 9)).toMatchObject({ qualifies: true, rank: 1 })
+    await clean()
+  })
+
+  it("stops queueing names once enough are waiting, and takes them again when some are decided", async () => {
+    await clean()
+    const first: string[] = []
+    for (let i = 0; i < MAX_PENDING; i++) {
+      const { id, claimed } = await pending(`Fila${i}`)
+      expect(claimed).not.toBeNull()
+      first.push(id)
+    }
+    // the queue is full: another name, however good its time, is turned away
+    const over = await pending("De mais")
+    expect(over.claimed).toBeNull()
+    // the admin decides one, and there is room again
+    await decideScore(first[0], "rejected")
+    expect((await pending("Cabe agora")).claimed).not.toBeNull()
+    await clean()
+  })
+
+  it("does not take a name after the window, even when the round was read inside it", async () => {
+    await clean()
+    const id = (await startRound()) as string
+    await startedAgo(id, "40 minutes")
+    // finished_at is when the last pair was reported: push it past the claim window
+    const sql = postgres(process.env.DATABASE_URL as string, { prepare: false })
+    try {
+      await finishRound(id, 12)
+      await sql`update memory_scores set finished_at = now() - interval '31 minutes' where id = ${id}`
+    } finally {
+      await sql.end()
+    }
+    expect(await claimRound(id, "Atrasada")).toBeNull()
     await clean()
   })
 })

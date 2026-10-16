@@ -3,7 +3,7 @@ import { localeFrom } from "@/lib/i18n/locales"
 import { TYPE_LABEL } from "@/lib/log/constants"
 import { inLocale } from "@/lib/log/locale"
 import { getPublishedEntries } from "@/lib/log/queries"
-import { rateLimit } from "../middleware/rate-limit"
+import { byClient, rateLimit } from "../middleware/rate-limit"
 
 export const site = new Hono()
 
@@ -21,7 +21,7 @@ site.get(
   rateLimit({
     max: 30,
     windowMs: 60_000,
-    key: (c) => `site-log:${c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"}`,
+    key: byClient("site-log"),
   }),
   async (c) => {
     const locale = localeFrom(c.req.query("lang"), null)

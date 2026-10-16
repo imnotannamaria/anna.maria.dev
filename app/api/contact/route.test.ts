@@ -42,6 +42,18 @@ describe("POST /api/contact", () => {
     expect((await POST(from("203.0.113.10"))).status).toBe(200)
   })
 
+  it("refuses a body that is not a postcard, however its length is declared", async () => {
+    const res = await POST(
+      new Request("http://localhost/api/contact", {
+        method: "POST",
+        headers: { "x-forwarded-for": "203.0.113.50" },
+        body: JSON.stringify({ name: "x", email: "x@x.com", message: "m".repeat(25_000) }),
+      }),
+    )
+    expect(res.status).toBe(413)
+    expect(send).not.toHaveBeenCalled()
+  })
+
   it("honeypot: a filled 'website' field returns success without ever calling Resend", async () => {
     const res = await POST(
       req({ website: "https://spam.example", name: "x", email: "x@x.com", message: "x" }),

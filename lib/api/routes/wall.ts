@@ -1,7 +1,7 @@
 import { Hono } from "hono"
 import { react } from "@/lib/wall/mutations"
 import { reactSchema } from "@/lib/wall/validation"
-import { rateLimit } from "../middleware/rate-limit"
+import { byClient, rateLimit } from "../middleware/rate-limit"
 
 export const wall = new Hono()
 
@@ -18,7 +18,7 @@ wall.post(
   rateLimit({
     max: 40,
     windowMs: 10 * 60 * 1000,
-    key: (c) => `wall-react:${c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"}`,
+    key: byClient("wall-react"),
   }),
   async (c) => {
     const parsed = reactSchema.safeParse(await c.req.json().catch(() => null))

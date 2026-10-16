@@ -8,7 +8,11 @@ vi.mock("resend", () => ({
   },
 }))
 const put = vi.fn()
-vi.mock("@vercel/blob", () => ({ put: (...args: unknown[]) => put(...args), del: vi.fn() }))
+const del = vi.fn()
+vi.mock("@vercel/blob", () => ({
+  put: (...args: unknown[]) => put(...args),
+  del: (...args: unknown[]) => del(...args),
+}))
 
 import { bug } from "./bug"
 
@@ -37,6 +41,7 @@ beforeEach(() => {
   vi.stubEnv("BLOB_READ_WRITE_TOKEN", "blob_test")
   send.mockReset().mockResolvedValue({ error: null })
   put.mockReset().mockResolvedValue({ url: "https://blob.example/bugs/x.png" })
+  del.mockReset().mockResolvedValue(undefined)
 })
 afterEach(() => vi.unstubAllEnvs())
 
@@ -114,5 +119,21 @@ describe("POST /bug", () => {
     const res = await post(good)
     expect(res.status).toBe(502)
     expect(await res.text()).not.toContain("secret")
+  })
+
+  it("takes the picture back down when the report did not go, so it is not left with no owner", async () => {
+    send.mockResolvedValue({ error: { message: "down" } })
+    vi.spyOn(console, "error").mockImplementation(() => {})
+    const res = await post({
+      ...good,
+      attachment: new File([PNG], "shot.png", { type: "image/png" }),
+    })
+    expect(res.status).toBe(502)
+    expect(del).toHaveBeenCalledWith("https://blob.example/bugs/x.png")
+  })
+
+  it("keeps the picture when the report went", async () => {
+    await post({ ...good, attachment: new File([PNG], "shot.png", { type: "image/png" }) })
+    expect(del).not.toHaveBeenCalled()
   })
 })

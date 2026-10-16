@@ -5,8 +5,8 @@ import { Resend } from "resend"
 import { BugReportEmail } from "@/emails/bug-report-email"
 import { BUG_ATTACHMENT_MAX_BYTES, bugSchema } from "@/lib/bug-schema"
 import { siteConfig } from "@/lib/site-config"
-import { sniffImage } from "@/lib/wall/avatar"
-import { rateLimit } from "../middleware/rate-limit"
+import { removeAvatar, sniffImage } from "@/lib/wall/avatar"
+import { byClient, rateLimit } from "../middleware/rate-limit"
 
 export const bug = new Hono()
 
@@ -27,7 +27,7 @@ bug.post(
   rateLimit({
     max: 5,
     windowMs: 10 * 60 * 1000,
-    key: (c) => `bug:${c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"}`,
+    key: byClient("bug"),
   }),
   async (c) => {
     if (!c.req.header("content-type")?.includes("multipart/form-data")) {
@@ -97,6 +97,8 @@ bug.post(
     })
     if (error) {
       console.error("[bug] Resend error:", error)
+      // the report did not go, so nobody will ever open the link to its picture
+      await removeAvatar(attachment)
       return c.json({ error: "unavailable" }, 502)
     }
     return c.json({ ok: true }, 201)

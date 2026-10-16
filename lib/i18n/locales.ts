@@ -63,7 +63,9 @@ export function localeFrom(cookie: string | undefined, acceptLanguage: string | 
 export function stripLocale(pathname: string): string {
   const [, first, ...rest] = pathname.split("/")
   if (!isLocale(first)) return pathname
-  return `/${rest.join("/")}`
+  // `/pt//host` has an empty segment, and `/` + `/host` is `//host`: a protocol-relative URL
+  // that `location.assign` would take off the site. Leading slashes collapse to one.
+  return `/${rest.join("/").replace(/^\/+/, "")}`
 }
 
 /** The address of a page in a language: `/notes` in English, `/pt/notes` in Portuguese. */

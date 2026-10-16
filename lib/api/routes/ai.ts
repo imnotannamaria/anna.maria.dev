@@ -5,7 +5,7 @@ import { MAX_OUTPUT_TOKENS, costMicro, reserveMicro } from "@/lib/ai/limits"
 import { RULE_MARKS, buildMessages, canaryOf } from "@/lib/ai/prompt"
 import { admit, settle, visitorOf } from "@/lib/ai/usage"
 import { chatSchema } from "@/lib/ai/validation"
-import { rateLimit } from "../middleware/rate-limit"
+import { byClient, clientIp, rateLimit } from "../middleware/rate-limit"
 
 export const ai = new Hono()
 
@@ -17,8 +17,6 @@ function config() {
   const model = process.env.OPENROUTER_MODEL?.trim()
   return key && model ? { key, model } : null
 }
-
-const ipOf = (header: string | undefined) => header?.split(",")[0]?.trim() || "unknown"
 
 /** One line per refusal, with the reason and never the text: enough to see an attack happening. */
 const note = (reason: string) => console.warn(JSON.stringify({ event: "ai.refused", reason }))
@@ -55,7 +53,7 @@ ai.post(
   rateLimit({
     max: 40,
     windowMs: 60_000,
-    key: (c) => `ai:${ipOf(c.req.header("x-forwarded-for"))}`,
+    key: byClient("ai"),
   }),
   async (c) => {
     const conf = config()
@@ -75,7 +73,7 @@ ai.post(
     const context = earlier.filter((text) => screenQuestion(text) === "ok")
 
     const reserve = reserveMicro(conf.model)
-    const visitor = visitorOf(ipOf(c.req.header("x-forwarded-for")), conf.key)
+    const visitor = visitorOf(clientIp(c.req.raw), conf.key)
     const admission = await admit(visitor, reserve).catch(() => ({
       ok: false as const,
       reason: "unavailable" as const,

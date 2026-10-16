@@ -2,6 +2,8 @@ import { ImageResponse } from "next/og"
 import { type NextRequest } from "next/server"
 import { readFile } from "node:fs/promises"
 import path from "node:path"
+import { LOCALES } from "@/lib/i18n/locales"
+import { getPublishedPosts, getPublishedProjects } from "@/lib/velite"
 
 export const runtime = "nodejs"
 
@@ -45,8 +47,25 @@ async function readMark(): Promise<string | null> {
  * Satori reads woff and ttf, not woff2, which is why the fonts come from @fontsource instead of
  * from next/font. The paths stay literal so the build traces the files.
  */
+/**
+ * The titles a card exists for: every published note and project, in each language. The route
+ * is open to anyone, and each distinct `title` is a full render and a cache entry of its own, so
+ * a string that is not a real title gets a 404 and costs nothing. The only callers (the
+ * metadata of a note and of a project) pass a title from this very list.
+ */
+function knownTitles() {
+  const titles = new Set<string>()
+  for (const locale of LOCALES) {
+    for (const entry of [...getPublishedPosts(locale), ...getPublishedProjects(locale)]) {
+      titles.add(entry.title.slice(0, 120))
+    }
+  }
+  return titles
+}
+
 export async function GET(req: NextRequest) {
   const title = new URL(req.url).searchParams.get("title")?.slice(0, 120)
+  if (title && !knownTitles().has(title)) return new Response("Not found", { status: 404 })
   const [newsreader, newsreaderItalic, mono, monoMedium, mark] = await Promise.all([
     readFile(
       path.join(

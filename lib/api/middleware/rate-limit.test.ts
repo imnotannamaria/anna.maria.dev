@@ -77,3 +77,43 @@ describe("rateLimit", () => {
     expect(afterWindow.status).toBe(200)
   })
 })
+
+describe("the bucket store", () => {
+  it("forgets the oldest buckets past its ceiling, and keeps the recent ones", async () => {
+    vi.resetModules()
+    const { take } = await import("./rate-limit")
+    const long = 60 * 60 * 1000
+    // the first key is used up, then 10,500 other keys push it out of a 10,000-key store
+    expect(take("first", 1, long).ok).toBe(true)
+    expect(take("first", 1, long).ok).toBe(false)
+    for (let i = 0; i < 10_500; i++) take(`other-${i}`, 1, long)
+    expect(take("first", 1, long).ok).toBe(true)
+    // a recent key is still counted: forgetting is only for the oldest
+    expect(take("other-10499", 1, long).ok).toBe(false)
+  })
+
+  it("drops expired buckets first", async () => {
+    vi.resetModules()
+    const { take } = await import("./rate-limit")
+    expect(take("stale", 1, 1000).ok).toBe(true)
+    for (let i = 0; i < 9_999; i++) take(`filler-${i}`, 1, 60 * 60 * 1000)
+    vi.advanceTimersByTime(2000)
+    // at the ceiling, the expired one goes and the live ones stay
+    take("one-more", 1, 60 * 60 * 1000)
+    expect(take("filler-0", 1, 60 * 60 * 1000).ok).toBe(false)
+  })
+})
+
+describe("byClient", () => {
+  it("keys a route's bucket on the client, falling back to x-real-ip", async () => {
+    vi.resetModules()
+    const { byClient } = await import("./rate-limit")
+    const key = byClient("bug")
+    const ask = (headers: Record<string, string>) =>
+      key({ req: { raw: new Request("http://x.test/", { headers }) } } as never)
+
+    expect(ask({ "x-forwarded-for": "1.2.3.4, 10.0.0.1" })).toBe("bug:1.2.3.4")
+    expect(ask({ "x-real-ip": "5.6.7.8" })).toBe("bug:5.6.7.8")
+    expect(ask({})).toBe("bug:unknown")
+  })
+})

@@ -1,8 +1,17 @@
 import "server-only"
-import { and, asc, count, desc, eq, gt, gte, inArray, lt, sql } from "drizzle-orm"
+import { and, asc, count, desc, eq, gt, gte, inArray, lt, or, sql } from "drizzle-orm"
 import { createDb, dbUrl } from "@/lib/db/client"
 import { isUuid } from "@/lib/format"
-import { BOARD_SIZE, CLAIM_TTL_MS, MIN_MS, ROUND_TTL_MS, type MemoryStatus } from "./constants"
+import {
+  ADMIN_LIST_LIMIT,
+  BOARD_SIZE,
+  CLAIM_TTL_MS,
+  MAX_PENDING,
+  MIN_MS,
+  REJECTED_KEEP_MS,
+  ROUND_TTL_MS,
+  type MemoryStatus,
+} from "./constants"
 import { memoryScores } from "./schema"
 
 /** Null without a database: the game still plays, with no board. */
@@ -19,7 +28,8 @@ export type MemoryScore = BoardRow & { status: MemoryStatus }
 
 /**
  * A new round, the moment the first card turns. Rounds nobody finished or named for a day go at
- * the same time, so the table holds the board and not every visit.
+ * the same time, and so do names turned down a month ago, so the table holds the board and not
+ * every visit.
  */
 export async function startRound(): Promise<string | null> {
   const conn = db()
@@ -27,9 +37,12 @@ export async function startRound(): Promise<string | null> {
   await conn
     .delete(memoryScores)
     .where(
-      and(
-        inArray(memoryScores.status, ["playing", "finished"]),
-        lt(memoryScores.startedAt, ago(24 * 60 * 60 * 1000)),
+      or(
+        and(
+          inArray(memoryScores.status, ["playing", "finished"]),
+          lt(memoryScores.startedAt, ago(24 * 60 * 60 * 1000)),
+        ),
+        and(eq(memoryScores.status, "rejected"), lt(memoryScores.decidedAt, ago(REJECTED_KEEP_MS))),
       ),
     )
   const [row] = await conn.insert(memoryScores).values({}).returning({ id: memoryScores.id })
@@ -96,10 +109,24 @@ export async function claimRound(id: string, name: string) {
   if (!round?.ms) return null
   const rank = await rankOf(round.ms)
   if (rank > BOARD_SIZE) return null
+  // the gate above counts only what is approved, so the queue needs a ceiling of its own
+  const [{ waiting }] = await conn
+    .select({ waiting: count() })
+    .from(memoryScores)
+    .where(eq(memoryScores.status, "submitted"))
+  if (waiting >= MAX_PENDING) return null
   const [row] = await conn
     .update(memoryScores)
     .set({ status: "submitted", name, submittedAt: sql`now()` })
-    .where(and(eq(memoryScores.id, id), eq(memoryScores.status, "finished")))
+    .where(
+      and(
+        eq(memoryScores.id, id),
+        eq(memoryScores.status, "finished"),
+        // the window is checked again here, on the database's clock: the select above is a
+        // moment older than this write
+        sql`${memoryScores.finishedAt} > now() - make_interval(secs => ${CLAIM_TTL_MS / 1000}::int)`,
+      ),
+    )
     .returning({ id: memoryScores.id })
   return row ? { id: row.id, name, ms: round.ms, moves: round.moves ?? 0, rank } : null
 }
@@ -130,6 +157,7 @@ export async function getNamedScores(): Promise<MemoryScore[]> {
       asc(memoryScores.ms),
       desc(memoryScores.submittedAt),
     )
+    .limit(ADMIN_LIST_LIMIT)
   return rows.map((row) => ({ ...toRow(row), status: row.status as MemoryStatus }))
 }
 

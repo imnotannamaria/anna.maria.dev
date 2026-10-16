@@ -198,3 +198,75 @@ describe("poster route — fetch and redirect handling", () => {
     expect(res.status).toBe(502)
   })
 })
+
+describe("poster route — what is served, and what is counted", () => {
+  it.each([
+    ["an IPv4-mapped IPv6 literal", "https://[::ffff:7f00:1]/x.jpg"],
+    ["a unique-local IPv6 literal", "https://[fc00::1]/x.jpg"],
+    ["a link-local IPv6 literal", "https://[fe80::1]/x.jpg"],
+    ["localhost with a trailing dot", "https://localhost./x.jpg"],
+    ["the 0.x.x.x block", "https://0.1.2.3/x.jpg"],
+    ["shared address space, 100.64.0.0/10", "https://100.64.0.1/x.jpg"],
+  ])("rejects %s with 400, before ever checking the allowlist", async (_label, url) => {
+    const res = await request(url)
+    expect(res.status).toBe(400)
+    expect(knownUrl).not.toHaveBeenCalled()
+  })
+
+  it("does not serve an SVG, which can carry script, from the site's own origin", async () => {
+    knownUrl.mockResolvedValue(true)
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response("<svg xmlns='http://www.w3.org/2000/svg'><script>1</script></svg>", {
+          status: 200,
+          headers: { "content-type": "image/svg+xml" },
+        }),
+      ),
+    )
+    const res = await request("https://example.com/vector-1.svg")
+    expect(res.status).toBe(415)
+  })
+
+  it("answers with the matched image type only, and headers that make it inert", async () => {
+    knownUrl.mockResolvedValue(true)
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(new Uint8Array([1]).buffer, {
+          status: 200,
+          headers: { "content-type": "image/PNG; charset=evil" },
+        }),
+      ),
+    )
+    const res = await request("https://example.com/known-headers.png")
+    expect(res.status).toBe(200)
+    expect(res.headers.get("content-type")).toBe("image/png")
+    expect(res.headers.get("x-content-type-options")).toBe("nosniff")
+    expect(res.headers.get("content-security-policy")).toContain("sandbox")
+  })
+
+  it("counts one poster once, however its token is spelled", async () => {
+    knownUrl.mockResolvedValue(true)
+    const fetchMock = vi.fn().mockImplementation(async () => imageResponse())
+    vi.stubGlobal("fetch", fetchMock)
+    const url = "https://example.com/spelled-many-ways.jpg"
+    const plain = encodePosterToken(url)
+    // the same URL, spelled with its padding and with whitespace inside (atob drops both)
+    const padded = plain + "=".repeat((4 - (plain.length % 4)) % 4)
+    const variants = [
+      plain,
+      padded,
+      `${plain.slice(0, 4)}%20${plain.slice(4)}`,
+      `${plain.slice(0, 8)}%0A${plain.slice(8)}`,
+    ]
+    let limited = 0
+    for (let i = 0; i < 100; i++) {
+      const res = await poster.request(`/${variants[i % variants.length]}`)
+      if (res.status === 429) limited++
+    }
+    // 60 allowed in the window, the rest refused: the spellings share one bucket
+    expect(limited).toBe(40)
+    expect(fetchMock).toHaveBeenCalledTimes(60)
+  })
+})

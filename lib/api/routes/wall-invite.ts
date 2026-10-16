@@ -5,7 +5,7 @@ import { notifySubmission } from "@/lib/wall/notify"
 import { getInviteByToken } from "@/lib/wall/queries"
 import { isTokenShape } from "@/lib/wall/token"
 import { submissionSchema } from "@/lib/wall/validation"
-import { rateLimit } from "../middleware/rate-limit"
+import { byClient, rateLimit } from "../middleware/rate-limit"
 
 /**
  * The one public write the wall has: a testimonial, sent through an invite link.
@@ -30,7 +30,7 @@ wallInvite.post(
   rateLimit({
     max: 10,
     windowMs: 10 * 60 * 1000,
-    key: (c) => `invite:${c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"}`,
+    key: byClient("invite"),
   }),
   async (c) => {
     const token = c.req.param("token")
@@ -81,7 +81,14 @@ wallInvite.post(
 
     // The update re-checks the invite on its own: it may have expired, or been used by a second
     // tab, since the lookup above. If it did, the photo just uploaded belongs to nothing.
-    const row = await submitTestimonial(token, parsed.data, avatarUrl)
+    let row: Awaited<ReturnType<typeof submitTestimonial>>
+    try {
+      row = await submitTestimonial(token, parsed.data, avatarUrl)
+    } catch (err) {
+      // the database failed after the photo was stored: same orphan, so the same cleanup
+      await removeAvatar(avatarUrl)
+      throw err
+    }
     if (!row) {
       await removeAvatar(avatarUrl)
       return c.json({ error: "used" }, 409)
