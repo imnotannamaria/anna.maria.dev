@@ -110,11 +110,16 @@ function Sticker({
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const [inHand, setInHand] = useState(false)
+  const button = useRef<HTMLButtonElement>(null)
   const t = useTranslations("person.stickers")
+  // a sticker left focused after a drag or a click would keep the arrow keys: the page would
+  // not scroll with them, the sticker would move instead. A pointer lets go; Tab still arrives.
+  const letGo = () => button.current?.blur()
 
   return (
     <Tip label={caption}>
       <motion.button
+        ref={button}
         type="button"
         aria-label={t("aria", { caption })}
         drag
@@ -125,8 +130,10 @@ function Sticker({
         onDragStart={() => setInHand(true)}
         onDragEnd={() => {
           setInHand(false)
+          letGo()
           pet.notify("sticker")
         }}
+        onPointerUp={letGo}
         onPointerDown={onGrab}
         onFocus={onGrab}
         onKeyDown={(event) => {
@@ -142,7 +149,7 @@ function Sticker({
           x.set(x.get() + step[0])
           y.set(y.get() + step[1])
         }}
-        className="st-grab focus-ring absolute cursor-grab touch-none active:cursor-grabbing"
+        className="st-grab focus-ring absolute cursor-grab touch-none select-none active:cursor-grabbing"
         style={{ x, y, left, top, zIndex: front }}
       >
         <span

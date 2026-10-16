@@ -69,6 +69,28 @@
   rotate: -1.9deg;
   translate: -12px 13px;
 }
+/* a phone: the room around the list is 16px, and a sheet tilted and slid out of its card (more so
+   on hover) went past it, which scrolled the page sideways. Half the slide, a gentler tilt. */
+@media (max-width: 639px) {
+  .st-nt-sheet[data-n="1"] {
+    rotate: 0.8deg;
+    translate: 4px 5px;
+  }
+  .st-nt-sheet[data-n="2"] {
+    rotate: -0.7deg;
+    translate: -4px 8px;
+  }
+  .st-nt-cell[data-featured]:hover .st-nt-sheet[data-n="1"],
+  .st-nt-cell[data-featured]:focus-within .st-nt-sheet[data-n="1"] {
+    rotate: 1.2deg;
+    translate: 6px 6px;
+  }
+  .st-nt-cell[data-featured]:hover .st-nt-sheet[data-n="2"],
+  .st-nt-cell[data-featured]:focus-within .st-nt-sheet[data-n="2"] {
+    rotate: -1deg;
+    translate: -6px 9px;
+  }
+}
 .st-nt-slips .st-nt-bundle > .st-nt-front {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

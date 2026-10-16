@@ -123,6 +123,9 @@ body:has(.st) [data-theme-switcher] {
   grid-column: 1;
   min-height: 0;
   overflow-y: auto;
+  /* the page scrolls down, never sideways: a tilted sheet or a sticker at the edge must not
+     open a horizontal scroll. The sources are fixed where they are; this is the net under them. */
+  overflow-x: hidden;
   overscroll-behavior: contain;
 }
 [data-page] {

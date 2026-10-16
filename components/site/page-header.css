@@ -26,3 +26,9 @@
     font-size: 16px;
   }
 }
+/* a very narrow phone: the chain of arrows may break rather than run past the page */
+@media (max-width: 479px) {
+  .st-lede-flow {
+    white-space: normal;
+  }
+}
