@@ -17,6 +17,8 @@ import {
   path,
   complete,
   execute,
+  options,
+  suggest,
   type Output,
   type ItemKind,
 } from "./shell"
@@ -69,6 +71,8 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
   const [entry, setEntry] = useState("")
   const [recalling, setRecalling] = useState<number | null>(null)
   const pastCommands = useRef<string[]>([])
+  // the entry the options were last listed for, so a second Tab on it does not list them again
+  const listed = useRef<string | null>(null)
   const count = useRef(1)
   const pane = useRef<HTMLDivElement>(null)
   const output = useRef<HTMLDivElement>(null)
@@ -115,6 +119,35 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
     setLines((before) => (result.clear ? [] : [...before, ...withId]))
     if (result.event) pet.notify(result.event)
     if (result.open) navigate(result.open.replace(/^tela:/, "") as ScreenId)
+  }
+
+  // the grey rest of the word, drawn after the cursor. Not for a long entry: the field scrolls
+  // sideways then, and the rest would no longer be where the cursor is.
+  const suggestion = useMemo(
+    () => (entry.length > 60 ? null : suggest(system, cwd, entry)),
+    [system, cwd, entry],
+  )
+
+  function take(next: string) {
+    setEntry(next)
+    setRecalling(null)
+    listed.current = null
+    field.current?.focus({ preventScroll: true })
+  }
+
+  // Tab finishes the word, or goes as far as the options agree. Where it cannot go further, the
+  // options are listed under the command, the way a shell does, once for each entry.
+  function tab() {
+    const next = complete(system, cwd, entry)
+    if (next !== entry) return take(next)
+    const names = options(system, cwd, entry)
+    if (names.length === 0 || listed.current === entry) return
+    listed.current = entry
+    const added: Output[] = [
+      { type: "echo", path: path(cwd), text: entry },
+      { type: "text", text: names.join("   ") },
+    ]
+    setLines((before) => [...before, ...added.map((line) => ({ ...line, id: count.current++ }))])
   }
 
   function recall(step: -1 | 1) {
@@ -191,33 +224,62 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
             <span aria-hidden className="text-[var(--t-folder)]">
               ❯
             </span>
-            <input
-              id={id}
-              ref={field}
-              value={entry}
-              placeholder={t("placeholder")}
-              autoComplete="off"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
-              className="min-w-0 flex-1 bg-transparent text-[var(--fg-primary)] caret-[var(--t-folder)] outline-none placeholder:text-[var(--fg-muted)]"
-              onChange={(event) => {
-                setEntry(event.target.value)
-                setRecalling(null)
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "ArrowUp") {
-                  event.preventDefault()
-                  recall(-1)
-                } else if (event.key === "ArrowDown") {
-                  event.preventDefault()
-                  recall(1)
-                } else if (event.key === "Tab" && entry) {
-                  event.preventDefault()
-                  setEntry(complete(system, cwd, entry))
-                }
-              }}
-            />
+            <div className="st-term-field">
+              <input
+                id={id}
+                ref={field}
+                value={entry}
+                placeholder={t("placeholder")}
+                autoComplete="off"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
+                className="m-0 block w-full min-w-0 border-0 bg-transparent p-0 text-[var(--fg-primary)] caret-[var(--t-folder)] outline-none placeholder:text-[var(--fg-muted)]"
+                onChange={(event) => {
+                  setEntry(event.target.value)
+                  setRecalling(null)
+                  listed.current = null
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowUp") {
+                    event.preventDefault()
+                    recall(-1)
+                  } else if (event.key === "ArrowDown") {
+                    event.preventDefault()
+                    recall(1)
+                  } else if (event.key === "Tab" && entry) {
+                    event.preventDefault()
+                    tab()
+                  } else if (
+                    event.key === "ArrowRight" &&
+                    suggestion &&
+                    event.currentTarget.selectionStart === entry.length
+                  ) {
+                    // at the end of the line, → takes the grey rest, as in fish
+                    event.preventDefault()
+                    take(suggestion.accepted)
+                  }
+                }}
+              />
+
+              {suggestion ? (
+                // The rest of the word, in grey. It is drawn over the field with the typed text
+                // invisible in front of it, so it starts where the cursor is. A tap takes it, for
+                // a phone, which has no Tab; the keyboard has Tab and →, so it is not a stop.
+                <span aria-hidden className="st-term-ghost">
+                  <span className="st-term-ghost-typed">{entry}</span>
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    className="st-term-ghost-rest"
+                    onClick={() => take(suggestion.accepted)}
+                  >
+                    {suggestion.rest}
+                    <kbd className="st-term-ghost-key text-mono-xs">tab</kbd>
+                  </button>
+                </span>
+              ) : null}
+            </div>
           </div>
         </form>
       </CardTerminalBody>

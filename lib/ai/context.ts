@@ -19,8 +19,8 @@ export function siteContext(): string {
 
   return [
     "ABOUT ANNA",
-    `Anna Maria is a full-stack software engineer from Pernambuco, Brazil, from a town really close to the beach. She has about ${calcYearsOfExp()} years of experience and builds things end to end, from the UI and the front, web or mobile, to shipping.`,
-    "Outside work: she goes to the gym five times a week, likes horror films, Mike Flanagan and Drag Race, plays a few instruments, and loves pop music. Her cat is called Abimaela, and is the cat in the corner of the site.",
+    `Anna Maria is a full-stack software engineer from Pernambuco, Brazil. She has about ${calcYearsOfExp()} years of experience and builds things end to end, from the UI and the front, web or mobile, to shipping.`,
+    "Outside work: she is not much for talking about herself, so she built her site as a playground, and the /person page says a lot about her. Her cat is called Abimaela, and is the cat in the corner of the site.",
     "",
     "WORK AND STUDY (page: /professional)",
     ...CAREER.map(

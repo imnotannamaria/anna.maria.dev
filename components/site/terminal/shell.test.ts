@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { complete, execute, type FileSystem, type Output } from "./shell"
+import { complete, execute, options, suggest, type FileSystem, type Output } from "./shell"
 
 const system: FileSystem = {
   root: {
@@ -67,9 +67,115 @@ describe("execute", () => {
   })
 })
 
+// a folder with names that share a start, to tell one way from several
+const crowded: FileSystem = {
+  root: {
+    "person.txt": "PERSON",
+    "professional.txt": "PROFESSIONAL",
+    "projects.txt": "PROJECTS",
+    "log.txt": "LOG",
+    notes: { "alpha.txt": "A", "alpine.txt": "B" },
+    projects: { "wristkit.txt": "W" },
+    ".secret": { "secret.txt": "shh" },
+  },
+  links: {},
+}
+
 describe("complete", () => {
   it("completes a command, with the space that lets you keep typing, and a file name", () => {
     expect(complete(system, [], "he")).toBe("help ")
     expect(complete(system, [], "cat per")).toBe("cat person.txt")
+  })
+
+  it("goes as far as the options agree, and no further", () => {
+    expect(complete(crowded, [], "cat pro")).toBe("cat pro")
+    expect(complete(crowded, [], "cat pers")).toBe("cat person.txt")
+    expect(complete(crowded, ["notes"], "cat al")).toBe("cat alp")
+    expect(complete(crowded, [], "cat notes/alp")).toBe("cat notes/alp")
+    expect(complete(crowded, [], "cat notes/alpi")).toBe("cat notes/alpine.txt")
+  })
+
+  it("gives a folder its slash and no space, so you can go on into it", () => {
+    expect(complete(crowded, [], "cd not")).toBe("cd notes/")
+    expect(complete(crowded, [], "cd notes/")).toBe("cd notes/")
+  })
+
+  it("completes in the folder you are in, and through a path", () => {
+    expect(complete(crowded, ["notes"], "cat alph")).toBe("cat alpha.txt")
+    expect(complete(crowded, [], "cat ~/notes/alph")).toBe("cat ~/notes/alpha.txt")
+    expect(complete(crowded, ["notes"], "cat ../per")).toBe("cat ../person.txt")
+  })
+
+  it("offers a folder to cd and ls, and no file", () => {
+    expect(complete(crowded, [], "cd p")).toBe("cd projects/")
+    expect(complete(crowded, [], "ls n")).toBe("ls notes/")
+  })
+
+  it("opens a page by its name, without the extension", () => {
+    expect(complete(crowded, [], "open pers")).toBe("open person")
+    expect(complete(crowded, [], "open notes/alph")).toBe("open notes/alpha")
+    // the extension, once it is being typed, stays
+    expect(complete(crowded, [], "open person.t")).toBe("open person.txt")
+  })
+
+  it("keeps hidden things for whoever types the dot", () => {
+    expect(complete(crowded, [], "cat s")).toBe("cat s")
+    expect(complete(crowded, [], "cat .sec")).toBe("cat .secret/")
+    expect(options(crowded, [], "cat ")).not.toContain(".secret/")
+  })
+
+  it("does nothing where there is nothing to finish", () => {
+    expect(complete(crowded, [], "")).toBe("")
+    expect(complete(crowded, [], "zzz")).toBe("zzz")
+    expect(complete(crowded, [], "pwd p")).toBe("pwd p")
+    expect(complete(crowded, [], "cd notes/ p")).toBe("cd notes/ p")
+    expect(complete(crowded, [], "cat nowhere/x")).toBe("cat nowhere/x")
+  })
+
+  it("keeps what was typed before the word, spaces included", () => {
+    expect(complete(crowded, [], "  he")).toBe("  help ")
+    expect(complete(crowded, [], "cat   pers")).toBe("cat   person.txt")
+  })
+})
+
+describe("options", () => {
+  it("lists what is left when Tab cannot finish the word, sorted", () => {
+    expect(options(crowded, [], "c")).toEqual(["cat", "cd", "clear"])
+    expect(options(crowded, [], "cat p")).toEqual([
+      "person.txt",
+      "professional.txt",
+      "projects.txt",
+      "projects/",
+    ])
+    expect(options(crowded, ["notes"], "cat alp")).toEqual(["alpha.txt", "alpine.txt"])
+    // one Tab more would still get somewhere, so it is not time for the list
+    expect(options(crowded, ["notes"], "cat al")).toEqual([])
+  })
+
+  it("lists nothing when Tab can finish it, or when there is nothing", () => {
+    expect(options(crowded, [], "he")).toEqual([])
+    expect(options(crowded, [], "cat pers")).toEqual([])
+    expect(options(crowded, [], "zzz")).toEqual([])
+  })
+
+  it("lists a folder's content for a space after the command", () => {
+    expect(options(crowded, [], "cd ")).toEqual(["notes/", "projects/"])
+  })
+})
+
+describe("suggest", () => {
+  it("shows the rest of the first option, and what taking it makes of the entry", () => {
+    expect(suggest(crowded, [], "he")).toEqual({ rest: "lp ", accepted: "help " })
+    expect(suggest(crowded, [], "c")).toEqual({ rest: "at ", accepted: "cat " })
+    expect(suggest(crowded, [], "cat pers")).toEqual({ rest: "on.txt", accepted: "cat person.txt" })
+    expect(suggest(crowded, [], "cd no")).toEqual({ rest: "tes/", accepted: "cd notes/" })
+  })
+
+  it("shows nothing for an empty word, a finished one, or no match", () => {
+    expect(suggest(crowded, [], "")).toBeNull()
+    expect(suggest(crowded, [], "cat ")).toBeNull()
+    expect(suggest(crowded, [], "help")).toBeNull()
+    expect(suggest(crowded, [], "cat person.txt")).toBeNull()
+    expect(suggest(crowded, [], "zzz")).toBeNull()
   })
 })

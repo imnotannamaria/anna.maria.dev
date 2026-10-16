@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/site-config"
 import "./signoff.css"
 
 /**
- * The last line of the site: "all rights reserved", with "reserved" taken out for "forked", as a
+ * The last line of the site: "all rights reserved", with "reserved" taken out for "forkable", as a
  * diff of the license. The site is an open source template anyone can fork, and the line ends in
  * the real link to do it. The two changed lines come in one after the other when it is seen.
  */

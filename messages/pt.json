@@ -161,7 +161,7 @@
     "signoff": {
       "all": "todos os direitos",
       "out": "reservados",
-      "in": "forkados",
+      "in": "forkáveis",
       "fork": "faz o seu fork",
       "changes": "uma linha mudou na licença"
     }
@@ -525,9 +525,9 @@
       "wallWhereValue": "na página",
       "logLoading": "O log ainda está carregando. Pergunta de novo daqui a pouco.",
       "logDown": "O log mora no Postgres, e o Postgres não respondeu agora.",
-      "log": "{count} coisas terminadas e registradas até agora. Essas são as mais recentes.",
+      "log": "{count, plural, one {# coisa terminada e registrada} other {# coisas terminadas e registradas}} até agora. Essas são as mais recentes.",
       "logCard": "log",
-      "notes": "{count} notas até agora. A em destaque vem primeiro.",
+      "notes": "{count, plural, one {# nota} other {# notas}} até agora. A em destaque vem primeiro.",
       "notesCard": "notas",
       "featured": "destaque",
       "projects": "{count} projetos publicados aqui: {libraries} open source, {demos} demos.",
@@ -544,7 +544,7 @@
       "contact": "Aqui estão todos os caminhos. Cada um abre, e cada um copia.",
       "contactCard": "contato",
       "channels": "Canais",
-      "person": "A Anna é de Pernambuco, de uma cidade bem perto da praia. A academia é o botão de reset diário dela, cinco vezes por semana. Ela é muito fã de filmes de terror, de Mike Flanagan e de Drag Race, toca alguns instrumentos, todos mediocremente, ama todo tipo de música, principalmente pop, e atende por Abimaela, a gata ali no canto.",
+      "person": "A Anna não é muito de falar sobre ela, então montou um playground. Só de olhar a página dá pra saber muita coisa sobre ela.",
       "personCard": "anna como pessoa",
       "thePage": "a página",
       "onIt": "o que tem",
@@ -585,7 +585,7 @@
     }
   },
   "terminal": {
-    "welcome": "o verso do annamaria.app. o site inteiro está aqui, em texto.\ndigita um comando e aperta enter, ou clica em um aqui embaixo.",
+    "welcome": "o verso do annamaria.app. o site inteiro está aqui, em texto.\ndigita um comando e aperta enter, ou clica em um aqui embaixo. o tab completa o que você começou.",
     "output": "Saída do terminal",
     "placeholder": "digita um comando",
     "shell": {
@@ -623,13 +623,7 @@
     "files": {
       "home": "Engenheira de Software full-stack, {years} anos construindo as coisas de ponta a ponta.",
       "doors": "seis portas, uma por página:",
-      "person": {
-        "0": "Eu sou a Anna, de Pernambuco, de uma cidade bem perto da praia.",
-        "1": "A academia é meu botão de reset diário, cinco vezes por semana, praticamente inegociável.",
-        "2": "Sou muito fã de filmes de terror, de Mike Flanagan e de Drag Race. Toco alguns",
-        "3": "instrumentos, todos mediocremente, e amo todo tipo de música, principalmente pop.",
-        "4": "Também atendo por Abimaela, a gata ali no canto."
-      },
+      "person": "Bom, eu não sou muito de falar sobre mim, então montei esse playground. Só de olhar a página dá pra saber muita coisa sobre mim :)",
       "onThePage": "na página:",
       "personItems1": "  rolo da câmera · eu, em playlist · anéis do wristkit · emojis e gifs que eu uso demais",
       "personItems2": "  o tempo em Pernambuco · stickers · a estante do log · coisas do dia a dia",

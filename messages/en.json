@@ -161,7 +161,7 @@
     "signoff": {
       "all": "all rights",
       "out": "reserved",
-      "in": "forked",
+      "in": "forkable",
       "fork": "fork your own",
       "changes": "one line changed in the license"
     }
@@ -525,9 +525,9 @@
       "wallWhereValue": "on the page",
       "logLoading": "The log is still loading. Ask me again in a second.",
       "logDown": "The log lives in Postgres, and Postgres did not answer just now.",
-      "log": "{count} things finished and logged so far. These are the latest.",
+      "log": "{count, plural, one {# thing} other {# things}} finished and logged so far. These are the latest.",
       "logCard": "log",
-      "notes": "{count} notes so far. The featured one comes first.",
+      "notes": "{count, plural, one {# note} other {# notes}} so far. The featured one comes first.",
       "notesCard": "notes",
       "featured": "featured",
       "projects": "{count} projects are published here: {libraries} open source, {demos} demos.",
@@ -544,7 +544,7 @@
       "contact": "Here is every way in. Each one opens, and each one copies.",
       "contactCard": "contact",
       "channels": "Channels",
-      "person": "Anna is from Pernambuco, from a town really close to the beach. The gym is her daily reset button, five times a week. She is a big fan of horror films, Mike Flanagan and Drag Race, plays a few instruments, all of them mediocrely, loves every kind of music, mostly pop, and answers to Abimaela, the cat in the corner.",
+      "person": "Anna is not much for talking about herself, so she built a playground. Just looking at the page tells you a lot about her.",
       "personCard": "anna as a person",
       "thePage": "the page",
       "onIt": "on it",
@@ -585,7 +585,7 @@
     }
   },
   "terminal": {
-    "welcome": "the back of annamaria.app. the whole site is in here, as text.\ntype a command and press enter, or click one below.",
+    "welcome": "the back of annamaria.app. the whole site is in here, as text.\ntype a command and press enter, or click one below. tab finishes what you started.",
     "output": "Terminal output",
     "placeholder": "type a command",
     "shell": {
@@ -623,13 +623,7 @@
     "files": {
       "home": "Full-stack Software Engineer, {years} years building things end to end.",
       "doors": "six doors, one per page:",
-      "person": {
-        "0": "I'm Anna, from Pernambuco, from a town really close to the beach.",
-        "1": "The gym is my daily reset button, five times a week, pretty much non negotiable.",
-        "2": "I'm a big fan of horror films, Mike Flanagan and Drag Race. I play a few",
-        "3": "instruments, all of them mediocrely, and I love every kind of music, mostly pop.",
-        "4": "I also answer to Abimaela, the cat in the corner."
-      },
+      "person": "Well, I'm not much for talking about myself, so I built this playground. Just looking at the page tells you a lot about me :)",
       "onThePage": "on the page:",
       "personItems1": "  camera roll · me, as a playlist · wristkit rings · emojis & gifs I overuse",
       "personItems2": "  the weather in Pernambuco · stickers · the log shelf · everyday things",

@@ -251,23 +251,116 @@ export function execute(system: FileSystem, cwd: string[], line: string): Result
   }
 }
 
-export function complete(system: FileSystem, cwd: string[], entry: string): string {
-  const parts = entry.split(/\s+/)
-  const last = parts.at(-1) ?? ""
+/**
+ * What can finish the word being typed. `head` is everything before that word, as typed;
+ * `piece` is the word so far; `matches` are the ways to end it, in the order they are offered.
+ * A match's `text` replaces the whole word (a path keeps its folders), its `label` is the name
+ * alone, which is what a list of options shows.
+ */
+export type Completion = {
+  head: string
+  piece: string
+  matches: { text: string; label: string; kind: "command" | "folder" | "file" }[]
+}
+
+// what each command takes as its argument: a folder, a file or a folder to go through, or a page
+const TAKES = { cd: "folder", ls: "folder", cat: "any", open: "page" } as const
+
+export function completion(system: FileSystem, cwd: string[], entry: string): Completion {
+  const lead = entry.length - entry.trimStart().length
+  const body = entry.slice(lead)
+  const parts = body.split(/\s+/)
+  const piece = parts.at(-1) ?? ""
+  const head = entry.slice(0, entry.length - piece.length)
+  const none: Completion = { head, piece, matches: [] }
+  if (!body) return none
 
   if (parts.length === 1) {
-    const found = COMMANDS.filter((c) => c.name.startsWith(last))
-    return found.length === 1 ? `${found[0].name} ` : entry
+    const matches = COMMANDS.filter((command) => command.name.startsWith(piece))
+      .map((command) => ({ text: command.name, label: command.name, kind: "command" as const }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+    return { head, piece, matches }
   }
 
-  const cut = last.lastIndexOf("/")
-  const base = cut >= 0 ? last.slice(0, cut + 1) : ""
-  const piece = last.slice(cut + 1)
-  const folder = go(system.root, resolver(cwd, base))
-  if (typeof folder !== "object") return entry
+  const takes = TAKES[parts[0] as keyof typeof TAKES]
+  // `cd` and `open` take one thing; `ls` and `cat` take as many as you like
+  const one = parts[0] === "cd" || parts[0] === "open"
+  if (!takes || (one && parts.length > 2)) return none
 
-  const found = Object.keys(folder).filter((name) => name.startsWith(piece))
-  if (found.length !== 1) return entry
-  const final = typeof folder[found[0]] === "object" ? "/" : ""
-  return [...parts.slice(0, -1), `${base}${found[0]}${final}`].join(" ")
+  const cut = piece.lastIndexOf("/")
+  const base = cut >= 0 ? piece.slice(0, cut + 1) : ""
+  const name = piece.slice(cut + 1)
+  const folder = go(system.root, resolver(cwd, base))
+  if (typeof folder !== "object") return none
+
+  const matches = Object.keys(folder)
+    // a hidden thing is offered only to someone who typed the dot
+    .filter((entryName) => entryName.startsWith(name) && (!entryName.startsWith(".") || name))
+    .flatMap((entryName) => {
+      const isFolder = typeof folder[entryName] === "object"
+      if (takes === "folder" && !isFolder) return []
+      // A page is opened by its name, with or without the extension: the shorter one is offered,
+      // unless the extension is already being typed.
+      const short = entryName.replace(/\.txt$/, "")
+      const shown = takes === "page" && !isFolder && short.startsWith(name) ? short : entryName
+      const label = isFolder ? `${shown}/` : shown
+      return [
+        {
+          text: `${base}${label}`,
+          label,
+          kind: isFolder ? ("folder" as const) : ("file" as const),
+        },
+      ]
+    })
+    .sort((a, b) => a.label.localeCompare(b.label))
+  return { head, piece, matches }
+}
+
+const commonStart = (words: string[]) =>
+  words.reduce((start, word) => {
+    let end = 0
+    while (end < start.length && end < word.length && start[end] === word[end]) end++
+    return start.slice(0, end)
+  })
+
+/**
+ * What Tab does: finish the word when there is one way to, go as far as the options agree when
+ * there are several, and change nothing when there is no way. A command gets the space that
+ * lets you keep typing; a folder gets its slash, and no space, so you can go on into it.
+ */
+export function complete(system: FileSystem, cwd: string[], entry: string): string {
+  const { head, piece, matches } = completion(system, cwd, entry)
+  if (matches.length === 0) return entry
+  if (matches.length === 1) {
+    const [only] = matches
+    return `${head}${only.text}${only.kind === "command" ? " " : ""}`
+  }
+  const shared = commonStart(matches.map((match) => match.text))
+  return shared.length > piece.length ? `${head}${shared}` : entry
+}
+
+/** The names a second look at Tab shows, when it cannot finish the word. Empty if it can. */
+export function options(system: FileSystem, cwd: string[], entry: string): string[] {
+  const { matches } = completion(system, cwd, entry)
+  return matches.length > 1 && complete(system, cwd, entry) === entry
+    ? matches.map((match) => match.label)
+    : []
+}
+
+/**
+ * The grey rest of the word, drawn after the cursor, and what accepting it makes of the entry.
+ * It is the first option, so with several the other ways in are Tab and its list. Nothing for an
+ * empty word: a suggestion appears once you have typed something.
+ */
+export function suggest(
+  system: FileSystem,
+  cwd: string[],
+  entry: string,
+): { rest: string; accepted: string } | null {
+  const { head, piece, matches } = completion(system, cwd, entry)
+  const [first] = matches
+  if (!first || !piece) return null
+  const accepted = `${head}${first.text}${first.kind === "command" ? " " : ""}`
+  const rest = accepted.slice(entry.length)
+  return rest.trim() ? { rest, accepted } : null
 }

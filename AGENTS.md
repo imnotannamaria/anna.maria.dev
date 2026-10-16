@@ -237,7 +237,7 @@ the cat in the corner. Below 768px the sidebar gives way to entrepta's `MobileNa
   the pages, a found pair turning into a link, with a plain row of the pages under it for anyone
   who would rather not play. The fastest rounds go on a board (`lib/memory`), timed by the server
   and shown once Anna approves the name in `/admin/memory`. Under it all, the signature: the
-  license line as a diff, "all rights ~~reserved~~ forked", with the link to fork the site.
+  license line as a diff, "all rights ~~reserved~~ forkable", with the link to fork the site.
 - **The screens nobody plans to see** (loading, 404, error, a removed page) are
   `components/site/frame/screen-state.tsx`: the cat doing something about it.
 - **A click draws a small burst** where it landed (`click-burst.tsx`), and plays a click.

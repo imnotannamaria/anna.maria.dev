@@ -71,6 +71,56 @@
   /* a command reads a size up from the chips above it */
   font-size: var(--text-mono-md);
 }
+/* The field, and the grey rest of the word laid over it. Both are the same size and family, the
+   rest starts after a copy of what was typed (invisible), so it begins where the cursor is. */
+.st-term-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.st-term-ghost {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  font-size: var(--text-mono-md);
+  white-space: pre;
+  pointer-events: none;
+}
+.st-term-ghost-typed {
+  visibility: hidden;
+}
+/* a button, so a tap on a phone takes it; the layer around it lets every other touch through */
+.st-term-ghost-rest {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg-muted);
+  font: inherit;
+  white-space: pre;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.st-term-ghost-rest:hover {
+  color: var(--fg-secondary);
+}
+/* the key the rest answers to: for a keyboard, so a phone does not draw it */
+.st-term-ghost-key {
+  padding: 0 5px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--fg-muted);
+  font-family: inherit;
+}
+@media (pointer: coarse) {
+  .st-term-ghost-key {
+    display: none;
+  }
+}
 /* the corner is the cat's */
 .st-term-shortcuts,
 .st-term-input {
