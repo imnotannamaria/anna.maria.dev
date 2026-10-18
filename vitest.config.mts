@@ -23,7 +23,7 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: ["{app,lib,components,hooks}/**/*.test.ts"],
+          include: ["{app,lib,components,hooks}/**/*.test.{ts,tsx}"],
           // "*.test.ts" alone also matches "*.integration.test.ts" — without this
           // exclude, `--project unit` silently picked up the integration suite too and
           // ran it against whatever DATABASE_URL happened to resolve to locally (in one
