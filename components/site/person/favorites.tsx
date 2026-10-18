@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl"
 import { SmileyIcon } from "@phosphor-icons/react"
 import Image, { type StaticImageData } from "next/image"
+import { useReducedMotion } from "motion/react"
 import { useState } from "react"
 import { Tile } from "@/components/site/tile"
 import nazareGif from "@/components/site/person/gifs/nazare-confusa.gif"
@@ -40,6 +41,7 @@ const GIFS: {
 
 function Gif({ name, code, stopped, playing }: (typeof GIFS)[number]) {
   const [player, setPlayer] = useState(false)
+  const reduce = useReducedMotion()
   const t = useTranslations("person.favorites")
   return (
     <button
@@ -52,7 +54,13 @@ function Gif({ name, code, stopped, playing }: (typeof GIFS)[number]) {
       onBlur={() => setPlayer(false)}
     >
       <span className="st-gif-img">
-        <Image src={player ? playing : stopped} alt="" fill sizes="64px" unoptimized />
+        <Image
+          src={player && reduce === false ? playing : stopped}
+          alt=""
+          fill
+          sizes="64px"
+          unoptimized
+        />
       </span>
       <span aria-hidden className="text-mono-xs min-w-0 truncate font-mono">
         :{code}:

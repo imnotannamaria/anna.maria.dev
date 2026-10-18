@@ -129,7 +129,7 @@
 }
 .st-nt-title-large {
   max-width: 22ch;
-  font-size: clamp(24px, 4.4cqw, 44px);
+  font-size: var(--text-display-md);
   line-height: 1.16;
   letter-spacing: -0.015em;
   text-wrap: balance;
@@ -184,10 +184,16 @@
   left: 18px;
   color: var(--fg-brand);
   font-family: var(--font-serif);
-  font-size: 64px;
+  font-size: var(--text-display-lg);
   line-height: 1;
 }
 .st-nt-cell[data-featured]:hover .st-nt-excerpt,
 .st-nt-cell[data-featured]:focus-within .st-nt-excerpt {
   rotate: 0.6deg;
+}
+
+@container (max-width: 640px) {
+  .st-nt-title-large {
+    font-size: var(--text-heading-lg);
+  }
 }

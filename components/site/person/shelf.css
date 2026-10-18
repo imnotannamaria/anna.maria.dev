@@ -110,7 +110,7 @@
   border-radius: var(--radius-full);
   background: var(--bg-card);
   color: var(--fg-brand);
-  font-size: 10px;
+  font-size: var(--text-mono-xs);
   line-height: 1;
   box-shadow: 0 0 0 1px var(--border-subtle);
 }

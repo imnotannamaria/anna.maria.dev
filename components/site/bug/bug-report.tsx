@@ -1,5 +1,7 @@
 "use client"
 
+import { useInvalidFocus } from "@/hooks/use-invalid-focus"
+
 import {
   BugBeetleIcon,
   ChatCircleDotsIcon,
@@ -56,6 +58,7 @@ export function BugReport({
   const pathname = useSitePath()
   const t = useTranslations("bug")
   const [phase, setPhase] = useState<Phase>("writing")
+  const { formRef, focusInvalid } = useInvalidFocus(phase !== "sending")
   const [errors, setErrors] = useState<Errors>({})
   const [problem, setProblem] = useState<string | null>(null)
   const [file, setFile] = useState<File | null>(null)
@@ -99,7 +102,9 @@ export function BugReport({
       page: pathname,
     })
     if (!parsed.success) {
-      return setErrors(worded(parsed.error.issues.map((issue) => String(issue.path[0]))))
+      setErrors(worded(parsed.error.issues.map((issue) => String(issue.path[0]))))
+      focusInvalid()
+      return
     }
 
     setErrors({})
@@ -116,8 +121,10 @@ export function BugReport({
       }
       const body = (await res.json().catch(() => ({}))) as { fields?: Errors }
       // the server says which fields it refused; the words for them are the page's, in its language
-      if (res.status === 400 && body.fields) setErrors(worded(Object.keys(body.fields)))
-      else if (res.status === 429) setProblem(t("tooMany"))
+      if (res.status === 400 && body.fields) {
+        setErrors(worded(Object.keys(body.fields)))
+        focusInvalid()
+      } else if (res.status === 429) setProblem(t("tooMany"))
       else setProblem(t("failed"))
     } catch {
       setProblem(t("offline"))
@@ -166,7 +173,7 @@ export function BugReport({
               </p>
             </div>
 
-            <form className="flex flex-col gap-4" onSubmit={onSend} noValidate>
+            <form ref={formRef} className="flex flex-col gap-4" onSubmit={onSend} noValidate>
               <Field
                 id={`${id}-name`}
                 label={t("name")}
@@ -219,6 +226,8 @@ export function BugReport({
                     </span>
                     <input
                       type="file"
+                      aria-invalid={!!errors.attachment}
+                      aria-describedby={errors.attachment ? `${id}-attachment-error` : undefined}
                       accept="image/png,image/jpeg,image/webp"
                       className="sr-only"
                       onChange={(event) => pick(event.target.files?.[0] ?? null)}
@@ -237,7 +246,11 @@ export function BugReport({
                   ) : null}
                 </div>
                 {errors.attachment ? (
-                  <p role="alert" className="text-mono-sm font-mono text-[var(--status-error-fg)]">
+                  <p
+                    id={`${id}-attachment-error`}
+                    role="alert"
+                    className="text-mono-sm font-mono text-[var(--status-error-fg)]"
+                  >
                     {errors.attachment}
                   </p>
                 ) : null}

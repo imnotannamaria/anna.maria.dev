@@ -1,3 +1,4 @@
+import { HTML_LANG, type Locale } from "@/lib/i18n/locales"
 import { reactionCounts, type ReactionCounts } from "@/lib/wall/constants"
 import type { Testimonial } from "@/lib/wall/validation"
 
@@ -17,17 +18,19 @@ export type Letter = {
   reactions: ReactionCounts
 }
 
-const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
-
-/** `2026-10` as "oct 2026". From the string alone, so the server and the browser agree. */
-function monthLabel(month: string): string | undefined {
-  const [year, number] = month.split("-")
-  const name = MONTHS[Number(number) - 1]
-  return year && name ? `${name} ${year}` : undefined
+/** UTC keeps a month label stable on the server and in the browser. */
+export function monthLabel(month: string, locale: Locale): string | undefined {
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return undefined
+  return new Intl.DateTimeFormat(HTML_LANG[locale], {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${month}-01T00:00:00Z`))
 }
 
 export function toLetter(
   testimonial: Omit<Testimonial, "reactions"> & { reactions?: ReactionCounts },
+  locale: Locale = "en",
 ): Letter {
   return {
     id: testimonial.id,
@@ -38,7 +41,7 @@ export function toLetter(
     lang: testimonial.lang,
     photo: testimonial.avatarUrl ?? undefined,
     linkedin: testimonial.linkedinUrl ?? undefined,
-    when: monthLabel(testimonial.month),
+    when: monthLabel(testimonial.month, locale),
     reactions: testimonial.reactions ?? reactionCounts(null),
   }
 }

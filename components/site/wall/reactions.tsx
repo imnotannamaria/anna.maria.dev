@@ -31,7 +31,8 @@ function writePicks(id: string, picks: WallReaction[]) {
 /**
  * The reactions under a letter: the buttons of "emojis & gifs I overuse" on the person page,
  * with the same flight when one is picked, and counts that are real. A click moves the count
- * at once and tells the server; if the server says no, it moves back.
+ * at once and tells the server; if the server says no, it moves back. Each reaction waits
+ * for its pending write before accepting another toggle, including clicks before a render.
  *
  * `readOnly` is for a letter that is not on the wall yet (the invite's preview, the admin):
  * the counts show and nothing can be clicked.
@@ -53,10 +54,8 @@ export function Reactions({
   const [flights, setFlights] = useState<Record<string, number>>({})
   // what this browser has picked, for the code below that runs between two renders
   const picks = useRef<WallReaction[]>([])
-  // the newest click of each reaction, and the request of the one before it: a reply only counts
-  // if no later click has happened since, and two requests of one reaction go out in order
-  const latest = useRef<Partial<Record<WallReaction, number>>>({})
-  const queue = useRef<Partial<Record<WallReaction, Promise<void>>>>({})
+  const pending = useRef(new Set<WallReaction>())
+  const [busy, setBusy] = useState<WallReaction[]>([])
 
   // after mount, so the server's HTML and the first paint agree
   useEffect(() => {
@@ -81,13 +80,16 @@ export function Reactions({
    * that is still on its way.
    */
   const toggle = (reaction: WallReaction) => {
+    if (readOnly || pending.current.has(reaction)) return
+    pending.current.add(reaction)
+    setBusy([...pending.current])
+    const previousCount = counts[reaction]
     const on = !picks.current.includes(reaction)
     choose(on ? [...picks.current, reaction] : picks.current.filter((pick) => pick !== reaction))
     setCounts((now) => ({ ...now, [reaction]: Math.max(0, now[reaction] + (on ? 1 : -1)) }))
     if (on) pet.notify("react")
     if (on) setFlights((now) => ({ ...now, [reaction]: (now[reaction] ?? 0) + 1 }))
 
-    const ticket = (latest.current[reaction] = (latest.current[reaction] ?? 0) + 1)
     const send = async () => {
       try {
         const res = await fetch(`/api/v1/wall/${id}/react`, {
@@ -97,19 +99,20 @@ export function Reactions({
         })
         if (!res.ok) throw new Error(String(res.status))
         const body = (await res.json()) as { reactions?: ReactionCounts }
-        if (body.reactions && latest.current[reaction] === ticket) {
+        if (body.reactions) {
           setCount(reaction, body.reactions[reaction])
         }
       } catch {
-        // a later click of this reaction decides what is right now; only the last one undoes
-        if (latest.current[reaction] !== ticket) return
         choose(
           on ? picks.current.filter((pick) => pick !== reaction) : [...picks.current, reaction],
         )
-        setCounts((now) => ({ ...now, [reaction]: Math.max(0, now[reaction] + (on ? -1 : 1)) }))
+        setCount(reaction, previousCount)
+      } finally {
+        pending.current.delete(reaction)
+        setBusy([...pending.current])
       }
     }
-    queue.current[reaction] = (queue.current[reaction] ?? Promise.resolve()).then(send)
+    void send()
   }
 
   return (
@@ -125,6 +128,7 @@ export function Reactions({
               aria-label={t("reactionCount", { reaction: t(`reactions.${reaction}`), count })}
               aria-pressed={on}
               disabled={readOnly}
+              aria-busy={busy.includes(reaction) || undefined}
               onClick={() => toggle(reaction)}
             >
               <span aria-hidden className="st-reaction-emoji">

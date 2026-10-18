@@ -38,3 +38,11 @@ describe("GET /site/log", () => {
     expect((await from("10.0.0.3")).status).toBe(200)
   })
 })
+
+it("localizes the type as well as the title for the Portuguese sides", async () => {
+  entries.mockResolvedValue([
+    { type: "film", title: "A film", titlePt: "Um filme", creator: "Anna", loggedAt: "2026-10-16" },
+  ] as never)
+  const res = await site.request("/log?lang=pt", { headers: { "x-forwarded-for": "10.0.0.4" } })
+  expect((await res.json()).entries[0]).toMatchObject({ type: "filme", title: "Um filme" })
+})

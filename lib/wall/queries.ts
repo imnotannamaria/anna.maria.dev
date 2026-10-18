@@ -8,7 +8,7 @@ import type { Testimonial, WallEntry } from "./validation"
 
 type Row = typeof wallTestimonials.$inferSelect
 
-/** Without a database the wall renders empty instead of crashing, like the log and the board. */
+/** Public reads report an unavailable database; admin reads keep their guarded fallbacks. */
 function db() {
   const url = dbUrl()
   return url ? createDb(url).db : null
@@ -54,7 +54,7 @@ function monthOf(d: Date): string {
 /** The wall: approved only, the oldest decision first, the way a channel reads: the newest is last. */
 export async function getApprovedTestimonials(): Promise<Testimonial[]> {
   const conn = db()
-  if (!conn) return []
+  if (!conn) throw new Error("Database unavailable")
 
   const rows = await conn
     .select()

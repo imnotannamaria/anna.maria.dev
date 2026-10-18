@@ -39,7 +39,7 @@ const ask = (question: string, earlier?: string[]) => post({ question, earlier }
 beforeEach(() => {
   vi.stubEnv("OPENROUTER_API_KEY", "test-key")
   vi.stubEnv("OPENROUTER_MODEL", "anthropic/claude-haiku-5.5")
-  admitted.mockReset().mockResolvedValue({ ok: true })
+  admitted.mockReset().mockResolvedValue({ ok: true, day: "2026-10-16" })
   settled.mockReset().mockResolvedValue()
   vi.spyOn(console, "warn").mockImplementation(() => {})
 })
@@ -58,7 +58,7 @@ describe("POST /ai/chat, an answer", () => {
       text: "Anna has worked at three companies.",
       topic: "career",
     })
-    expect(settled).toHaveBeenCalledWith(expect.any(Number), 420)
+    expect(settled).toHaveBeenCalledWith("2026-10-16", expect.any(Number), 420)
   })
 
   it("decides the model, the length and the rules itself", async () => {
@@ -182,7 +182,7 @@ describe("POST /ai/chat, an answer that must not reach the visitor", () => {
 
   it("still pays for it: the answer was written, whether or not it is shown", async () => {
     await blocked("@none\n```js\nalert(1)\n```")
-    expect(settled).toHaveBeenCalledWith(expect.any(Number), 420)
+    expect(settled).toHaveBeenCalledWith("2026-10-16", expect.any(Number), 420)
   })
 
   it("lets the site's own link through", async () => {
@@ -200,7 +200,7 @@ describe("POST /ai/chat, the provider failing", () => {
     const res = await ask("Who is Anna?")
     expect(res.status).toBe(502)
     expect(await res.text()).not.toContain("secret")
-    expect(settled).toHaveBeenCalledWith(expect.any(Number), 0)
+    expect(settled).toHaveBeenCalledWith("2026-10-16", expect.any(Number), 0)
   })
 
   it("treats an empty answer as a failure", async () => {

@@ -60,12 +60,13 @@
   border: 0;
   background: repeating-linear-gradient(
     to bottom,
-    transparent 0 31px,
-    var(--border-strong) 31px 32px
+    transparent 0 calc(100% - 1px),
+    var(--border-strong) calc(100% - 1px) 100%
   );
   color: var(--fg-primary);
-  font-size: 19px;
-  line-height: 32px;
+  font-size: var(--text-heading-md);
+  line-height: var(--text-heading-md--line-height);
+  background-size: 100% calc(var(--text-heading-md) * var(--text-heading-md--line-height));
   outline: none;
   resize: none;
 }
@@ -76,9 +77,10 @@
 .st-ct-message:focus-visible {
   background: repeating-linear-gradient(
     to bottom,
-    transparent 0 31px,
-    var(--border-brand-strong) 31px 32px
+    transparent 0 calc(100% - 1px),
+    var(--border-brand-strong) calc(100% - 1px) 100%
   );
+  background-size: 100% calc(var(--text-heading-md) * var(--text-heading-md--line-height));
 }
 
 .st-ct-back {
@@ -101,9 +103,9 @@
   align-items: center;
   gap: 3px;
   padding: 6px 6px 4px;
-  background: #ffffff;
-  color: #16161a;
-  outline: 4px dotted #ffffff;
+  background: var(--bg-surface);
+  color: var(--fg-primary);
+  outline: 4px dotted var(--bg-surface);
   outline-offset: -2px;
   box-shadow: 0 2px 6px rgb(0 0 0 / 0.25);
   rotate: 3deg;
@@ -113,10 +115,10 @@
   width: 62px;
   height: 62px;
   place-items: end center;
-  background: color-mix(in srgb, var(--fg-brand) 22%, #ffffff);
+  background: color-mix(in srgb, var(--fg-brand) 22%, var(--bg-surface));
 }
 .st-ct-stamp > small {
-  font-size: 9px;
+  font-size: var(--text-mono-xs);
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
@@ -136,7 +138,7 @@
   fill: var(--fg-secondary);
   stroke: none;
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: var(--text-mono-xs);
   letter-spacing: 0.08em;
 }
 .st-ct-address {
@@ -198,7 +200,7 @@
   border: 4px double var(--status-error);
   border-radius: 8px;
   color: var(--status-error);
-  font-size: 24px;
+  font-size: var(--text-heading-lg);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-align: center;

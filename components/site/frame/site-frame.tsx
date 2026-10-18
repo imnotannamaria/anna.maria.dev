@@ -128,7 +128,7 @@ export function SiteFrame({
     if (part !== "front") return
     front.current?.scrollTo({ top: 0 })
     pet.notify(pageEvent(screen))
-  }, [pathname, part])
+  }, [pathname, part, screen])
 
   const panes: Record<Part, ReactNode> = {
     front: (
@@ -163,7 +163,7 @@ export function SiteFrame({
       />
 
       {/* the skip link lands here: always visible, whichever side is showing */}
-      <div
+      <main
         id="main-content"
         tabIndex={-1}
         className="st-main outline-none"
@@ -184,7 +184,7 @@ export function SiteFrame({
         <Island part={part} onSwap={swap} sides={!focused} />
 
         <Abimaela />
-      </div>
+      </main>
 
       {/* Below 768px the sidebar is gone (CSS) and this takes over, in reach of the thumb. Both
           are always rendered and CSS picks one, so the first paint is already right. */}

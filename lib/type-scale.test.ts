@@ -1,3 +1,4 @@
+import { readFileSync, readdirSync } from "node:fs"
 import { execFileSync } from "node:child_process"
 import { describe, expect, it } from "vitest"
 
@@ -58,4 +59,39 @@ describe("the type scale is the only way to set a size", () => {
     })
     expect(oversized).toEqual([])
   })
+})
+
+it("uses the scale in the site's CSS too", () => {
+  // Only page titles are fluid; the remaining pixel sizes are small decorative glyphs.
+  const exceptions: Record<string, string> = {
+    "components/site/home/home.css:.st-hm-name": "clamp(44px, 8cqw, 88px)",
+    "components/site/post/post.css:.st-ps-title": "clamp(28px, 5cqw, 52px)",
+    "components/site/project/open-project.css:.st-pa-title": "clamp(32px, 6cqw, 64px)",
+    "components/site/plate.css:.st-plate-chars": "13px", // logo initials, not running text
+    "components/site/home/home.css:.st-hm-reacts > b": "11px", // decorative emoji
+    "components/site/person/favorites.css:.st-reaction-emoji": "15px",
+    "components/site/person/favorites.css:.st-reaction-flight": "15px",
+  }
+  const files = [
+    "app/globals.css",
+    ...readdirSync("components/site", { recursive: true })
+      .filter((path) => path.toString().endsWith(".css"))
+      .map((path) => `components/site/${path}`),
+  ]
+  const violations: string[] = []
+  for (const file of files) {
+    const css = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "")
+    for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      for (const decl of rule[2].matchAll(/\bfont-size:\s*([^;]+);/g)) {
+        const value = decl[1].trim()
+        const key = `${file}:${rule[1].trim()}`
+        if (/^var\(--text-[a-z-]+\)$/.test(value)) continue
+        // Hiding the copied chat glyph behind the site's avatar is not a new text size.
+        if (file === "components/site/ai/chat.css" && value === "0 !important") continue
+        if (exceptions[key] === value) continue
+        violations.push(`${key}: ${value}`)
+      }
+    }
+  }
+  expect(violations).toEqual([])
 })

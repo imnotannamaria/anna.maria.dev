@@ -80,7 +80,10 @@ export function MemoryGame({ page }: { page: PageId }) {
   // dealt in order on the server, shuffled once it is yours
   useEffect(() => {
     const deal = setTimeout(() => setDeck((cards) => shuffle(cards)))
-    return () => clearTimeout(deal)
+    return () => {
+      clearTimeout(deal)
+      roundId.current = null
+    }
   }, [])
 
   // the focus goes on to the link that took the button's place
@@ -134,9 +137,11 @@ export function MemoryGame({ page }: { page: PageId }) {
 
   // the last pair: the server says the official time and where it lands
   const report = async (total: number) => {
-    const id = await roundId.current
-    if (!id) return
+    const pending = roundId.current
+    const id = await pending
+    if (!id || roundId.current !== pending) return
     const finished = await finishRound(id, total)
+    if (roundId.current !== pending) return
     setResult(finished)
     if (finished?.qualifies) setClaimId(id)
   }

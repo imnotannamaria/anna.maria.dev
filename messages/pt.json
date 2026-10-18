@@ -341,7 +341,7 @@
       "pe": "Pernambuco, meu país",
       "galadriel": "Galadriel",
       "dany": "Daenerys Targaryen, Rainha dos Sete Reinos",
-      "bosco": "Bosco, de Drag Race",
+      "bosco": "Bosco, do Drag Race",
       "cherry": "Cheryl Blossom"
     },
     "shelf": {
@@ -461,7 +461,17 @@
     },
     "contributions": "contribuições",
     "activity": "atividade pública · últimos 12 meses",
-    "github": "github"
+    "github": "github",
+    "calendar": {
+      "loading": "Carregando contribuições",
+      "empty": "nenhuma contribuição pública nos últimos 12 meses",
+      "unavailable": "não consegui acessar o github",
+      "count": "{count, plural, one {# contribuição} other {# contribuições}}",
+      "summary": "{count, plural, one {# contribuição no GitHub no último ano} other {# contribuições no GitHub no último ano}}",
+      "year": "{count, plural, one {# contribuição neste ano} other {# contribuições neste ano}}",
+      "less": "menos",
+      "more": "mais"
+    }
   },
   "career": {
     "cesar": {
@@ -582,7 +592,11 @@
         "title": "Eu vi isso.",
         "body": "Minhas regras não estão em discussão, e quem eu sou também não. Me pergunta sobre a Anna."
       }
-    }
+    },
+    "inputLabel": "Mensagem",
+    "send": "Enviar",
+    "stop": "Parar",
+    "suggestions": "Sugestões"
   },
   "terminal": {
     "welcome": "o verso do annamaria.app. o site inteiro está aqui, em texto.\ndigita um comando e aperta enter, ou clica em um aqui embaixo. o tab completa o que você começou.",

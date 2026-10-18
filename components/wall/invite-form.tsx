@@ -1,5 +1,7 @@
 "use client"
 
+import { useInvalidFocus } from "@/hooks/use-invalid-focus"
+
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
@@ -125,6 +127,7 @@ export function InviteForm({
   })
   const [step, setStep] = useState(0)
   const [phase, setPhase] = useState<Phase>("form")
+  const { formRef, focusInvalid } = useInvalidFocus(phase !== "sending")
   const [errors, setErrors] = useState<Partial<Record<SubmissionField | "avatar", string>>>({})
   const [notice, setNotice] = useState<string | null>(null)
   const [photo, setPhoto] = useState<{ file: File; url: string } | null>(null)
@@ -182,6 +185,7 @@ export function InviteForm({
     const reached = fields.filter((field) => STEP_OF[field as SubmissionField] <= step)
     if (reached.length === 0) return true
     setErrors(fieldErrors(reached))
+    focusInvalid()
     const first = Math.min(...reached.map((field) => STEP_OF[field as SubmissionField]))
     if (first !== step) goTo(first)
     return false
@@ -201,6 +205,7 @@ export function InviteForm({
       } catch {
         setErrors((prev) => ({ ...prev, avatar: copy.errorPhoto }))
         setPhase("form")
+        focusInvalid()
         return
       }
     }
@@ -222,6 +227,7 @@ export function InviteForm({
         return
       }
       if (res.status === 400 && Array.isArray(json.fields)) {
+        focusInvalid()
         if (json.fields.includes("avatar"))
           setErrors((prev) => ({ ...prev, avatar: copy.errorPhoto }))
         const next = fieldErrors(json.fields)
@@ -292,7 +298,7 @@ export function InviteForm({
   }
 
   return (
-    <form noValidate lang={values.lang} onSubmit={advance} className="st-iv-walk">
+    <form ref={formRef} noValidate lang={values.lang} onSubmit={advance} className="st-iv-walk">
       <div ref={top} className="flex scroll-mt-6 flex-col gap-6 pb-6">
         <p className="text-mono-sm m-0 text-center font-mono text-[var(--fg-muted)]">
           {step + 1} {copy.stepOf} 3 · {[copy.stepLang, copy.stepMessage, copy.stepYou][step]}
@@ -436,6 +442,8 @@ export function InviteForm({
                     <Button
                       type="button"
                       variant="secondary"
+                      aria-invalid={!!errors.avatar}
+                      aria-describedby={errors.avatar ? "invite-photo-error" : undefined}
                       onClick={() => fileInput.current?.click()}
                     >
                       {photo ? copy.photoChange : copy.photoAdd}
@@ -462,6 +470,7 @@ export function InviteForm({
                 />
                 {errors.avatar ? (
                   <span
+                    id="invite-photo-error"
                     role="alert"
                     className="text-mono-sm font-mono text-[var(--status-error-fg)]"
                   >

@@ -43,7 +43,7 @@
   border-radius: var(--radius-md) var(--radius-md) 0 0;
   padding: 0.5rem 1rem;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--text-mono-sm);
   color: var(--fg-muted);
 }
 

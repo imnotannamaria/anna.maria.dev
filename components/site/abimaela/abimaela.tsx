@@ -285,7 +285,7 @@ export function Abimaela() {
       window.removeEventListener("pointerdown", onPress)
       window.removeEventListener("keydown", onType)
     }
-  }, [])
+  }, [t])
 
   // sitting in the corner with nothing else going on
   const resting = action === "idle" && !sleeping

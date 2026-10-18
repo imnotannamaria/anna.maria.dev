@@ -7,7 +7,7 @@
  */
 
 import { CheckIcon, XIcon } from "@phosphor-icons/react"
-import { AnimatePresence, useReducedMotion } from "motion/react"
+import { AnimatePresence } from "motion/react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Badge, type BadgeProps } from "@/app/components/entrepta/badge"
@@ -17,9 +17,9 @@ import { toast } from "@/app/components/entrepta/toast"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
 import { MotionTableRow } from "@/components/admin/motion-table-row"
 import { playSoundEffect } from "@/components/ui/sound-feedback"
-import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
+import { useAdminRows } from "./use-admin-rows"
 import { formatMs, MIN_MS, type MemoryStatus } from "@/lib/memory/constants"
-import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
+import { revealViewport } from "@/lib/motion"
 
 type Row = { id: string; name: string; ms: number; moves: number; status: MemoryStatus }
 
@@ -31,8 +31,7 @@ const BADGE: Partial<Record<MemoryStatus, { color: BadgeProps["color"]; label: s
 
 export function MemoryScoreRows({ rows }: { rows: Row[] }) {
   const router = useRouter()
-  const reduce = useReducedMotion() ?? false
-  const { visible, hide, restore } = useOptimisticRemoval(rows)
+  const { visible, remove, enter, leave } = useAdminRows(rows, "/api/v1/admin/memory")
   const [busy, setBusy] = useState<string | null>(null)
 
   async function decide(id: string, status: "approved" | "rejected") {
@@ -58,33 +57,6 @@ export function MemoryScoreRows({ rows }: { rows: Row[] }) {
       setBusy(null)
     }
   }
-
-  async function remove(id: string, name: string) {
-    hide(id)
-    try {
-      const res = await fetch(`/api/v1/admin/memory/${id}`, { method: "DELETE" })
-      if (!res.ok) {
-        restore(id)
-        toast(`could not delete (${res.status})`)
-        playSoundEffect("error")
-        return
-      }
-      toast(`deleted ${name}`)
-      playSoundEffect("success")
-      router.refresh()
-    } catch {
-      restore(id)
-      toast("network error — nothing was deleted")
-      playSoundEffect("error")
-    }
-  }
-
-  const stagger = reduce || visible.length > STAGGER_LIMIT ? 0 : 0.04
-  const enter = (index: number) => ({
-    opacity: 1,
-    transition: { duration: reduce ? 0 : 0.32, ease: EASE_OUT, delay: index * stagger },
-  })
-  const leave = { opacity: 0, transition: { duration: reduce ? 0 : 0.18, ease: EASE_OUT } }
 
   return (
     <TableBody>

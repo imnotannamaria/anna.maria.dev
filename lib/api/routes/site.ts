@@ -1,6 +1,7 @@
 import { Hono } from "hono"
 import { localeFrom } from "@/lib/i18n/locales"
-import { TYPE_LABEL } from "@/lib/log/constants"
+import { log as enLog } from "@/messages/en.json"
+import { log as ptLog } from "@/messages/pt.json"
 import { inLocale } from "@/lib/log/locale"
 import { getPublishedEntries } from "@/lib/log/queries"
 import { byClient, rateLimit } from "../middleware/rate-limit"
@@ -28,7 +29,7 @@ site.get(
     const entries = (await getPublishedEntries()).map((entry) => inLocale(entry, locale))
     return c.json({
       entries: entries.map((entry) => ({
-        type: TYPE_LABEL[entry.type],
+        type: (locale === "pt" ? ptLog : enLog).type[entry.type],
         title: entry.title,
         creator: entry.creator,
         loggedAt: entry.loggedAt,

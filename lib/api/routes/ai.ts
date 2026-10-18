@@ -108,7 +108,7 @@ ai.post(
       if (!upstream.ok) throw new Error("upstream")
       completion = (await upstream.json()) as Completion
     } catch {
-      await settle(reserve, 0).catch(() => {})
+      await settle(admission.day, reserve, 0).catch(() => {})
       return c.json({ reason: "upstream" }, 502)
     }
 
@@ -118,7 +118,7 @@ ai.post(
       : typeof usage.cost === "number"
         ? Math.ceil(usage.cost * 1_000_000)
         : costMicro(conf.model, usage.prompt_tokens ?? 0, usage.completion_tokens ?? 0)
-    await settle(reserve, actual).catch(() => {})
+    await settle(admission.day, reserve, actual).catch(() => {})
 
     const { topic, text } = splitTopic(completion.choices?.[0]?.message?.content ?? "")
     if (topic === "off") {

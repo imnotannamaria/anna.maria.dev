@@ -210,6 +210,8 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
         streaming={writing}
         onStop={() => stop.current?.()}
         placeholder={t("placeholder")}
+        label={t("inputLabel")}
+        labels={{ send: t("send"), stop: t("stop"), suggestions: t("suggestions") }}
         suggestions={QUESTIONS.map((key) => t(`questions.${key}`))}
       />
     </div>

@@ -461,7 +461,17 @@
     },
     "contributions": "contributions",
     "activity": "public activity · last 12 months",
-    "github": "github"
+    "github": "github",
+    "calendar": {
+      "loading": "Loading contributions",
+      "empty": "no public contributions in the last 12 months",
+      "unavailable": "couldn't reach github",
+      "count": "{count, plural, one {# contribution} other {# contributions}}",
+      "summary": "{count, plural, one {# contribution on GitHub over the last year} other {# contributions on GitHub over the last year}}",
+      "year": "{count, plural, one {# contribution this year} other {# contributions this year}}",
+      "less": "less",
+      "more": "more"
+    }
   },
   "career": {
     "cesar": {
@@ -582,7 +592,11 @@
         "title": "I saw that.",
         "body": "My rules are not up for discussion, and neither is who I am. Ask me about Anna instead."
       }
-    }
+    },
+    "inputLabel": "Message",
+    "send": "Send",
+    "stop": "Stop",
+    "suggestions": "Suggestions"
   },
   "terminal": {
     "welcome": "the back of annamaria.app. the whole site is in here, as text.\ntype a command and press enter, or click one below. tab finishes what you started.",

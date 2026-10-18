@@ -3,7 +3,7 @@ import { createDb, dbUrl } from "@/lib/db/client"
 import { DAILY_CAP_MICRO, MIN_GAP_SECONDS, PER_VISITOR } from "./limits"
 
 export type Refusal = "visitor" | "slow" | "budget" | "unavailable"
-export type Admission = { ok: true } | { ok: false; reason: Refusal }
+export type Admission = { ok: true; day: string } | { ok: false; reason: Refusal }
 
 /**
  * Who is asking, without keeping who: a hash of the address, the day and a secret. The day is
@@ -44,16 +44,18 @@ export async function admit(visitor: string, reserve: number): Promise<Admission
     on conflict (day) do update
       set requests = ai_usage.requests + 1, micro_usd = ai_usage.micro_usd + ${reserve}
       where ai_usage.micro_usd + ${reserve} <= ${DAILY_CAP_MICRO}
-    returning micro_usd`
-  return spent.length === 0 ? { ok: false, reason: "budget" } : { ok: true }
+    returning day::text as day`
+  return spent.length === 0
+    ? { ok: false, reason: "budget" }
+    : { ok: true, day: spent[0].day as string }
 }
 
 /** After the answer: swap what was set aside for what it really cost. */
-export async function settle(reserve: number, actual: number): Promise<void> {
+export async function settle(day: string, reserve: number, actual: number): Promise<void> {
   const url = dbUrl()
   if (!url) return
   const { sql } = createDb(url)
   await sql`
     update ai_usage set micro_usd = greatest(micro_usd - ${reserve} + ${actual}, 0)
-    where day = current_date`
+    where day = ${day}::date`
 }

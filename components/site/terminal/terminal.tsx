@@ -139,15 +139,19 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
   // options are listed under the command, the way a shell does, once for each entry.
   function tab() {
     const next = complete(system, cwd, entry)
-    if (next !== entry) return take(next)
+    if (next !== entry) {
+      take(next)
+      return true
+    }
     const names = options(system, cwd, entry)
-    if (names.length === 0 || listed.current === entry) return
+    if (names.length === 0 || listed.current === entry) return false
     listed.current = entry
     const added: Output[] = [
       { type: "echo", path: path(cwd), text: entry },
       { type: "text", text: names.join("   ") },
     ]
     setLines((before) => [...before, ...added.map((line) => ({ ...line, id: count.current++ }))])
+    return true
   }
 
   function recall(step: -1 | 1) {
@@ -247,9 +251,8 @@ export function Terminal({ data, className }: { data: SiteData; className?: stri
                   } else if (event.key === "ArrowDown") {
                     event.preventDefault()
                     recall(1)
-                  } else if (event.key === "Tab" && entry) {
-                    event.preventDefault()
-                    tab()
+                  } else if (event.key === "Tab" && !event.shiftKey && entry) {
+                    if (tab()) event.preventDefault()
                   } else if (
                     event.key === "ArrowRight" &&
                     suggestion &&

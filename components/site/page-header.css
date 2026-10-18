@@ -2,8 +2,8 @@
 
 .st-lede {
   max-width: 50ch;
-  font-size: clamp(18px, 2.1cqw, 26px);
-  line-height: 1.38;
+  font-size: var(--text-heading-md);
+  line-height: var(--text-heading-md--line-height);
   color: var(--fg-muted);
   text-wrap: pretty;
 }
@@ -13,18 +13,13 @@
    Two classes, so it beats `.st-lede` whatever order the stylesheets load in. */
 .st-lede.st-lede-wide {
   max-width: none;
-  font-size: clamp(16px, 1.75cqw, 22px);
+  font-size: var(--text-body-lg);
+  line-height: var(--text-body-lg--line-height);
 }
 /* neither the arrows nor the sum break in the middle */
 .st-lede-flow,
 .st-lede-wide .st-lede-keep {
   white-space: nowrap;
-}
-/* a phone: smaller, so the arrows fit in one line of the page and the sentence takes fewer */
-@media (max-width: 639px) {
-  .st-lede.st-lede-wide {
-    font-size: 16px;
-  }
 }
 /* a very narrow phone: the chain of arrows may break rather than run past the page */
 @media (max-width: 479px) {
