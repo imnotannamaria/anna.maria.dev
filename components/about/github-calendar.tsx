@@ -1,5 +1,6 @@
 "use client"
 
+import { useLocale, useTranslations } from "next-intl"
 import { memo, useCallback, useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
@@ -8,10 +9,7 @@ import { EASE_OUT } from "@/lib/motion"
 import { OVERLAY_SURFACE } from "@/lib/overlay"
 import { cn } from "@/lib/utils"
 import type { ContributionWeek, ContributionYear } from "@/lib/github/contributions"
-import type { CardState } from "@/lib/showcase/state"
-
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+import type { CardState } from "@/lib/card-state"
 
 /** The whole scale is mixed from --fg-brand, so it follows the active theme. */
 const LEVEL_FILL = [
@@ -43,25 +41,8 @@ const RING = 2
  */
 const TOOLTIP_H = 52
 
-/** The titlebar's own height (`app/layout.tsx`'s grid row), which the
- *  portalled tooltip would otherwise draw over near the top of `<main>`. */
-const TITLEBAR_H = 40
-
-/**
- * `new Date("2026-08-12")` is UTC midnight, so every local formatter in a
- * negative offset prints the day before — the trap CLAUDE.md flags. The parts
- * are read straight off the string, and the weekday is the one thing that needs
- * a Date, read in UTC to match how the string was parsed.
- */
-function formatFull(iso: string) {
-  const [y, m, d] = iso.split("-")
-  const weekday = WEEKDAYS[new Date(iso).getUTCDay()]
-  return `${weekday} ${Number(d)} ${MONTHS[Number(m) - 1]} ${y}`
-}
-
-function plural(n: number) {
-  return `${n} contribution${n === 1 ? "" : "s"}`
-}
+/** Keep the tooltip below the floating header's top area. */
+const HEADER_CLEARANCE = 40
 
 const column: Variants = { hidden: {}, show: {} }
 const cell: Variants = {
@@ -217,6 +198,7 @@ function GridFrame({
  * animating a gradient, which is the per-frame repaint CLAUDE.md warns about, 371 times over.
  */
 function CalendarSkeleton() {
+  const t = useTranslations("professional.calendar")
   return (
     <>
       <GridFrame
@@ -230,7 +212,7 @@ function CalendarSkeleton() {
         }
       />
       <span className="sr-only" role="status">
-        Loading contributions
+        {t("loading")}
       </span>
     </>
   )
@@ -270,6 +252,21 @@ function CalendarBlank({ message }: { message: string }) {
 }
 
 export function GithubCalendar({ state }: { state: CardState<ContributionYear> }) {
+  const t = useTranslations("professional.calendar")
+  const locale = useLocale()
+  const dates = useMemo(
+    () => ({
+      month: new Intl.DateTimeFormat(locale, { month: "short", timeZone: "UTC" }),
+      full: new Intl.DateTimeFormat(locale, {
+        weekday: "long",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      }),
+    }),
+    [locale],
+  )
   const data = state.kind === "ok" || state.kind === "stale" ? state.data : null
   const reduce = useReducedMotion() ?? false
   const [hover, setHover] = useState<Hover>(null)
@@ -308,12 +305,9 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
     })
   }, [])
 
-  // `app/layout.tsx` makes the editor chrome `position: fixed` and gives
-  // `<main>` its own scroll — the window itself never scrolls. The tooltip is a
-  // portalled `position: fixed` element holding coordinates captured once, at
-  // hover time, so a scroll of `<main>` leaves it pinned to a spot the cell has
-  // moved out from under (and often now sits over a *different* cell). Capture
-  // phase is what catches a scroll on `<main>` rather than only on `window`.
+  // The frame scrolls each side independently. The portalled tooltip holds viewport
+  // coordinates, so dismiss it on any captured scroll rather than leaving it over a
+  // different cell. Listening only to window would miss the side scrolling.
   useEffect(() => {
     if (!hover) return
     const dismiss = () => setHover(null)
@@ -339,10 +333,10 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
         continue
       }
       last = m
-      out.push(MONTHS[m])
+      out.push(dates.month.format(new Date(`2000-${String(m + 1).padStart(2, "0")}-01T00:00:00Z`)))
     }
     return out
-  }, [weeks])
+  }, [weeks, dates])
 
   const hoveredDay = hover ? (weeks[hover.week]?.[hover.day] ?? null) : null
   const active = hoveredDay?.date ? hoveredDay : null
@@ -355,15 +349,7 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
   if (state.kind === "loading") return <CalendarSkeleton />
 
   if (!data) {
-    return (
-      <CalendarBlank
-        message={
-          state.kind === "empty"
-            ? "no public contributions in the last 12 months"
-            : "couldn't reach github"
-        }
-      />
-    )
+    return <CalendarBlank message={state.kind === "empty" ? t("empty") : t("unavailable")} />
   }
 
   // Past the guard above, `data` is never null, so `total` is always a number —
@@ -425,7 +411,7 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
               // 371 focus stops would wreck keyboard nav for a picture of a
               // year. It is described as one, and the total is in text below.
               role="img"
-              aria-label={`${plural(total)} on GitHub over the last year`}
+              aria-label={t("summary", { count: total })}
             >
               {weeks.map((week, wi) => (
                 <Column
@@ -474,11 +460,9 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
                         top: hover.y,
                         translateX: hover.align,
                         // Flip below the cell when there isn't TOOLTIP_H + an
-                        // 8px gap above it before the titlebar — otherwise a
-                        // cell in the top couple of rows draws the tooltip over
-                        // the 40px fixed chrome instead of the page.
+                        // 8px gap above it before the floating header area.
                         translateY:
-                          hover.y - TOOLTIP_H - 8 < TITLEBAR_H
+                          hover.y - TOOLTIP_H - 8 < HEADER_CLEARANCE
                             ? `${hover.h + 8}px`
                             : "calc(-100% - 8px)",
                       }}
@@ -491,13 +475,13 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
                         className="text-mono-sm block font-mono"
                         style={{ color: "var(--fg-primary)" }}
                       >
-                        {plural(active.count)}
+                        {t("count", { count: active.count })}
                       </span>
                       <span
                         className="text-mono-sm block font-mono"
                         style={{ color: "var(--fg-muted)" }}
                       >
-                        {formatFull(active.date)}
+                        {dates.full.format(new Date(`${active.date}T00:00:00Z`))}
                       </span>
                     </motion.div>
                   )}
@@ -514,7 +498,7 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
           style={{ color: "var(--fg-muted)" }}
           aria-hidden
         >
-          less
+          {t("less")}
           {LEVEL_FILL.map((fill, i) => (
             <span
               key={i}
@@ -528,11 +512,11 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
               }}
             />
           ))}
-          more
+          {t("more")}
         </div>
 
         <span className="text-mono-sm truncate font-mono" style={{ color: "var(--fg-muted)" }}>
-          {total.toLocaleString("en-US")} contributions this year
+          {t("year", { count: total })}
         </span>
       </div>
     </div>

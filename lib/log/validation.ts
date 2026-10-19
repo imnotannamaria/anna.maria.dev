@@ -30,6 +30,8 @@ const posterUrlSchema = z
 export const logEntryInputSchema = z.object({
   type: LogTypeSchema,
   title: z.string().trim().min(1, "title is required").max(200, "that title is too long"),
+  // The Portuguese of the title and of the note. Optional: without one, /pt shows the English.
+  titlePt: optionalText(200),
   creator: optionalText(150),
   // No z.coerce and no .default() anywhere in this schema. Both make zod's input type
   // differ from its output type, which breaks react-hook-form's generics. Callers send
@@ -50,6 +52,7 @@ export const logEntryInputSchema = z.object({
     .optional(),
   favorite: z.boolean().optional(),
   note: optionalText(2000),
+  notePt: optionalText(2000),
   posterUrl: posterUrlSchema.optional().or(z.literal("")),
   // Same https check as the poster, and for a sharper reason: this one becomes the `href`
   // of the card's stretched link. `.url()` alone accepts `javascript:…`, which would be
@@ -77,17 +80,22 @@ export const logEntryInputSchema = z.object({
 
 export type LogEntryInput = z.infer<typeof logEntryInputSchema>
 
-/** An entry as the UI consumes it: rating is a number, empty strings are null. */
+/**
+ * An entry as the UI consumes it: rating is a number, empty strings are null. `title` and `note`
+ * are the English; a public page swaps in the Portuguese with `inLocale` (lib/log/locale.ts).
+ */
 export type LogEntry = {
   id: string
   slug: string
   type: LogType
   title: string
+  titlePt: string | null
   creator: string | null
   year: number | null
   rating: number | null
   favorite: boolean
   note: string | null
+  notePt: string | null
   posterUrl: string | null
   externalUrl: string | null
   loggedAt: string

@@ -23,6 +23,7 @@ function toRow(input: LogEntryInput) {
   return {
     type: input.type,
     title: input.title.trim(),
+    titlePt: blankToNull(input.titlePt),
     creator: blankToNull(input.creator),
     year: input.year ?? null,
     rating: input.rating == null ? null : input.rating.toFixed(1),
@@ -30,6 +31,7 @@ function toRow(input: LogEntryInput) {
     // from its output type, which breaks react-hook-form's generics.
     favorite: input.favorite ?? false,
     note: blankToNull(input.note),
+    notePt: blankToNull(input.notePt),
     posterUrl: blankToNull(input.posterUrl),
     externalUrl: blankToNull(input.externalUrl),
     loggedAt: input.loggedAt,

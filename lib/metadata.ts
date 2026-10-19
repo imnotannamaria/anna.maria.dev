@@ -5,20 +5,31 @@ export function createMetadata({
   description,
   path = "",
   titleAbsolute = false,
+  locale = "en",
+  cover = "Anna Maria, Full-stack Software Engineer",
 }: {
   title: string
   description: string
   path?: string
   /** Skip the "%s · Anna Maria" root template (use for the home page). */
   titleAbsolute?: boolean
+  /** The language the page is in, for the share card. */
+  locale?: "en" | "pt"
+  /** What the cover image shows, for whoever cannot see it. */
+  cover?: string
 }): Metadata {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://annamaria.app"
 
+  // the page's own address in its language, and the pair it belongs to
+  const english = `${baseUrl}${path}`
+  const portuguese = `${baseUrl}/pt${path === "/" ? "" : path}`
+  const here = locale === "pt" ? portuguese : english
+
   const ogImage = {
-    url: `${baseUrl}/images/og-cover.jpg`,
+    url: `${baseUrl}/images/og-cover.png`,
     width: 1200,
     height: 630,
-    alt: "Anna Maria — Full-stack Software Engineer",
+    alt: cover,
   }
 
   return {
@@ -27,10 +38,10 @@ export function createMetadata({
     openGraph: {
       title,
       description,
-      url: `${baseUrl}${path}`,
+      url: here,
       images: [ogImage],
       siteName: "Anna Maria",
-      locale: "en_US",
+      locale: locale === "pt" ? "pt_BR" : "en_US",
       type: "website",
     },
     twitter: {
@@ -40,7 +51,9 @@ export function createMetadata({
       images: [ogImage.url],
     },
     alternates: {
-      canonical: `${baseUrl}${path}`,
+      canonical: here,
+      // how a search engine learns there is another language, and which one is the default
+      languages: { en: english, "pt-BR": portuguese, "x-default": english },
     },
   }
 }

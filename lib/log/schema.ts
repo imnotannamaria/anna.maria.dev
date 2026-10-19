@@ -12,7 +12,7 @@ import {
 } from "drizzle-orm/pg-core"
 
 /**
- * Mirrors docs/sql/001-log-entries.sql. The CHECK constraints live only in the database —
+ * Mirrors docs/sql/001-log-entries.sql, plus the two columns of 007-log-translations.sql. The CHECK constraints live only in the database —
  * drizzle has no way to express them here, so zod in lib/log/validation.ts is what stops
  * bad values before they reach Postgres.
  */
@@ -23,12 +23,15 @@ export const logEntries = pgTable(
     slug: text("slug").notNull(),
     type: text("type").notNull(),
     title: text("title").notNull(),
+    // the Portuguese of the title and of the note, when it differs: see 007-log-translations.sql
+    titlePt: text("title_pt"),
     creator: text("creator"),
     year: integer("year"),
     // Comes back as a string. queries.ts converts it; nothing else should see the raw row.
     rating: numeric("rating"),
     favorite: boolean("favorite").notNull().default(false),
     note: text("note"),
+    notePt: text("note_pt"),
     posterUrl: text("poster_url"),
     externalUrl: text("external_url"),
     // Comes back as "YYYY-MM-DD", which is what the UI wants anyway.

@@ -16,11 +16,13 @@ function toEntry(row: Row): LogEntry {
     slug: row.slug,
     type: row.type as LogType,
     title: row.title,
+    titlePt: row.titlePt,
     creator: row.creator,
     year: row.year,
     rating: row.rating == null ? null : Number(row.rating),
     favorite: row.favorite,
     note: row.note,
+    notePt: row.notePt,
     posterUrl: row.posterUrl,
     externalUrl: row.externalUrl,
     loggedAt: row.loggedAt,
@@ -29,8 +31,8 @@ function toEntry(row: Row): LogEntry {
 }
 
 /**
- * Without a database the page renders empty instead of crashing, which is how the wristkit
- * card already behaves. A fork with no DATABASE_URL should still build and serve.
+ * Admin reads can use an empty fallback; public reads reject an unavailable database so
+ * their callers can distinguish it from a successful query with no entries.
  */
 function db() {
   const url = dbUrl()
@@ -61,7 +63,7 @@ const TYPE_ORDER: LogType[] = ["music"]
  */
 export const getPublishedEntries = cache(async function getPublishedEntries(): Promise<LogEntry[]> {
   const conn = db()
-  if (!conn) return []
+  if (!conn) throw new Error("Database unavailable")
 
   // A CASE giving each listed type its index and everything else a rank past the end.
   const typeRank = sql`case ${logEntries.type} ${sql.join(

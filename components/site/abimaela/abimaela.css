@@ -1,0 +1,261 @@
+.st-abi {
+  --st-abi-h: 128px;
+  position: absolute;
+  right: 20px;
+  bottom: 14px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  gap: 12px;
+  pointer-events: none;
+}
+.st-abi {
+  transition:
+    opacity 240ms var(--ease-out),
+    translate 240ms var(--ease-out);
+}
+/* On a phone she is small, in the corner. This has to come after the base rule: the two weigh
+   the same. */
+@media (max-width: 767px) {
+  .st-abi {
+    --st-abi-h: 56px;
+    right: 12px;
+    bottom: 12px;
+  }
+}
+/* A touch keyboard covers the foot of the screen, so while someone types (the terminal, the
+   chat, the postcard) she steps aside. Touch only: with a mouse the terminal keeps its prompt
+   focused, and she would never come back. */
+@media (max-width: 767px) and (pointer: coarse) {
+  .st-main:has(.st-page :is(input, textarea):focus) .st-abi {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+.st-abi-body {
+  display: block;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.st-abi-body > span {
+  display: block;
+}
+.st-abi-sprite {
+  /* 24 frames of 224 by 235, side by side */
+  --st-abi-w: calc(var(--st-abi-h, 128px) * 224 / 235);
+  display: block;
+  width: var(--st-abi-w);
+  height: var(--st-abi-h);
+  background-image: var(--st-abi-sheet);
+  background-size: calc(var(--st-abi-w) * 24) 100%;
+  background-repeat: no-repeat;
+
+  animation: st-abi-idle 4s steps(24) infinite;
+  transition: scale 180ms var(--ease-out);
+}
+.st-abi-walk {
+  /* 24 frames of 252 by 228, side by side: four turns of a six-step walk */
+  --st-abi-w: calc(var(--st-abi-h, 70px) * 252 / 228);
+  display: block;
+  width: var(--st-abi-w);
+  height: var(--st-abi-h, 70px);
+  background-image: var(--st-abi-sheet);
+  background-size: calc(var(--st-abi-w) * 24) 100%;
+  background-repeat: no-repeat;
+  animation: st-abi-walk 2.6s steps(24) infinite;
+}
+@keyframes st-abi-walk {
+  to {
+    background-position-x: calc(var(--st-abi-w) * -24);
+  }
+}
+/* Two frames of 260 by 229: she settles into the sit. The sheet came with twelve, most of them
+   still walking and turning, and played after a walk those read as time skipping. It plays once
+   and holds the last frame; `jump-none` gives each of the two half the duration. */
+.st-abi-stop {
+  --st-abi-w: calc(var(--st-abi-h, 70px) * 260 / 229);
+  display: block;
+  width: var(--st-abi-w);
+  height: var(--st-abi-h, 70px);
+  background-image: var(--st-abi-sheet);
+  background-size: calc(var(--st-abi-w) * 2) 100%;
+  background-repeat: no-repeat;
+  animation: st-abi-stop 220ms steps(2, jump-none) forwards;
+}
+@keyframes st-abi-stop {
+  to {
+    background-position-x: calc(var(--st-abi-w) * -1);
+  }
+}
+.st-abi-stage {
+  position: relative;
+  display: block;
+  transition: scale 180ms var(--ease-out);
+}
+.st-abi-stage[data-looking="left"] {
+  scale: -1 1;
+}
+.st-abi-sprite[data-hidden] {
+  visibility: hidden;
+}
+/* Twenty frames of 270 by 290, at the idle sheet's scale (its frame is 235 tall, and the extra
+   height here is the room she jumps into). It sits on the same ground, centred over her, plays
+   once and holds the last frame. */
+.st-abi-jump {
+  --w: calc(var(--st-abi-h) * 270 / 235);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: var(--w);
+  height: calc(var(--st-abi-h) * 290 / 235);
+  margin-left: calc(var(--w) / -2);
+  background-image: var(--st-abi-sheet);
+  background-size: calc(var(--w) * 20) 100%;
+  background-repeat: no-repeat;
+  animation: st-abi-jump 900ms steps(20, jump-none) forwards;
+}
+@keyframes st-abi-jump {
+  to {
+    background-position-x: calc(var(--w) * -19);
+  }
+}
+/* Twenty frames of 254 by 229, at the idle sheet's scale (whose frame is 235 tall): ears back,
+   fur up, the hiss. It stands on the same ground, centred over her, plays once and holds the
+   last frame, which is the one that stays on a 404 or an error. */
+.st-abi-angry {
+  --w: calc(var(--st-abi-h) * 254 / 235);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: var(--w);
+  height: calc(var(--st-abi-h) * 229 / 235);
+  margin-left: calc(var(--w) / -2);
+  background-image: var(--st-abi-sheet);
+  background-size: calc(var(--w) * 20) 100%;
+  background-repeat: no-repeat;
+  animation: st-abi-angry 1400ms steps(20, jump-none) forwards;
+}
+@keyframes st-abi-angry {
+  to {
+    background-position-x: calc(var(--w) * -19);
+  }
+}
+/* Twenty frames of 257 by 230, at the idle sheet's scale: one eye opens, a yawn, a stretch, and
+   she sits up. It plays once when something wakes her, on the same ground, centred. */
+.st-abi-wake {
+  --w: calc(var(--st-abi-h) * 257 / 235);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: var(--w);
+  height: calc(var(--st-abi-h) * 230 / 235);
+  margin-left: calc(var(--w) / -2);
+  background-image: var(--st-abi-sheet);
+  background-size: calc(var(--w) * 20) 100%;
+  background-repeat: no-repeat;
+  animation: st-abi-wake 1800ms steps(20, jump-none) forwards;
+}
+@keyframes st-abi-wake {
+  to {
+    background-position-x: calc(var(--w) * -19);
+  }
+}
+/* The sheets below all stand on the idle cat's ground, centred over her, at her scale: the
+   idle frame is 235 tall, and each one is sized from that. */
+.st-abi-confused,
+.st-abi-happy {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: var(--w);
+  margin-left: calc(var(--w) / -2);
+  background-image: var(--st-abi-sheet);
+  background-repeat: no-repeat;
+}
+/* Twenty frames of 262 by 234: her head tilts and a question mark shows up. Once. */
+.st-abi-confused {
+  --w: calc(var(--st-abi-h) * 262 / 235);
+  height: calc(var(--st-abi-h) * 234 / 235);
+  background-size: calc(var(--w) * 20) 100%;
+  animation: st-abi-confused 1600ms steps(20, jump-none) forwards;
+}
+@keyframes st-abi-confused {
+  to {
+    background-position-x: calc(var(--w) * -19);
+  }
+}
+/* Twenty frames of 255 by 235: eyes closed, tail going, hearts over her head. Once. */
+.st-abi-happy {
+  --w: calc(var(--st-abi-h) * 255 / 235);
+  height: var(--st-abi-h);
+  background-size: calc(var(--w) * 20) 100%;
+  animation: st-abi-happy 1800ms steps(20, jump-none) forwards;
+}
+@keyframes st-abi-happy {
+  to {
+    background-position-x: calc(var(--w) * -19);
+  }
+}
+/* Falling asleep, then asleep: one sheet with two rows, at the idle sheet's scale, in cells of
+   245 by 235.
+   - the top row is her dozing off, twenty frames: she fights it, nods off, startles, lies down.
+     It plays once.
+   - the bottom row is her asleep, 24 frames: breathing, with the Zzz. It loops.
+   Two animations on the one property: the second has a delay as long as the first, and takes
+   over when it starts. One element and one image, so there is never a second cat under her. */
+.st-abi-sleep {
+  --w: calc(var(--st-abi-h) * 245 / 235);
+  --doze: 2000ms;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: var(--w);
+  height: calc(var(--st-abi-h) * 235 / 235);
+  margin-left: calc(var(--w) / -2);
+  background-image: var(--st-abi-sheet);
+  background-size: calc(var(--w) * 24) 200%;
+  background-repeat: no-repeat;
+  animation:
+    st-abi-doze var(--doze) steps(20, jump-none) forwards,
+    st-abi-sleep 5s steps(24) var(--doze) infinite;
+}
+@keyframes st-abi-doze {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: calc(var(--w) * -19) 0;
+  }
+}
+@keyframes st-abi-sleep {
+  from {
+    background-position: 0 100%;
+  }
+  to {
+    background-position: calc(var(--w) * -24) 100%;
+  }
+}
+@keyframes st-abi-idle {
+  to {
+    background-position-x: calc(var(--st-abi-w) * -24);
+  }
+}
+.st-abi-speech {
+  max-width: 220px;
+  margin: 0 6px 0 0;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  border-bottom-right-radius: 3px;
+  opacity: 0;
+  translate: 0 4px;
+  transition:
+    opacity 160ms var(--ease-out),
+    translate 160ms var(--ease-out);
+}
+.st-abi-speech[data-visible] {
+  opacity: 1;
+  translate: 0 0;
+}

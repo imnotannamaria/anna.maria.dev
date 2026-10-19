@@ -1,7 +1,14 @@
 import { Hono } from "hono"
 import { adminLog } from "./routes/admin-log"
-import { adminRoadmap } from "./routes/admin-roadmap"
+import { adminMemory } from "./routes/admin-memory"
+import { adminWall } from "./routes/admin-wall"
+import { ai } from "./routes/ai"
+import { bug } from "./routes/bug"
+import { memory } from "./routes/memory"
 import { poster } from "./routes/poster"
+import { site } from "./routes/site"
+import { wall } from "./routes/wall"
+import { wallInvite } from "./routes/wall-invite"
 import { wristkit } from "./routes/wristkit"
 
 /**
@@ -14,8 +21,15 @@ export const app = new Hono().basePath("/api/v1")
 
 app.route("/wristkit", wristkit)
 app.route("/poster", poster)
+app.route("/site", site)
+app.route("/ai", ai)
+app.route("/bug", bug)
 app.route("/admin/log", adminLog)
-app.route("/admin/roadmap", adminRoadmap)
+app.route("/admin/wall", adminWall)
+app.route("/admin/memory", adminMemory)
+app.route("/invite", wallInvite)
+app.route("/wall", wall)
+app.route("/memory", memory)
 
 app.onError((err, c) => {
   console.error("[api]", err)

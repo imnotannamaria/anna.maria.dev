@@ -1,4 +1,8 @@
 import type { NextConfig } from "next"
+import createNextIntlPlugin from "next-intl/plugin"
+
+/** Points next-intl at where the language and the messages of a page come from. */
+const withNextIntl = createNextIntlPlugin("./lib/i18n/request.ts")
 
 const nextConfig: NextConfig = {
   /**
@@ -52,8 +56,43 @@ const nextConfig: NextConfig = {
    *
    * Every future rename of a `content/` file needs a line here for the same reason.
    */
+  /**
+   * The headers a browser should get from every address, the ones that cannot break a page:
+   * no sniffing of a response's type, no framing of the site by another one (the admin and the
+   * postcard are actions a framed page could trick someone into), and a Referer that leaves
+   * only the origin when a visitor follows a link out. A Content-Security-Policy is not here
+   * on purpose: it needs a pass over every script, font and image host the pages use, and a
+   * policy written blind blocks one of them.
+   */
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ]
+  },
+
   async redirects() {
     return [
+      // v3 renamed two sections. Permanent, so a crawler carries the old URL's history over.
+      { source: "/about", destination: "/person", permanent: true },
+      { source: "/blog", destination: "/notes", permanent: true },
+      { source: "/blog/:slug", destination: "/notes/:slug", permanent: true },
+      // Notes taken down. Their addresses go to the list instead of to a 404.
+      ...[
+        "accessibility-of-a-hosted-auth-ui",
+        "auditing-accessibility-in-a-codebase-that-already-cares",
+        "i-build-the-tools-i-wish-existed",
+        "spreadsheets-arent-the-problem",
+      ].flatMap((slug) => [
+        { source: `/notes/${slug}`, destination: "/notes", permanent: true },
+        { source: `/pt/notes/${slug}`, destination: "/pt/notes", permanent: true },
+      ]),
       {
         source: "/projects/anna-dev-br",
         destination: "/projects/annamaria-app",
@@ -63,4 +102,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+export default withNextIntl(nextConfig)

@@ -1,0 +1,60 @@
+import { useTranslations } from "next-intl"
+import { ArrowSquareOutIcon, GithubLogoIcon } from "@phosphor-icons/react/dist/ssr"
+import Image from "next/image"
+import { cn } from "@/lib/utils"
+import "./project-cover.css"
+
+type CoverProject = { title: string; cover: string | null }
+type LinkedProject = { title: string; github: string | null; live: string | null }
+
+/** A project's cover image, or its title when it has none, so a grid never has a hole. */
+export function Cover({
+  project,
+  sizes,
+  className,
+}: {
+  project: CoverProject
+  sizes: string
+  className?: string
+}) {
+  return (
+    <span className={cn("st-cover", className)}>
+      {project.cover ? (
+        <Image src={project.cover} alt="" fill sizes={sizes} />
+      ) : (
+        <span className="text-mono-sm font-mono text-[var(--fg-muted)]">{project.title}</span>
+      )}
+    </span>
+  )
+}
+
+/** The GitHub and live links of a project, as two small icon buttons. */
+export function ProjectLinks({ project }: { project: LinkedProject }) {
+  const t = useTranslations("projects")
+  return (
+    <span className="relative z-[2] flex items-center gap-1">
+      {project.github ? (
+        <a
+          href={project.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="st-project-link focus-ring"
+          aria-label={t("onGithub", { title: project.title })}
+        >
+          <GithubLogoIcon aria-hidden size={15} />
+        </a>
+      ) : null}
+      {project.live ? (
+        <a
+          href={project.live}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="st-project-link focus-ring"
+          aria-label={t("live", { title: project.title })}
+        >
+          <ArrowSquareOutIcon aria-hidden size={15} />
+        </a>
+      ) : null}
+    </span>
+  )
+}

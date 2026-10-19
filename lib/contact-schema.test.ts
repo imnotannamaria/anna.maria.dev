@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { contactSchema } from "./contact-schema"
+import { MESSAGE_MAX, contactSchema } from "./contact-schema"
 
 function base() {
   return { name: "Anna", email: "anna@example.com", message: "Hello, this is a real message." }
@@ -22,8 +22,13 @@ describe("contactSchema", () => {
     expect(contactSchema.safeParse({ ...base(), message: "short" }).success).toBe(false)
   })
 
-  it("rejects a message over 5000 characters", () => {
-    expect(contactSchema.safeParse({ ...base(), message: "a".repeat(5001) }).success).toBe(false)
+  it("rejects a message longer than a postcard holds", () => {
+    expect(contactSchema.safeParse({ ...base(), message: "a".repeat(MESSAGE_MAX) }).success).toBe(
+      true,
+    )
+    expect(
+      contactSchema.safeParse({ ...base(), message: "a".repeat(MESSAGE_MAX + 1) }).success,
+    ).toBe(false)
   })
 
   it("trims whitespace from name and message", () => {

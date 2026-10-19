@@ -1,19 +1,21 @@
 ---
 title: "entrepta"
-description: "A dark-first design system for sites that look like they were built by an engineer."
+description: "A dark-first design system you copy into your repo. Mono for UI, serif italic for titles, and no mark of its own."
 date: "2026-05-18"
 tags:
   ["nextjs", "react", "typescript", "tailwindcss", "design-system", "components", "cli", "radix-ui"]
 github: "https://github.com/imnotannamaria/entrepta"
 live: "https://entrepta.vercel.app"
-cover: "/projects/entrepta.png"
+cover: "/projects/entrepta-v4.png"
 featured: true
 published: true
 ---
 
 ## Overview
 
-entrepta is a dark-first design system for sites that look like an engineer built them. Tabs, a command palette, a status bar, shell prompts, serif italic next to mono.
+entrepta is a dark-first design system. Near black surfaces, mono for UI, serif italic for titles.
+
+It started out looking like a code editor: tabs with a title bar, a status bar, a ◆ in front of every label and a `//` before every error. In v4 I took all of that out. It was the look of my site, not something every project should get by default. Now the library has no mark of its own, and if you want the ◆ or the editor frame back, you pass them in.
 
 Components are copied into your repo as source, in the shadcn model. No SDK, no runtime. You own the code.
 
@@ -24,18 +26,20 @@ npx @entrepta/cli@latest add button card command-palette
 
 ## What you get
 
-33 components across 6 sections, in React 19, Tailwind v4 and CSS variables.
+62 components across 8 sections, in React 19, Tailwind v4 and CSS variables.
 
-| Section    | Components                                                         |
-| ---------- | ------------------------------------------------------------------ |
-| Primitives | Button, Badge, Card, Dialog, Dropdown, Tooltip, Kbd, Tabs          |
-| Forms      | Input, Textarea, Checkbox, Switch, Field, FilterPill               |
-| Layout     | StatusBar, TopNav, ThemeSwitcher, ModeToggle, Sidebar, PageOutline |
-| Content    | CodeBlock, SectHead, doc parts                                     |
-| Feedback   | Toast, Skeleton, CommandPalette, ChromeMessage, PageLoading        |
-| Motion     | Reveal, TypeIn, RollingNumber, Spotlight, ArrowLink                |
+| Section    | What's in it                                                                           |
+| ---------- | -------------------------------------------------------------------------------------- |
+| Primitives | Button, Badge, Avatar, Card, Dialog, Sheet, Popover, Accordion, Tabs, Stepper and more |
+| Forms      | Input, Field, Select, Combobox, SegmentedControl, MoneyInput, DatePicker and more      |
+| Layout     | TopNav, Sidebar, MobileNav, BentoGrid, ThemeSwitcher, ModeToggle                       |
+| Content    | CodeBlock                                                                              |
+| Data       | Metric, Delta, Sparkline, Chart, BarList, Table, DataTable, FilterBuilder and more     |
+| Chat       | PromptInput, ChatThread                                                                |
+| Feedback   | Alert, EmptyState, Toast, Skeleton, CommandPalette                                     |
+| Motion     | Reveal, TypeIn, RollingNumber, ArrowLink                                               |
 
-Six theme presets: `entrepta`, `blossom`, `marmalade`, `julia`, `ivy` and `bosco`. Pick one, or install all six and switch at runtime. Every text color clears WCAG AA in all 12 theme and mode combinations, and a test measures it on every change.
+Seven theme presets: `entrepta`, `blossom`, `marmalade`, `julia`, `ivy`, `bosco` and `taylor`, the newest one, which has no hue at all: white on dark, black on light. Pick one, or install all seven and switch at runtime. Every text color clears WCAG AA in every theme and mode, and a test measures it on every change.
 
 ## Built for coding agents
 
@@ -50,7 +54,7 @@ entrepta is meant to be installed and used by Claude Code, Cursor or Codex as mu
 ```bash
 npx @entrepta/cli@latest init --theme=ivy
 
-# all six themes, switchable at runtime
+# all seven themes, switchable at runtime
 npx @entrepta/cli@latest init --theme=ivy --themes=all
 
 npx @entrepta/cli@latest add button card field
@@ -83,7 +87,7 @@ export function Launch() {
 
 ## Built with entrepta
 
-This site runs on it. entrepta started here, and v2 was built here first before it moved into the design system.
+This site runs on it. entrepta started here, and v2 was built here first before it moved into the design system. The site is still on v3, so it keeps the editor-free look with overrides of its own for now.
 
 ## Stack
 

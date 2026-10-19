@@ -1,14 +1,15 @@
 import { type PostgresJsDatabase, drizzle } from "drizzle-orm/postgres-js"
 import postgres, { type Sql } from "postgres"
 import * as logSchema from "@/lib/log/schema"
-import * as roadmapSchema from "@/lib/roadmap/schema"
+import * as memorySchema from "@/lib/memory/schema"
 import * as wristkitSchema from "@/lib/wristkit/schema"
+import * as wallSchema from "@/lib/wall/schema"
 
 /**
- * Every feature that talks to Postgres goes through here. wristkit, /log and /roadmap share
- * one Supabase database, so they should also share one connection pool.
+ * Every feature that talks to Postgres goes through here. wristkit, /log, the wall and the
+ * footer's memory game share one Supabase database, so they should also share one connection pool.
  */
-const schema = { ...wristkitSchema, ...logSchema, ...roadmapSchema }
+const schema = { ...wristkitSchema, ...logSchema, ...wallSchema, ...memorySchema }
 
 export type AppDb = {
   db: PostgresJsDatabase<typeof schema>
@@ -31,12 +32,12 @@ export function createDb(url: string): AppDb {
 
 /**
  * The one place that resolves the connection string. Returns null rather than throwing so
- * callers can degrade to an empty state — a missing database should not take down a page.
+ * callers can show an unavailable state — a missing database should not take down a page.
  *
  * Empty counts as unset. `??` alone would not do that, and `.env.example` ships
  * `DATABASE_URL=` with no value, so anyone copying it would get "" here: truthy enough to
- * build a client, useless enough to fail on the first query. That turns "the log renders
- * empty" into "the page throws", which is the opposite of the intent.
+ * build a client, useless enough to fail on the first query. Resolve absence here; public
+ * readers report it explicitly and pages catch it without taking down the frame.
  *
  * WRISTKIT_DATABASE_URL is the old name, kept until DATABASE_URL is set in Vercel.
  */

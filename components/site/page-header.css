@@ -1,0 +1,29 @@
+/* The serif line under a page's title. */
+
+.st-lede {
+  max-width: 50ch;
+  font-size: var(--text-heading-md);
+  line-height: var(--text-heading-md--line-height);
+  color: var(--fg-muted);
+  text-wrap: pretty;
+}
+
+/* The sentence at the top of the home and of the professional page: one line of thought with a
+   chain of arrows and a sum in it, so it takes the page's whole width and a size that fits.
+   Two classes, so it beats `.st-lede` whatever order the stylesheets load in. */
+.st-lede.st-lede-wide {
+  max-width: none;
+  font-size: var(--text-body-lg);
+  line-height: var(--text-body-lg--line-height);
+}
+/* neither the arrows nor the sum break in the middle */
+.st-lede-flow,
+.st-lede-wide .st-lede-keep {
+  white-space: nowrap;
+}
+/* a very narrow phone: the chain of arrows may break rather than run past the page */
+@media (max-width: 479px) {
+  .st-lede-flow {
+    white-space: normal;
+  }
+}

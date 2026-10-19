@@ -1,0 +1,90 @@
+/* The wall of love, as a channel of messages. */
+
+.st-wl-channel {
+  display: flex;
+  flex-direction: column;
+  /* as wide as the page, which is as wide as the footer under it */
+  width: 100%;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  text-align: left;
+}
+.st-wl-channel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 14px;
+  padding: 14px 20px;
+  border-bottom: 1px dashed var(--border-strong);
+}
+.st-wl-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+}
+.st-wl-list > li {
+  padding: 16px 20px;
+  transition: background-color 150ms var(--ease-out);
+}
+.st-wl-list > li:hover {
+  background: var(--bg-hover-soft);
+}
+.st-wl-msg {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+}
+/* the name, then who they are; when the two stop fitting the second drops under the first */
+.st-wl-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+.st-wl-head > p {
+  overflow-wrap: anywhere;
+}
+.st-wl-linkedin {
+  align-self: center;
+  color: var(--fg-muted);
+  transition: color 150ms var(--ease-out);
+}
+.st-wl-linkedin:hover {
+  color: var(--fg-brand-text);
+}
+.st-wl-text {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-wrap: anywhere;
+}
+.st-wl-composer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 20px 20px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--fg-muted);
+}
+/* a reaction that only shows: no pointer, no hover */
+.st-wl-channel .st-reaction:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+/* a phone: the avatar steps down a size so the words keep their width */
+@media (max-width: 479px) {
+  .st-wl-list > li,
+  .st-wl-channel-head {
+    padding-inline: 14px;
+  }
+  .st-wl-composer {
+    margin-inline: 14px;
+  }
+  .st-wl-msg {
+    gap: 10px;
+  }
+}

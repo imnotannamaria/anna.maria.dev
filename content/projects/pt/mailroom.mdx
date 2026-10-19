@@ -1,0 +1,107 @@
+---
+title: "mailroom"
+description: "Um receptor de webhooks de referência pra API da Stable."
+date: "2026-08-10"
+tags:
+  [
+    "nextjs",
+    "typescript",
+    "hono",
+    "inngest",
+    "supabase",
+    "drizzle-orm",
+    "zod",
+    "svix",
+    "tailwindcss",
+    "reference-implementation",
+  ]
+kind: "demo"
+published: true
+---
+
+## Visão geral
+
+Um receptor de webhooks de referência pra API da [Stable](https://www.usestable.com). A Stable
+é um serviço de caixa postal virtual: recebe correspondência física pra empresas dos EUA,
+digitaliza, extrai os dados e deposita os cheques que encontra dentro. Ela avisa os
+integradores de tudo isso por webhooks entregues pelo Svix. O mailroom é o lado que recebe,
+mais uma UI que deixa você disparar cada modo de falha de propósito e ver o sistema absorver.
+
+Não tem uma conta real da Stable por trás disso. A Stable não tem plano gratuito nem sandbox
+pública, e ativar uma caixa postal exige um USPS Form 1583 assinado, com documentos de
+identidade dos EUA. Todo evento aqui vem de um simulador local, que assina e reproduz
+exatamente os formatos de payload publicados no catálogo público de eventos da Stable no Svix.
+É uma implementação de referência, não uma integração de produção, e não finge ser.
+
+## O problema que ele resolve
+
+Receber um webhook parece um endpoint de dez linhas. Não é, porque o fluxo de eventos da Stable
+tem quatro propriedades que corrompem o estado se você inserir e atualizar às cegas:
+
+- **Reentrega.** O Svix tenta de novo em qualquer timeout ou resposta que não seja 2xx, então o
+  mesmo evento pode chegar duas vezes. Um insert às cegas conta dinheiro em dobro.
+- **Chegada fora de ordem.** O `mailItem.scan.ocrCompleted` pode chegar antes do
+  `mailItem.scan.completed`. Um update às cegas deixa um evento velho sobrescrever um estado novo.
+- **Reversão.** Um cheque pode ir de `completed` pra `failed`, nunca o contrário, e essa
+  transição significa que o dinheiro já foi descontado. É um evento contábil, não uma mudança
+  de status.
+- **Estados pulados.** Se um depósito é pedido antes de o cheque ser transcrito, o
+  `check.processing` nunca é emitido: o estado pula direto de `created` pra `completed` ou `failed`.
+
+O painel `/chaos` dispara cada um desses como uma sequência real e assinada na rota real do
+webhook, e mostra o resultado ao vivo.
+
+## Como é construído
+
+Três tabelas, de propósito:
+
+- `webhook_events`: a fonte da verdade. Só recebe inserts, o corpo guardado exatamente como
+  chegou, deduplicado por uma constraint `UNIQUE` em `svix_id`, não por um `if exists` no código
+  da aplicação.
+- `mail_items`: uma projeção, derivada e reconstruível a partir do log. Um inteiro `state_rank`
+  garante a guarda monotônica, então um evento atrasado não consegue voltar o estado pra trás.
+- `check_entries`: um livro-razão que só recebe inserts. Uma linha por transição, com
+  `amount_cents` com sinal. Não existe coluna de status mutável num cheque: um cheque liquidado
+  que depois falha vira uma nova linha `reversed`, nunca uma alteração da linha liquidada.
+
+O que a Stable manda é fato. O que eu concluo disso é interpretação, e os dois ficam guardados
+separados. Se a lógica da projeção tiver um bug, eu conserto e reproduzo o `webhook_events`: o
+evento original nunca foi destruído.
+
+## Stack
+
+- Next.js, com o Hono montado numa rota catch-all
+- Inngest pra durabilidade e retries
+- Postgres no Supabase, via Drizzle
+- Zod pra validação na borda
+- `svix` pra verificar a assinatura
+- entrepta no tema `bosco`
+
+## Escopo
+
+Nove eventos em dois pipelines: correspondência (`created`, `scan.processing`,
+`scan.completed`, `scan.ocrCompleted`, `summary.created`) e cheques (`created`, `processing`,
+`completed`, `failed`). Encaminhamento, fragmentação, depósitos e resultados de OCR ficaram de
+fora de propósito: eles aumentam o volume de eventos, não trazem problemas novos.
+
+## Rodando local
+
+```bash
+npm install
+INNGEST_DEV=1 npm run dev
+npx inngest-cli@latest dev -u http://localhost:3000/api/inngest
+```
+
+Precisa de uma connection string do Postgres no Supabase (o transaction pooler, porta 6543) e
+de um signing secret `whsec_` compartilhado entre o simulador e a rota. Abra `/chaos` e aperte
+um botão.
+
+## Licença
+
+MIT.
+
+## Links
+
+https://mailroom-stable.vercel.app/
+
+https://github.com/imnotannamaria/mailroom

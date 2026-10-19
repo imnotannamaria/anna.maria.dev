@@ -1,19 +1,59 @@
 import { readFileSync } from "node:fs"
 import { join } from "node:path"
-import { blog, projects, componentDocs } from "@/.velite"
+import { blog, projects } from "@/.velite"
 import { slugify, countWords, estimateReadingTime } from "@/lib/format"
+import type { Locale } from "@/lib/i18n/locales"
 
 function stripPrefix(slug: string) {
   return slug.split("/").slice(1).join("/")
 }
 
+/**
+ * A document in a language. The English file is the document: `content/blog/my-post.mdx`. A
+ * translation sits beside it in a folder named after the language, `content/blog/pt/my-post.mdx`,
+ * and replaces only what is written (title, description, body). The date, the tags, the cover
+ * and the links stay the English file's, so the two cannot drift apart. A document with no
+ * translation is shown in English.
+ */
+function inLocale<T extends { slug: string; title: string; description: string; body: string }>(
+  items: T[],
+  locale: Locale,
+): T[] {
+  const originals: T[] = []
+  const translated = new Map<string, T>()
+  for (const item of items) {
+    const [first, ...rest] = stripPrefix(item.slug).split("/")
+    if (first === "pt" && rest.length) translated.set(rest.join("/"), item)
+    else originals.push({ ...item, slug: stripPrefix(item.slug) })
+  }
+  if (locale === "en") return originals
+  return originals.map((item) => {
+    const other = translated.get(item.slug)
+    return other
+      ? { ...item, title: other.title, description: other.description, body: other.body }
+      : item
+  })
+}
+
 export type TocItem = { id: string; label: string; level: 2 | 3 }
 
 /** Read a document's raw MDX from a content dir, minus frontmatter. "" if missing. */
-function readRaw(dir: "blog" | "projects" | "components", slug: string): string {
+function readRaw(dir: "blog" | "projects", slug: string, locale: Locale = "en"): string {
+  const read = (...parts: string[]) =>
+    readFileSync(join(process.cwd(), "content", dir, ...parts), "utf-8").replace(
+      /^---\n[\s\S]*?\n---/,
+      "",
+    )
+  // the translation when there is one, the English file otherwise
+  if (locale !== "en") {
+    try {
+      return read(locale, `${slug}.mdx`)
+    } catch {
+      // no translation yet
+    }
+  }
   try {
-    const raw = readFileSync(join(process.cwd(), "content", dir, `${slug}.mdx`), "utf-8")
-    return raw.replace(/^---\n[\s\S]*?\n---/, "")
+    return read(`${slug}.mdx`)
   } catch {
     return ""
   }
@@ -60,80 +100,49 @@ function extractToc(body: string): TocItem[] {
   return items
 }
 
-export function getPostReadingStats(slug: string) {
-  return readingStats(readRaw("blog", slug))
+export function getPostReadingStats(slug: string, locale: Locale = "en") {
+  return readingStats(readRaw("blog", slug, locale))
 }
 
-export function getPostToc(slug: string): TocItem[] {
-  return extractToc(readRaw("blog", slug))
+export function getPostToc(slug: string, locale: Locale = "en"): TocItem[] {
+  return extractToc(readRaw("blog", slug, locale))
 }
 
-export function getProjectReadingStats(slug: string) {
-  return readingStats(readRaw("projects", slug))
+export function getProjectReadingStats(slug: string, locale: Locale = "en") {
+  return readingStats(readRaw("projects", slug, locale))
 }
 
-export function getProjectToc(slug: string): TocItem[] {
-  return extractToc(readRaw("projects", slug))
+export function getProjectToc(slug: string, locale: Locale = "en"): TocItem[] {
+  return extractToc(readRaw("projects", slug, locale))
 }
 
-export function getPublishedPosts() {
-  return blog
+const newestFirst = (a: { date: string }, b: { date: string }) =>
+  new Date(b.date).getTime() - new Date(a.date).getTime()
+
+export function getPublishedPosts(locale: Locale = "en") {
+  return inLocale(blog, locale)
     .filter((post) => post.published)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .map((post) => ({ ...post, slug: stripPrefix(post.slug) }))
+    .sort(newestFirst)
 }
 
-export function getFeaturedPosts() {
-  return blog
-    .filter((post) => post.published && post.featured)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .map((post) => ({ ...post, slug: stripPrefix(post.slug) }))
+export function getFeaturedPosts(locale: Locale = "en") {
+  return getPublishedPosts(locale).filter((post) => post.featured)
 }
 
-export function getFeaturedProjects() {
-  return projects
-    .filter((project) => project.published && project.featured)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .map((project) => ({ ...project, slug: stripPrefix(project.slug) }))
-}
-
-export function getPublishedProjects() {
-  return projects
+export function getPublishedProjects(locale: Locale = "en") {
+  return inLocale(projects, locale)
     .filter((project) => project.published)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .map((project) => ({ ...project, slug: stripPrefix(project.slug) }))
+    .sort(newestFirst)
 }
 
-export function getPostBySlug(slug: string) {
-  return blog
-    .filter((post) => post.published)
-    .map((post) => ({ ...post, slug: stripPrefix(post.slug) }))
-    .find((post) => post.slug === slug)
+export function getFeaturedProjects(locale: Locale = "en") {
+  return getPublishedProjects(locale).filter((project) => project.featured)
 }
 
-export function getProjectBySlug(slug: string) {
-  return projects
-    .filter((project) => project.published)
-    .map((project) => ({ ...project, slug: stripPrefix(project.slug) }))
-    .find((project) => project.slug === slug)
+export function getPostBySlug(slug: string, locale: Locale = "en") {
+  return getPublishedPosts(locale).find((post) => post.slug === slug)
 }
 
-// ─── Component docs ────────────────────────────────────────────────────────────
-//
-// The showcase's prose half. Same shape as the two collections above, and the same helpers:
-// there is nothing special about a component doc except what its frontmatter points at, and
-// that is checked at build time by the refinements in velite.config.ts.
-
-export function getComponentDocs() {
-  return componentDocs
-    .filter((doc) => doc.published)
-    .map((doc) => ({ ...doc, slug: stripPrefix(doc.slug) }))
-}
-
-export function getComponentDocBySlug(slug: string) {
-  return getComponentDocs().find((doc) => doc.slug === slug)
-}
-
-export function getComponentDocToc(slug: string): TocItem[] {
-  return extractToc(readRaw("components", slug))
+export function getProjectBySlug(slug: string, locale: Locale = "en") {
+  return getPublishedProjects(locale).find((project) => project.slug === slug)
 }

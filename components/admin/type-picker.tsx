@@ -14,8 +14,7 @@ import { LOG_TYPES, TYPE_LABEL, type LogType } from "@/lib/log/constants"
  * menu. Radix gives it the listbox semantics, roving focus, type-ahead and Escape handling a
  * native `<select>` would have provided.
  *
- * It used to be a `DropdownMenu` with a hand-drawn trigger imitating the Input, because v2 had
- * no select. A dropdown is a menu of actions; this is a form field, and v3 ships one.
+ * A select and not a dropdown menu: a dropdown is a menu of actions, and this is a form field.
  *
  * The id and the invalid state go on the root, which hands them to the trigger — so the
  * Field's label points at it and the error is announced through `aria-describedby`.

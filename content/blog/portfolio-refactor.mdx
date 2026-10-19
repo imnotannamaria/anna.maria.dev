@@ -7,81 +7,89 @@ featured: true
 published: true
 ---
 
-Well well well, if you're reading this, I already finished the refactor, and I hope you're thinking "wow." right now.
+If you're reading this, this is the THIRD UI version of this portfolio. I've been having a lot of fun spending my tokens on this site, and I've been making improvements to it for a while now. In this note you'll follow the process of building each version (with screenshots to compare).
 
-## How I got here
+## V1
 
-I finished my portfolio. When I looked at it, I noticed something. It felt generic. The kind of site that looks like it was "made with AI in 30 minutes."
+### How it was
 
-It had fun features, like the piano, but the UI wasn't me. I wanted something more unique. Something that actually came from me.
+![V1 home page](/blog/ui-refactor/before-1.png)
 
-So I started refactoring it. I split the work into 3 parts.
+_V1: home page_
 
-## 1. A design system
+![V1 projects page](/blog/ui-refactor/before-2.png)
 
-The first part is something that had been in my head for a long time: entrepta.
+_V1: projects page_
 
-entrepta is a dark-first design system. You copy the components into your project and own the code. No SDK, no black box. It ships with 14 components, 6 theme presets, and a CLI to set the whole thing up in one command.
+![V1 contact page](/blog/ui-refactor/before-3.png)
 
-If you want to look at it: https://entrepta.vercel.app
+_V1: contact page_
 
-## 2. Wrist kit
+![V1 piano page](/blog/ui-refactor/before-4.png)
 
-While looking for inspiration for my new portfolio, I came across a personal site that made me stop and think "wow." That's the reaction I want people to have when they land on mine.
+_V1: piano page_
+
+### Why I wanted to change
+
+I thought it was too simple. After I started looking at other portfolios for references, mine was missing a lot of me. And this first version really was built in half an hour with AI (lol).
+
+## V2
+
+### How it was
+
+This is where I started putting more of me into the project.
+
+entrepta is a dark-first design system. You copy the components into your project and own the code. No SDK, no black box, and a CLI to set the whole thing up in one command. If you want to look at it: https://entrepta.vercel.app
+
+wristkit started while I was looking for inspiration for my new portfolio. I came across a personal site that made me stop and think "wow." That's the reaction I want people to have when they land on mine.
 
 Two things in particular caught my attention.
 
 1. The bento grid. I hadn't seen this layout before. It's a grid of cards in different sizes that fit together like little boxes. I ended up using something similar on my own home page.
 2. The Apple Fitness ring. That little ring on the Apple Watch with your activity data.
 
-I searched for a ready-made solution that gives you that Apple ring filled with your Apple Watch data, and I couldn't find one. So I built it myself. That's how wristkit was born.
+I searched for a ready-made solution that gives you that Apple ring filled with your Apple Watch data, and I couldn't find one. So I built it myself. That's how wristkit was born. I use Apple Shortcuts to send my data to an endpoint, and every day the endpoint updates a ring component that lives on my site. If you want to use it on your own site: https://wristkit-web.vercel.app/
 
-The idea is simple. I use Apple Shortcuts to send my data to an endpoint. Every day the endpoint updates a ring component that lives on my site.
+For the UI, I used Claude to turn my ideas into something visual before writing a line of code. The plan: a bento grid on the home page, an editor metaphor chrome (titlebar, sidebar, status bar) wrapping every page, and the same content everywhere, just wearing a new skin. Blog, projects, about, contact, and piano all got the same treatment.
 
-Both the design system and wristkit are live now. You can see wristkit in action on my home page, under `$ cat ./off-the-clock`, next to the Spotify widget and the mini piano.
+![V2 home page](/blog/ui-refactor/v2-home.png)
 
-If you want to use it on your own site: https://wristkit-web.vercel.app/
+_V2: home page_
 
-## 3. Prototyping and UI
+![V2 home page, featured work](/blog/ui-refactor/v2-home-work.png)
 
-For this part I used Claude to turn my ideas into something visual before writing a line of code. The plan: a bento grid on the home page, an editor metaphor chrome (titlebar, sidebar, status bar) wrapping every page, and the same content everywhere, just wearing a new skin. Blog, projects, about, contact, and piano all got the same treatment.
+_V2: home page, featured work_
 
-## Before and after
+![V2 projects page](/blog/ui-refactor/v2-projects.png)
 
-Here's the actual comparison. These four screenshots are the old site, right before the refactor. The "after" is whatever you're looking at right now, since you're already on the new one.
+_V2: projects page_
 
-![Old home page](/blog/ui-refactor/before-1.png)
+![V2 contact page](/blog/ui-refactor/v2-contact.png)
 
-_Before: home page_
+_V2: contact page_
 
-![Old projects page](/blog/ui-refactor/before-2.png)
+### Why I wanted to change
 
-_Before: projects page_
+I felt it had too much stuff, too many pages, and the home was very messy. Looking at the analytics, people didn't look at the other pages, because the home had so much going on.
 
-![Old contact page](/blog/ui-refactor/before-3.png)
+I learned more about animations here, and I built entrepta on top of this version, but then I got tired of it. I wanted something cleaner, with fewer things.
 
-_Before: contact page_
+## V3
 
-![Old piano page](/blog/ui-refactor/before-4.png)
+### How it is
 
-_Before: piano page_
+This is the current version. I separated the pages better, I used more bento grid, mostly on the /person page, which is my favorite, I talked to an artist to create art of me, and I worked on the brand.
 
-## Lighthouse scores
+This one took me a lot longer to build. I did a discovery for each component, the footer, each page, working on each component individually: I'd say what I wanted, ask Claude to generate 3 versions of the UI, and keep shaping it from there.
 
-I also ran PageSpeed Insights before and after, just to make sure the new UI didn't tank performance.
+The tone of entrepta changed a lot here. I stopped thinking of it as a personal design system, and started thinking of it as the design system I want to use in all my projects, no matter the theme. And entrepta v4 is out now: it took away that "posed as an editor" vibe (no more ◆, no //, no editor frame), and it's simpler and more customizable, with a seventh theme, taylor, that is flat and monochrome. This site is still on v3 for now. I should write an article about that too.
 
-![Lighthouse report before the refactor](/blog/ui-refactor/lighthouse/before.png)
+This version also brings this visualization of who I am as a professional: the site is split between front, back (a terminal) and IA.
 
-_Before: 100 performance, 85 accessibility, 100 best practices, 100 SEO_
+I learned more about AI engineering in practice, and I researched security and prompt limiting.
 
-![Lighthouse report after the refactor](/blog/ui-refactor/lighthouse/after.png)
+I've always loved little games in portfolios, so I added a memory game with a record board in the footer.
 
-_After: 100 performance, 100 accessibility, 100 best practices, 100 SEO_
+And Abimaela, my cat, a mascot like a tamagotchi that I want to evolve in the future (you can see more in [docs/abimaela.md](https://github.com/imnotannamaria/anna.maria.dev/blob/main/docs/abimaela.md) on GitHub). She has several animations that I made using sprites, and she reacts to clicks and page changes.
 
-Accessibility went from 85 to 100. Everything else was already at 100 and stayed there.
-
-## What is next
-
-The log page is still on my roadmap. Something like Letterboxd, but for everything: movies, series, albums, places I went to.
-
-Past that, I want to add more personal stuff to the site. Not just the dev side of me, but who I actually am outside of code too.
+And of course, all of it with good Lighthouse scores. I paid attention to the details, mostly performance and accessibility.

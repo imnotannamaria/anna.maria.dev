@@ -10,6 +10,9 @@ const MAX_BYTES = 8 * 1024 * 1024
 /** Long enough that the upstream is hit roughly never; the URL is the cache key. */
 const CACHE_CONTROL = "public, max-age=31536000, s-maxage=31536000, immutable"
 
+/** The image types a poster can be. No SVG: it can carry script. */
+const RASTER = /^image\/(?:png|jpe?g|webp|gif|avif)(?=$|\s|;)/i
+
 /** One redirect, so a CDN's `/latest` style URL still resolves. Two is a chain. */
 const MAX_REDIRECTS = 1
 
@@ -44,18 +47,26 @@ export function decodePosterToken(token: string): string | null {
  * are typed as literals, and `169.254.169.254` is the whole reason redirects are validated.
  */
 function isBlockedHost(hostname: string): boolean {
-  const host = hostname.replace(/^\[|\]$/g, "").toLowerCase()
+  // a trailing dot is the same host: `localhost.` is localhost
+  const host = hostname
+    .replace(/^\[|\]$/g, "")
+    .replace(/\.$/, "")
+    .toLowerCase()
 
   if (host === "localhost" || host.endsWith(".localhost")) return true
-  if (host === "::1" || host === "0.0.0.0") return true
+  // A poster is never typed as an IPv6 literal, and the forms that matter (`::1`, `::ffff:…`
+  // for an IPv4 address, `fc00::/7`, `fe80::/10`) are too many to list. None is a use for this.
+  if (host.includes(":")) return true
 
   const v4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.\d{1,3}$/)
   if (!v4) return false
 
   const [a, b] = [Number(v4[1]), Number(v4[2])]
   return (
+    a === 0 || // "this network", where 0.0.0.0 goes to the local host
     a === 127 || // loopback
     a === 10 || // private
+    (a === 100 && b >= 64 && b <= 127) || // shared address space, used inside carriers and clouds
     (a === 172 && b >= 16 && b <= 31) || // private
     (a === 192 && b === 168) || // private
     (a === 169 && b === 254) // link-local, incl. the metadata endpoint
@@ -152,14 +163,27 @@ async function fetchImage(start: URL): Promise<Response | null> {
  * moment can trip for everybody at once, while a direct caller gets a private bucket of their
  * own. Exactly backwards.
  *
- * Per token, the limit caps the thing that actually costs something: an outbound fetch to
+ * Per poster, the limit caps the thing that actually costs something: an outbound fetch to
  * someone else's server. Legitimate traffic asks for a handful of widths per poster and then
- * lives in the optimiser's cache; a loop on one valid token stops at 60. There are only ever
- * as many buckets as there are posters.
+ * lives in the optimiser's cache; a loop on one valid token stops at 60.
+ *
+ * "Per poster" is the URL the token decodes to, not the token's own characters. Several
+ * strings decode to one URL (both base64 alphabets, optional padding, whitespace that `atob`
+ * drops), so counting the string gave each spelling a bucket of its own: the cap did not hold,
+ * and every made-up string left a bucket behind.
  */
+const bucketOf = (token: string) => {
+  const raw = decodePosterToken(token)
+  try {
+    return `poster:${raw ? new URL(raw).toString() : "invalid"}`
+  } catch {
+    return "poster:invalid"
+  }
+}
+
 poster.get(
   "/:token",
-  rateLimit({ max: 60, windowMs: 5 * 60 * 1000, key: (c) => `poster:${c.req.param("token")}` }),
+  rateLimit({ max: 60, windowMs: 5 * 60 * 1000, key: (c) => bucketOf(c.req.param("token") ?? "") }),
   async (c) => {
     const raw = decodePosterToken(c.req.param("token"))
     if (!raw) return c.json({ error: "invalid_url" }, 400)
@@ -191,10 +215,11 @@ poster.get(
       return c.json({ error: "upstream_unavailable" }, 502)
     }
 
-    const contentType = upstream.headers.get("content-type") ?? ""
-    if (!contentType.startsWith("image/")) {
-      return c.json({ error: "not_an_image" }, 415)
-    }
+    // A picture a browser draws, and not a document it runs: `image/svg+xml` is both, and this
+    // answer is served from the site's own origin. The type sent back is the one matched, not
+    // whatever else the upstream put after it.
+    const contentType = upstream.headers.get("content-type")?.match(RASTER)?.[0]?.toLowerCase()
+    if (!contentType) return c.json({ error: "not_an_image" }, 415)
 
     const declared = Number(upstream.headers.get("content-length") ?? NaN)
     if (Number.isFinite(declared) && declared > MAX_BYTES) {
@@ -215,6 +240,10 @@ poster.get(
     return c.body(bytes, 200, {
       "content-type": contentType,
       "cache-control": CACHE_CONTROL,
+      // belt and braces for a response that is a third party's bytes under our name: no type
+      // sniffing, and if one ever were a document, it could run nothing
+      "x-content-type-options": "nosniff",
+      "content-security-policy": "default-src 'none'; sandbox",
     })
   },
 )

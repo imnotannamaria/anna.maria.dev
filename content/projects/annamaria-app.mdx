@@ -1,32 +1,49 @@
 ---
 title: "annamaria.app"
-description: "My personal website with projects, a blog, and a contact page."
+description: "My portfolio, and the playground behind it: pages, a terminal, a chat and a cat."
 date: "2026-05-04"
-tags: ["nextjs", "react", "typescript", "tailwindcss", "mdx", "resend"]
+tags: ["nextjs", "react", "typescript", "tailwindcss", "mdx", "resend", "postgres", "hono"]
 github: "https://github.com/imnotannamaria/anna.maria.dev"
 live: "https://annamaria.app"
-cover: "/projects/annamaria.app.png"
+cover: "/projects/annamaria.app-v3.png"
 featured: false
 published: true
 ---
 
 ## Overview
 
-This is my personal website. I use it to publish projects and blog posts.
+This is the site you're on. It's my portfolio, and the third version of it. I think of it as a playground more than a résumé.
 
-It also includes a contact page with email sending, plus static pages like About and Uses.
+It has three sides, and you switch between them in the header. The Front is the pages. The Back is a terminal over the same content, where you `ls`, `cd` and `cat` your way through. The IA is a chat that answers about me and the site.
 
-## Main sections
+Everything exists in English and in Portuguese, at `/pt`.
 
-- Home with a short intro and quick links
-- Projects with MDX case studies
-- Blog with MDX posts
-- Contact with a form that sends email
+## What's in it
+
+- A home that is a door to each page
+- `/person`, with photos, a playlist, my Apple Watch rings, the weather in Pernambuco, stickers and a shelf of what I've finished
+- `/professional`, with my career, my stack, the apps I work in and my GitHub contributions
+- Notes and projects, in MDX, each one with its Portuguese twin
+- A wall of love, with letters from people I worked with, by invitation
+- A contact page that is a postcard, and sends an email
+- A memory game in the footer, where the pairs are the pages, and a board for the fastest rounds
+- Abimaela, my cat, in the corner, reacting to what you do
+
+## Decisions
+
+- **entrepta is copied in, not installed.** The site has no runtime dependency on it. A change in entrepta only arrives here when I bring it in on purpose.
+- **The chat has a model behind it, and the model is the last guard, not the only one.** A question is screened before it reaches it, and the answer is screened too, so it isn't streamed. The limits live in Postgres. Without the key, the chat answers from a script. The cap that holds even if my code is wrong is the credit limit on the key itself.
+- **Pages that read Postgres aren't cached, on purpose.** An entry I published ten minutes ago should be there, and a ring shouldn't be frozen at this morning's numbers. It costs a couple of indexed queries.
+- **`/admin` is behind WorkOS AuthKit and an email allowlist.** Anyone else gets a 404, never a 403, because a 403 confirms the page exists.
+- **On the memory board, the server keeps the time, not the browser.** A name only shows up after I approve it.
 
 ## Stack
 
-- Next.js (App Router)
-- TypeScript
-- Tailwind CSS
-- MDX with Velite
-- Resend for sending email
+- Next.js (App Router), TypeScript and Tailwind
+- entrepta, my design system
+- MDX with Velite, in two languages with next-intl
+- Postgres on Supabase, with Drizzle
+- Hono for the API
+- WorkOS AuthKit for the admin
+- Resend for email
+- OpenRouter for the chat

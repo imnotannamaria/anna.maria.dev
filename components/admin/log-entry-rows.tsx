@@ -18,76 +18,22 @@
  * the row and looks exactly like that.
  */
 
-import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { AnimatePresence, useReducedMotion } from "motion/react"
+import { AnimatePresence } from "motion/react"
 import { PencilSimpleIcon } from "@phosphor-icons/react"
 import { TableBody, TableCell } from "@/app/components/entrepta/table"
-import { toast } from "@/app/components/entrepta/toast"
-import { useOptimisticRemoval } from "@/hooks/use-optimistic-removal"
+import { useAdminRows } from "./use-admin-rows"
 import { DeleteDialog } from "@/components/admin/delete-dialog"
 import { Tip } from "@/components/ui/tip"
 import { MotionTableRow } from "@/components/admin/motion-table-row"
 import { StarRating } from "@/components/log/star-rating"
-import { EASE_OUT, revealViewport, STAGGER_LIMIT } from "@/lib/motion"
+import { revealViewport } from "@/lib/motion"
 import { formatLoggedAt } from "@/lib/log/date"
 import { TYPE_LABEL } from "@/lib/log/constants"
 import type { LogEntry } from "@/lib/log/validation"
-import { playSoundEffect } from "@/components/ui/sound-feedback"
 
 export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
-  const router = useRouter()
-  const reduce = useReducedMotion() ?? false
-
-  const { visible, hide, restore } = useOptimisticRemoval(entries)
-
-  /** Hide first, then ask. Every failure path puts the row back explicitly — there is no
-   *  transition boundary doing it for us, and that is the point. */
-  async function remove(id: string, title: string) {
-    hide(id)
-    try {
-      const res = await fetch(`/api/v1/admin/log/${id}`, { method: "DELETE" })
-      if (!res.ok) {
-        restore(id)
-        toast(`could not delete (${res.status})`)
-        playSoundEffect("error")
-        return
-      }
-      toast(`deleted "${title}"`)
-      playSoundEffect("success")
-      router.refresh()
-    } catch {
-      restore(id)
-      toast("network error — nothing was deleted")
-      playSoundEffect("error")
-    }
-  }
-
-  /**
-   * The entrance lives on the row, not on the `<tbody>` orchestrating it through variants.
-   *
-   * It used to: `initial="hidden" whileInView="show"` on the tbody, rows as variant children.
-   * That is the arrangement that left `PageOutline` with a rail of invisible links — a
-   * container's `whileInView` with `once` is spent after it fires, so a child mounting later
-   * resolves `hidden` and is never told to show. In a table that is a row at `opacity: 0`,
-   * which reads as missing data rather than as a broken animation. Rare here (creating an entry
-   * arrives by navigation, and a delete only ever removes rows) and reachable through an edit
-   * that reorders, or a refresh picking up a row written elsewhere.
-   *
-   * Keying the tbody would have fixed it and broken something better: a new key on every
-   * removal means `AnimatePresence` never sees the row leave, and the fade on delete — the
-   * whole point of the optimistic list — would not play.
-   *
-   * The stagger moves onto the row's own transition, which the Cards and motion rules warn
-   * about: a delay left on a transition is re-applied by every later interaction. Safe here
-   * because a row has exactly two states and the other one, `exit`, carries its own.
-   */
-  const stagger = reduce || visible.length > STAGGER_LIMIT ? 0 : 0.04
-  const enter = (index: number) => ({
-    opacity: 1,
-    transition: { duration: reduce ? 0 : 0.32, ease: EASE_OUT, delay: index * stagger },
-  })
-  const leave = { opacity: 0, transition: { duration: reduce ? 0 : 0.18, ease: EASE_OUT } }
+  const { visible, remove, enter, leave } = useAdminRows(entries, "/api/v1/admin/log")
 
   return (
     <TableBody>
@@ -128,6 +74,13 @@ export function LogEntryRows({ entries }: { entries: LogEntry[] }) {
                   style={{ color: "var(--fg-muted)" }}
                 >
                   {entry.creator}
+                </span>
+              )}
+              {/* A note with no Portuguese is the one thing /pt shows in the wrong language: a
+                  title is often a name and fine as it is, a sentence is not. */}
+              {entry.note && !entry.notePt && (
+                <span className="text-mono-xs block font-mono" style={{ color: "var(--fg-muted)" }}>
+                  note not translated
                 </span>
               )}
             </TableCell>

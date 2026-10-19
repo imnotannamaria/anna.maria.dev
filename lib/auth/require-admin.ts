@@ -16,6 +16,18 @@ export function isAdminEmail(email: string | null | undefined): boolean {
 }
 
 /**
+ * The allowlist is the email, so it is only as good as the email being the person's: AuthKit
+ * says who signed in, and `emailVerified` says whether it checked the address. An account that
+ * WorkOS marks as unverified is not let in, whatever address it carries. Only an explicit
+ * `false` refuses: a user object without the field (an older SDK) is not locked out by this.
+ */
+export function isAdmin(
+  user: { email?: string | null; emailVerified?: boolean } | null | undefined,
+) {
+  return !!user && user.emailVerified !== false && isAdminEmail(user.email)
+}
+
+/**
  * AuthKit says who you are. This says whether you're allowed in.
  *
  * Call it in the admin layout AND in every mutating route. The middleware matcher is not
@@ -25,6 +37,6 @@ export function isAdminEmail(email: string | null | undefined): boolean {
  */
 export async function requireAdmin() {
   const { user } = await withAuth({ ensureSignedIn: true })
-  if (!isAdminEmail(user?.email)) notFound()
+  if (!isAdmin(user)) notFound()
   return user
 }

@@ -19,15 +19,6 @@ export default async function AdminLogPage() {
     <>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div
-            className="text-mono-sm mb-2 font-mono tracking-[0.08em] uppercase"
-            style={{ color: "var(--fg-muted)" }}
-          >
-            <span aria-hidden style={{ color: "var(--fg-brand)" }}>
-              $
-            </span>{" "}
-            log --admin
-          </div>
           <h1
             className="text-display-md font-serif leading-none font-normal tracking-[-0.02em]"
             style={{ color: "var(--fg-primary)" }}

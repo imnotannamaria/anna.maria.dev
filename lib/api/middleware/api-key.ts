@@ -1,17 +1,16 @@
-import { timingSafeEqual } from "node:crypto"
+import { createHash, timingSafeEqual } from "node:crypto"
 import { createMiddleware } from "hono/factory"
+
+const digest = (value: string) => createHash("sha256").update(value).digest()
 
 /**
  * Constant-time comparison, so response timing doesn't leak how much of the key matched.
- * timingSafeEqual throws on length mismatch, hence the length check first — that does leak
- * the key's length, which is not worth defending against.
+ * Both sides are hashed first: timingSafeEqual throws on a length mismatch, and checking the
+ * length beforehand would answer "how long is the key" to anyone who asks.
  */
 function keyMatches(provided: string | undefined, expected: string | undefined): boolean {
   if (!provided || !expected) return false
-  const a = Buffer.from(provided)
-  const b = Buffer.from(expected)
-  if (a.length !== b.length) return false
-  return timingSafeEqual(a, b)
+  return timingSafeEqual(digest(provided), digest(expected))
 }
 
 /** Guards a route with a shared secret read from `envVar`. */

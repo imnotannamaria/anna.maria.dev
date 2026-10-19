@@ -1,0 +1,95 @@
+---
+title: "Construindo um portfólio que não parece feito com IA em 30 minutos"
+description: "Meu processo pra refatorar meu portfólio até ele ter a minha cara de verdade. Um design system, o wristkit e uma UI nova."
+date: "2026-06-09"
+tags: ["portfolio", "design-system", "ui", "process"]
+featured: true
+published: true
+---
+
+Se você está lendo isso, essa é a TERCEIRA versão de UI desse portfólio. Eu tenho me divertido bastante gastando meus tokens nesse site, e venho fazendo melhorias nele há um tempo. Nessa nota você vai acompanhar o processo de construir cada versão (com fotos pra comparação).
+
+## V1
+
+### Como era
+
+![Home da V1](/blog/ui-refactor/before-1.png)
+
+_V1: home_
+
+![Página de projetos da V1](/blog/ui-refactor/before-2.png)
+
+_V1: página de projetos_
+
+![Página de contato da V1](/blog/ui-refactor/before-3.png)
+
+_V1: página de contato_
+
+![Página do piano da V1](/blog/ui-refactor/before-4.png)
+
+_V1: página do piano_
+
+### Por que eu quis mudar
+
+Eu achava muito simples. Depois que fui vendo referências de portfólio, faltava muito de mim no meu. E essa primeira versão realmente foi construída em meia hora com IA (rs).
+
+## V2
+
+### Como era
+
+Aqui eu comecei a colocar mais de mim no projeto.
+
+O entrepta é um design system dark first. Você copia os componentes pro seu projeto e o código é seu. Sem SDK, sem caixa preta, e uma CLI pra configurar tudo com um comando. Se quiser dar uma olhada: https://entrepta.vercel.app
+
+O wristkit começou enquanto eu procurava inspiração pro meu portfólio novo. Encontrei um site pessoal que me fez parar e pensar "uau". É essa reação que eu quero que as pessoas tenham quando chegam no meu.
+
+Duas coisas em especial chamaram minha atenção.
+
+1. O bento grid. Eu nunca tinha visto esse layout. É uma grade de cards de tamanhos diferentes que se encaixam como caixinhas. Acabei usando algo parecido na minha própria home.
+2. O anel do Apple Fitness. Aquele anelzinho do Apple Watch com os dados da sua atividade.
+
+Procurei uma solução pronta que entregasse esse anel da Apple preenchido com os dados do Apple Watch, e não achei. Então eu construí. Foi assim que o wristkit nasceu. Eu uso os Atalhos da Apple pra mandar meus dados pra um endpoint, e todo dia o endpoint atualiza um componente de anel que mora no meu site. Se quiser usar no seu site: https://wristkit-web.vercel.app/
+
+Pra UI, usei o Claude pra transformar minhas ideias em algo visual antes de escrever uma linha de código. O plano: um bento grid na home, um chrome com metáfora de editor (titlebar, sidebar, status bar) em volta de toda página, e o mesmo conteúdo em todo lugar, só de roupa nova. Blog, projetos, sobre, contato e piano receberam o mesmo tratamento.
+
+![Home da V2](/blog/ui-refactor/v2-home.png)
+
+_V2: home_
+
+![Home da V2, trabalhos em destaque](/blog/ui-refactor/v2-home-work.png)
+
+_V2: home, trabalhos em destaque_
+
+![Página de projetos da V2](/blog/ui-refactor/v2-projects.png)
+
+_V2: página de projetos_
+
+![Página de contato da V2](/blog/ui-refactor/v2-contact.png)
+
+_V2: página de contato_
+
+### Por que eu quis mudar
+
+Eu sentia que tinha coisa demais, páginas demais, e a home era muito bagunçada. Olhando o analytics, as pessoas não olhavam as outras páginas, porque a home tinha tanta coisa.
+
+Aqui eu aprendi mais sobre animações, e construí o entrepta em cima dessa versão, mas depois enjoei. Quis algo mais clean, com menos coisas.
+
+## V3
+
+### Como é
+
+Essa é a versão atual. Separei melhor as páginas, usei mais bento grid, principalmente na página /person, que é a minha favorita, falei com um artista pra criar artes minhas, e trabalhei a marca.
+
+Aqui eu levei muito mais tempo pra construir. Fui fazendo um discovery de cada componente, do footer, de cada página, trabalhando cada componente individualmente: eu falava o que queria, pedia pro Claude gerar 3 versões de UI e ia moldando.
+
+O tom do entrepta mudou bastante aqui. Eu parei de pensar nele como um design system pessoal, e passei a pensar nele como o design system que eu quero usar em todos os meus projetos, independente do tema. E a v4 do entrepta já saiu: ela tirou essa vibe de "posar de editor" (sem ◆, sem //, sem moldura de editor), e ficou mais simples e mais customizável, com um sétimo tema, o taylor, que é flat e monocromático. Esse site ainda está na v3 por enquanto. Devo escrever um artigo sobre isso também.
+
+Essa versão também traz essa visualização de quem eu sou como profissional: o site dividido entre front, back (um terminal) e IA.
+
+Aprendi mais sobre AI engineering na prática, e pesquisei sobre segurança e prompt limiting.
+
+Sempre amei joguinhos em portfólios, por isso adicionei um jogo da memória com placar de recorde no footer.
+
+E a Abimaela, minha gata, uma mascote tipo tamagotchi que eu quero evoluir no futuro (dá pra ver mais no doc [docs/abimaela.md](https://github.com/imnotannamaria/anna.maria.dev/blob/main/docs/abimaela.md) no GitHub). Ela tem várias animações que eu fiz usando sprites, e reage a cliques e a mudanças de página.
+
+E claro, tudo isso com boas notas no Lighthouse. Cuidei dos detalhes, principalmente de performance e acessibilidade.

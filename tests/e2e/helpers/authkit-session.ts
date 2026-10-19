@@ -15,7 +15,8 @@ import { PRIVATE_KEY_PATH } from "../../../playwright/global-setup"
  * session.js calls `jwtVerify()` against that same endpoint, so this makes AuthKit's real
  * middleware genuinely pass — nothing about the verification step is stubbed.
  */
-export async function signInAs(context: BrowserContext, email: string) {
+/** The sealed session cookie of `email`, as AuthKit would have written it. */
+export async function sessionCookie(email: string): Promise<string> {
   const cookiePassword = process.env.TEST_WORKOS_COOKIE_PASSWORD
   if (!cookiePassword) throw new Error("TEST_WORKOS_COOKIE_PASSWORD must be set for e2e tests")
 
@@ -46,6 +47,16 @@ export async function signInAs(context: BrowserContext, email: string) {
     { password: cookiePassword, ttl: 0 },
   )
 
+  return value
+}
+
+/** A `cookie` header for a request made with no browser: the API tests. */
+export async function cookieHeaderFor(email: string): Promise<string> {
+  return `wos-session=${await sessionCookie(email)}`
+}
+
+export async function signInAs(context: BrowserContext, email: string) {
+  const value = await sessionCookie(email)
   await context.addCookies([
     { name: "wos-session", value, domain: "localhost", path: "/", httpOnly: true, sameSite: "Lax" },
   ])

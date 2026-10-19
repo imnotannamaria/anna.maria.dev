@@ -1,0 +1,47 @@
+/* The admin, in the site's frame. Only its own layout: the tables and forms are entrepta's. */
+/* Three parts, and the middle one is the middle of the page: two equal tracks around it, so it
+   does not drift to whichever side has less in it (`space-between` put it halfway between the two
+   edges of the other parts, which are not the same width). */
+.st-admin-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--border-strong);
+}
+.st-admin-top > :first-child {
+  justify-self: start;
+}
+.st-admin-top > :last-child {
+  justify-self: end;
+}
+.st-admin-nav {
+  display: flex;
+  gap: 8px;
+}
+/* too narrow for three in a row: the label and the account share the first row, the sections
+   take the second, centred */
+@media (max-width: 719px) {
+  .st-admin-top {
+    grid-template-columns: 1fr auto;
+  }
+  .st-admin-nav {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+}
+.st-admin-nav a {
+  padding: 4px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-full);
+  color: var(--fg-secondary);
+  transition:
+    color 150ms var(--ease-out),
+    border-color 150ms var(--ease-out);
+}
+.st-admin-nav a:hover {
+  border-color: var(--border-brand-strong);
+  color: var(--fg-primary);
+}

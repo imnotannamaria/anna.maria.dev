@@ -1,0 +1,7 @@
+.st-roll {
+  display: grid;
+  /* the pile fans out 21px to the right; two of them fit a 375px phone side by side */
+  min-width: 150px;
+  min-height: 172px;
+  place-items: center;
+}

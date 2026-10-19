@@ -1,6 +1,6 @@
 import { withAuth } from "@workos-inc/authkit-nextjs"
 import { createMiddleware } from "hono/factory"
-import { isAdminEmail } from "@/lib/auth/require-admin"
+import { isAdmin } from "@/lib/auth/require-admin"
 
 /**
  * Same gate as `requireAdmin()` for pages, for the API.
@@ -12,6 +12,6 @@ import { isAdminEmail } from "@/lib/auth/require-admin"
  */
 export const requireAdminApi = createMiddleware(async (c, next) => {
   const { user } = await withAuth().catch(() => ({ user: null }))
-  if (!isAdminEmail(user?.email)) return c.json({ error: "not_found" }, 404)
+  if (!isAdmin(user)) return c.json({ error: "not_found" }, 404)
   await next()
 })
