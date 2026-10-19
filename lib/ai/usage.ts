@@ -50,6 +50,22 @@ export async function admit(visitor: string, reserve: number): Promise<Admission
     : { ok: true, day: spent[0].day as string }
 }
 
+let warmed = false
+
+/**
+ * Opens the connection pool before the first question needs it: a cold connection is a TLS
+ * handshake to the pooler on top of the two writes in `admit`. Once per instance, so a page
+ * that is opened a thousand times does not query a thousand times.
+ */
+export async function warm(): Promise<void> {
+  const url = dbUrl()
+  if (warmed || !url) return
+  warmed = true
+  await createDb(url).sql`select 1`.catch(() => {
+    warmed = false
+  })
+}
+
 /** After the answer: swap what was set aside for what it really cost. */
 export async function settle(day: string, reserve: number, actual: number): Promise<void> {
   const url = dbUrl()

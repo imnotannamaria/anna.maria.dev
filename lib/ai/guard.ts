@@ -105,6 +105,22 @@ const CODE: RegExp[] = [
   /[{};]\s*\n.*[{};]\s*(\n|$)/,
 ]
 
+/** The site itself: any of its pages is a fine link. */
+const SITE_ORIGIN = "https://annamaria.app"
+const URL_IN_TEXT = /\bhttps?:\/\/[^\s)"'<>]+/gi
+/** A link as text, compared without its case, a closing slash or the punctuation after it. */
+const clean = (url: string) =>
+  url
+    .toLowerCase()
+    .replace(/[.,;:!?]+$/, "")
+    .replace(/\/+$/, "")
+
+/**
+ * The answer as the visitor gets it: no invisible or bidirectional characters, which could hide
+ * text in it or show it in an order other than the one it was screened in.
+ */
+export const visible = (answer: string) => answer.replace(INVISIBLE, "")
+
 export type AnswerVerdict = "ok" | "code" | "link" | "leak" | "empty"
 
 /**
@@ -122,9 +138,13 @@ export function screenAnswer(
   if (leaks.some((leak) => leak && flat.includes(normalise(leak)))) return "leak"
   if (CODE.some((pattern) => pattern.test(text))) return "code"
 
-  const known = allowed.toLowerCase()
-  for (const [, host] of text.matchAll(/\bhttps?:\/\/([^\s/)"'<>]+)/gi)) {
-    if (!known.includes(host.toLowerCase().replace(/[.,;:!?]+$/, ""))) return "link"
+  // A link is fine only if it is one of the site's own, whole. Checking the host alone let
+  // through any page on a host the site mentions: github.com/someone-else, or a host that is
+  // only the tail of one of them (maria.app inside annamaria.app).
+  const known = [SITE_ORIGIN, ...[...allowed.matchAll(URL_IN_TEXT)].map(([url]) => clean(url))]
+  for (const [url] of text.matchAll(URL_IN_TEXT)) {
+    const link = clean(url)
+    if (!known.some((site) => link === site || link.startsWith(`${site}/`))) return "link"
   }
   if (/!\[[^\]]*\]\(|<img\b|<a\b|<iframe\b/i.test(text)) return "link"
   return "ok"

@@ -33,6 +33,10 @@ const NOTICE_KINDS: readonly string[] = ["budget", "visitor", "slow", "scope", "
  * against the list of pages, and the card itself is the script's. When the chat says no (a
  * limit, a question that is not about Anna, an attempt on the rules) it says so with a notice.
  */
+/** The longest a word of an answer waits, and the longest a whole answer takes to type out. */
+const WORD_MS = 45
+const TYPING_MS = 1200
+
 export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group[] }) {
   const data = useSiteData(staticData)
   const navigate = useNavigate()
@@ -52,10 +56,14 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
   const stop = useRef<(() => void) | null>(null)
   const asked = useRef<string[]>([])
   const count = useRef(0)
+  // the answer to "is a model answering", kept so a question asked before it arrives waits for it
+  // instead of going to the script
+  const checking = useRef<Promise<boolean> | null>(null)
 
   useEffect(() => {
     let alive = true
-    void isLive().then((answering) => alive && setLive(answering))
+    checking.current = isLive()
+    void checking.current.then((answering) => alive && setLive(answering))
     return () => {
       alive = false
       stop.current?.()
@@ -103,10 +111,15 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
     write(id, content, false)
   }
 
-  /** Writes an answer a word at a time, under a notice if there is one. */
+  /**
+   * Writes an answer a word at a time, under a notice if there is one. The whole answer is
+   * already here, so the typing is only the look of it: it never takes longer than TYPING_MS,
+   * however long the answer is. At a fixed pace a long answer took ten seconds to finish.
+   */
   function type(id: string, text: string, card: Answer["card"], notice: NoticeKind | null = null) {
     const words = text ? text.split(" ") : []
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const pace = Math.min(WORD_MS, TYPING_MS / Math.max(words.length, 1))
     let until = calm ? words.length : 0
     const partial = () => composed(words.slice(0, until).join(" "), undefined, notice)
     const timer = setInterval(
@@ -116,7 +129,7 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
         clearInterval(timer)
         finish(id, composed(text, card, notice))
       },
-      calm ? 0 : 45,
+      calm ? 0 : pace,
     )
     stop.current = () => {
       clearInterval(timer)
@@ -154,7 +167,8 @@ export function Chat({ data: staticData, stack }: { data: SiteData; stack: Group
     asked.current = [...earlier, question]
 
     if (!fits) return type(id, "", undefined, "long")
-    if (!live) {
+    const answering = live ?? (await (checking.current ?? Promise.resolve(false)))
+    if (!answering) {
       // the script had nothing for it: no card means it fell through to "not in my notes"
       if (!scripted.card) pet.notify("noAnswer")
       return type(id, scripted.text, scripted.card)

@@ -1,10 +1,11 @@
 import { Hono } from "hono"
 import { siteContext } from "@/lib/ai/context"
-import { screenAnswer, screenQuestion, splitTopic } from "@/lib/ai/guard"
+import { screenAnswer, screenQuestion, splitTopic, visible } from "@/lib/ai/guard"
 import { MAX_OUTPUT_TOKENS, costMicro, reserveMicro } from "@/lib/ai/limits"
 import { RULE_MARKS, buildMessages, canaryOf } from "@/lib/ai/prompt"
-import { admit, settle, visitorOf } from "@/lib/ai/usage"
+import { admit, settle, visitorOf, warm } from "@/lib/ai/usage"
 import { chatSchema } from "@/lib/ai/validation"
+import { jsonBody } from "../middleware/json-body"
 import { byClient, clientIp, rateLimit } from "../middleware/rate-limit"
 
 export const ai = new Hono()
@@ -22,7 +23,13 @@ function config() {
 const note = (reason: string) => console.warn(JSON.stringify({ event: "ai.refused", reason }))
 
 /** Whether a model is answering, so the page can say so before the first question. */
-ai.get("/status", (c) => c.json({ live: config() !== null }))
+ai.get("/status", (c) => {
+  const live = config() !== null
+  // The page asks this when the chat opens, while the visitor is still typing. Opening the
+  // database connection now takes it off the first question's wait.
+  if (live) void warm()
+  return c.json({ live })
+})
 
 type Completion = {
   choices?: { message?: { content?: string | null } }[]
@@ -49,6 +56,10 @@ type Completion = {
  */
 ai.post(
   "/chat",
+  // JSON only, and small. Without the type check a page on any other site could post a question
+  // from its visitors' browsers with a plain form (text/plain needs no preflight), each from a
+  // different address, and spend the day's budget for everyone.
+  jsonBody({ maxBytes: 8 * 1024 }),
   // a blunt first gate, in memory: the real limits are in Postgres, in `admit`
   rateLimit({
     max: 40,
@@ -103,12 +114,20 @@ ai.post(
           // providers that keep or train on prompts are not used
           provider: { data_collection: "deny" },
         }),
-        signal: AbortSignal.timeout(25_000),
+        // an answer of 300 tokens takes a few seconds; past this the provider is stuck, and the
+        // visitor is better served by the script than by waiting longer
+        signal: AbortSignal.timeout(15_000),
       })
-      if (!upstream.ok) throw new Error("upstream")
+      if (!upstream.ok) {
+        // the provider refused the call: nothing was written, so nothing is owed
+        await settle(admission.day, reserve, 0).catch(() => {})
+        return c.json({ reason: "upstream" }, 502)
+      }
       completion = (await upstream.json()) as Completion
     } catch {
-      await settle(admission.day, reserve, 0).catch(() => {})
+      // A timeout or a dropped connection: the answer may have been written and billed anyway,
+      // so the reservation stays spent. Giving it back here would let calls that never finish
+      // run past the day's budget.
       return c.json({ reason: "upstream" }, 502)
     }
 
@@ -120,7 +139,7 @@ ai.post(
         : costMicro(conf.model, usage.prompt_tokens ?? 0, usage.completion_tokens ?? 0)
     await settle(admission.day, reserve, actual).catch(() => {})
 
-    const { topic, text } = splitTopic(completion.choices?.[0]?.message?.content ?? "")
+    const { topic, text } = splitTopic(visible(completion.choices?.[0]?.message?.content ?? ""))
     if (topic === "off") {
       note("scope:model")
       return c.json({ reason: "scope" }, 422)

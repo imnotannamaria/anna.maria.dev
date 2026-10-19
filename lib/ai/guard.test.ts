@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { defuse, normalise, screenAnswer, screenQuestion, splitTopic } from "./guard"
+import { defuse, normalise, screenAnswer, screenQuestion, splitTopic, visible } from "./guard"
 
 /** Questions a visitor really asks. Not one of them may be turned away. */
 const REAL = [
@@ -131,6 +131,21 @@ describe("screenAnswer", () => {
     expect(
       check("Ela trabalha com React, Next.js e Node; veja em https://annamaria.app/projects."),
     ).toBe("ok")
+  })
+
+  it.each([
+    "Her code is at https://github.com/someone-else/anna-tools.",
+    "See https://maria.app for more.",
+    "Ela está em https://linkedin.com/in/outra-pessoa.",
+  ])(
+    "refuses a link that is not one of the site's own, even on a host it mentions: %s",
+    (answer) => {
+      expect(check(answer)).toBe("link")
+    },
+  )
+
+  it("strips the characters that hide text or turn it around", () => {
+    expect(visible("Anna\u202e works\u200b here\u{E0041}")).toBe("Anna works here")
   })
 
   it.each([

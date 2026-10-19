@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 vi.mock("@/lib/ai/usage", () => ({
   admit: vi.fn(),
   settle: vi.fn(),
+  warm: vi.fn(async () => {}),
   visitorOf: vi.fn(() => "visitor-hash"),
 }))
 vi.mock("@/lib/ai/context", () => ({
@@ -10,7 +11,7 @@ vi.mock("@/lib/ai/context", () => ({
 }))
 
 import { canaryOf } from "@/lib/ai/prompt"
-import { admit, settle } from "@/lib/ai/usage"
+import { admit, settle, warm } from "@/lib/ai/usage"
 import { ai } from "./ai"
 
 const admitted = vi.mocked(admit)
@@ -203,6 +204,12 @@ describe("POST /ai/chat, the provider failing", () => {
     expect(settled).toHaveBeenCalledWith("2026-10-16", expect.any(Number), 0)
   })
 
+  it("keeps what it set aside when the call times out, since it may have been billed", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new DOMException("timed out", "TimeoutError")))
+    expect((await ask("Who is Anna?")).status).toBe(502)
+    expect(settled).not.toHaveBeenCalled()
+  })
+
   it("treats an empty answer as a failure", async () => {
     model("@none\n")
     expect((await ask("Who is Anna?")).status).toBe(502)
@@ -218,9 +225,35 @@ describe("the log line", () => {
 })
 
 describe("GET /ai/status", () => {
-  it("says whether a model is answering", async () => {
+  it("says whether a model is answering, and opens the database only when one is", async () => {
+    vi.mocked(warm).mockClear()
     expect(await (await ai.request("/status")).json()).toEqual({ live: true })
+    expect(warm).toHaveBeenCalledTimes(1)
     vi.stubEnv("OPENROUTER_MODEL", "")
     expect(await (await ai.request("/status")).json()).toEqual({ live: false })
+    expect(warm).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("POST /ai/chat, what the request must look like", () => {
+  it("refuses a body that is not JSON, the kind a form on another site can send", async () => {
+    const fetched = model("@person\nAnna lives in Pernambuco.")
+    const res = await ai.request("/chat", {
+      method: "POST",
+      headers: { "Content-Type": "text/plain", "x-forwarded-for": "198.51.100.250" },
+      body: JSON.stringify({ question: "Who is Anna?" }),
+    })
+    expect(res.status).toBe(415)
+    expect(admitted).not.toHaveBeenCalled()
+    expect(fetched).not.toHaveBeenCalled()
+  })
+})
+
+describe("POST /ai/chat, characters nobody sees", () => {
+  it("takes them out of the answer before it is screened and sent", async () => {
+    model("@person\nAnna\u202e lives\u200b in Pernambuco.")
+    const res = await ask("Where is Anna from?")
+    expect(res.status).toBe(200)
+    expect((await res.json()).text).toBe("Anna lives in Pernambuco.")
   })
 })
