@@ -2,20 +2,22 @@ import type { ReactNode } from "react"
 import type { PageId } from "@/components/site/pages"
 import { ScreenLink } from "@/components/site/screen-link"
 
-/** A card on the home that is, whole, the link to a page. `label` is its whole accessible name. */
+/**
+ * A card on the home that is, whole, the link to a page. Its accessible name is its visible text
+ * (the label and the tagline): an aria-label that left the tagline out is a name that does not
+ * contain what is on the card, which a voice-control user cannot say.
+ */
 export function Door({
   to,
-  label,
   className,
   children,
 }: {
   to: PageId
-  label: string
   className?: string
   children: ReactNode
 }) {
   return (
-    <ScreenLink to={to} className={className} aria-label={label}>
+    <ScreenLink to={to} className={className}>
       {children}
     </ScreenLink>
   )

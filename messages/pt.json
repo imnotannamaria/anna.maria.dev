@@ -100,7 +100,6 @@
     "lede": "Eu construo as coisas <b>de ponta a ponta</b>: <flow>UI → front (web / mobile) → back → IA → deploy</flow>, e faço isso há uns <b>{now} − {since} anos</b>.",
     "hintCards": "é só clicar em um card se quiser saber mais",
     "hintSides": "Você pode trocar lá em cima: <b>Front</b> é onde você tá agora, <b>Back</b> é uma versão terminal das infos desse site e <b>IA</b> é um chat :)",
-    "goTo": "Ir para {page}",
     "wallExcerpt": "o que quem trabalhou comigo escreveu sobre trabalhar comigo",
     "notesFallback": "notas",
     "projectsFallback": "projetos"
@@ -195,6 +194,7 @@
     "postCard": "cartão postal",
     "greetings": "saudações de onde você estiver",
     "messagePlaceholder": "escreve aqui sua mensagem, pode ser curtinha",
+    "count": "{n} de {max}",
     "to": "para",
     "from": "de",
     "country": "Brasil",
@@ -312,7 +312,12 @@
     "avatarAlt": "Anna Maria",
     "wristkit": "Ver o wristkit",
     "bio": "Bom, eu não sou muito de falar sobre mim, então montei esse playground. Só de olhar a página dá pra saber muita coisa sobre mim :)",
-    "roll": "Rolo da câmera. {alt}. Foto {n} de {total}; clica pra ver a próxima.",
+    "roll": "Rolo da câmera, {roll}. {alt}. Foto {n} de {total}; clica pra ver a próxima.",
+    "rolls": {
+      "anna": "Eu e minha irmã",
+      "food": "Comida",
+      "abimaela": "Abimaela"
+    },
     "photos": {
       "selfie": "Uma selfie, com uma camiseta da Olivia Rodrigo",
       "abimaela": "Abimaela, a gata, ganhando carinho",
@@ -320,7 +325,10 @@
       "lunch": "Um prato bem cheio no almoço",
       "glasses": "Uma selfie com óculos de luz azul",
       "burger": "Um hambúrguer num papel quadriculado",
-      "snout": "O focinho da Abimaela, perto demais da câmera"
+      "snout": "O focinho da Abimaela, perto demais da câmera",
+      "desk": "Uma selfie na minha mesa, de óculos de armação transparente",
+      "bed": "Abimaela deitada de barriga pra cima na cama",
+      "little": "Eu criança, de trancinhas, fazendo o sinal do rock"
     },
     "beachAlt": "A praia no fim da tarde: mar calmo, um barquinho e areia",
     "sky": {
@@ -476,7 +484,7 @@
   "career": {
     "cesar": {
       "role": "engenheira full-stack",
-      "text": "O CESAR é um dos principais centros de inovação do Brasil, e foi lá que passei a maior parte do tempo no ESG Carbon, uma plataforma no top 5 de ESGTech do Brasil que atende mais de 140 empresas. Eu arquitetei e coloquei no ar do zero, com React, Next.js, TypeScript, Python e Django, transformando um labirinto de regras do GHG Protocol numa ferramenta de autoatendimento que derrubou o relatório manual de 3 horas pra 5 minutos. Hoje estou num app de finanças pessoais, trabalhando de ponta a ponta entre um app em React Native e um backend em FastAPI, no fluxo de consentimento do Open Finance.",
+      "text": "O CESAR é um dos principais centros de inovação do Brasil, e foi lá que passei a maior parte do tempo no ESG Carbon, uma plataforma no top 5 de ESGTech do Brasil que atende mais de 140 empresas. Eu ajudei a arquitetar e colocar no ar do zero, com React, Next.js, TypeScript, Python e Django, transformando um labirinto de regras do GHG Protocol numa ferramenta de autoatendimento que derrubou o relatório manual de 3 horas pra 5 minutos. Hoje estou num app de finanças pessoais, trabalhando de ponta a ponta entre um app em React Native e um backend em FastAPI, no fluxo de consentimento do Open Finance.",
       "stats": {
         "0": "empresas no ESG Carbon",
         "1": "relatório manual",

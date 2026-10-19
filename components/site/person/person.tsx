@@ -57,7 +57,11 @@ export function Person({ log }: { log: LogEntry[] | null }) {
           {/* One sentence, on purpose: the page under it is the bio. */}
           <Lede>{t("bio")}</Lede>
         </div>
-        <CameraRoll />
+        <div className="st-rolls">
+          <CameraRoll roll="anna" />
+          <CameraRoll roll="food" />
+          <CameraRoll roll="abimaela" />
+        </div>
       </header>
 
       <div className="st-bento">

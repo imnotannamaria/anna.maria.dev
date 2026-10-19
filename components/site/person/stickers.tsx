@@ -40,8 +40,8 @@ const STICKERS: Sticker[] = [
       <Image
         src={pernambuco}
         alt=""
-        width={104}
-        sizes="104px"
+        width={80}
+        sizes="80px"
         draggable={false}
         className="rounded-[8px]"
       />
@@ -52,7 +52,7 @@ const STICKERS: Sticker[] = [
   },
   {
     id: "galadriel",
-    art: cutout(galadriel, 118),
+    art: cutout(galadriel, 90),
     diecut: true,
     x: "56%",
     y: "2%",
@@ -60,7 +60,7 @@ const STICKERS: Sticker[] = [
   },
   {
     id: "dany",
-    art: cutout(dany, 118),
+    art: cutout(dany, 90),
     diecut: true,
     x: "30%",
     y: "30%",
@@ -68,7 +68,7 @@ const STICKERS: Sticker[] = [
   },
   {
     id: "bosco",
-    art: cutout(bosco, 118),
+    art: cutout(bosco, 90),
     diecut: true,
     x: "2%",
     y: "56%",
@@ -76,7 +76,7 @@ const STICKERS: Sticker[] = [
   },
   {
     id: "cherry",
-    art: cutout(cherry, 118),
+    art: cutout(cherry, 90),
     diecut: true,
     x: "60%",
     y: "54%",

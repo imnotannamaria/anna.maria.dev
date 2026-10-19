@@ -1,6 +1,6 @@
 ---
 title: "entrepta"
-description: "Um design system dark first pra sites que parecem feitos por uma engenheira."
+description: "Um design system dark first que você copia pro seu repositório. Mono na UI, serifa em itálico nos títulos, e nenhuma marca própria."
 date: "2026-05-18"
 tags:
   ["nextjs", "react", "typescript", "tailwindcss", "design-system", "components", "cli", "radix-ui"]
@@ -9,7 +9,9 @@ published: true
 
 ## Visão geral
 
-O entrepta é um design system dark first pra sites que parecem ter sido feitos por alguém de engenharia. Abas, uma paleta de comandos, uma status bar, prompts de shell, serifa em itálico do lado de mono.
+O entrepta é um design system dark first. Superfícies quase pretas, mono na UI, serifa em itálico nos títulos.
+
+Ele começou com cara de editor de código: abas com barra de título, uma status bar, um ◆ na frente de todo label e um `//` antes de todo erro. Na v4 eu tirei tudo isso. Era a cara do meu site, não algo que todo projeto devia receber por padrão. Agora a biblioteca não tem marca própria, e se você quiser o ◆ ou a moldura de editor de volta, é só passar.
 
 Os componentes são copiados pro seu repositório como código-fonte, no modelo do shadcn. Sem SDK, sem runtime. O código é seu.
 
@@ -20,18 +22,20 @@ npx @entrepta/cli@latest add button card command-palette
 
 ## O que vem
 
-33 componentes em 6 seções, em React 19, Tailwind v4 e variáveis CSS.
+62 componentes em 8 seções, em React 19, Tailwind v4 e variáveis CSS.
 
-| Seção       | Componentes                                                        |
-| ----------- | ------------------------------------------------------------------ |
-| Primitivos  | Button, Badge, Card, Dialog, Dropdown, Tooltip, Kbd, Tabs          |
-| Formulários | Input, Textarea, Checkbox, Switch, Field, FilterPill               |
-| Layout      | StatusBar, TopNav, ThemeSwitcher, ModeToggle, Sidebar, PageOutline |
-| Conteúdo    | CodeBlock, SectHead, doc parts                                     |
-| Feedback    | Toast, Skeleton, CommandPalette, ChromeMessage, PageLoading        |
-| Movimento   | Reveal, TypeIn, RollingNumber, Spotlight, ArrowLink                |
+| Seção       | O que tem                                                                            |
+| ----------- | ------------------------------------------------------------------------------------ |
+| Primitivos  | Button, Badge, Avatar, Card, Dialog, Sheet, Popover, Accordion, Tabs, Stepper e mais |
+| Formulários | Input, Field, Select, Combobox, SegmentedControl, MoneyInput, DatePicker e mais      |
+| Layout      | TopNav, Sidebar, MobileNav, BentoGrid, ThemeSwitcher, ModeToggle                     |
+| Conteúdo    | CodeBlock                                                                            |
+| Dados       | Metric, Delta, Sparkline, Chart, BarList, Table, DataTable, FilterBuilder e mais     |
+| Chat        | PromptInput, ChatThread                                                              |
+| Feedback    | Alert, EmptyState, Toast, Skeleton, CommandPalette                                   |
+| Movimento   | Reveal, TypeIn, RollingNumber, ArrowLink                                             |
 
-Seis temas prontos: `entrepta`, `blossom`, `marmalade`, `julia`, `ivy` e `bosco`. Escolha um, ou instale os seis e troque em runtime. Toda cor de texto passa no WCAG AA nas 12 combinações de tema e modo, e um teste mede isso a cada mudança.
+Sete temas prontos: `entrepta`, `blossom`, `marmalade`, `julia`, `ivy`, `bosco` e `taylor`, o mais novo, que não tem cor nenhuma: branco no escuro, preto no claro. Escolha um, ou instale os sete e troque em runtime. Toda cor de texto passa no WCAG AA em todo tema e modo, e um teste mede isso a cada mudança.
 
 ## Feito pra agentes de código
 
@@ -46,7 +50,7 @@ O entrepta foi pensado pra ser instalado e usado pelo Claude Code, pelo Cursor o
 ```bash
 npx @entrepta/cli@latest init --theme=ivy
 
-# all six themes, switchable at runtime
+# all seven themes, switchable at runtime
 npx @entrepta/cli@latest init --theme=ivy --themes=all
 
 npx @entrepta/cli@latest add button card field
@@ -79,7 +83,7 @@ export function Launch() {
 
 ## Feito com entrepta
 
-Esse site roda nele. O entrepta começou aqui, e a v2 foi construída aqui primeiro, antes de ir pro design system.
+Esse site roda nele. O entrepta começou aqui, e a v2 foi construída aqui primeiro, antes de ir pro design system. O site ainda está na v3, então por enquanto ele tira a cara de editor com overrides próprios.
 
 ## Stack
 

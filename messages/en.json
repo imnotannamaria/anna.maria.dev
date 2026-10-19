@@ -100,7 +100,6 @@
     "lede": "I build things <b>end to end</b>: <flow>UI → front (web / mobile) → back → AI → deploy</flow>, and I've been at it for about <b>{now} − {since} years</b>.",
     "hintCards": "just click a card if you want to know more",
     "hintSides": "You can switch up top: <b>Front</b> is where you are now, <b>Back</b> is a terminal version of what's on this site, and <b>IA</b> is a chat :)",
-    "goTo": "Go to {page}",
     "wallExcerpt": "what people I have worked with wrote about working with me",
     "notesFallback": "notes",
     "projectsFallback": "projects"
@@ -195,6 +194,7 @@
     "postCard": "post card",
     "greetings": "greetings from wherever you are",
     "messagePlaceholder": "write your message here, a short one is fine",
+    "count": "{n} of {max}",
     "to": "to",
     "from": "from",
     "country": "Brazil",
@@ -312,7 +312,12 @@
     "avatarAlt": "Anna Maria",
     "wristkit": "View wristkit",
     "bio": "Well, I'm not much for talking about myself, so I built this playground. Just looking at the page tells you a lot about me :)",
-    "roll": "Camera roll. {alt}. Photo {n} of {total}; click for the next one.",
+    "roll": "Camera roll, {roll}. {alt}. Photo {n} of {total}; click for the next one.",
+    "rolls": {
+      "anna": "Me and my sister",
+      "food": "Food",
+      "abimaela": "Abimaela"
+    },
     "photos": {
       "selfie": "A selfie, in an Olivia Rodrigo t-shirt",
       "abimaela": "Abimaela, the cat, being petted",
@@ -320,7 +325,10 @@
       "lunch": "A very full plate at lunch",
       "glasses": "A selfie with blue-light glasses",
       "burger": "A burger on a checkered paper",
-      "snout": "Abimaela's nose, far too close to the camera"
+      "snout": "Abimaela's nose, far too close to the camera",
+      "desk": "A selfie at my desk, with clear-framed glasses",
+      "bed": "Abimaela lying on her back on the bed, showing her belly",
+      "little": "Me as a kid, braids and all, doing the rock hand sign"
     },
     "beachAlt": "The beach at dusk: calm sea, a small boat, and sand",
     "sky": {
@@ -476,7 +484,7 @@
   "career": {
     "cesar": {
       "role": "full-stack engineer",
-      "text": "CESAR is one of Brazil's top innovation centers, and it's where I spent most of my time on ESG Carbon, a platform ranked top 5 in ESGTech in Brazil that serves 140+ companies. I architected and shipped it from zero with React, Next.js, TypeScript, Python and Django, turning a maze of GHG Protocol rules into a self-serve tool that cut manual reporting from 3 hours down to 5 minutes. These days I'm on a personal-finance fintech app, working end to end across a React Native app and a FastAPI backend on the Open Finance consent flow.",
+      "text": "CESAR is one of Brazil's top innovation centers, and it's where I spent most of my time on ESG Carbon, a platform ranked top 5 in ESGTech in Brazil that serves 140+ companies. I helped architect and ship it from zero with React, Next.js, TypeScript, Python and Django, turning a maze of GHG Protocol rules into a self-serve tool that cut manual reporting from 3 hours down to 5 minutes. These days I'm on a personal-finance fintech app, working end to end across a React Native app and a FastAPI backend on the Open Finance consent flow.",
       "stats": {
         "0": "companies on ESG Carbon",
         "1": "manual reporting",

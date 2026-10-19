@@ -192,7 +192,6 @@ export function Home() {
             <Reveal index={index} className="h-full">
               <Door
                 to={page.id}
-                label={t("goTo", { page: pages(`${page.id}.label`) })}
                 className={cn("st-hm-door focus-ring", page.id === "projects" && "st-folder-host")}
               >
                 <span className="st-hm-label text-mono-sm font-mono">

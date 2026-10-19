@@ -18,11 +18,42 @@
   border-radius: var(--radius-lg);
   object-fit: cover;
 }
+/* Three piles of photos, mine, food and Abimaela's, side by side; on a phone the last one
+   wraps under the other two */
+.st-rolls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
 @container (min-width: 620px) {
   .st-me {
-    grid-template-columns: 148px minmax(0, 1fr) auto;
+    grid-template-columns: 148px minmax(0, 1fr);
     align-items: center;
     gap: 24px;
+  }
+  .st-me-avatar {
+    grid-row: span 2;
+  }
+  /* not room for the piles beside the sentence yet: they go under it */
+  .st-rolls {
+    grid-column: 2;
+    justify-content: start;
+  }
+}
+/* Beside the sentence, side by side. The piles take the same share of the row as the words and
+   spread to its two ends, so the room left over goes between them instead of piling up between
+   the words and the photos. */
+@container (min-width: 900px) {
+  .st-me {
+    grid-template-columns: 148px minmax(0, 1fr) minmax(min-content, 1fr);
+  }
+  .st-me-avatar {
+    grid-row: auto;
+  }
+  .st-rolls {
+    grid-column: auto;
+    justify-content: space-between;
   }
 }
 .st-bento {

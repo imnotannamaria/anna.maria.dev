@@ -26,7 +26,7 @@ export const CAREER: Entry[] = [
     from: [2024, 7],
     until: null,
     current: true,
-    text: "CESAR is one of Brazil's top innovation centers, and it's where I spent most of my time on ESG Carbon, a platform ranked top 5 in ESGTech in Brazil that serves 140+ companies. I architected and shipped it from zero with React, Next.js, TypeScript, Python and Django, turning a maze of GHG Protocol rules into a self-serve tool that cut manual reporting from 3 hours down to 5 minutes. These days I'm on a personal-finance fintech app, working end to end across a React Native app and a FastAPI backend on the Open Finance consent flow.",
+    text: "CESAR is one of Brazil's top innovation centers, and it's where I spent most of my time on ESG Carbon, a platform ranked top 5 in ESGTech in Brazil that serves 140+ companies. I helped architect and ship it from zero with React, Next.js, TypeScript, Python and Django, turning a maze of GHG Protocol rules into a self-serve tool that cut manual reporting from 3 hours down to 5 minutes. These days I'm on a personal-finance fintech app, working end to end across a React Native app and a FastAPI backend on the Open Finance consent flow.",
     tags: ["react", "next.js", "django", "react native", "fastapi"],
     stats: [
       { value: "140+", what: "companies on ESG Carbon" },
