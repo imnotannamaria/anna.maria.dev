@@ -1,7 +1,7 @@
 "use client"
 
 import { RequiredMark } from "@/components/site/required-mark"
-import { contactSchema } from "@/lib/contact-schema"
+import { MESSAGE_MAX, contactSchema } from "@/lib/contact-schema"
 import { LinkedinLogoIcon, PaperPlaneTiltIcon } from "@phosphor-icons/react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useTranslations } from "next-intl"
@@ -98,6 +98,7 @@ export function Postcard({ channels }: { channels: Channels }) {
   const [problem, setProblem] = useState<string | null>(null)
   // which field the problem is in, so it is marked and gets the cursor
   const [wrong, setWrong] = useState<Field | null>(null)
+  const [written, setWritten] = useState(0)
 
   // the schema and the server say which field is wrong; the words for it are in the page's language
   const isField = (field: string | undefined): field is Field =>
@@ -210,6 +211,7 @@ export function Postcard({ channels }: { channels: Channels }) {
                 variant="secondary"
                 onClick={() => {
                   setProblem(null)
+                  setWritten(0)
                   setPhase("writing")
                 }}
               >
@@ -261,13 +263,28 @@ export function Postcard({ channels }: { channels: Channels }) {
                   placeholder={t("messagePlaceholder")}
                   aria-required
                   aria-invalid={wrong === "message" || undefined}
+                  aria-describedby="postal-count"
+                  maxLength={MESSAGE_MAX}
                   className="st-ct-message font-serif"
-                  onInput={() => {
+                  onInput={(event) => {
+                    // the card grows with the text instead of scrolling inside it, so every line
+                    // of writing stays on a ruled line
+                    const field = event.currentTarget
+                    field.style.height = "auto"
+                    field.style.height = `${field.scrollHeight}px`
+                    setWritten(field.value.length)
                     if (phase === "error") setPhase("writing")
                     setProblem(null)
                     setWrong(null)
                   }}
                 />
+                <p
+                  id="postal-count"
+                  className="st-ct-count text-mono-xs m-0 font-mono"
+                  data-full={written >= MESSAGE_MAX || undefined}
+                >
+                  {t("count", { n: written, max: MESSAGE_MAX })}
+                </p>
               </div>
 
               <div className="st-ct-back">

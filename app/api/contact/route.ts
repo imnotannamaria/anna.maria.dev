@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
   const resend = new Resend(process.env.RESEND_API_KEY)
 
-  // The message is at most 5000 characters; a body past this is not a postcard. The text is
+  // The message is at most MESSAGE_MAX characters; a body past this is not a postcard. The text is
   // read first and parsed after, so a request that lies about (or leaves out) its length is
   // still stopped at the limit.
   let payload: unknown
