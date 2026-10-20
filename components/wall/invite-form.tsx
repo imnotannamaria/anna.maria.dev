@@ -32,6 +32,7 @@ import {
   WALL_LANGS,
   type WallLang,
 } from "@/lib/wall/constants"
+import { siteConfig } from "@/lib/site-config"
 import { COPY } from "@/lib/wall/copy"
 import { submissionSchema, type SubmissionField } from "@/lib/wall/validation"
 import { Flag } from "./flag"
@@ -360,6 +361,29 @@ export function InviteForm({
                   ),
                 }))}
               />
+            </div>
+
+            {/* What happens to the letter, said before anything is written: where it shows, and
+                how to have it taken down. */}
+            <div className={tileClass({ size: "sm" })}>
+              <CardHeader>
+                <CardLabel icon={<InfoIcon />}>{copy.termsTitle}</CardLabel>
+              </CardHeader>
+              <p className="text-body-md m-0 font-sans leading-relaxed text-[var(--fg-secondary)]">
+                <b className="font-medium text-[var(--fg-primary)]">{copy.termsUseLabel}</b>{" "}
+                {copy.termsUse}
+              </p>
+              <p className="text-body-md m-0 font-sans leading-relaxed text-[var(--fg-secondary)]">
+                <b className="font-medium text-[var(--fg-primary)]">{copy.termsRemoveLabel}</b>{" "}
+                {copy.termsRemove}{" "}
+                <a
+                  href={`mailto:${siteConfig.email}`}
+                  data-sound="click"
+                  className="focus-ring rounded-sm break-all text-[var(--fg-brand-text)] underline underline-offset-4"
+                >
+                  {siteConfig.email}
+                </a>
+              </p>
             </div>
           </>
         )}

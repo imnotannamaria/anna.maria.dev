@@ -105,7 +105,11 @@
     "projectsFallback": "projects"
   },
   "footer": {
-    "end": "end of the page",
+    "who": "Software engineer from Pernambuco. This site is a template, fork it.",
+    "about": "Three ways to read it: Front, Back and IA. Abimaela, my cat, lives in the corner and reacts to what you do.",
+    "built": "Built with Next.js, MDX and Postgres, on the entrepta design system. English and Portuguese.",
+    "pages": "Pages",
+    "elsewhere": "Elsewhere",
     "label": "places you can go from here",
     "note": "a game, with a board",
     "places": "Where to go",

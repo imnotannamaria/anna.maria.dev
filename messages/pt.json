@@ -105,7 +105,11 @@
     "projectsFallback": "projetos"
   },
   "footer": {
-    "end": "fim da página",
+    "who": "Engenheira de software de Pernambuco. Este site é um template, faz o seu fork.",
+    "about": "Três jeitos de ler: Front, Back e IA. A Abimaela, minha gata, mora no canto e reage ao que você faz.",
+    "built": "Feito com Next.js, MDX e Postgres, em cima do design system entrepta. Em português e em inglês.",
+    "pages": "Páginas",
+    "elsewhere": "Por aí",
     "label": "lugares que você pode ir a partir daqui",
     "note": "um jogo, com placar",
     "places": "Pra onde ir",
