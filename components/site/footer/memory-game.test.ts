@@ -24,7 +24,7 @@ vi.mock("./board", () => ({
 }))
 vi.mock("./parts", () => ({
   ...Object.fromEntries(
-    ["BarButton", "Chip", "GameBar", "Places", "Prize"].map((name) => [name, () => null]),
+    ["BarButton", "Chip", "GameBar", "Prize"].map((name) => [name, () => null]),
   ),
   formatClock: () => "0:00",
   shuffle: (cards: unknown[]) => cards,
@@ -58,7 +58,7 @@ function find(
     return find(node.props.children, matches)
   }
 }
-const render = () => holder.current!.render(() => MemoryGame({ page: "home" }))
+const render = () => holder.current!.render(() => MemoryGame())
 function win() {
   for (const index of [0, 2, 1, 3])
     find(render(), (el) => el.props["data-index"] === index)!.props.onClick!()

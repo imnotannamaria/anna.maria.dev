@@ -5,15 +5,15 @@ import { MESSAGE_MAX, contactSchema } from "@/lib/contact-schema"
 import { LinkedinLogoIcon, PaperPlaneTiltIcon } from "@phosphor-icons/react"
 import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import { useTranslations } from "next-intl"
-import { useState, type FormEvent } from "react"
+import { useState, type FormEvent, type ReactNode } from "react"
 import { siGithub, siGmail, siX } from "simple-icons"
 import { Button } from "@/app/components/entrepta/button"
 import { Cat, pet } from "@/components/site/abimaela/abimaela"
+import { channelLinks, type ChannelId, type Channels } from "@/components/site/channels"
 import { Dock, type DockItem } from "@/components/site/dock"
 import { Plate } from "@/components/site/plate"
 
 /** The contact form as a postcard, and the channels as a dock. */
-export type Channels = { email: string; github: string; linkedin: string; x: string }
 
 type Phase = "writing" | "sending" | "sent" | "error"
 /** The three things a visitor writes. */
@@ -31,53 +31,35 @@ function Glyph({ path, color }: { path: string; color: string }) {
 
 export function dockChannels(channels: Channels): DockItem[] {
   const stripProtocol = (url: string) => url.replace(/^https?:\/\//, "")
-  return [
-    {
-      name: "Email",
-      what: channels.email,
-      href: `mailto:${channels.email}`,
-      copy: channels.email,
-
-      icon: (
-        <Plate>
-          <Glyph path={siGmail.path} color={`#${siGmail.hex}`} />
-        </Plate>
-      ),
-    },
-    {
-      name: "LinkedIn",
-      what: stripProtocol(channels.linkedin),
-      href: channels.linkedin,
-      copy: channels.linkedin,
-      icon: (
-        <Plate background="#0a66c2">
-          <LinkedinLogoIcon aria-hidden weight="fill" />
-        </Plate>
-      ),
-    },
-    {
-      name: "GitHub",
-      what: stripProtocol(channels.github),
-      href: channels.github,
-      copy: channels.github,
-      icon: (
-        <Plate>
-          <Glyph path={siGithub.path} color={`#${siGithub.hex}`} />
-        </Plate>
-      ),
-    },
-    {
-      name: "X",
-      what: stripProtocol(channels.x),
-      href: channels.x,
-      copy: channels.x,
-      icon: (
-        <Plate tone="dark">
-          <Glyph path={siX.path} color="#ffffff" />
-        </Plate>
-      ),
-    },
-  ]
+  const icons: Record<ChannelId, ReactNode> = {
+    email: (
+      <Plate>
+        <Glyph path={siGmail.path} color={`#${siGmail.hex}`} />
+      </Plate>
+    ),
+    linkedin: (
+      <Plate background="#0a66c2">
+        <LinkedinLogoIcon aria-hidden weight="fill" />
+      </Plate>
+    ),
+    github: (
+      <Plate>
+        <Glyph path={siGithub.path} color={`#${siGithub.hex}`} />
+      </Plate>
+    ),
+    x: (
+      <Plate tone="dark">
+        <Glyph path={siX.path} color="#ffffff" />
+      </Plate>
+    ),
+  }
+  return channelLinks(channels).map(({ id, name, value, href }) => ({
+    name,
+    what: id === "email" ? value : stripProtocol(value),
+    href,
+    copy: value,
+    icon: icons[id],
+  }))
 }
 
 /**

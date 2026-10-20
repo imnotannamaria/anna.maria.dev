@@ -1,51 +1,94 @@
+/* The footer: a band as wide as the page area, on a brand-tinted ground under a brand line, so it
+   reads as the edge of the page and not as one more card of it. Solid lines here: the dashes
+   are the pages' own. */
 .st-footer {
+  margin-top: 72px;
+  border-top: 1px solid var(--border-brand-strong);
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--fg-brand) 14%, transparent),
+      transparent 240px
+    ),
+    color-mix(in srgb, var(--fg-brand) 6%, var(--bg-card));
+}
+.st-ft-inner {
   container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
   max-width: var(--st-width);
   margin-inline: auto;
-  padding: 0 16px 176px;
+  padding: 48px 16px 64px;
 }
 @media (min-width: 768px) {
-  .st-footer {
-    padding-inline: 32px;
+  .st-ft-inner {
+    padding: 48px 32px 28px;
   }
 }
 
-/* where the page stops: a dashed rule, and a strip of tape across it with the words on it */
-.st-ft-end {
+.st-ft-grid {
+  display: grid;
+  gap: 32px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.st-ft-who {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
-  margin: 72px 0 32px;
-  padding-block: 8px;
+  grid-column: 1 / -1;
 }
-.st-ft-rule {
-  flex: 1;
-  border-top: 1px dashed var(--border-strong);
+@media (min-width: 768px) {
+  .st-ft-grid {
+    grid-template-columns: 1.6fr 1fr 1fr;
+  }
+  .st-ft-who {
+    grid-column: auto;
+  }
 }
-/* the site's tape (tape.css), long enough to write on */
-.st-ft-tape {
-  padding: 6px 22px;
-  background: color-mix(in srgb, var(--fg-brand) 26%, transparent);
-  color: var(--fg-primary);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+.st-ft-icon {
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 1px var(--border-brand);
+}
+.st-ft-who > p {
+  max-width: 44ch;
+}
+.st-ft-h {
+  margin: 0 0 12px;
+  color: var(--fg-brand-text);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  white-space: nowrap;
-  rotate: -2deg;
-  /* torn ends, like tape pulled off the roll */
-  clip-path: polygon(
-    0 8%,
-    3% 0,
-    97% 6%,
-    100% 0,
-    98% 30%,
-    100% 55%,
-    97% 78%,
-    100% 100%,
-    3% 94%,
-    0 100%,
-    2% 70%,
-    0 45%,
-    2% 22%
-  );
+}
+.st-ft-col ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.st-ft-col a[aria-current="page"] {
+  color: var(--fg-brand-text);
+}
+
+/* the signature: the license line, centred, and the way to fork */
+.st-ft-license {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 0.5ch;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-brand);
+  color: var(--fg-secondary);
+  text-align: center;
+}
+.st-ft-license del {
+  color: var(--status-error-fg);
+  text-decoration-thickness: 2px;
+}
+.st-ft-license ins {
+  color: var(--status-success-fg);
+  font-weight: 600;
+  text-decoration: none;
 }

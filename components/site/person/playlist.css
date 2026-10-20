@@ -79,7 +79,6 @@
   transition: translate 500ms var(--ease-out);
   animation: st-tilt 3.2s linear infinite paused;
 }
-.st-player:hover .st-player-vinyl,
 .st-player:focus-visible .st-player-vinyl {
   translate: 30px 0;
 }
@@ -87,9 +86,17 @@
   translate: 44px 0;
   animation-play-state: running;
 }
-.st-player[data-playing]:hover .st-player-vinyl,
 .st-player[data-playing]:focus-visible .st-player-vinyl {
   translate: 52px 0;
+}
+/* a tap leaves `:hover` stuck, so the nudge is for a pointer that can hover */
+@media (hover: hover) {
+  .st-player:hover .st-player-vinyl {
+    translate: 30px 0;
+  }
+  .st-player[data-playing]:hover .st-player-vinyl {
+    translate: 52px 0;
+  }
 }
 
 /* the title, before there is one */

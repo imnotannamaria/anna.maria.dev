@@ -23,7 +23,6 @@ import {
   BarButton,
   Chip,
   GameBar,
-  Places,
   Prize,
   formatClock,
   shuffle,
@@ -50,7 +49,7 @@ type Face = PageId | "cat"
 const ClaimForm = dynamic(() => import("./claim-form"))
 const PEEK_MS = 1300
 
-export function MemoryGame({ page }: { page: PageId }) {
+export function MemoryGame() {
   const t = useTranslations("footer.game")
   const places = usePlaces()
   const faces: Face[] = [...places.map((place) => place.id), "cat"]
@@ -188,7 +187,6 @@ export function MemoryGame({ page }: { page: PageId }) {
 
   const done = end !== null
   const lastPlace = places.find((place) => place.id === found.at(-1)) ?? null
-  const lit = new Set(found.filter((face): face is PageId => face !== "cat"))
 
   const official = !result
     ? ""
@@ -351,7 +349,6 @@ export function MemoryGame({ page }: { page: PageId }) {
         </div>
         <Board rows={board.rows} mine={board.mine} />
       </div>
-      <Places places={places} current={page} lit={lit} />
     </div>
   )
 }
