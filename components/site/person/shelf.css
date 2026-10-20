@@ -25,6 +25,10 @@
 }
 .st-spine-button {
   position: relative;
+  /* The disc slides out from behind the cover. Its endless rotation puts it on a layer of its
+     own, and on iOS that layer painted over the cover that comes later in the markup; the
+     order is written down here instead of left to the markup. */
+  isolation: isolate;
   display: block;
   border-radius: 4px;
   cursor: pointer;
@@ -33,21 +37,34 @@
     translate 240ms var(--ease-out),
     rotate 240ms var(--ease-out);
 }
-.st-spine:hover > .st-spine-button,
+/* A finger has no hover: a tap leaves `:hover` stuck on the spine it touched, so the lift, the
+   shove on its neighbours and the disc sliding out all stayed put until the next tap. They
+   answer to a pointer that can really hover, and to the keyboard. */
 .st-spine-button:focus-visible {
   translate: 0 -8px;
   rotate: -3deg;
 }
-.st-spine:hover ~ .st-spine > .st-spine-button,
 .st-spine:has(:focus-visible) ~ .st-spine > .st-spine-button {
   translate: 8px 0;
 }
-.st-spine[data-type="music"]:hover ~ .st-spine > .st-spine-button,
 .st-spine[data-type="music"]:has(:focus-visible) ~ .st-spine > .st-spine-button {
   translate: 24px 0;
 }
+@media (hover: hover) {
+  .st-spine:hover > .st-spine-button {
+    translate: 0 -8px;
+    rotate: -3deg;
+  }
+  .st-spine:hover ~ .st-spine > .st-spine-button {
+    translate: 8px 0;
+  }
+  .st-spine[data-type="music"]:hover ~ .st-spine > .st-spine-button {
+    translate: 24px 0;
+  }
+}
 .st-spine-cover {
   position: relative;
+  z-index: 1;
   display: grid;
   width: 44px;
   aspect-ratio: 2 / 3;
@@ -76,12 +93,15 @@
   translate: -110% 0;
   transition: translate 0s;
 }
-.st-spine:hover .st-spine-cover::after {
-  translate: 110% 0;
-  transition: translate 620ms var(--ease-out);
+@media (hover: hover) {
+  .st-spine:hover .st-spine-cover::after {
+    translate: 110% 0;
+    transition: translate 620ms var(--ease-out);
+  }
 }
 .st-spine-disc {
   position: absolute;
+  z-index: 0;
   inset: 3px;
   border-radius: var(--radius-full);
   background:
@@ -89,10 +109,15 @@
     repeating-radial-gradient(circle, #131316 0 2px, #1e1e24 2px 3px);
   transition: translate 320ms var(--ease-out);
 }
-.st-spine:hover .st-spine-disc,
 .st-spine-button:focus-visible .st-spine-disc {
   translate: 42% 0;
   animation: st-tilt 2.4s linear infinite;
+}
+@media (hover: hover) {
+  .st-spine:hover .st-spine-disc {
+    translate: 42% 0;
+    animation: st-tilt 2.4s linear infinite;
+  }
 }
 @keyframes st-tilt {
   to {

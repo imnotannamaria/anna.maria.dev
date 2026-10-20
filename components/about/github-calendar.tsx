@@ -1,7 +1,7 @@
 "use client"
 
 import { useLocale, useTranslations } from "next-intl"
-import { memo, useCallback, useEffect, useMemo, useState } from "react"
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "motion/react"
 import { Skeleton } from "@/app/components/entrepta/skeleton"
@@ -44,6 +44,9 @@ const TOOLTIP_H = 52
 /** Keep the tooltip below the floating header's top area. */
 const HEADER_CLEARANCE = 40
 
+/** Portuguese writes a weekday in lower case, and here it opens a line. */
+const upperFirst = (text: string) => text.charAt(0).toLocaleUpperCase() + text.slice(1)
+
 const column: Variants = { hidden: {}, show: {} }
 const cell: Variants = {
   hidden: { opacity: 0, scale: 0.4 },
@@ -51,7 +54,7 @@ const cell: Variants = {
 }
 
 /**
- * `x`/`y`/`h`/`align` are the cell's own viewport position, captured on the
+ * `x`/`y`/`h` are the cell's own viewport position, captured on the
  * same pointer move that finds it. The tooltip is portalled to `document.body`
  * and positioned from these rather than from percentages of the grid, because
  * the grid sits inside two independent clipping ancestors — this scroll
@@ -67,7 +70,6 @@ type Hover = {
   x: number
   y: number
   h: number
-  align: "0%" | "-50%" | "-100%"
 } | null
 
 /**
@@ -270,6 +272,7 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
   const data = state.kind === "ok" || state.kind === "stale" ? state.data : null
   const reduce = useReducedMotion() ?? false
   const [hover, setHover] = useState<Hover>(null)
+  const tipBox = useRef<HTMLDivElement>(null)
 
   // `data?.weeks ?? []` would mint a new array every render, which defeats the
   // monthLabels memo below — it would recompute on every hover.
@@ -300,8 +303,7 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
       if (prev && prev.week === week && prev.day === day) return prev
       const rect = el.getBoundingClientRect()
       const x = rect.left + rect.width / 2
-      const align = x < 60 ? "0%" : x > window.innerWidth - 60 ? "-100%" : "-50%"
-      return { week, day, x, y: rect.top, h: rect.height, align }
+      return { week, day, x, y: rect.top, h: rect.height }
     })
   }, [])
 
@@ -317,6 +319,23 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
       window.removeEventListener("scroll", dismiss, true)
       window.removeEventListener("resize", dismiss)
     }
+  }, [hover])
+
+  // The tooltip is centred on its cell, then pushed back inside the viewport by however much it
+  // sticks out. Its width is only known once it is on screen (the date is longer in Portuguese,
+  // and longer still on a Wednesday), so it is measured here, before paint, and handed to the
+  // style as a custom property rather than through state: a state would draw it once in the
+  // wrong place first.
+  useLayoutEffect(() => {
+    const box = tipBox.current
+    if (!box || !hover) return
+    const edge = 8
+    const half = box.offsetWidth / 2
+    const left = Math.min(
+      Math.max(hover.x - half, edge),
+      Math.max(edge, window.innerWidth - edge - box.offsetWidth),
+    )
+    box.style.setProperty("--tip-nudge", `${left - (hover.x - half)}px`)
   }, [hover])
 
   // A label lands on the first column of each month. Written as a loop rather
@@ -445,20 +464,20 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
                       key="contributions-tooltip"
                       aria-hidden
                       // The finish of entrepta's Tooltip, without the component: the overlay
-                      // surface, its radius and padding, and `data-surface="dark"` so it stays
-                      // dark in light mode like the sidebar's. The component itself is one
-                      // Radix root per trigger, which here would be 371 of them; this is one
-                      // box that follows a delegated pointer.
-                      data-surface="dark"
+                      // surface, its radius and padding. No `data-surface="dark"`: like every
+                      // other tooltip of the site it follows the page's mode (site-frame.css).
+                      // The component itself is one Radix root per trigger, which here would be
+                      // 371 of them; this is one box that follows a delegated pointer.
+                      ref={tipBox}
                       className={cn(
                         OVERLAY_SURFACE,
                         "pointer-events-none fixed z-50 rounded-[var(--radius-sm)] px-2.5 py-1.5",
                         "text-center whitespace-nowrap",
                       )}
                       style={{
-                        left: hover.x,
+                        left: `calc(${hover.x}px + var(--tip-nudge, 0px))`,
                         top: hover.y,
-                        translateX: hover.align,
+                        translateX: "-50%",
                         // Flip below the cell when there isn't TOOLTIP_H + an
                         // 8px gap above it before the floating header area.
                         translateY:
@@ -481,7 +500,7 @@ export function GithubCalendar({ state }: { state: CardState<ContributionYear> }
                         className="text-mono-sm block font-mono"
                         style={{ color: "var(--fg-muted)" }}
                       >
-                        {dates.full.format(new Date(`${active.date}T00:00:00Z`))}
+                        {upperFirst(dates.full.format(new Date(`${active.date}T00:00:00Z`)))}
                       </span>
                     </motion.div>
                   )}

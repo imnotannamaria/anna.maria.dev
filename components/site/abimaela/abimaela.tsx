@@ -61,6 +61,30 @@ const GESTURE_MS = {
 // as long as the waking sheet takes to play (abimaela.css)
 const WAKE_MS = 1800
 
+/**
+ * The sheets she plays when something happens. A sheet is a CSS background of an element that
+ * only exists while she plays it, so its image was first asked for at the moment of the click.
+ * The idle sprite is hidden the instant she starts, so on a slow phone she vanished for as long
+ * as the sheet took to arrive and came back mid-gesture. They are fetched and decoded once she is
+ * on the page, and the idle sprite stays until they are.
+ */
+const GESTURE_SHEETS = [jumping, angry, confused, happy, waking, sleepingSheet].map(
+  (image) => image.src,
+)
+
+let sheetsLoaded: Promise<void> | undefined
+function loadSheets() {
+  sheetsLoaded ??= Promise.all(
+    GESTURE_SHEETS.map((src) => {
+      const image = new Image()
+      image.src = src
+      // a sheet that fails to decode must not hold the others back
+      return image.decode().catch(() => undefined)
+    }),
+  ).then(() => undefined)
+  return sheetsLoaded
+}
+
 export function Cat({ height = 60 }: { height?: number }) {
   return (
     <span
@@ -166,6 +190,7 @@ export function Abimaela() {
   // whether she is asleep, for the code below that runs outside of a render
   const asleep = useRef(false)
   const [tap, setTap] = useState(0)
+  const [sheetsReady, setSheetsReady] = useState(false)
   const back = useRef<ReturnType<typeof setTimeout>>(undefined)
   const body = useRef<HTMLButtonElement>(null)
   const turn = useRef<Partial<Record<PetEvent, number>>>({})
@@ -287,6 +312,14 @@ export function Abimaela() {
     }
   }, [t])
 
+  useEffect(() => {
+    let alive = true
+    loadSheets().then(() => alive && setSheetsReady(true))
+    return () => {
+      alive = false
+    }
+  }, [])
+
   // sitting in the corner with nothing else going on
   const resting = action === "idle" && !sleeping
 
@@ -323,7 +356,7 @@ export function Abimaela() {
           <span
             aria-hidden
             className="st-abi-sprite"
-            data-hidden={resting ? undefined : ""}
+            data-hidden={resting || !sheetsReady ? undefined : ""}
             style={{ "--st-abi-sheet": `url(${sheet.src})` } as CSSProperties}
           />
           {sleeping && action === "idle" ? (
