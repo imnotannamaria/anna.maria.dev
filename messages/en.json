@@ -105,9 +105,12 @@
     "projectsFallback": "projects"
   },
   "footer": {
-    "who": "Software engineer from Pernambuco. This site is a template, fork it.",
-    "about": "Three ways to read it: Front, Back and IA. Abimaela, my cat, lives in the corner and reacts to what you do.",
-    "built": "Built with Next.js, MDX and Postgres, on the entrepta design system. English and Portuguese.",
+    "who": "Software engineer from Brazil.",
+    "craft": "I build things end to end: UI → front (web / mobile) → back → AI → deploy, and I have been doing it for about {years} years, in startups and in big company teams.",
+    "open": "This site is open source.",
+    "sides": "Three ways to read it: Front, Back and IA.",
+    "cat": "Abimaela, my cat, lives in the corner and reacts to what you do.",
+    "built": "Built with Next.js, MDX and Postgres, on the entrepta design system.",
     "pages": "Pages",
     "elsewhere": "Elsewhere",
     "label": "places you can go from here",

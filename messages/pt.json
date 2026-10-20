@@ -105,9 +105,12 @@
     "projectsFallback": "projetos"
   },
   "footer": {
-    "who": "Engenheira de software de Pernambuco. Este site é um template, faz o seu fork.",
-    "about": "Três jeitos de ler: Front, Back e IA. A Abimaela, minha gata, mora no canto e reage ao que você faz.",
-    "built": "Feito com Next.js, MDX e Postgres, em cima do design system entrepta. Em português e em inglês.",
+    "who": "Engenheira de software do Brasil.",
+    "craft": "Eu construo as coisas de ponta a ponta: UI → front (web / mobile) → back → IA → deploy, e faço isso há uns {years} anos, em startups e em times grandes de empresa.",
+    "open": "Este site é open source.",
+    "sides": "Há três jeitos de ler: Front, Back e IA.",
+    "cat": "A Abimaela, minha gata, mora no canto e reage ao que você faz.",
+    "built": "Feito com Next.js, MDX e Postgres, em cima do design system entrepta.",
     "pages": "Páginas",
     "elsewhere": "Por aí",
     "label": "lugares que você pode ir a partir daqui",

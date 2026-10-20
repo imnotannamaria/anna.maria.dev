@@ -234,10 +234,10 @@ the cat in the corner. Below 768px the sidebar gives way to entrepta's `MobileNa
 - **The sides stay mounted.** The terminal and the chat load on the first visit to their address
   and are then only hidden, so a session and a conversation survive a trip to another side.
 - **Every page of the Front ends in the footer**, a band as wide as the page area on a brand-tinted ground, with the favicon and who made the site, the pages and the places elsewhere as `ArrowLink` columns, and a game: a memory game whose pairs are
-  the pages, a found pair turning into a link, with a plain row of the pages under it for anyone
-  who would rather not play. The fastest rounds go on a board (`lib/memory`), timed by the server
+  the pages, a found pair turning into a link; the column of pages is the plain way for anyone who
+  would rather not play. The fastest rounds go on a board (`lib/memory`), timed by the server
   and shown once Anna approves the name in `/admin/memory`. Under it all, the signature: the
-  license line, "all rights ~~reserved~~ forkable", with a button to fork the site.
+  license line, "all rights ~~reserved~~ forkable", with a link to fork the site.
 - **The screens nobody plans to see** (loading, 404, error, a removed page) are
   `components/site/frame/screen-state.tsx`: the cat doing something about it.
 - **A click draws a small burst** where it landed (`click-burst.tsx`), and plays a click.

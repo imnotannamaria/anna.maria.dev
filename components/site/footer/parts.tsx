@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { buttonVariants } from "@/app/components/entrepta/button-variants"
 import { DESTINATIONS, type Destination } from "@/components/site/icons"
-import type { PageId } from "@/components/site/pages"
 import { ScreenLink } from "@/components/site/screen-link"
 import { cn } from "@/lib/utils"
 
@@ -22,39 +21,6 @@ export function usePlaces(): Place[] {
     short: pages(`${destination.id}.short`),
     tagline: pages(`${destination.id}.tagline`),
   }))
-}
-
-/**
- * The plain way out, under the game: the seven pages as links. A page the game found is lit, so
- * the game points at the row instead of replacing it.
- */
-export function Places({
-  places,
-  current,
-  lit,
-}: {
-  places: Place[]
-  current: PageId
-  lit?: ReadonlySet<PageId>
-}) {
-  const t = useTranslations("footer")
-  return (
-    <nav aria-label={t("places")} className="st-ft-places">
-      {places.map((place) => (
-        <ScreenLink
-          key={place.id}
-          to={place.id}
-          data-sound="click"
-          className="st-ft-place focus-ring text-mono-xs font-mono"
-          aria-current={place.id === current ? "page" : undefined}
-          data-lit={lit?.has(place.id) || undefined}
-        >
-          <place.Icon aria-hidden size={16} weight={lit?.has(place.id) ? "fill" : "regular"} />
-          <span className="max-w-full truncate">{place.short}</span>
-        </ScreenLink>
-      ))}
-    </nav>
-  )
 }
 
 /** What the game says, and, when it has just found a page, the way there. */

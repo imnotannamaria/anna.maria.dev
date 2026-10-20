@@ -126,6 +126,8 @@
 }
 .st-spine-heart {
   position: absolute;
+  /* above the cover (z-index 1) it hangs over, inside the button's own stacking context */
+  z-index: 2;
   top: -6px;
   right: -5px;
   display: grid;

@@ -65,24 +65,36 @@ const WAKE_MS = 1800
  * The sheets she plays when something happens. A sheet is a CSS background of an element that
  * only exists while she plays it, so its image was first asked for at the moment of the click.
  * The idle sprite is hidden the instant she starts, so on a slow phone she vanished for as long
- * as the sheet took to arrive and came back mid-gesture. They are fetched and decoded once she is
- * on the page, and the idle sprite stays until they are.
+ * as the sheet took to arrive and came back mid-gesture. They are fetched and decoded when the
+ * browser has nothing better to do, the sleeping sheet (the biggest, and wanted only after 45
+ * seconds) last. Until the gestures are ready she only shows the idle sprite: a tap draws no
+ * second cat over it.
  */
-const GESTURE_SHEETS = [jumping, angry, confused, happy, waking, sleepingSheet].map(
-  (image) => image.src,
-)
+const GESTURE_SHEETS = [jumping, angry, confused, happy, waking].map((image) => image.src)
+
+const preload = (src: string) => {
+  const image = new Image()
+  image.src = src
+  // a sheet that fails to decode must not hold the others back
+  return image.decode().catch(() => undefined)
+}
 
 let sheetsLoaded: Promise<void> | undefined
 function loadSheets() {
-  sheetsLoaded ??= Promise.all(
-    GESTURE_SHEETS.map((src) => {
-      const image = new Image()
-      image.src = src
-      // a sheet that fails to decode must not hold the others back
-      return image.decode().catch(() => undefined)
-    }),
-  ).then(() => undefined)
+  sheetsLoaded ??= Promise.all(GESTURE_SHEETS.map(preload)).then(() => {
+    void preload(sleepingSheet.src)
+  })
   return sheetsLoaded
+}
+
+/** Safari has no `requestIdleCallback`; a short timer stands in for it. */
+function whenIdle(run: () => void) {
+  if (typeof requestIdleCallback === "function") {
+    const id = requestIdleCallback(run, { timeout: 3000 })
+    return () => cancelIdleCallback(id)
+  }
+  const id = setTimeout(run, 1500)
+  return () => clearTimeout(id)
 }
 
 export function Cat({ height = 60 }: { height?: number }) {
@@ -314,9 +326,10 @@ export function Abimaela() {
 
   useEffect(() => {
     let alive = true
-    loadSheets().then(() => alive && setSheetsReady(true))
+    const cancel = whenIdle(() => void loadSheets().then(() => alive && setSheetsReady(true)))
     return () => {
       alive = false
+      cancel()
     }
   }, [])
 
@@ -366,7 +379,7 @@ export function Abimaela() {
               style={{ "--st-abi-sheet": `url(${sleepingSheet.src})` } as CSSProperties}
             />
           ) : null}
-          {action === "confused" ? (
+          {sheetsReady && action === "confused" ? (
             <span
               key={tap}
               aria-hidden
@@ -374,7 +387,7 @@ export function Abimaela() {
               style={{ "--st-abi-sheet": `url(${confused.src})` } as CSSProperties}
             />
           ) : null}
-          {action === "happy" ? (
+          {sheetsReady && action === "happy" ? (
             <span
               key={tap}
               aria-hidden
@@ -382,7 +395,7 @@ export function Abimaela() {
               style={{ "--st-abi-sheet": `url(${happy.src})` } as CSSProperties}
             />
           ) : null}
-          {action === "jump" ? (
+          {sheetsReady && action === "jump" ? (
             <span
               key={tap}
               aria-hidden
@@ -390,7 +403,7 @@ export function Abimaela() {
               style={{ "--st-abi-sheet": `url(${jumping.src})` } as CSSProperties}
             />
           ) : null}
-          {action === "wake" ? (
+          {sheetsReady && action === "wake" ? (
             <span
               key={tap}
               aria-hidden
@@ -398,7 +411,7 @@ export function Abimaela() {
               style={{ "--st-abi-sheet": `url(${waking.src})` } as CSSProperties}
             />
           ) : null}
-          {action === "angry" ? (
+          {sheetsReady && action === "angry" ? (
             <span
               key={tap}
               aria-hidden
