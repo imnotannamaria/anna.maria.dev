@@ -233,11 +233,11 @@ the cat in the corner. Below 768px the sidebar gives way to entrepta's `MobileNa
   mute, the other language (a flag), light or dark (the new mode comes down like a curtain).
 - **The sides stay mounted.** The terminal and the chat load on the first visit to their address
   and are then only hidden, so a session and a conversation survive a trip to another side.
-- **Every page of the Front ends in the footer**, which is a game: a memory game whose pairs are
+- **Every page of the Front ends in the footer**, a band as wide as the page area on a brand-tinted ground, with the favicon and who made the site, the pages and the places elsewhere as `ArrowLink` columns, and a game: a memory game whose pairs are
   the pages, a found pair turning into a link, with a plain row of the pages under it for anyone
   who would rather not play. The fastest rounds go on a board (`lib/memory`), timed by the server
   and shown once Anna approves the name in `/admin/memory`. Under it all, the signature: the
-  license line as a diff, "all rights ~~reserved~~ forkable", with the link to fork the site.
+  license line, "all rights ~~reserved~~ forkable", with a button to fork the site.
 - **The screens nobody plans to see** (loading, 404, error, a removed page) are
   `components/site/frame/screen-state.tsx`: the cat doing something about it.
 - **A click draws a small burst** where it landed (`click-burst.tsx`), and plays a click.
@@ -484,6 +484,37 @@ ELEVENLABS_API_KEY=
 ```
 
 Everything except Resend and the base URL is optional. Without a database the activity card shows an error state, and the log, the wall and the shelf say the database did not answer; without WorkOS `/admin` is unreachable; without `GITHUB_TOKEN` the contributions card shows an empty state. The rest of the site still builds and runs either way.
+
+### The database has no safety net: treat it that way
+
+The Postgres on Supabase is the free plan. Supabase's docs describe automatic daily backups only
+for Pro, Team and Enterprise (Pro keeps 7 days, point-in-time recovery is a paid add-on), and tell
+free projects to export their data themselves. So **there is no backup to restore from**, and the
+log, the wall of love letters and the memory board cannot be rebuilt from git. A script with SQL in
+it has already deleted data here once. These rules exist so it does not happen twice:
+
+- **Never run SQL that destroys or rewrites data against the real database.** That is `DROP`,
+  `TRUNCATE`, `DELETE` or `UPDATE` without a `WHERE` that names the rows, `ALTER ... DROP`, and
+  anything that resets or pushes a schema (`drizzle-kit push`, a "reset" or "clean" script). Not
+  for a fix, not for a test, not "just this once". If Anna asks for one, in that message and
+  naming the table, first make the backup below, show her the statement and the number of rows it
+  touches, and wait for a yes.
+- **The real database is whatever `DATABASE_URL` points at in Infisical or Vercel.** A command run
+  with `infisical run --` is a command against production. Before running any script that reads
+  the environment, read it, and say in one line what it writes. A script nobody has read does not
+  run against `infisical run`. Tests and anything destructive run only against the throwaway
+  database (`npm run test:all`, localhost:5433); the integration suites already refuse another
+  host, and a new destructive script copies that check before it does anything.
+- **Files in `docs/sql/` are run by Anna, by hand, in the SQL editor.** Do not run them, and do
+  not write one that deletes without a `DESTRUCTIVE:` comment at the top that says what is lost
+  (see `008-drop-roadmap.sql`). A new script that touches the database is idempotent and never
+  deletes, like `scripts/seed-log.ts`; deleting is the admin's job, one row at a time, through the
+  API.
+- **Back up before any write that is not an insert.** From the project folder:
+  `infisical run -- sh -c 'pg_dump "$DATABASE_URL" -Fc -f ~/backups/annamaria-$(date +%F-%H%M).dump'`,
+  then `pg_restore --list` on the file to check it opens, and its size is not zero. The dump goes
+  outside the repository: it holds the wall's letters and the people's names. Never print the URL.
+- **Say what was not backed up.** The photos on the wall are in Vercel Blob, not in the dump.
 
 **Never print a secret, and never paste one into a chat.** Check that a variable is there, as a
 yes or a no.
