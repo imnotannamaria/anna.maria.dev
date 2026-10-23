@@ -31,7 +31,8 @@ Meu portfólio, escrito à mão numa folha só, fotografado e publicado aqui. (r
 
 ## Visão geral
 
-Uma carta chega fechada, num envelope endereçado. Abrir rasga o selo e desdobra as folhas.
+Uma carta chega fechada: um envelope endereçado, de frente, com selo. Abrir vira o envelope,
+levanta a aba e desdobra as folhas.
 
 Eu escrevo uma carta à mão, tiro uma foto de cada página e faço o upload. Um modelo de visão lê
 a letra e devolve markdown. Eu corrijo comparando com a foto, marco o que quero que seja lido
@@ -50,8 +51,8 @@ um usuário e sem cadastro. O código é MIT, então o jeito de ter o seu é clo
   copiar dela. Uma transcrição atrás de um botão "mostrar texto" faz da versão legível a opcional.
 - **Destaques guardados como posição de caractere quebram na primeira vírgula que você corrige**,
   e uma transcrição de letra à mão é corrigida o tempo todo.
-- **Uma carta que você manda ou é aberta ou não é, e você nunca fica sabendo qual.** Nem se a
-  pessoa parou no primeiro parágrafo.
+- **Uma carta que você manda ou é aberta ou não é, e você nunca fica sabendo qual.** Nem se
+  ela chegou em alguém.
 
 ## Destaques dentro do markdown
 
@@ -86,9 +87,15 @@ markdown, e não pra primeira ocorrência.
 - **Um link errado, um rascunho, uma carta expirada e a carta de outra pessoa recebem o mesmo
   404**, status e corpo.
 - **Estar logada não é estar autorizada.** Uma allowlist decide, e uma vazia nega todo mundo.
-- **Duas marcas, não uma.** Uma visualização quando a carta abre, registrada depois da resposta,
-  e uma segunda quando o fim entra na tela. A mesa mostra aberta, lida até o fim e largada no
-  meio. Uma linha por sessão, prévias de link filtradas, nenhum IP guardado.
+- **Uma resposta no lugar de uma medição.** Uma visualização quando a carta abre, registrada
+  depois da resposta, e uma reação que a pessoa escolhe numa lista fechada de seis, como
+  responder uma mensagem num app de conversa. Uma linha por pessoa por reação, a pessoa sendo um
+  cookie de sessão opaco. Nenhum IP, nada sobre quem é, e as minhas próprias visitas não contam.
+  A mesa mostra aberturas, quem reagiu, as reações, e as reações por origem de `?from=`.
+- **Escritas entre sites em `/api/` são recusadas** antes de uma rota ler qualquer coisa, e a
+  Permissions-Policy nega câmera, microfone, localização e pagamento.
+- **O modo escuro é preto de verdade.** O modo salvo é aplicado por um script inline no `<head>`
+  antes da primeira pintura, então não tem flash branco, e o `theme-color` acompanha.
 
 ## A transcrição
 
@@ -106,7 +113,7 @@ editado, e avisa toda vez que não sabe dizer quais palavras são nomes.
 
 ## Stack
 
-- Next.js 16, TypeScript, Tailwind v4, entrepta no modo claro
+- Next.js 16, TypeScript, Tailwind v4, entrepta v4 no modo claro e no escuro preto de verdade
 - unified, remark-directive e rehype-sanitize, por meio do pacote
 - Postgres na Neon com Drizzle, Vercel Blob privado
 - Um modelo de visão pelo OpenRouter, Clerk pra única porta de entrada
@@ -138,10 +145,11 @@ publicar.
 O que os testes não viram: o import do Google Fonts foi descartado pelo build, e o site ficou em
 Times New Roman até eu abrir o inspetor. As fontes vêm do `next/font` agora.
 
-A primeira versão do maço registrava uma leitura completa pra um leitor que nunca saiu da folha
-um: o fim estava posicionado atrás do envelope, então o observer disparava na chegada. Nada deu
-erro, e a tabela se encheu de linhas plausíveis. Isso foi achado num navegador de verdade,
-contra o banco, não lendo o diff.
+A primeira versão da medição de fim de carta registrava uma leitura completa pra um leitor que
+nunca saiu da folha um: o fim estava posicionado atrás do envelope, então o observer disparava
+na chegada. Nada deu erro, e a tabela se encheu de linhas plausíveis. Isso foi achado num
+navegador de verdade, contra o banco, não lendo o diff. Essa medição não existe mais. As
+reações entraram no lugar.
 
 ## Licença
 
