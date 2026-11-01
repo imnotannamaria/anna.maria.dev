@@ -2,6 +2,8 @@ import { useTranslations } from "next-intl"
 import { AppWindowIcon } from "@phosphor-icons/react/dist/ssr"
 import Image, { type StaticImageData } from "next/image"
 import type { ReactNode } from "react"
+import { ArrowLink } from "@/app/components/entrepta/arrow-link"
+import { siteConfig } from "@/lib/site-config"
 import { Tile } from "@/components/site/tile"
 import { APP_LIST, type AppName } from "./app-list"
 import chatgpt from "@/components/site/professional/apps/chatgpt.png"
@@ -9,6 +11,8 @@ import chrome from "@/components/site/professional/apps/chrome.png"
 import claude from "@/components/site/professional/apps/claude.png"
 import cursor from "@/components/site/professional/apps/cursor.png"
 import notion from "@/components/site/professional/apps/notion.png"
+import granola from "@/components/site/professional/apps/granola.png"
+import raycast from "@/components/site/professional/apps/raycast.png"
 import spotify from "@/components/site/professional/apps/spotify.png"
 import warp from "@/components/site/professional/apps/warp.png"
 import { Dock, type DockItem } from "@/components/site/dock"
@@ -32,6 +36,8 @@ const ICON: Record<AppName, ReactNode> = {
     </Plate>
   ),
   Spotify: <Icon src={spotify} />,
+  Raycast: <Icon src={raycast} />,
+  Granola: <Icon src={granola} />,
   Slack: (
     <Plate>
       <SlackMark />
@@ -60,6 +66,17 @@ export function Apps() {
       size="md"
     >
       <Dock items={apps} label={t("apps")} />
+      <p className="text-mono-sm m-0 mt-4 text-center font-mono text-[var(--fg-secondary)]">
+        {t("macSetupLead")}{" "}
+        <ArrowLink
+          href={siteConfig.macSetup}
+          external
+          data-sound="click"
+          className="text-[var(--fg-brand-text)]"
+        >
+          {t("macSetup")}
+        </ArrowLink>
+      </p>
     </Tile>
   )
 }

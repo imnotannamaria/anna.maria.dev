@@ -462,6 +462,8 @@
     "appsLabel": "apps",
     "inDock": "{count} no dock",
     "apps": "Apps",
+    "macSetupLead": "Tudo isso instala com um comando:",
+    "macSetup": "meu mac-setup",
     "app": {
       "Warp": "terminal",
       "Claude": "IA",
@@ -471,6 +473,8 @@
       "Google Chrome": "navegador",
       "Google Calendar": "agenda",
       "Spotify": "música",
+      "Raycast": "launcher",
+      "Granola": "notas de reunião",
       "Slack": "chat do time",
       "Figma": "design"
     },
