@@ -7,6 +7,8 @@ export const APP_LIST = [
   { name: "Google Chrome", what: "browser" },
   { name: "Google Calendar", what: "calendar" },
   { name: "Spotify", what: "music" },
+  { name: "Raycast", what: "launcher" },
+  { name: "Granola", what: "meeting notes" },
   { name: "Slack", what: "team chat" },
   { name: "Figma", what: "design" },
 ] as const

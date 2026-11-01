@@ -6,6 +6,7 @@ export const siteConfig = {
   name: "Anna Maria",
   email: "anna.maria.dev.br@gmail.com",
   githubUser: "imnotannamaria",
+  macSetup: "https://github.com/imnotannamaria/mac-setup",
   careerStart: CAREER_START_DATE,
   socials: {
     github: "https://github.com/imnotannamaria",
