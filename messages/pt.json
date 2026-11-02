@@ -465,7 +465,9 @@
     "macSetupLead": "Tudo isso instala com um comando:",
     "macSetup": "meu mac-setup",
     "app": {
-      "Warp": "terminal",
+      "Dia": "navegador com IA",
+      "OrbStack": "containers",
+      "Ghostty": "terminal",
       "Claude": "IA",
       "Codex": "IA",
       "Cursor": "editor de código",
@@ -475,8 +477,7 @@
       "Spotify": "música",
       "Raycast": "launcher",
       "Granola": "notas de reunião",
-      "Slack": "chat do time",
-      "Figma": "design"
+      "Slack": "chat do time"
     },
     "contributions": "contribuições",
     "activity": "atividade pública · últimos 12 meses",
