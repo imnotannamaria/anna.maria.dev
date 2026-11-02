@@ -5,6 +5,8 @@ export const APP_LIST = [
   { name: "Cursor", what: "code editor" },
   { name: "Notion", what: "notes and docs" },
   { name: "Google Chrome", what: "browser" },
+  { name: "Dia", what: "ai browser" },
+  { name: "OrbStack", what: "containers" },
   { name: "Google Calendar", what: "calendar" },
   { name: "Spotify", what: "music" },
   { name: "Raycast", what: "launcher" },

@@ -465,6 +465,8 @@
     "macSetupLead": "All of this installs with one command:",
     "macSetup": "my mac-setup",
     "app": {
+      "Dia": "AI browser",
+      "OrbStack": "containers",
       "Ghostty": "terminal",
       "Claude": "AI",
       "Codex": "AI",

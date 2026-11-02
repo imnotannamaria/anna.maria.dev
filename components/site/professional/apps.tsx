@@ -9,10 +9,12 @@ import { APP_LIST, type AppName } from "./app-list"
 import chatgpt from "@/components/site/professional/apps/chatgpt.png"
 import chrome from "@/components/site/professional/apps/chrome.png"
 import claude from "@/components/site/professional/apps/claude.png"
+import dia from "@/components/site/professional/apps/dia.png"
 import ghostty from "@/components/site/professional/apps/ghostty.png"
 import cursor from "@/components/site/professional/apps/cursor.png"
 import notion from "@/components/site/professional/apps/notion.png"
 import granola from "@/components/site/professional/apps/granola.png"
+import orbstack from "@/components/site/professional/apps/orbstack.png"
 import raycast from "@/components/site/professional/apps/raycast.png"
 import spotify from "@/components/site/professional/apps/spotify.png"
 import { Dock, type DockItem } from "@/components/site/dock"
@@ -25,6 +27,8 @@ function Icon({ src }: { src: StaticImageData }) {
 
 const ICON: Record<AppName, ReactNode> = {
   Ghostty: <Icon src={ghostty} />,
+  Dia: <Icon src={dia} />,
+  OrbStack: <Icon src={orbstack} />,
   Claude: <Icon src={claude} />,
   Codex: <Icon src={chatgpt} />,
   Cursor: <Icon src={cursor} />,
