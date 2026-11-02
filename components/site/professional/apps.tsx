@@ -9,22 +9,22 @@ import { APP_LIST, type AppName } from "./app-list"
 import chatgpt from "@/components/site/professional/apps/chatgpt.png"
 import chrome from "@/components/site/professional/apps/chrome.png"
 import claude from "@/components/site/professional/apps/claude.png"
+import ghostty from "@/components/site/professional/apps/ghostty.png"
 import cursor from "@/components/site/professional/apps/cursor.png"
 import notion from "@/components/site/professional/apps/notion.png"
 import granola from "@/components/site/professional/apps/granola.png"
 import raycast from "@/components/site/professional/apps/raycast.png"
 import spotify from "@/components/site/professional/apps/spotify.png"
-import warp from "@/components/site/professional/apps/warp.png"
 import { Dock, type DockItem } from "@/components/site/dock"
 import { Plate } from "@/components/site/plate"
-import { CalendarMark, FigmaMark, SlackMark } from "./marks"
+import { CalendarMark, SlackMark } from "./marks"
 
 function Icon({ src }: { src: StaticImageData }) {
   return <Image src={src} alt="" width={52} height={52} sizes="64px" />
 }
 
 const ICON: Record<AppName, ReactNode> = {
-  Warp: <Icon src={warp} />,
+  Ghostty: <Icon src={ghostty} />,
   Claude: <Icon src={claude} />,
   Codex: <Icon src={chatgpt} />,
   Cursor: <Icon src={cursor} />,
@@ -41,11 +41,6 @@ const ICON: Record<AppName, ReactNode> = {
   Slack: (
     <Plate>
       <SlackMark />
-    </Plate>
-  ),
-  Figma: (
-    <Plate tone="dark">
-      <FigmaMark />
     </Plate>
   ),
 }
