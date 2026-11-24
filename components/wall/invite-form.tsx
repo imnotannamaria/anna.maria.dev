@@ -431,20 +431,22 @@ export function InviteForm({
                 onChange={(event) => set("company", event.target.value)}
               />
             </Field>
-            <Field id="invite-role" label={copy.role} error={errors.role}>
+            <Field
+              id="invite-role"
+              label={<Optional label={copy.role} word={copy.optional} />}
+              error={errors.role}
+            >
               <Input
                 size="lg"
                 autoComplete="organization-title"
-                placeholder={copy.optional}
                 value={values.role}
                 onChange={(event) => set("role", event.target.value)}
               />
             </Field>
             <Field
               id="invite-linkedin"
-              label={copy.linkedin}
+              label={<Optional label={copy.linkedin} word={copy.optional} />}
               error={errors.linkedin}
-              hint={copy.optional}
             >
               <Input
                 size="lg"
@@ -459,7 +461,9 @@ export function InviteForm({
 
             {photoUploads && (
               <div className="flex flex-col gap-1.5">
-                <FieldLabel htmlFor="invite-photo">{copy.photo}</FieldLabel>
+                <FieldLabel htmlFor="invite-photo">
+                  <Optional label={copy.photo} word={copy.optional} />
+                </FieldLabel>
                 <div className="flex items-center gap-3">
                   <Avatar aria-hidden name={values.name || "?"} src={photo?.url} size="lg" />
                   <div className="flex min-w-0 flex-wrap gap-2">
@@ -577,6 +581,20 @@ function Counter({ length }: { length: number }) {
     <span className={`shrink-0 whitespace-nowrap tabular-nums ${tone}`}>
       {length} / {MESSAGE_MAX}
     </span>
+  )
+}
+
+/**
+ * A label that says its field can be left blank. Required fields carry the label's `*`; the
+ * optional ones say so here, the same way on every field, rather than in a placeholder that
+ * disappears on the first key or in a hint under one field and not the next.
+ */
+function Optional({ label, word }: { label: string; word: string }) {
+  return (
+    <>
+      {label}
+      <span className="ml-auto tracking-normal normal-case">{word}</span>
+    </>
   )
 }
 
