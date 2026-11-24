@@ -170,7 +170,7 @@ All three read the same Postgres database.
 
 The last step matters. AuthKit decides who is signed in, not who is allowed in; without the allowlist, anyone who signs up in your WorkOS organisation reaches the admin. `lib/auth/require-admin.ts` is the real guard.
 
-A log entry is written in English, with an optional Portuguese title and note beside it. A letter on the wall comes in through an invite: a link you create in the admin, good for three days and one letter, which you approve before it shows. Photos go to Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set. A name on the memory board works the same way: the server times the round, a time in the ten best gets a form, and the name waits for you in `/admin/memory`, with an email when Resend is set. Without the database the game still plays, with no board.
+A log entry is written in English, with an optional Portuguese title and note beside it. A letter on the wall comes in through an invite: a link you create in the admin, good for thirty days and one letter, which you approve before it shows. Photos go to Vercel Blob when `BLOB_READ_WRITE_TOKEN` is set. A name on the memory board works the same way: the server times the round, a time in the ten best gets a form, and the name waits for you in `/admin/memory`, with an email when Resend is set. Without the database the game still plays, with no board.
 
 ### The chat
 

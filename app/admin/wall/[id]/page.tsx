@@ -73,7 +73,7 @@ export default async function WallEntryPage({ params }: { params: Promise<{ id: 
           ) : (
             <p className="text-mono-md m-0 font-mono" style={{ color: "var(--fg-muted)" }}>
               {status === "expired"
-                ? "The link expired before anything was written. A new link gives another day."
+                ? "The link expired before anything was written. A new link gives another 30 days."
                 : "Nothing written yet. The link only exists in plain text where it was created; lost, it is renewed."}
             </p>
           )}

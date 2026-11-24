@@ -106,7 +106,7 @@ export async function getEntryById(id: string): Promise<WallEntry | null> {
  * What an invite link opens to.
  *
  * - `missing`: no such token, or not a token at all. The page is a 404.
- * - `expired`: still waiting, but past its day.
+ * - `expired`: still waiting, but past its 30 days.
  * - `used`: already written. Whether it was approved is not the visitor's business.
  * - `open`: the form.
  */

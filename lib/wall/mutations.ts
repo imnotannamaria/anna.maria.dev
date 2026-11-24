@@ -50,7 +50,7 @@ export async function createInvite(input: InviteInput) {
 }
 
 /**
- * A fresh link for an invite nobody has used: a new token and another day. The old link stops
+ * A fresh link for an invite nobody has used: a new token and another 30 days. The old link stops
  * working at once, because its hash is gone. Only while the row is still `invited` — a written
  * testimonial has no use for a link.
  */
