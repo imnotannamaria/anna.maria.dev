@@ -334,7 +334,7 @@ metadata, and the data the page needs.
 | `/log`            | Everything she finishes: films, series, books, albums, podcasts, games                                                                 |
 | `/back`           | The terminal                                                                                                                           |
 | `/ai`             | The chat                                                                                                                               |
-| `/invite/[token]` | The form a wall of love invite opens: one letter per link, three days                                                                  |
+| `/invite/[token]` | The form a wall of love invite opens: one letter per link, thirty days                                                                 |
 | `/admin`          | The log and the wall, behind AuthKit and the allowlist                                                                                 |
 
 Things that are true of all of them, each one learned:
@@ -363,7 +363,7 @@ sentences, and a page each would be a hundred thin pages.
 
 ### The wall of love
 
-An invite is a link good for three days and one letter; only its hash is stored. A letter waits
+An invite is a link good for thirty days and one letter; only its hash is stored. A letter waits
 for approval in the admin, then shows on the wall, oldest first like a channel. Reactions are a
 count per emoji on the letter's row, with nobody's identity kept.
 

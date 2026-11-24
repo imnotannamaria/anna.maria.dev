@@ -215,7 +215,7 @@ export function WallInviteForm() {
 
       <Hint icon={<ClockCountdownIcon aria-hidden size={13} />}>
         <span>
-          the link is good for 3 days and one letter. only its hash is kept, so copy it on the next
+          the link is good for 30 days and one letter. only its hash is kept, so copy it on the next
           screen
         </span>
       </Hint>

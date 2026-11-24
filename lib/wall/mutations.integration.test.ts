@@ -90,6 +90,24 @@ describe("an invite, from link to wall", () => {
     expect((await getInviteByToken(token)).state).toBe("used")
   })
 
+  it("gives a new link, and a renewed one, thirty days", async () => {
+    const DAY = 24 * 60 * 60 * 1000
+    const within = (iso: string, from: number) => {
+      const left = new Date(iso).getTime() - from
+      expect(left).toBeGreaterThan(30 * DAY - 60_000)
+      expect(left).toBeLessThanOrEqual(30 * DAY + 60_000)
+    }
+
+    const before = Date.now()
+    const created = await invite()
+    within(created.expiresAt, before)
+    expect((await getEntryById(created.id))?.expired).toBe(false)
+
+    const renewedAt = Date.now()
+    const renewed = await renewInvite(created.id)
+    within(renewed!.expiresAt, renewedAt)
+  })
+
   it("refuses an expired link, and a renewed one works where the old one no longer does", async () => {
     const { id, token } = await invite()
     await expire(id)

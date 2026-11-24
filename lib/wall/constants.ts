@@ -33,8 +33,8 @@ export const MESSAGE_MAX = 3000
 /** Past this the card clamps the text. Roughly six lines at the card's width. */
 export const CLAMP_AT = 320
 
-/** An invite link is good for three days from the moment it is created or renewed. */
-export const INVITE_TTL_MS = 3 * 24 * 60 * 60 * 1000
+/** An invite link is good for thirty days from the moment it is created or renewed. */
+export const INVITE_TTL_MS = 30 * 24 * 60 * 60 * 1000
 
 /**
  * The photo, as the server accepts it. The form shrinks it to 512px before sending, so a

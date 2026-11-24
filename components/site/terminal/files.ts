@@ -13,7 +13,7 @@ const ROUTES: [method: string, path: string, keep: string][] = [
   ["DELETE", "/api/v1/admin/log/:id", "authkit + allowlist"],
   ["POST", "/api/v1/admin/wall", "authkit + allowlist · zod"],
   ["PATCH", "/api/v1/admin/memory/:id", "authkit + allowlist · zod"],
-  ["POST", "/api/v1/invite/:token", "one use · 3 days · zod · photo checked by its bytes"],
+  ["POST", "/api/v1/invite/:token", "one use · 30 days · zod · photo checked by its bytes"],
   ["POST", "/api/v1/wall/:id/react", "rate limit 40/10min · zod · approved letters only"],
   ["POST", "/api/v1/memory/start", "rate limit 30/10min · one row per round"],
   ["POST", "/api/v1/memory/finish", "rate limit 30/10min · the server keeps the time · zod"],
