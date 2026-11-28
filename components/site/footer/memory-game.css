@@ -160,7 +160,13 @@
   color: var(--fg-muted);
   transition:
     color 160ms var(--ease-out),
-    border-color 160ms var(--ease-out);
+    border-color 160ms var(--ease-out),
+    visibility 0s linear 120ms;
+}
+/* backface-visibility alone let the paw show through a found card's tinted face (the tint is
+   translucent), so the back also goes away once the turn passes its edge */
+.st-mg-card[data-up] .st-mg-back {
+  visibility: hidden;
 }
 .st-mg-card:hover .st-mg-back {
   border-color: var(--border-brand-strong);
@@ -178,7 +184,8 @@
 }
 .st-mg-card[data-found] .st-mg-face {
   border-color: var(--border-brand);
-  background: var(--bg-surface-brand);
+  /* the tint over the surface, so the face stays opaque */
+  background: linear-gradient(var(--bg-surface-brand), var(--bg-surface-brand)), var(--bg-surface);
 }
 .st-mg-card[data-found]:hover .st-mg-face {
   border-color: var(--border-brand-strong);
